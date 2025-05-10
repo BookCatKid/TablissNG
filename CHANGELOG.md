@@ -15,6 +15,7 @@ I attempt to follow the [Conventional Commits](https://www.conventionalcommits.o
 ### Fixed
 
 - fix(Quotes): typo, dwyl, backup quotable api. [#4faa4d1](https://github.com/BookCatKid/TablissNG/commit/4faa4d107e9dbd1a1c68e992bc3b2883b63cfc9e)
+- fix: make video content centered by default.
 
 ## [1.4.0] - 4/24/2025 | Feature Update
 
