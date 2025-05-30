@@ -26,13 +26,13 @@ $scrollbar-thumb-hover-dark: #555555
 ::-webkit-scrollbar-thumb
     background: $scrollbar-thumb-light
     border-radius: 5px
-    
+
     .dark &
         background: $scrollbar-thumb-dark
 
 ::-webkit-scrollbar-thumb:hover
     background: $scrollbar-thumb-hover-light
-    
+
     .dark &
         background: $scrollbar-thumb-hover-dark
 
@@ -44,7 +44,7 @@ $scrollbar-thumb-hover-dark: #555555
 *
     scrollbar-width: thin
     scrollbar-color: $scrollbar-thumb-light $scrollbar-track-light
-    
+
     .dark &
         scrollbar-color: $scrollbar-thumb-dark $scrollbar-track-dark
 
@@ -100,7 +100,7 @@ $scrollbar-thumb-hover-dark: #555555
     label + .info
         font-size: 0.9em
         margin-top: -0.75rem
-        
+
         // Add dark mode styles for info text
         .dark &
             color: $dark-secondary-text
@@ -111,6 +111,7 @@ $scrollbar-thumb-hover-dark: #555555
     input[type=text],
     input[type=time],
     input[type=date],
+    input[type=datetime-local],
     input[type=url],
     textarea,
     select
@@ -191,7 +192,7 @@ $scrollbar-thumb-hover-dark: #555555
         transition: background 0.25s ease-out
         text-align: center
         font-weight: 500
-        
+
         &:disabled
             background-color: #bdc3c7
             cursor: default

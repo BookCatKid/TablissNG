@@ -250,14 +250,38 @@ const System: React.FC = () => {
           margin: 0,
         }}
       >
-        <span>Theme</span>
-        <select 
+        <span>
+          <FormattedMessage
+            id="settings.theme"
+            defaultMessage="Theme"
+            description="Theme selection label"
+          />
+        </span>
+        <select
           value={themePreference}
           onChange={(e) => handleThemeChange(e.target.value as 'light' | 'dark' | 'system')}
         >
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-          <option value="system">System</option>
+          <option value="light">
+            <FormattedMessage
+              id="settings.theme.light"
+              defaultMessage="Light"
+              description="Light theme option"
+            />
+          </option>
+          <option value="dark">
+            <FormattedMessage
+              id="settings.theme.dark"
+              defaultMessage="Dark"
+              description="Dark theme option"
+            />
+          </option>
+          <option value="system">
+            <FormattedMessage
+              id="settings.theme.system"
+              defaultMessage="System"
+              description="System theme option"
+            />
+          </option>
         </select>
       </label>
 
@@ -270,7 +294,11 @@ const System: React.FC = () => {
           width: "100%",
         }}
       >
-        Settings Icon Position
+        <FormattedMessage
+          id="settings.iconPosition"
+          defaultMessage="Settings Icon Position"
+          description="Settings icon position label"
+        />
         <div className="PositionInput">
           <div
             style={{
@@ -291,7 +319,7 @@ const System: React.FC = () => {
           </div>
         </div>
       </label>
-        
+
       <label
         style={{
           alignItems: "center",
@@ -301,7 +329,13 @@ const System: React.FC = () => {
           width: "100%",
         }}
       >
-        <span>Allow Highlighting</span>
+        <span>
+          <FormattedMessage
+            id="settings.highlighting"
+            defaultMessage="Allow Highlighting"
+            description="Highlighting toggle label"
+          />
+        </span>
         <input
           type="checkbox"
           checked={highlightingEnabled}
@@ -317,7 +351,13 @@ const System: React.FC = () => {
           width: "100%",
         }}
       >
-        <span>Hide Settings Icon</span>
+        <span>
+          <FormattedMessage
+            id="settings.hideIcon"
+            defaultMessage="Hide Settings Icon"
+            description="Hide settings icon toggle label"
+          />
+        </span>
         <input
           type="checkbox"
           checked={hideSettingsIcon}

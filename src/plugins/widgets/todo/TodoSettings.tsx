@@ -44,7 +44,11 @@ const TodoSettings: FC<Props> = ({ data = defaultData, setData }) => (
         }
         checked={data.dailyRoutine}
       />
-      Daily routine
+      <FormattedMessage
+          id="plugins.tasks.dailyRoutine"
+          defaultMessage="Daily routine"
+          description="Daily routine title"
+        />
     </label>
   </div>
 );

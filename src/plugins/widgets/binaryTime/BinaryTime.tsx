@@ -23,7 +23,7 @@ interface BinaryDigitGroupProps {
 }
 
 const Pip: FC<PipProps> = ({ isOn, onColor, offColor }) => (
-  <div 
+  <div
     className={`pip ${isOn ? 'pip--on' : ''}`}
     style={{
       backgroundColor: isOn ? onColor : offColor
@@ -51,7 +51,7 @@ function numberToBinary(base10Number: number): number[] {
   const base2Values = [8, 4, 2, 1];
   const output = [0, 0, 0, 0];
   let remainder = base10Number;
-  
+
   base2Values.forEach((val, idx) => {
     const left = remainder - val;
     if (left >= 0) {
@@ -59,7 +59,7 @@ function numberToBinary(base10Number: number): number[] {
       remainder = left;
     }
   });
-  
+
   return output;
 }
 
@@ -73,15 +73,16 @@ function numberAsBinaryArrayPair(number: number): number[][] {
     pair[0] = numberToBinary(parseInt(numberAsArray[0], 10));
     pair[1] = numberToBinary(parseInt(numberAsArray[1], 10));
   }
-  
+
   return pair;
 }
 
 const BinaryTime: FC<Props> = ({ data = defaultData }) => {
-  const { timeZone, name, showHours, showMinutes, showSeconds, onColor, offColor } = data;
+  const { name, showHours, showMinutes, showSeconds, onColor, offColor, timeZone } = data;
   const [digits, setDigits] = useState<number[][][]>([[], [], []]);
-  
+
   let time = useTime(timeZone ? "absolute" : "zoned");
+
   if (timeZone) {
     time = toZonedTime(time, timeZone);
   }
@@ -97,7 +98,7 @@ const BinaryTime: FC<Props> = ({ data = defaultData }) => {
         ...(showMinutes ? [numberAsBinaryArrayPair(minutes)] : []),
         ...(showSeconds ? [numberAsBinaryArrayPair(seconds)] : [])
       ];
-      
+
       setDigits(newDigits);
     };
 
@@ -117,4 +118,3 @@ const BinaryTime: FC<Props> = ({ data = defaultData }) => {
 };
 
 export default BinaryTime;
-

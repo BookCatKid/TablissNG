@@ -29,11 +29,17 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
           checked={data.markdownEnabled}
           onChange={(e) => setData({ ...data, markdownEnabled: e.target.checked })}
         />{" "}
-        Enable Markdown formatting
+        <FormattedMessage
+          id="plugins.notes.enableMarkdown"
+          defaultMessage="Enable Markdown formatting"
+        />
       </label>
 
       <div>
-        <label>Text Alignment</label>
+        <label><FormattedMessage
+          id="plugins.notes.textAlignment"
+          defaultMessage="Text Alignment"
+        /></label>
         <div className="alignment">
           {alignments.map((alignment) => (
             <IconButton

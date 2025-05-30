@@ -6,7 +6,7 @@ import { migrate } from "../db/migrate";
 import { cacheStorage, dbStorage } from "../db/state";
 import { Stream } from "../lib";
 import { useValue } from "../lib/db/react";
-import { Dashboard } from "./dashboard";
+import Dashboard from "./dashboard";
 import { Settings } from "./settings";
 import Errors from "./shared/Errors";
 import StoreError from "./shared/StoreError";

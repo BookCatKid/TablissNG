@@ -24,6 +24,7 @@ import todo from "./todo";
 import topSites from "./topSites";
 import weather from "./weather";
 import workHours from "./workHours";
+import timeTracker from "./timeTracker";
 
 export const widgetConfigs = [
   // nba,
@@ -48,6 +49,7 @@ export const widgetConfigs = [
   todo,
   weather,
   workHours,
+  timeTracker,
 ];
 
 if (BUILD_TARGET === "web") {

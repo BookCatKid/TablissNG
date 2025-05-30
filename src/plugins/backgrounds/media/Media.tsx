@@ -1,5 +1,7 @@
 import React from "react";
 import { useObjectUrl } from "../../../hooks";
+import { db } from "../../../db/state";
+import { useValue } from "../../../lib/db/react";
 import Backdrop from "../../../views/shared/Backdrop";
 import "./Media.sass";
 import { defaultCache, Props } from "./types";
@@ -11,6 +13,8 @@ const Media: React.FC<Props> = ({ cache = defaultCache }) => {
   );
   const item = cache[index];
   const url = useObjectUrl(item);
+  const background = useValue(db, "background");
+  const { scale } = background.display;
 
   if (!item || !url) return null;
 
@@ -21,10 +25,19 @@ const Media: React.FC<Props> = ({ cache = defaultCache }) => {
       className="Image fullscreen"
       url={isVideo ? undefined : url}
     >
-      {isVideo && <video autoPlay loop className="video" src={url} />}
+      {isVideo && (
+        <video
+          autoPlay
+          loop
+          className="video"
+          src={url}
+          style={{
+            objectFit: scale ? "cover" : "contain"
+          }}
+        />
+      )}
     </Backdrop>
   );
 };
 
 export default Media;
-

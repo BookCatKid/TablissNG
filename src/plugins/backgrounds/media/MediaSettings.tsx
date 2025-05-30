@@ -1,10 +1,20 @@
 import React, { useState } from "react";
+import { FormattedMessage, useIntl, defineMessages } from "react-intl";
 import { useObjectUrls } from "../../../hooks";
 import { IconButton, RemoveIcon } from "../../../views/shared";
 import "./MediaSettings.sass";
 import { defaultCache, Props } from "./types";
 
+const messages = defineMessages({
+  removeMedia: {
+    id: "backgrounds.media.removeMedia",
+    defaultMessage: "Remove media",
+    description: "Title for remove media button"
+  }
+});
+
 const ImageSettings: React.FC<Props> = ({ cache = defaultCache, setCache }) => {
+  const intl = useIntl();
   const urls = useObjectUrls(cache);
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -33,7 +43,11 @@ const ImageSettings: React.FC<Props> = ({ cache = defaultCache, setCache }) => {
       </label>
 
       <p className="info media-count">
-        {cache.length} media uploaded.{" "}
+        <FormattedMessage
+          id="backgrounds.media.uploadCount"
+          defaultMessage="{count} media uploaded."
+          values={{ count: cache.length }}
+        />{" "}
         <a className="link" onClick={() => setIsExpanded(!isExpanded)}>
           {isExpanded ? "Collapse" : "Expand"}
         </a>
@@ -58,7 +72,7 @@ const ImageSettings: React.FC<Props> = ({ cache = defaultCache, setCache }) => {
               )}
               <IconButton
                 onClick={() => removeMedia(index)}
-                title="Remove media"
+                title={intl.formatMessage(messages.removeMedia)}
               >
                 <RemoveIcon />
               </IconButton>
@@ -68,13 +82,22 @@ const ImageSettings: React.FC<Props> = ({ cache = defaultCache, setCache }) => {
       </div>
 
       {largeMedia && (
-        <p className="info" style={{ marginTop: "5px" }}>Large media may affect performance.</p>
+        <p className="info" style={{ marginTop: "5px" }}>
+          <FormattedMessage
+            id="backgrounds.media.performanceWarning"
+            defaultMessage="Large media may affect performance."
+          />
+        </p>
       )}
 
-      <p className="info">Media does not sync between devices.</p>
+      <p className="info">
+        <FormattedMessage
+          id="backgrounds.media.syncWarning"
+          defaultMessage="Media does not sync between devices."
+        />
+      </p>
     </div>
   );
 };
 
 export default ImageSettings;
-

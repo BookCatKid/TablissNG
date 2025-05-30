@@ -37,8 +37,12 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         type="checkbox"
         checked={data.hideIP}
         onChange={() => setData({ ...data, hideIP: !data.hideIP })}
+      />{" "}
+      <FormattedMessage
+        id="plugins.ipInfo.hideIP"
+        defaultMessage="Hide IP"
+        description="Option to hide IP address"
       />
-      Hide IP
     </label>
 
     <label>
@@ -46,8 +50,12 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         type="checkbox"
         checked={data.maskIP}
         onChange={() => setData({ ...data, maskIP: !data.maskIP })}
+      />{" "}
+      <FormattedMessage
+        id="plugins.ipInfo.maskIP"
+        defaultMessage="Mask IP"
+        description="Option to mask IP address"
       />
-      Mask IP
     </label>
 
     <label>
@@ -55,8 +63,12 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         type="checkbox"
         checked={data.clickToRefresh}
         onChange={() => setData({ ...data, clickToRefresh: !data.clickToRefresh })}
+      />{" "}
+      <FormattedMessage
+        id="plugins.ipInfo.clickToRefresh"
+        defaultMessage="Enable Click to Refresh"
+        description="Option to enable click to refresh functionality"
       />
-      Enable Click to Refresh
     </label>
   </div>
 );
