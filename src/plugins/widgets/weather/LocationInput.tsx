@@ -1,10 +1,48 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { useToggle } from "../../../hooks";
 import { Icon } from "@iconify/react";
 import { geocodeLocation, requestLocation } from "./api";
 import "./LocationInput.sass";
 import { Coordinates } from "./types";
+
+const messages = defineMessages({
+  cityOrLocation: {
+    id: "plugins.weather.cityOrLocation",
+    defaultMessage: "City or location",
+    description: "City or location placeholder"
+  },
+  latitude: {
+    id: "plugins.weather.latitude",
+    defaultMessage: "Latitude",
+    description: "Latitude title and placeholder"
+  },
+  longitude: {
+    id: "plugins.weather.longitude",
+    defaultMessage: "Longitude",
+    description: "Longitude title and placeholder"
+  },
+  enterCoordinates: {
+    id: "plugins.weather.enterCoordinates",
+    defaultMessage: "Enter coordinates",
+    description: "Link text to switch to coordinate input"
+  },
+  searchForCity: {
+    id: "plugins.weather.searchForCity",
+    defaultMessage: "Search for city",
+    description: "Link text to switch to city search"
+  },
+  unableToFindLocation: {
+    id: "plugins.weather.unableToFindLocation",
+    defaultMessage: "Unable to find location. Please try again.",
+    description: "Message displayed when location cannot be found"
+  },
+  cannotDetermineLocation: {
+    id: "plugins.weather.cannotDetermineLocation",
+    defaultMessage: "Cannot determine your location: {err}",
+    description: "Message displayed when location cannot be determined"
+  }
+})
 
 type Props = {
   latitude?: number;
@@ -14,30 +52,27 @@ type Props = {
 
 const GeocodeInput: React.FC<Props> = ({ onChange }) => {
   const [query, setQuery] = React.useState("");
+  const intl = useIntl();
 
   const handleGeocode = (event: React.FormEvent) => {
     event.preventDefault();
     geocodeLocation(query)
       .then((coords) => onChange({ ...coords, name: query }))
       .catch(() => {
-        alert("Unable to find location. Please try again.");
+        alert(intl.formatMessage(messages.unableToFindLocation));
       });
   };
 
   return (
     <form onSubmit={handleGeocode}>
       <div className="grid" style={{ gridTemplateColumns: "1fr auto" }}>
-        <label htmlFor="LocationInput__query"><FormattedMessage
-          id="plugins.weather.searchForCity"
-          defaultMessage="Search for city"
-          description="Search for city title"
-        /></label>
+        <label htmlFor="LocationInput__query"><FormattedMessage {...messages.searchForCity}/></label>
 
         <div />
 
         <input
           id="LocationInput__query"
-          placeholder="City or location"
+          placeholder={intl.formatMessage(messages.cityOrLocation)}
           type="text"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
@@ -58,10 +93,12 @@ const CoordinateInput: React.FC<Props> = ({
   longitude,
   onChange,
 }) => {
+  const intl = useIntl();
+
   const handleLocate = () => {
     requestLocation()
       .then(onChange)
-      .catch((err) => alert(`Cannot determine your location: ${err.message}`));
+      .catch((err) => alert(intl.formatMessage(messages.cannotDetermineLocation, { err: err.message })));
   };
 
   return (
@@ -74,22 +111,15 @@ const CoordinateInput: React.FC<Props> = ({
             : "1fr 1fr",
         }}
       >
-        <label htmlFor="LocationInput__latitude"><FormattedMessage
-          id="plugins.weather.latitude"
-          defaultMessage="Latitude"
-          description="Latitude title"
-        /></label>
+        <label htmlFor="LocationInput__latitude"><FormattedMessage {...messages.latitude} /></label>
 
-        <label htmlFor="LocationInput__longitude"><FormattedMessage
-          id="plugins.weather.longitude"
-          defaultMessage="Longitude"
-          description="Longitude title"
-        /></label>
+        <label htmlFor="LocationInput__longitude"><FormattedMessage {...messages.longitude} /></label>
 
         {geolocationAvailable && <div />}
 
         <input
           id="LocationInput__latitude"
+          placeholder={intl.formatMessage(messages.latitude)}
           type="text"
           value={latitude}
           onChange={(event) =>
@@ -99,6 +129,7 @@ const CoordinateInput: React.FC<Props> = ({
 
         <input
           id="LocationInput__longitude"
+          placeholder={intl.formatMessage(messages.longitude)}
           type="text"
           value={longitude}
           onChange={(event) =>
@@ -137,7 +168,7 @@ const LocationInput: React.FC<Props> = ({ onChange, ...props }) => {
       )}
 
       <a onClick={toggleLookUp}>
-        {lookUp ? "Enter coordinates" : "Search for city"}
+        {lookUp ? <FormattedMessage {...messages.enterCoordinates} /> : <FormattedMessage {...messages.searchForCity} />}
       </a>
     </div>
   );

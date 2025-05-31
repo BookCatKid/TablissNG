@@ -1,9 +1,9 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
 import { MINUTES, HOURS } from "../../../utils";
-
 import categories from "./categories";
 import { Props, defaultData, JokeAPICategory } from "./types";
+import { pluginMessages, timingMessages } from "../../../locales/messages";
 
 function updateSelectedCategories(
   existingCategories: Set<JokeAPICategory>,
@@ -35,11 +35,13 @@ function updateSelectedCategories(
 const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
   return (
     <div className="JokeSettings">
-      <h5><FormattedMessage
+      <h5>
+        <FormattedMessage
           id="plugins.joke.dailyJoke"
           defaultMessage="Daily Joke"
           description="Daily Joke title"
-        /></h5>
+        />
+      </h5>
 
       <label>
         <FormattedMessage
@@ -53,31 +55,31 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
             setData({ ...data, timeout: Number(event.target.value) })
           }
         >
-          <option value={5 * MINUTES}><FormattedMessage
-          id="plugins.joke.every5min"
-          defaultMessage="Every 5 minutes"
-          description="Every 5 minutes title"
-        /></option>
-          <option value={15 * MINUTES}><FormattedMessage
-          id="plugins.joke.every15min"
-          defaultMessage="Every 15 minutes"
-          description="Every 15 minutes title"
-        /></option>
-          <option value={HOURS}><FormattedMessage
-          id="plugins.joke.everyHour"
-          defaultMessage="Every hour"
-          description="Every hour title"
-        /></option>
-          <option value={24 * HOURS}><FormattedMessage
-          id="plugins.joke.everyDay"
-          defaultMessage="Every day"
-          description="Every day title"
-        /></option>
-          <option value={7 * 24 * HOURS}><FormattedMessage
-          id="plugins.joke.everyWeek"
-          defaultMessage="Every week"
-          description="Every week title"
-        /></option>
+          <option value={5 * MINUTES}>
+            <FormattedMessage
+              {...timingMessages.every5min}
+            />
+          </option>
+          <option value={15 * MINUTES}>
+            <FormattedMessage
+              {...timingMessages.every15min}
+            />
+          </option>
+          <option value={HOURS}>
+            <FormattedMessage
+              {...timingMessages.everyHour}
+            />
+          </option>
+          <option value={24 * HOURS}>
+            <FormattedMessage
+              {...timingMessages.everyDay}
+            />
+          </option>
+          <option value={7 * 24 * HOURS}>
+            <FormattedMessage
+              {...timingMessages.everyWeek}
+            />
+          </option>
         </select>
       </label>
 
@@ -103,7 +105,10 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
                   setData({ ...data, categories });
                 }}
               />{" "}
-              {category.name}
+              <FormattedMessage
+                id={category.name}
+                defaultMessage={category.key.charAt(0).toUpperCase() + category.key.slice(1)}
+              />
             </label>
           );
         })}
@@ -124,10 +129,8 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <p>
-      <FormattedMessage
-          id="plugins.poweredBy"
-          defaultMessage="Powered by"
-          description="Powered by title"
+        <FormattedMessage
+          {...pluginMessages.poweredBy}
         />{" "}
         <a
           href="https://jokeapi.dev/"

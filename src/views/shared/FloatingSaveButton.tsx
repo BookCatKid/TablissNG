@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
+import { FormattedMessage } from 'react-intl';
 import { Icon } from '@iconify/react';
 import './FloatingSaveButton.css';
+import { pluginMessages } from '../../locales/messages';
 
 interface Props {
   onClick: () => void;
@@ -15,10 +17,10 @@ const FloatingSaveButton: React.FC<Props> = ({ onClick }) => {
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!buttonRef.current) return;
-    
+
     e.preventDefault();
     const rect = buttonRef.current.getBoundingClientRect();
-    
+
     setIsDragging(true);
     setWasDragging(false);
     setDragStart({
@@ -67,7 +69,7 @@ const FloatingSaveButton: React.FC<Props> = ({ onClick }) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     }
-    
+
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -75,7 +77,7 @@ const FloatingSaveButton: React.FC<Props> = ({ onClick }) => {
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <button 
+    <button
       ref={buttonRef}
       className={`FloatingSaveButton ${isDragging ? 'dragging' : ''}`}
       onClick={handleClick}
@@ -86,14 +88,11 @@ const FloatingSaveButton: React.FC<Props> = ({ onClick }) => {
         top: `${position.y}px`,
         cursor: isDragging ? 'grabbing' : 'grab'
       }}
-      title="Save Position"
     >
       <Icon icon="feather:check" />
-      Save Position
+      <FormattedMessage {...pluginMessages.freeMoveSave} />
     </button>
   );
 };
 
 export default FloatingSaveButton;
-
-

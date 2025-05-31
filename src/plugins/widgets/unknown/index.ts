@@ -3,7 +3,7 @@ import { defineMessages } from "react-intl";
 import Unknown from "./Unknown";
 import UnknownSettings from "./UnknownSettings";
 
-const messages = defineMessages({
+export const messages = defineMessages({
   name: {
     id: "plugins.unknown.name",
     defaultMessage: "Unknown Widget",

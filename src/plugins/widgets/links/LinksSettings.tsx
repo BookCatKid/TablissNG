@@ -48,17 +48,45 @@ const LinksSettings: FC<Props> = ({ data = defaultData, setData, cache = default
       </label>
 
       <label>
-        Sort links by
+        <FormattedMessage
+          id="plugins.links.sortBy"
+          defaultMessage="Sort links by"
+          description="Sort links by title"
+        />
         <select
           value={data.sortBy}
           onChange={(event) =>
             setData({ ...data, sortBy: event.target.value as Data["sortBy"] })
           }
         >
-          <option value="none">Manual order</option>
-          <option value="name">Name</option>
-          <option value="icon">Icon type</option>
-          <option value="lastUsed">Most recently used</option>
+          <option value="none">
+            <FormattedMessage
+              id="plugins.links.sortBy.manual"
+              defaultMessage="Manual order"
+              description="Manual sorting option"
+            />
+          </option>
+          <option value="name">
+            <FormattedMessage
+              id="plugins.links.sortBy.name"
+              defaultMessage="Name"
+              description="Sort by name option"
+            />
+          </option>
+          <option value="icon">
+            <FormattedMessage
+              id="plugins.links.sortBy.icon"
+              defaultMessage="Icon type"
+              description="Sort by icon type option"
+            />
+          </option>
+          <option value="lastUsed">
+            <FormattedMessage
+              id="plugins.links.sortBy.lastUsed"
+              defaultMessage="Most recently used"
+              description="Sort by most recently used option"
+            />
+          </option>
         </select>
       </label>
 
@@ -99,7 +127,11 @@ const LinksSettings: FC<Props> = ({ data = defaultData, setData, cache = default
             setData({ ...data, linksNumbered: !data.linksNumbered })
           }
         />
-        Links are numbered
+        <FormattedMessage
+          id="plugins.links.areNumbered"
+          defaultMessage="Links are numbered"
+          description="Links are numbered title"
+        />
       </label>
       <hr />
 

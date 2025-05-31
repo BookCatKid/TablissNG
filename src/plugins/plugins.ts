@@ -4,22 +4,9 @@ export { backgroundConfigs } from "./backgrounds";
 export { widgetConfigs } from "./widgets";
 import Unknown from "./widgets/unknown/Unknown";
 import UnknownSettings from "./widgets/unknown/UnknownSettings";
-import { defineMessages } from "react-intl";
+import { messages as unknownMessages } from "./widgets/unknown";
 
 const configs = [...backgroundConfigs, ...widgetConfigs];
-
-const unknownMessages = defineMessages({
-  name: {
-    id: "plugins.unknown.name",
-    defaultMessage: "Unknown Widget",
-    description: "Name of the fallback Unknown Widget",
-  },
-  description: {
-    id: "plugins.unknown.description",
-    defaultMessage: "Something went wrong",
-    description: "Description of the fallback Unknown Widget",
-  },
-});
 
 export function getConfig(key: string) {
   const config = configs.find((config) => config.key === key);

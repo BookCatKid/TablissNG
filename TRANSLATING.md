@@ -1,7 +1,6 @@
 # Adding Translations
 
 This document gives you a step by step guide for how to add your own translations to Tabliss!
-Translations are currently only available for the main dashboard (not the settings menu).
 
 1. Fork and checkout the repository
 2. Run `npm install` to download the dependencies
@@ -14,3 +13,9 @@ Translations are currently only available for the main dashboard (not the settin
 9. Submit a Pull Request back to the Tabliss repository!
 
 You can test your changes at anytime by running a local development build of Tabliss with `npm run dev`.
+
+### About Whitelist Files
+
+In the `src/locales/lang` directory, you'll find files named like `whitelist_fr.json`, `whitelist_en-CA.json`, etc. These whitelist files tell the translation system which strings should be kept in English and don't need translation for each language.
+
+For example, if `widgets` appears in `whitelist_fr.json`, the system won't prompt you to translate "widgets" into French - it will keep the English word. This is useful if the work does not change in your language or its a word that should remain in English across all languages.

@@ -1,11 +1,25 @@
 import React, { useMemo } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { setBackground } from "../../db/action";
 import { BackgroundDisplay, db } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import { backgroundConfigs, getConfig } from "../../plugins";
+import { sectionMessages } from "../../locales/messages";
 import Plugin from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
+
+const messages = defineMessages({
+  lighten: {
+    id: "backgrounds.display.lighten",
+    defaultMessage: "Lighten",
+    description: "Label for maximum luminosity"
+  },
+  darken: {
+    id: "backgrounds.display.darken",
+    defaultMessage: "Darken",
+    description: "Label for minimum luminosity"
+  }
+});
 
 const Background: React.FC = () => {
   const [data, setData] = useKey(db, "background");
@@ -23,6 +37,46 @@ const Background: React.FC = () => {
   const setBackgroundDisplay = (display: BackgroundDisplay): void => {
     setData({ ...data, display: { ...data.display, ...display } });
   };
+
+  const sanitizeFilename = (filename: string): string => {
+    // Remove illegal characters and trim
+    return filename
+      .replace(/[/\\?%*:|"<>]/g, '-') // Replace illegal chars with dash
+      .replace(/\s+/g, '_')           // Replace spaces with underscore
+      .replace(/-+/g, '-')            // Replace multiple dashes with single dash
+      .trim();
+  };
+
+  // const handleDownloadWallpaper = async (): Promise<void> => {
+  //   const img = document.querySelector('.picture.fullscreen, .image.fullscreen') as HTMLElement;
+
+  //   if (!img) {
+  //     console.error('No image element found');
+  //     return;
+  //   }
+
+  //   try {
+  //     // Extract URL from background-image CSS property
+  //     const bgImage = img.style.backgroundImage;
+  //     const url = bgImage.replace(/^url\(['"](.+)['"]\)$/, '$1');
+
+  //     // Get the filename from the URL and sanitize it
+  //     const urlParts = new URL(url).pathname.split('/');
+  //     const rawFilename = urlParts[urlParts.length - 1];
+  //     const filename = sanitizeFilename(rawFilename);
+
+  //     console.log('Downloading wallpaper:', url, filename);
+
+  //     // Use browser.downloads API to download the file
+  //     await browser.downloads.download({
+  //       url: url,
+  //       filename: filename,
+  //       saveAs: true // Shows the "Save As" dialog
+  //     });
+  //   } catch (error) {
+  //     console.error('Failed to download wallpaper:', error);
+  //   }
+  // };
 
   return (
     <div>
@@ -58,13 +112,27 @@ const Background: React.FC = () => {
             </div>
           )}
 
+          {/* <button
+            onClick={handleDownloadWallpaper}
+            className="button button--primary"
+            style={{
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            <Icon icon="feather:download" />
+            <FormattedMessage
+              id="backgrounds.download"
+              defaultMessage="Download Wallpaper"
+              description="Download wallpaper button text"
+            />
+          </button> */}
+
           {plugin.supportsBackdrop && (
             <ToggleSection
-              name={intl.formatMessage({
-                id: "backgrounds.display.settings",
-                defaultMessage: "Display Settings",
-                description: "Title for background display settings section"
-              })}
+              name={intl.formatMessage(sectionMessages.displaySettings)}
             >
               <>
                 <label>
@@ -114,20 +182,12 @@ const Background: React.FC = () => {
                   <datalist id="luminosity-markers">
                     <option
                       value="-1"
-                      label={intl.formatMessage({
-                        id: "backgrounds.display.darken",
-                        defaultMessage: "Darken",
-                        description: "Label for minimum luminosity"
-                      })}
+                      label={intl.formatMessage(messages.darken)}
                     />
                     <option value="0" />
                     <option
                       value="1"
-                      label={intl.formatMessage({
-                        id: "backgrounds.display.lighten",
-                        defaultMessage: "Lighten",
-                        description: "Label for maximum luminosity"
-                      })}
+                      label={intl.formatMessage(messages.lighten)}
                     />
                   </datalist>
                 </label>

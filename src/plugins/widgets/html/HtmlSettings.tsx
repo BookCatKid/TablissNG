@@ -1,6 +1,7 @@
 import React, { FC, useState } from "react";
-
+import { FormattedMessage } from "react-intl";
 import { Props, defaultData } from "./types";
+import { pluginMessages } from "../../../locales/messages";
 
 const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const [input, setInput] = useState(data.input);
@@ -9,7 +10,11 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
   return (
     <div className="HtmlSettings">
       <label>
-        HTML Snippet
+        <FormattedMessage
+          id="plugins.html.snippet"
+          defaultMessage="HTML Snippet"
+          description="Label for HTML input field"
+        />
         <textarea
           rows={3}
           style={{ fontFamily: "monospace" }}
@@ -19,15 +24,28 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <p className="info">
-        Warning: This functionality is intended for advanced users.
+        <FormattedMessage
+          id="plugins.html.warning"
+          defaultMessage="Warning: This functionality is intended for advanced users."
+          description="Warning message for HTML widget"
+        />
         {BUILD_TARGET !== "web" && (
           <>
-            &nbsp;JavaScript will not be executed.
+            &nbsp;
+            <FormattedMessage
+              id="plugins.html.jsWarning"
+              defaultMessage="JavaScript will not be executed."
+              description="Warning about JavaScript execution"
+            />
           </>
         )}
       </p>
 
-      <button className="button button--primary" onClick={handleSave}>Apply</button>
+      <button className="button button--primary" onClick={handleSave}>
+        <FormattedMessage
+          {...pluginMessages.apply}
+        />
+      </button>
     </div>
   );
 };

@@ -1,26 +1,32 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import "./WikimediaSettings.sass";
 import { DebounceInput } from "../../shared";
 import { WikimediaDate, defaultData, Props } from "./types";
+import { backgroundMessages } from "../../../locales/messages";
 
 const WikimediaSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
   <div className="ApodSettings">
     <label>
-      Date of the picture
+      <FormattedMessage {...backgroundMessages.dateOfPicture} />
       <select
         value={data.date}
         onChange={(event) =>
           setData({ ...data, date: event.target.value as WikimediaDate })
         }
       >
-        <option value="today">Today</option>
-        <option value="custom">Custom date</option>
+        <option value="today">
+          <FormattedMessage {...backgroundMessages.today} />
+        </option>
+        <option value="custom">
+          <FormattedMessage {...backgroundMessages.customDate} />
+        </option>
       </select>
     </label>
 
     {data.date === "custom" && (
       <label>
-        Date
+        <FormattedMessage {...backgroundMessages.date} />
         <DebounceInput
           type="date"
           value={data.customDate}
@@ -38,10 +44,9 @@ const WikimediaSettings: React.FC<Props> = ({ data = defaultData, setData }) => 
         checked={data.showTitle}
         onChange={(event) => setData({ ...data, showTitle: !data.showTitle })}
       />{" "}
-      Show title
+      <FormattedMessage {...backgroundMessages.showTitle} />
     </label>
   </div>
 );
 
 export default WikimediaSettings;
-

@@ -29,7 +29,7 @@ body.dark .Modal {
 }
 
 /* Add dark mode styles for any links inside modals */
-body.dark .Modal a {
+body.dark .Modal {
   color: #ffffff;
 }
 

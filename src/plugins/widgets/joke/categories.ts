@@ -1,26 +1,26 @@
 export default [
   {
     key: "any",
-    name: "Any",
+    name: "plugins.joke.category.any",
   },
   {
     key: "misc",
-    name: "Misc",
+    name: "plugins.joke.category.misc",
   },
   {
     key: "programming",
-    name: "Programming",
+    name: "plugins.joke.category.programming",
   },
   {
     key: "pun",
-    name: "Pun",
+    name: "plugins.joke.category.pun",
   },
   {
     key: "spooky",
-    name: "Spooky",
+    name: "plugins.joke.category.spooky",
   },
   {
     key: "christmas",
-    name: "Christmas",
+    name: "plugins.joke.category.christmas",
   },
 ] as const;

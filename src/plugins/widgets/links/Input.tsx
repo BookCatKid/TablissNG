@@ -13,6 +13,45 @@ import { Icon } from "@iconify/react";
 import { addIconData } from "../../../utils";
 import "./Input.sass";
 
+const messages = defineMessages({
+  githubIssue: {
+    id: "plugins.links.input.githubIssue",
+    defaultMessage: "this GitHub issue"
+  },
+  optional: {
+    id: "plugins.links.input.optional",
+    defaultMessage: "optional"
+  },
+  removeLink: {
+    id: "plugins.links.input.removeLink",
+    defaultMessage: "Remove link"
+  },
+  moveDown: {
+    id: "plugins.links.input.moveDown",
+    defaultMessage: "Move link down"
+  },
+  moveUp: {
+    id: "plugins.links.input.moveUp",
+    defaultMessage: "Move link up"
+  },
+  custom: {
+    id: "plugins.links.input.custom",
+    defaultMessage: "Custom"
+  },
+  websiteIcons: {
+    id: "plugins.links.input.websiteIcons",
+    defaultMessage: "Website Icons"
+  },
+  iconifyIcons: {
+    id: "plugins.links.input.iconifyIcons",
+    defaultMessage: "Iconify Icons"
+  },
+  searchIcons: {
+    id: "plugins.links.input.searchIcons",
+    defaultMessage: "Search icons..."
+  }
+});
+
 type Props = Link & {
   number: number;
   onChange: (values: Partial<Link>) => void;
@@ -136,25 +175,16 @@ const Input: FC<Props> = (props) => {
     <div className="LinkInput">
       <h5>
         <div className="title--buttons">
-          <IconButton onClick={props.onRemove} title={intl.formatMessage({
-            id: "plugins.links.input.removeLink",
-            defaultMessage: "Remove link"
-          })}>
+          <IconButton onClick={props.onRemove} title={intl.formatMessage(messages.removeLink)}>
             <RemoveIcon />
           </IconButton>
           {props.onMoveDown && (
-            <IconButton onClick={props.onMoveDown} title={intl.formatMessage({
-              id: "plugins.links.input.moveDown",
-              defaultMessage: "Move link down"
-            })}>
+            <IconButton onClick={props.onMoveDown} title={intl.formatMessage(messages.moveDown)}>
               <DownIcon />
             </IconButton>
           )}
           {props.onMoveUp && (
-            <IconButton onClick={props.onMoveUp} title={intl.formatMessage({
-              id: "plugins.links.input.moveUp",
-              defaultMessage: "Move link up"
-            })}>
+            <IconButton onClick={props.onMoveUp} title={intl.formatMessage(messages.moveUp)}>
               <UpIcon />
             </IconButton>
           )}
@@ -186,7 +216,7 @@ const Input: FC<Props> = (props) => {
         <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />
         {" "}
         <span className="text--grey">
-          (<FormattedMessage id="plugins.links.input.optional" defaultMessage="optional" />)
+          (<FormattedMessage {...messages.optional} />)
         </span>
         <input
           type="text"
@@ -199,7 +229,7 @@ const Input: FC<Props> = (props) => {
         <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />
         {" "}
         <span className="text--grey">
-          (<FormattedMessage id="plugins.links.input.optional" defaultMessage="optional" />)
+          (<FormattedMessage {...messages.optional} />)
         </span>
         <select
           ref={selectRef}
@@ -209,7 +239,7 @@ const Input: FC<Props> = (props) => {
           <option value="">
             <FormattedMessage id="plugins.links.input.none" defaultMessage="None" />
           </option>
-          <optgroup label={intl.formatMessage({ id: "plugins.links.input.websiteIcons", defaultMessage: "Website Icons" })}>
+          <optgroup label={intl.formatMessage(messages.websiteIcons)}>
             <option value="_favicon_google">
               <FormattedMessage id="plugins.links.input.fromGoogle" defaultMessage="From Google" />
             </option>
@@ -220,7 +250,7 @@ const Input: FC<Props> = (props) => {
               <FormattedMessage id="plugins.links.input.fromFavicone" defaultMessage="From Favicone" />
             </option>
           </optgroup>
-          <optgroup label={intl.formatMessage({ id: "plugins.links.input.custom", defaultMessage: "Custom" })}>
+          <optgroup label={intl.formatMessage(messages.custom)}>
             <option value="_custom_iconify">
               <FormattedMessage id="plugins.links.input.fromIconify" defaultMessage="From Iconify" />
             </option>
@@ -234,7 +264,7 @@ const Input: FC<Props> = (props) => {
               <FormattedMessage id="plugins.links.input.uploadCustomIcon" defaultMessage="Upload Custom Icon" />
             </option>
           </optgroup>
-          <optgroup label={intl.formatMessage({ id: "plugins.links.input.iconifyIcons", defaultMessage: "Iconify Icons" })}>
+          <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
             <option value="_feather">
               <FormattedMessage id="plugins.links.input.feather" defaultMessage="Feather" />
             </option>
@@ -266,10 +296,7 @@ const Input: FC<Props> = (props) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FormattedMessage
-                id="plugins.links.input.githubIssue"
-                defaultMessage="this GitHub issue"
-              />
+              <FormattedMessage {...messages.githubIssue} />
             </a>
             .
           </p>
@@ -299,10 +326,7 @@ const Input: FC<Props> = (props) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FormattedMessage
-                id="plugins.links.input.githubIssue"
-                defaultMessage="this GitHub issue"
-              />
+              <FormattedMessage {...messages.githubIssue} />
             </a>
             .
           </p>
@@ -495,10 +519,7 @@ const Input: FC<Props> = (props) => {
 
             <input
               type="text"
-              placeholder={intl.formatMessage({
-                id: "plugins.links.input.searchIcons",
-                defaultMessage: "Search icons..."
-              })}
+              placeholder={intl.formatMessage(messages.searchIcons)}
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
               className="search-bar"

@@ -1,13 +1,22 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, defineMessages } from "react-intl";
 import { WidgetDisplay as WidgetDisplayType } from "../../db/state";
 import PositionInput from "./PositionInput";
 import "./WidgetDisplay.css";
+import { pluginMessages } from "../../locales/messages";
 
 type Props = {
   display: WidgetDisplayType;
   onChange: (display: Partial<WidgetDisplayType>) => void;
 };
+
+const messages = defineMessages({
+  editPosition: {
+    id: "settings.position.edit",
+    defaultMessage: "Edit Position",
+    description: "Button text for editing widget position"
+  }
+});
 
 const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
   return (
@@ -29,24 +38,38 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
               onClick={() => onChange({ isEditingPosition: !display.isEditingPosition })}
               className={`button button--primary ${display.isEditingPosition ? "active" : ""}`}
             >
-              {display.isEditingPosition ? "Save Position" : "Edit Position"}
+              <FormattedMessage
+                {...(display.isEditingPosition
+                  ? pluginMessages.freeMoveSave
+                  : messages.editPosition)}
+              />
             </button>
             <button
               onClick={() => {onChange({ x: window.innerWidth / 2, y: window.innerHeight / 2 }); window.location.reload();}}
               className="button button--primary"
             >
-              Reset Position
+              <FormattedMessage
+                id="settings.position.reset"
+                defaultMessage="Reset Position"
+                description="Button text to reset widget position"
+              />
             </button>
           </div>
           {display.isEditingPosition && (
-            <p className="info">Drag the widget to adjust its position</p>
+            <p className="info">
+              <FormattedMessage
+                id="settings.position.drag"
+                defaultMessage="Drag the widget to adjust its position"
+                description="Help text shown when editing widget position"
+              />
+            </p>
           )}
         </div>
       )}
 
       <label>
-      <FormattedMessage
-          id="font.size"
+        <FormattedMessage
+          id="settings.font.size"
           defaultMessage="Font Size"
           description="Font Size slider title"
         />
@@ -64,7 +87,11 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
       </label>
 
       <label>
-        Scale
+        <FormattedMessage
+          id="settings.scale"
+          defaultMessage="Scale"
+          description="Scale slider title"
+        />
         <br />
         <input
           type="range"
@@ -85,7 +112,11 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
       </label>
 
       <label>
-        Rotation
+        <FormattedMessage
+          id="settings.rotation"
+          defaultMessage="Rotation"
+          description="Rotation slider title"
+        />
         <br />
         <input
           type="range"
