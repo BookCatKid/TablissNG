@@ -1,4 +1,4 @@
-<h1 align="center">Tabliss</h1>
+<h1 align="center">Tabliss - exampe</h1>
 
 <p align="center">A beautiful, customisable New Tab page for Firefox and Chrome.</p>
 
