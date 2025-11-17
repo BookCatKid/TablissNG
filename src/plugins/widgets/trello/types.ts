@@ -1,9 +1,24 @@
 import { API } from "../../types";
 
-// locally saved preferences
-// stored in local storage with boardID as the key
+/**
+ * Locally saved preferences
+ * Stored in local storage with boardID as the key 
+ */
 export type BoardPreferences = {
   selectedLists: List[];
+}
+
+/**
+ * Type to represent UI lists on the browser page
+ */
+export type DisplayList = {
+  id: string; // same list id
+  name: string;
+  items: DisplayListItem[];
+}
+
+export type DisplayListItem = {
+  content: string;
 }
 
 export type Board = {
@@ -14,20 +29,17 @@ export type Board = {
 export type List = {
   id: string;
   name: string;
-  boardID: string;
   watch: boolean;
-  items?: string[];
 }
 
 export type Data = {
-  selectedBoard: Board | null;  // user's current board selection
-  selectedID: string | null;
+  selectedID: string | null; // selected board ID
+  selectedLists: List[]; // lists to display in the UI
 };
 
 export type Props = API<Data>;
 
 export const defaultData: Data = {
-  selectedBoard: null, 
   selectedID: null,
-
+  selectedLists: [],
 };

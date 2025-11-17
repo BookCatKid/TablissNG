@@ -1,6 +1,11 @@
+
+/**
+ * Creates authentication popup then calls callback endpoint to generate JWT
+ * Stores JWT in extension local storage
+ */
 export const runAuthFlow = async () => {
     const AUTH_URL_BASE = "https://trello.com/1/authorize" +
-        "?expiration=1day" +
+        "?expiration=1hour" +
         "&callback_method=fragment" +
         "&scope=read" +
         "&response_type=token" +
@@ -16,39 +21,41 @@ export const runAuthFlow = async () => {
     // receive token granted by Trello
     const tokenMatch = redirectResponse.match(/token=([^&]+)/);
     const token = tokenMatch ? tokenMatch[1] : null;
-    // convert token into JWT and alter user data in Firestore
-    const callbackResult = await fetch("https://trellocallback-rrswz5h5iq-de.a.run.app", {
-                                      method: "POST",
-                                      headers: { "Content-Type": "application/json"},
-                                      body: JSON.stringify({ token: token })
-                                    });
+    try {
+        // set token in database and return JWT
+        const callbackResult = await fetch("http://localhost:3000/api/trello/callback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json"},
+            body: JSON.stringify({ token: token })
+        });
 
-    if (callbackResult.ok) {
-      const json = await callbackResult.json();
-      const token = json.token;
-      await browser.storage.local.set({ trelloSessionToken: token });
-      return true;
-    } else {
-      // handle error
-      console.log("ERROR");
-      return false;
+        if (callbackResult.ok) {
+            const json = await callbackResult.json();
+            const token = json.token;
+            await browser.storage.local.set({ trelloSessionToken: token });
+        }
+    } catch (err) {
+        console.error("Failed to authenticate: ", err);
+        throw err;
     }
 }
 
-// returns true if user is properly authenticated
+/**
+ * Checks if the user is authenticated by checking the local JWT
+ * @returns 
+ */
 export const checkAuth = async () => {
     try {
         const token = await getToken();
         if (!token) {
             return false;
         }
-        
         const payload = JSON.parse(atob(token.split('.')[1]));
         const authenticated = payload.exp * 1000 > Date.now();
         return authenticated;
-    } catch (error) {
-        console.error(error);
-        return false;
+    } catch (err) {
+        console.error(err);
+        throw err;
     }
 }
 
@@ -56,9 +63,7 @@ export const getToken = async () => {
     const obj = await browser.storage.local.get("trelloSessionToken");
     const token: string | null = typeof obj["trelloSessionToken"] === "string" ? obj["trelloSessionToken"] : null;
 
-    if (!token) {
-        return null;
-    }
+    if (!token) return null;
     return token
 }
 

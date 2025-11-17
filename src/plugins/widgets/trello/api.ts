@@ -1,4 +1,4 @@
-import { getToken } from "./utils";
+import { getToken } from "./utils/auth";
 
 export const getBoards = async () => {
     const token = await getToken();
@@ -6,10 +6,10 @@ export const getBoards = async () => {
         return null;
     }
 
-    const fetchBoardRes = await fetch("https://getboards-rrswz5h5iq-de.a.run.app", { 
-                                    method: "POST", 
-                                    headers: { "Authorization": `Bearer ${token}` },
-                                });
+    const fetchBoardRes = await fetch("http://localhost:3000/api/trello/get/boards", { 
+        method: "POST", 
+        headers: { "Authorization": `Bearer ${token}` },
+    });
 
     if (!fetchBoardRes.ok) {
         return null;
@@ -25,11 +25,11 @@ export const getLists = async (boardID: string) => {
         return null;
     }
 
-    const fetchListRes = await fetch("https://getlists-rrswz5h5iq-de.a.run.app", {
-                                    method: "POST",
-                                    headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
-                                    body: JSON.stringify({ boardID: boardID })
-                                });
+    const fetchListRes = await fetch("http://localhost:3000/api/trello/get/lists", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ boardID: boardID })
+    });
 
     if (!fetchListRes.ok) {
         return null;
