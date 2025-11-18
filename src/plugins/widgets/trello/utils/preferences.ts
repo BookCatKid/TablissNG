@@ -5,13 +5,8 @@ export const setPreferences = async (boardID: string | null, preferences: BoardP
         throw new Error("Received NULL boardID");
     }
 
-    try {
-        console.log("Setting preference");
-        await browser.storage.local.set({ [boardID]: preferences });
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    console.log("Setting preference");
+    await browser.storage.local.set({ [boardID]: preferences });
 }
 
 export const getPreferences = async (boardID: string | null) => {
@@ -19,12 +14,7 @@ export const getPreferences = async (boardID: string | null) => {
         throw new Error("Received NULL boardID");
     }
 
-    try {
-        console.log("Getting preference for board ", boardID);
-        const obj = await browser.storage.local.get(boardID);
-        return obj[boardID] as BoardPreferences;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    console.log("Getting preference for board ", boardID);
+    const obj = await browser.storage.local.get(boardID);
+    return obj[boardID] as BoardPreferences;
 }

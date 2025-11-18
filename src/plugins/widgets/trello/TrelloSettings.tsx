@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { BoardPreferences, defaultData, DisplayList, Props } from "./types";
+import { BoardPreferences, defaultData, Props } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { runAuthFlow, checkAuth } from "./utils/auth";
@@ -27,7 +27,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
   useEffect(() => {
     const effect = async () => {
-      console.log("Checking auth status");
       const auth = await checkAuth();
       setAuthState(auth ? "authenticated" : "unauthenticated");
     }
@@ -77,8 +76,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
     // get updated lists that are being watched
     const filtered = updated.filter((list: List ) => { return list.watch });
-    console.log("Filtered ", filtered);
-    
     // save local preferences
     const newPreferences: BoardPreferences = {selectedLists: filtered };
     setPreferences(data.selectedID, newPreferences);
@@ -93,8 +90,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       const boards = await getBoards();
       if (!!boards) {
         setAvailableBoards({
-          boards: boards,
-          loading: false
+          ...availableBoards,
+          boards: boards
         });
         
         setData({...data, selectedID: boards[0].id});
@@ -110,15 +107,9 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     // when a board is selected pull the lists under it
     setAvailableLists({ ...availableLists, loading: true });
     const effect = async () => {
-      if (!data.selectedID) {
-        return;
-      }
-
+      if (!data.selectedID) return;
       const lists = await getLists(data.selectedID);
-
-      if (!lists) {
-        return;
-      }
+      if (!lists) return;
 
       // load preferences if they exist
       const preferences = await getPreferences(data.selectedID);
