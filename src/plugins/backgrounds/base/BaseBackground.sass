@@ -1,4 +1,4 @@
-.Unsplash
+.bg-base
     .credit
         display: grid
         grid-template-columns: 1fr auto 1fr
@@ -7,7 +7,15 @@
         left: 1rem
         right: 1rem
 
+        .photo
+            grid-column: 1
+
+        .controls
+            grid-column: 2
+            justify-self: center
+
         .location-wrapper
+            grid-column: 3
             text-align: right
             justify-self: end
 

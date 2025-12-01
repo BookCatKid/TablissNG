@@ -1,11 +1,10 @@
 import React from "react";
-import { Icon } from "@iconify/react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { DebounceInput } from "../../shared";
 import topics from "./topics.json";
 import { defaultData, Props } from "./types";
 import Select from "react-dropdown-select";
-import { timingMessages } from "../../../locales/messages";
+import BaseSettings from "../base/BaseSettings";
 
 const messages = defineMessages({
   searchTermPlaceholder: {
@@ -24,46 +23,17 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
   return (
     <div className="UnsplashSettings">
-      <label>
-        <span style={{ float: "right" }}>
-          {data.paused ? <span className="text--grey">(Paused) </span> : null}
-          <a onClick={() => setData({ ...data, paused: !data.paused })}>
-            <Icon icon={`feather:${data.paused ? "play" : "pause"}`} />
-          </a>
-        </span>
-        <FormattedMessage
+      <BaseSettings
+        data={data}
+        setData={setData}
+        title={(
+          <FormattedMessage
             id="backgrounds.unsplash.showNewPhoto"
             defaultMessage="Show a new photo"
             description="Show a new photo title"
           />
-        <select
-          value={data.timeout}
-          onChange={(event) =>
-            setData({ ...data, timeout: Number(event.target.value) })
-          }
-        >
-          <option value="0"><FormattedMessage
-            {...timingMessages.everyNewTab}
-          /></option>
-          <option value="300"><FormattedMessage
-            {...timingMessages.every5min}
-          /></option>
-          <option value="900"><FormattedMessage
-            {...timingMessages.every15min}
-          /></option>
-          <option value="3600"><FormattedMessage
-            {...timingMessages.everyHour}
-          /></option>
-          <option value="86400"><FormattedMessage
-            {...timingMessages.everyDay}
-          /></option>
-          <option value="604800"><FormattedMessage
-            id="plugins.everyWeek"
-            defaultMessage="Every week"
-            description="Every week title"
-          /></option>
-        </select>
-      </label>
+        )}
+      />
 
       <label>
         <input

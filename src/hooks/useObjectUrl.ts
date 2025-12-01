@@ -6,7 +6,7 @@ export function useObjectUrl(data?: Blob) {
 
   useEffect(() => {
     const prev = url;
-    () => {
+    return () => {
       if (prev) URL.revokeObjectURL(prev);
     };
   }, [url]);
@@ -18,10 +18,11 @@ export function useObjectUrls(data: Blob[]) {
   const [urls, setUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    setUrls(data.map(URL.createObjectURL));
+    const newUrls = data.map(URL.createObjectURL);
+    setUrls(newUrls);
 
     return () => {
-      urls.map(URL.revokeObjectURL);
+      newUrls.forEach(URL.revokeObjectURL);
       setUrls([]);
     };
   }, [data]);

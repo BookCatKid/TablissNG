@@ -88,6 +88,11 @@ export const engines: Engine[] = [
     search_url: "https://phind.com/search?q={searchTerms}",
   },
   {
+    key: "perplexity",
+    name: "Perplexity",
+    search_url: "https://www.perplexity.ai/search?q={searchTerms}",
+  },
+  {
     key: "vuhuv",
     name: "Vuhuv",
     search_url: "https://vuhuv.com/?k=1&p=1&d=1&q={searchTerms}",
