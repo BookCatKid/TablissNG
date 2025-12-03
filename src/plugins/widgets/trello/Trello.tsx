@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useRef, useCallback } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
 import { defaultData, Props, DisplayList, DisplayListItem, List } from "./types";
 import { getItems } from "./api";
 import DisplayListComponent from "./ui/DisplayListComponent/DisplayListComponent";
@@ -7,7 +7,7 @@ import "./Trello.sass";
 const Trello: FC<Props> = ({data = defaultData, setData}) => {
   const renderDisplayedLists = () => {
     return data.selectedLists.map((list: List) => {
-      return { id: list.id, name: list.name, items: [] } as DisplayList
+      return { id: list.id, name: list.name, items: [], loading: true } as DisplayList
     })
   }
   const [displayedLists, setDisplayedLists] = useState<DisplayList[]>(renderDisplayedLists());
@@ -40,6 +40,7 @@ const Trello: FC<Props> = ({data = defaultData, setData}) => {
         
         return { 
           ...list, 
+          loading: false,
           items: items.map(item => ({ content: item.name } as DisplayListItem)) 
         };
       }));

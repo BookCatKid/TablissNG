@@ -4,12 +4,14 @@ import "./Spinner.sass";
 
 interface SpinnerProps {
   size: number
+  className?: string
 }
 
 const Spinner: FC<SpinnerProps> = ({
-  size
+  size,
+  className = ""
 }) => {
-  return <span style={{width: `${size}px`, height: `${size}px`}} className="loader"/>
+  return <span style={{width: `${size}px`, height: `${size}px`}} className={`loader ${className}`}/>
 }
 
 export default Spinner;

@@ -15,6 +15,7 @@ export type DisplayList = {
   id: string; // same list id
   name: string;
   items: DisplayListItem[];
+  loading: boolean;
 }
 
 export type DisplayListItem = {

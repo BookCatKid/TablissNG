@@ -155,7 +155,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
           }
         </label>
         <Button disabled={data.authState === "pending"} primary onClick={onAuthenticateClick}>
-          { data.authState === "unauthenticated" ? "Authenticate" : "Authenticating..."}
+          { data.authState === "unauthenticated" ? "Authenticate" : "Authenticating..." }
         </Button>
       </>
     );
