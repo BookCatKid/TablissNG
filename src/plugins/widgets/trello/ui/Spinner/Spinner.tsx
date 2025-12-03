@@ -1,5 +1,6 @@
 import React from "react";
 import { FC } from "react";
+import "./Spinner.sass";
 
 interface SpinnerProps {
   size: number

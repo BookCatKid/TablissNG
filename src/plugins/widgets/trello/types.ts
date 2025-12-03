@@ -32,9 +32,15 @@ export type List = {
   watch: boolean;
 }
 
+export type Item = {
+  id: string;
+  name: string;
+}
+
 export type Data = {
   selectedID: string | null; // selected board ID
   selectedLists: List[]; // lists to display in the UI
+  authState: "authenticated" | "pending" | "unauthenticated"
 };
 
 export type Props = API<Data>;
@@ -42,4 +48,5 @@ export type Props = API<Data>;
 export const defaultData: Data = {
   selectedID: null,
   selectedLists: [],
+  authState: "unauthenticated"
 };

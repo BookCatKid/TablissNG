@@ -5,13 +5,12 @@ import { FormattedMessage } from "react-intl";
 import { runAuthFlow, checkAuth } from "./utils/auth";
 import { getPreferences, setPreferences } from "./utils/preferences";
 import { Board, List } from "./types";
-import ListCheckbox from "./ui/ListCheckbox";
-import Spinner from "./ui/Spinner";
+import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
+import Spinner from "./ui/Spinner/Spinner";
 import { getBoards, getLists } from "./api";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const MAX_LISTENERS = 4; // maximum lists a user can select
-  const [authState, setAuthState] = useState<"authenticated" | "unauthenticated" | "pending">("unauthenticated");
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
@@ -28,26 +27,26 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
   useEffect(() => {
     const effect = async () => {
       const auth = await checkAuth();
-      setAuthState(auth ? "authenticated" : "unauthenticated");
+      setData({...data, authState: auth ? "authenticated" : "unauthenticated"});
     }
     effect();
   }, []);
 
   const onAuthenticateClick = async () => {
-    setAuthState("pending");
+    setData({ ...data, authState: "pending"});
     try {
       await runAuthFlow();
-      setAuthState("authenticated");
+      setData({ ...data, authState: "authenticated"});
       setError(false);
     } catch (err) {
       setError(true);
-      setAuthState("unauthenticated")
+      setData({ ...data, authState: "unauthenticated"});
     }
   }
 
   const onSignout = async () => {
     await browser.storage.local.remove("trelloSessionToken");
-    setAuthState("unauthenticated");
+    setData({ ...data, authState: "unauthenticated"});
   }
 
   const onListCheckboxSelect = (listID: string) => {
@@ -68,11 +67,15 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     const updated = availableLists.lists.map((list: List) => { 
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
-    // update UI state
+
+
+    // optimistically update UI state
     setAvailableLists({
       ...availableLists,
       lists: updated,
     });
+
+    // fetch data in background then revalidate
 
     // get updated lists that are being watched
     const filtered = updated.filter((list: List ) => { return list.watch });
@@ -81,7 +84,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     setPreferences(data.selectedID, newPreferences);
     setData({...data, selectedLists: filtered});
 
-    // create a new listener/webhook
   }
 
   useEffect(() => {
@@ -98,10 +100,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       }
     };
 
-    if (authState === "authenticated") {
+    if (data.authState === "authenticated") {
       effect();
     }
-  }, [authState]);
+  }, [data.authState]);
 
   useEffect(() => {
     // when a board is selected pull the lists under it
@@ -129,12 +131,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       }); 
     };
 
-    if (authState === "authenticated") {
+    if (data.authState === "authenticated") {
       effect();
     }
-  }, [data.selectedID, authState]);
+  }, [data.selectedID, data.authState]);
 
-  if (authState !== "authenticated") {
+  if (data.authState !== "authenticated") {
     return (
       <>
         <label>
@@ -152,8 +154,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
             />
           }
         </label>
-        <Button disabled={authState === "pending"} primary onClick={onAuthenticateClick}>
-          { authState === "unauthenticated" ? "Authenticate" : "Authenticating..."}
+        <Button disabled={data.authState === "pending"} primary onClick={onAuthenticateClick}>
+          { data.authState === "unauthenticated" ? "Authenticate" : "Authenticating..."}
         </Button>
       </>
     );

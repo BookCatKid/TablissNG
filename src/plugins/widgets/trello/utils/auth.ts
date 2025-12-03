@@ -5,7 +5,7 @@
  */
 export const runAuthFlow = async () => {
     const AUTH_URL_BASE = "https://trello.com/1/authorize" +
-        "?expiration=1hour" +
+        "?expiration=1day" +
         "&callback_method=fragment" +
         "&scope=read" +
         "&response_type=token" +
@@ -23,7 +23,7 @@ export const runAuthFlow = async () => {
     const token = tokenMatch ? tokenMatch[1] : null;
     try {
         // set token in database and return JWT
-        const callbackResult = await fetch("http://localhost:3000/api/trello/callback", {
+        const callbackResult = await fetch("https://trellocallback-rrswz5h5iq-de.a.run.app ", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({ token: token })

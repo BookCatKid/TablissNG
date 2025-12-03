@@ -1,6 +1,8 @@
 .offset 
     margin-top: 1rem
 
+.label 
+    user-select: none
 
 .board-select-container 
     min-height: 50px
@@ -10,25 +12,11 @@
     height: 150px
     overflow-y: scroll
 
-.label 
-    user-select: none
-
 .loading 
     display: flex
     padding-top: 10px
     gap: 10px
     align-items: center
 
-.loader 
-    border: 2px solid #3498db
-    border-bottom-color: transparent
-    border-radius: 50%
-    display: inline-block
-    box-sizing: border-box
-    animation: rotation 1s linear infinite
-
-@keyframes rotation 
-    0% 
-        transform: rotate(0deg)
-    100% 
-        transform: rotate(360deg)
+.display-list-container
+    display: flex
