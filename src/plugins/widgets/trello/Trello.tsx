@@ -61,12 +61,9 @@ const Trello: FC<Props> = ({data = defaultData, setData}) => {
         <div className="display-list-container">
         {  
           displayedLists.map((list: DisplayList) => {
-          return (
-            <>
-              <DisplayListComponent list={list} />
-            </>
-          )
-        })}    
+            return <DisplayListComponent list={list} />
+          }
+        )}    
         </div>
       }
     </>
