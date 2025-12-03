@@ -10,7 +10,7 @@ import Spinner from "./ui/Spinner/Spinner";
 import { getBoards, getLists } from "./api";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
-  const MAX_LISTENERS = 4; // maximum lists a user can select
+  const MAX_LISTENERS = 6; // maximum lists a user can select
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
@@ -36,6 +36,20 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     setData({ ...data, authState: "pending"});
     try {
       await runAuthFlow();
+      if (!!data.selectedID) {
+        // attempt load preferences if selected board id exists
+        const preferences = await getPreferences(data.selectedID);
+        if (!preferences) {
+          // error caused by stale id
+          setData({ ...data, authState: "authenticated"});
+          setError(true);
+        } else {
+          setData({ ...data, selectedLists: preferences.selectedLists, authState: "authenticated" })
+          setError(false);
+        }
+        return;
+      }
+
       setData({ ...data, authState: "authenticated"});
       setError(false);
     } catch (err) {
@@ -46,6 +60,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
   const onSignout = async () => {
     await browser.storage.local.remove("trelloSessionToken");
+    // clear preferences
     setData({ ...data, authState: "unauthenticated"});
   }
 
@@ -74,8 +89,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       ...availableLists,
       lists: updated,
     });
-
-    // fetch data in background then revalidate
 
     // get updated lists that are being watched
     const filtered = updated.filter((list: List ) => { return list.watch });

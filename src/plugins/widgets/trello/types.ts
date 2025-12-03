@@ -38,13 +38,17 @@ export type Item = {
   name: string;
 }
 
+export type Cache = {
+  displayedLists: DisplayList[];
+}
+
 export type Data = {
   selectedID: string | null; // selected board ID
   selectedLists: List[]; // lists to display in the UI
   authState: "authenticated" | "pending" | "unauthenticated"
 };
 
-export type Props = API<Data>;
+export type Props = API<Data, Cache>;
 
 export const defaultData: Data = {
   selectedID: null,
