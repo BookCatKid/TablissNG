@@ -25,11 +25,8 @@ export const getPreferences = async (boardID: string | null) => {
  * @param lists 
  */
 export const applyPreferences = async (lists: List[], preferences: BoardPreferences) => {
-    lists.forEach((list: List) => {
-    const match = preferences.selectedLists.find(item => item.id === list.id);
-        if (match) {
-        list.watch = match.watch;
-        }   
-    });      
-    return lists;         
+    return lists.map(list => {
+        const match = preferences.selectedLists.find(item => item.id === list.id);
+        return match ? { ...list, watch: match.watch } : list;
+    });
 }

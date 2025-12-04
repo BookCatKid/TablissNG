@@ -18,6 +18,18 @@ export type DisplayList = {
   loading: boolean;
 }
 
+export type TrelloItemsResponse = {
+  listId: string;
+  items: TrelloListItem[];
+  loading: boolean;
+}
+
+export type TrelloListItem = {
+  id: string;
+  name: string;
+  // add more attributes from api as fit
+}
+
 export type DisplayListItem = {
   content: string;
 }
@@ -39,12 +51,13 @@ export type Item = {
 }
 
 export type Cache = {
-  displayedLists: DisplayList[];
+  order: List[]; // order of responses for rendering
+  responses: Map<string, TrelloItemsResponse>; // map list ids to the corresponding API response
 }
 
 export type Data = {
   selectedID: string | null; // selected board ID
-  selectedLists: List[]; // lists to display in the UI
+  selectedLists: List[]; // currently selected lists
   authState: "authenticated" | "pending" | "unauthenticated"
 };
 
@@ -55,3 +68,8 @@ export const defaultData: Data = {
   selectedLists: [],
   authState: "unauthenticated"
 };
+
+export const defaultCache: Cache = {
+  order: [],
+  responses: new Map<string, TrelloItemsResponse>(),
+}

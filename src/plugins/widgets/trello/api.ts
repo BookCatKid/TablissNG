@@ -1,4 +1,4 @@
-import { Board, Item, List } from "./types";
+import { Board, List, TrelloListItem } from "./types";
 import { getToken } from "./utils/auth";
 
 export const getBoards = async () => {
@@ -60,5 +60,5 @@ export const getItems = async (listID: string) => {
     }
 
     const items = await fetchItemsRes.json();
-    return items as Item[];
+    return items as TrelloListItem[];
 }

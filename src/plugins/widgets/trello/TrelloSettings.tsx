@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FC, useEffect, useState } from "react";
-import { BoardPreferences, defaultData, Props } from "./types";
+import { BoardPreferences, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { runAuthFlow, checkAuth } from "./utils/auth";
@@ -9,7 +9,7 @@ import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
 import { getBoards, getLists } from "./api";
 
-const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) => {
+const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
@@ -36,9 +36,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
     setData({ ...data, authState: "pending"});
     try {
       await runAuthFlow();
-      console.log("AUTH FLOW COMPLETE");
-      console.log(data);
-
       if (!data.selectedID) {
         console.log("First time sign in");
         // first-time sign in / sign in after reset
@@ -72,11 +69,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
     await browser.storage.local.clear();
     // reset data and clear cache
     setData(defaultData);
-    setCache({ displayedLists: [] });
+    setCache(defaultCache);
   }
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
    setData({ ...data, selectedID: event.target.value });
+   setCache(defaultCache);
   }
 
   const onListCheckboxSelect = (listID: string) => {
@@ -85,7 +83,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
       return;
     }
 
-    if (found.watch) {
+    const operation: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
+    if (operation === "REMOVE") {
       // set to unchecked
       setSelectedListCount(count => count - 1);
     } else {
@@ -98,6 +97,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
 
+    // update settings UI
     setAvailableLists({
       ...availableLists,
       lists: updated,
@@ -105,10 +105,30 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
 
     // get updated lists that are being watched
     const filtered = updated.filter((list: List ) => { return list.watch });
-    // save local preferences
     const newPreferences: BoardPreferences = {selectedLists: filtered };
-    setPreferences(data.selectedID, newPreferences);    
+    setPreferences(data.selectedID, newPreferences); 
     setData({...data, selectedLists: filtered});
+
+    // update UI
+    if (operation === "ADD") {
+      // update with new order of display and
+      // create new pending fetch operation
+      setCache({
+        ...cache, 
+        order: filtered, 
+        responses: cache.responses.set(listID, { 
+          listId: listID, 
+          items: [], 
+          loading: true } as TrelloItemsResponse
+        )
+      });
+    } else {
+      cache.responses.delete(listID);
+      setCache({
+        ...cache,
+        order: filtered
+      });
+    }
   }
 
   // on load fetch available boards for use
@@ -121,8 +141,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
         loading: false,
       });
 
-      // if user hsa not yet selected a board
-      // set it for them using the first board by default
+      // if the user has not yet selected a board
+      // set a default for them using the first board
       if (!data.selectedID) {
         setData({...data, selectedID: boards[0].id});
       }
@@ -142,14 +162,31 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
       if (!lists) return;
 
       const preferences = await getPreferences(data.selectedID);
-      let filtered = lists;
-      if (preferences) {
-        filtered = await applyPreferences(lists, preferences);
-      }
+      console.log("PREFERENCES ", preferences);
 
+      let listsWithPreferences = lists;
+      if (preferences) {
+        listsWithPreferences = await applyPreferences(lists, preferences);
+      }
+      
       setAvailableLists({
-        lists: filtered,
+        lists: listsWithPreferences,
         loading: false,
+      });
+
+      // load new fetching jobs into cache
+      const filtered = listsWithPreferences.filter(list => list.watch);
+      const responses = new Map<string, TrelloItemsResponse>();
+      filtered.map(list => {
+        console.log(list.name);
+        responses.set(list.id, { listId: list.id, items: [], loading: true} as TrelloItemsResponse)
+      });
+
+      console.log("Filtered ", filtered);
+      setCache({
+        ...cache,
+        order: filtered,
+        responses: responses
       })
     };
 
