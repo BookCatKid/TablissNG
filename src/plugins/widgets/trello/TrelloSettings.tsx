@@ -10,7 +10,7 @@ import Spinner from "./ui/Spinner/Spinner";
 import { getBoards, getLists } from "./api";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
-  const MAX_LISTENERS = 6; // maximum lists a user can select
+  const MAX_LISTS = 6; // maximum lists a user can select
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
@@ -36,14 +36,19 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     setData({ ...data, authState: "pending"});
     try {
       await runAuthFlow();
+      console.log("AUTH FLOW COMPLETE");
+      console.log(data);
       if (!!data.selectedID) {
+        console.log("Loading preference ", data.selectedID);
         // attempt load preferences if selected board id exists
         const preferences = await getPreferences(data.selectedID);
         if (!preferences) {
+          console.log("Stale error");
           // error caused by stale id
           setData({ ...data, authState: "authenticated"});
           setError(true);
         } else {
+          console.log("Setting preset preferences");
           setData({ ...data, selectedLists: preferences.selectedLists, authState: "authenticated" })
           setError(false);
         }
@@ -75,14 +80,13 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       setSelectedListCount(count => count - 1);
     } else {
       // set to checked
-      if (selectedListCount + 1 > MAX_LISTENERS) return;
+      if (selectedListCount + 1 > MAX_LISTS) return;
       setSelectedListCount(count => count + 1); 
     }
    
     const updated = availableLists.lists.map((list: List) => { 
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
-
 
     // optimistically update UI state
     setAvailableLists({
@@ -96,7 +100,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     const newPreferences: BoardPreferences = {selectedLists: filtered };
     setPreferences(data.selectedID, newPreferences);
     setData({...data, selectedLists: filtered});
-
   }
 
   useEffect(() => {
@@ -207,8 +210,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <label>
           <FormattedMessage
             id="plugins.trello.listSelect"
-            defaultMessage="Select up to 4 lists to watch"
-            description="Select up to 4 lists to watch"
+            defaultMessage={`Select up to ${MAX_LISTS} lists to watch`}
+            description={`Select up to ${MAX_LISTS} lists to watch`}
           />
           <div className="list-select-container">
             {availableLists.loading ? (

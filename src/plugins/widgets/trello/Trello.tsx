@@ -4,22 +4,14 @@ import { getItems } from "./api";
 import DisplayListComponent from "./ui/DisplayListComponent/DisplayListComponent";
 import "./Trello.sass";
 import Skeleton from "./ui/Skeleton/Skeleton";
+import { getPreferences } from "./utils/preferences";
 
 const Trello: FC<Props> = ({ data = defaultData, cache, setCache, loader }) => {
-  const renderDisplayedLists = () => {
-    return data.selectedLists.map((list: List) => {
-      return { id: list.id, name: list.name, items: [], loading: true } as DisplayList
-    })
-  }
-
-  useEffect(() => {
-    // on page load update all displayed lists with new data 
-    const effect = async () => {
-      loader.push();
-      const updated: DisplayList[] = await Promise.all(
-      data.selectedLists.map(async (list, i) => {
+  const updateDisplayedLists = async (lists: List[]) => {
+    const updated: DisplayList[] = await Promise.all(
+      lists.map(async (list, i) => {
         const items = await getItems(list.id);
-        
+    
         if (!items) {
           console.error("Could not fetch items");
           return { 
@@ -35,10 +27,29 @@ const Trello: FC<Props> = ({ data = defaultData, cache, setCache, loader }) => {
           loading: false,
           items: items.map(item => ({ content: item.name } as DisplayListItem)) 
         } as DisplayList;
-      }));
+      }) 
+    )
+    setCache({...cache, displayedLists: updated});
+  }
 
-      console.log(updated);
-      setCache({...cache, displayedLists: updated});
+  useEffect(() => {
+    const effect = async () => {
+      console.log("LOADING PREFS INTO UI")
+      if (!!data.selectedID) {
+        const preferences = await getPreferences(data.selectedID);
+        loader.push();
+        await updateDisplayedLists(preferences.selectedLists);
+        loader.pop();
+      }
+    }
+    effect();
+  }, [data.selectedID]);
+
+  useEffect(() => {
+    // on page load update all displayed lists with new data 
+    const effect = async () => {
+      loader.push();
+      await updateDisplayedLists(data.selectedLists);
       loader.pop();
     }
 
@@ -49,30 +60,27 @@ const Trello: FC<Props> = ({ data = defaultData, cache, setCache, loader }) => {
 
   console.log("Cache ", cache);
   console.log("Cache lists ", cache?.displayedLists);
-
   console.log("Data lists ", data.selectedLists);
   console.log("Data id", data.selectedID);
   return (
     <>
       {
-        (data.authState !== "authenticated" || data.selectedLists.length === 0) ? <p>Add some lists to view</p>  
+        (data.authState !== "authenticated" || cache?.displayedLists.length === 0) ? <p>Add some lists to view</p>  
       :
         <div className="display-list-container">
         {  
-          // // if cache is empty display skeleton
-          // !cache || !cache.displayedLists ? 
-          //   data.selectedLists.map(list => {
-          //     console.log("Ccreating skeelton");
-          //     return <Skeleton header={list.name} />
-          //   })
-          //   : 
-          //   cache.displayedLists.map((list: DisplayList) => {
-          //     return <DisplayListComponent list={list} />
-          //   }
-        //   )
-          data.selectedLists.map(list => {
-            return <Skeleton header={list.name} />
-          })
+          // if cache is empty display skeleton
+          !cache || !cache.displayedLists ? 
+            data.selectedLists.map(list => {
+              console.log("Creating skeelton");
+              return <Skeleton header={list.name} />
+            })
+          : 
+            cache.displayedLists.map((list: DisplayList) => {
+              console.log("Generating display list");
+              console.log(list);
+              return <DisplayListComponent list={list} />
+            })
         }    
         </div>
       }
