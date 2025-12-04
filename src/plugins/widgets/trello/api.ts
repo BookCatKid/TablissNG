@@ -37,6 +37,14 @@ export const getLists = async (boardID: string) => {
     return lists as List[];
 }
 
+/**
+ * Load lists under a board and preselect 
+ * @param boardID 
+ */
+export const getListsWithPreferences = async (boardID: string) => {
+
+}
+
 export const getItems = async (listID: string) => {
     const token = await getToken();
     if (!token) {

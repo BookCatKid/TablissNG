@@ -3,7 +3,7 @@ import { BoardPreferences, defaultData, Props } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { runAuthFlow, checkAuth } from "./utils/auth";
-import { getPreferences, setPreferences } from "./utils/preferences";
+import { applyPreferences, getPreferences, setPreferences } from "./utils/preferences";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
@@ -75,6 +75,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
     setCache({ displayedLists: [] });
   }
 
+  const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
+   setData({ ...data, selectedID: event.target.value });
+  }
+
   const onListCheckboxSelect = (listID: string) => {
     const found = availableLists.lists.find((list: List) => list.id === listID);
     if (!found) {
@@ -107,19 +111,20 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
     setData({...data, selectedLists: filtered});
   }
 
-  const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
-   setData({ ...data, selectedID: event.target.value });
-  }
-
+  // on load fetch available boards for use
   useEffect(() => {
-    // fetch available boards for use
     const effect = async () => {
       const boards = await getBoards();
-      if (!!boards) {
-        setAvailableBoards({
-          ...availableBoards,
-          boards: boards
-        });
+      if (!boards) return; // add better error handling
+      setAvailableBoards({
+        boards: boards,
+        loading: false,
+      });
+
+      // if user hsa not yet selected a board
+      // set it for them using the first board by default
+      if (!data.selectedID) {
+        setData({...data, selectedID: boards[0].id});
       }
     };
 
@@ -128,30 +133,24 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
     }
   }, [data.authState]);
 
+  // when a board is selected fetch the lists under it
   useEffect(() => {
-    // when a board is selected pull the lists under it
     setAvailableLists({ ...availableLists, loading: true });
     const effect = async () => {
       if (!data.selectedID) return;
       const lists = await getLists(data.selectedID);
       if (!lists) return;
 
-      // load preferences if they exist
       const preferences = await getPreferences(data.selectedID);
+      let filtered = lists;
       if (preferences) {
-        // apply preferences
-        lists.forEach((list: List) => {
-          const match = preferences.selectedLists.find(item => item.id === list.id);
-          if (match) {
-            list.watch = match.watch;
-          }   
-        });                  
+        filtered = await applyPreferences(lists, preferences);
       }
 
       setAvailableLists({
-        lists: lists,
+        lists: filtered,
         loading: false,
-      }); 
+      })
     };
 
     if (data.authState === "authenticated") {
@@ -193,7 +192,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
           description="Select your board"
         />
         <div className="board-select-container">
-          {availableBoards.loading && availableBoards.boards.length === 0 ? (
+          {availableBoards.loading ? (
             <div className="loading" style={{marginLeft: "4px"}}>
               Loading... <Spinner size={16} />
             </div>
@@ -222,10 +221,9 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
             description={`Select up to ${MAX_LISTS} lists to watch`}
           />
           <div className="list-select-container">
-            {availableLists.loading ? (
+            { (availableLists.loading || availableBoards.loading) ? (
               <div className="loading">Loading... <Spinner size={16} /></div>
-            ) : (
-              data.selectedID !== "Select a board" ? 
+            ) : ( 
               availableLists.lists.map((list: List, index) => {
                 return (
                   <ListCheckbox   
@@ -237,7 +235,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) =>
                     onChange={onListCheckboxSelect} 
                   />
                 );
-              }) : <p>Select a board</p>
+              })
             )}
           </div>
         </label>

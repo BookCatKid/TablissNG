@@ -22,11 +22,6 @@ export type DisplayListItem = {
   content: string;
 }
 
-export type BoardPreference = {
-  boardId: string;
-  selectedLists: List[]
-}
-
 export type Board = {
   id: string;
   name: string;

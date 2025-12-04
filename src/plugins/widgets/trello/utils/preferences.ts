@@ -1,4 +1,4 @@
-import { BoardPreferences } from "../types";
+import { BoardPreferences, List } from "../types";
 
 export const setPreferences = async (boardID: string | null, preferences: BoardPreferences) => {
     if (!boardID) {
@@ -17,4 +17,19 @@ export const getPreferences = async (boardID: string | null) => {
     console.log("Getting preference for board ", boardID);
     const obj = await browser.storage.local.get(boardID);
     return obj[boardID] as BoardPreferences;
+}
+
+/**
+ * Returns a filtered subset of lists with only those selected by the user
+ * dicated by their saved preferences 
+ * @param lists 
+ */
+export const applyPreferences = async (lists: List[], preferences: BoardPreferences) => {
+    lists.forEach((list: List) => {
+    const match = preferences.selectedLists.find(item => item.id === list.id);
+        if (match) {
+        list.watch = match.watch;
+        }   
+    });      
+    return lists;         
 }
