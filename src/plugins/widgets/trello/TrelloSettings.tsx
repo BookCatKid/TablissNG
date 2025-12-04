@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import { BoardPreferences, defaultData, Props } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
@@ -9,7 +9,7 @@ import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
 import { getBoards, getLists } from "./api";
 
-const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
+const TrelloSettings: FC<Props> = ({ data = defaultData, setData, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
@@ -38,25 +38,29 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       await runAuthFlow();
       console.log("AUTH FLOW COMPLETE");
       console.log(data);
-      if (!!data.selectedID) {
-        console.log("Loading preference ", data.selectedID);
-        // attempt load preferences if selected board id exists
-        const preferences = await getPreferences(data.selectedID);
-        if (!preferences) {
-          console.log("Stale error");
-          // error caused by stale id
-          setData({ ...data, authState: "authenticated"});
-          setError(true);
-        } else {
-          console.log("Setting preset preferences");
-          setData({ ...data, selectedLists: preferences.selectedLists, authState: "authenticated" })
-          setError(false);
-        }
+
+      if (!data.selectedID) {
+        console.log("First time sign in");
+        // first-time sign in / sign in after reset
+        setData({ ...data, selectedID: null, authState: "authenticated"});
+        setError(false);
         return;
       }
 
-      setData({ ...data, authState: "authenticated"});
-      setError(false);
+      // user has preferences already
+      console.log("Loading preference ", data.selectedID);
+      // attempt load preferences if selected board id exists
+      const preferences = await getPreferences(data.selectedID);
+      if (!preferences) {
+        console.log("Stale error");
+        // error caused by selected id that no longer exists
+        setData({ ...data, authState: "authenticated"});
+        setError(true);
+      } else {
+        console.log("Loading preferences");
+        setData({ ...data, selectedLists: preferences.selectedLists, authState: "authenticated" })
+        setError(false);
+      }
     } catch (err) {
       setError(true);
       setData({ ...data, authState: "unauthenticated"});
@@ -64,9 +68,11 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
   }
 
   const onSignout = async () => {
-    await browser.storage.local.remove("trelloSessionToken");
-    // clear preferences
-    setData({ ...data, authState: "unauthenticated"});
+    // clear session token and preferences
+    await browser.storage.local.clear();
+    // reset data and clear cache
+    setData(defaultData);
+    setCache({ displayedLists: [] });
   }
 
   const onListCheckboxSelect = (listID: string) => {
@@ -88,7 +94,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
 
-    // optimistically update UI state
     setAvailableLists({
       ...availableLists,
       lists: updated,
@@ -98,8 +103,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
     const filtered = updated.filter((list: List ) => { return list.watch });
     // save local preferences
     const newPreferences: BoardPreferences = {selectedLists: filtered };
-    setPreferences(data.selectedID, newPreferences);
+    setPreferences(data.selectedID, newPreferences);    
     setData({...data, selectedLists: filtered});
+  }
+
+  const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
+   setData({ ...data, selectedID: event.target.value });
   }
 
   useEffect(() => {
@@ -111,8 +120,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
           ...availableBoards,
           boards: boards
         });
-        
-        setData({...data, selectedID: boards[0].id});
       }
     };
 
@@ -187,13 +194,14 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
         <div className="board-select-container">
           {availableBoards.loading && availableBoards.boards.length === 0 ? (
-            <div className="loading" style={{marginLeft: "4px"}}>Loading... <Spinner size={16} /></div>
+            <div className="loading" style={{marginLeft: "4px"}}>
+              Loading... <Spinner size={16} />
+            </div>
             ) : 
             (
-              <select
-                onChange={(event) =>
-                  setData({ ...data, selectedID: event.target.value })
-                }
+              <select 
+                onChange={onBoardSelect} 
+                defaultValue={data.selectedID === null ? availableBoards.boards[0].id : data.selectedID}
               >
                 {availableBoards.boards.map((board: Board) => {
                   return (
@@ -217,6 +225,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
             {availableLists.loading ? (
               <div className="loading">Loading... <Spinner size={16} /></div>
             ) : (
+              data.selectedID !== "Select a board" ? 
               availableLists.lists.map((list: List, index) => {
                 return (
                   <ListCheckbox   
@@ -228,7 +237,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
                     onChange={onListCheckboxSelect} 
                   />
                 );
-              })
+              }) : <p>Select a board</p>
             )}
           </div>
         </label>
@@ -237,8 +246,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <label>
           <FormattedMessage
             id="plugins.trello.logout"
-            defaultMessage="Sign Out"
-            description="Sign Out"
+            defaultMessage="Signing out will clear preferences"
+            description="Signing out will clear all preferences"
           />
         </label>
         <Button primary onClick={onSignout}>Sign Out</Button>
