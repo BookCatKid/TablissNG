@@ -9,22 +9,16 @@ import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
 import useAuth from "./hooks/useAuth";
 import { getBoards, getLists } from "./utils/api";
+import useBoards from "./hooks/useBoards";
+import useLists from "./hooks/useLists";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
   const { authState, authError, authenticate, signOut } = useAuth();
+  const { boards, isLoading: boardsLoading } = useBoards(data, setData, authState);
+  const { lists, setLists, isLoading: listsLoading } = useLists(data, cache, setCache, authState);
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
-
-  const [availableBoards, setAvailableBoards] = useState<{
-    boards: Board[];
-    loading: boolean;
-  }>({ boards: [], loading: true });
-
-  const [availableLists, setAvailableLists] = useState<{
-    lists: List[];
-    loading: boolean;
-  }>({ lists: [], loading: true });
 
   const onAuthenticateClick = async () => {
     await authenticate();
@@ -61,7 +55,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   }
 
   const onListCheckboxSelect = (listID: string) => {
-    const found = availableLists.lists.find((list: List) => list.id === listID);
+    const found = lists.find((list: List) => list.id === listID);
     if (!found) {
       return;
     }
@@ -76,15 +70,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       setSelectedListCount(count => count + 1); 
     }
    
-    const updated = availableLists.lists.map((list: List) => { 
+    const updated = lists.map((list: List) => { 
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
 
     // update settings UI
-    setAvailableLists({
-      ...availableLists,
-      lists: updated,
-    });
+    setLists(updated);
 
     // get updated lists that are being watched
     const filtered = updated.filter((list: List ) => { return list.watch });
@@ -113,70 +104,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       });
     }
   }
-
-  // on load fetch available boards for use
-  useEffect(() => {
-    const effect = async () => {
-      const boards = await getBoards();
-      if (!boards) return; // add better error handling
-      setAvailableBoards({
-        boards: boards,
-        loading: false,
-      });
-
-      // if the user has not yet selected a board
-      // set a default for them using the first board
-      if (!data.selectedID) {
-        setData({...data, selectedID: boards[0].id});
-      }
-    };
-
-    if (authState === "authenticated") {
-      effect();
-    }
-  }, [authState]);
-
-  // when a board is selected fetch the lists under it
-  useEffect(() => {
-    setAvailableLists({ ...availableLists, loading: true });
-    const effect = async () => {
-      if (!data.selectedID) return;
-      const lists = await getLists(data.selectedID);
-      if (!lists) return;
-
-      const preferences = await getPreferences(data.selectedID);
-      console.log("PREFERENCES ", preferences);
-
-      let listsWithPreferences = lists;
-      if (preferences) {
-        listsWithPreferences = await applyPreferences(lists, preferences);
-      }
-      
-      setAvailableLists({
-        lists: listsWithPreferences,
-        loading: false,
-      });
-
-      // load new fetching jobs into cache
-      const filtered = listsWithPreferences.filter(list => list.watch);
-      const responses = new Map<string, TrelloItemsResponse>();
-      filtered.map(list => {
-        console.log(list.name);
-        responses.set(list.id, { listId: list.id, items: [], loading: true} as TrelloItemsResponse)
-      });
-
-      console.log("Filtered ", filtered);
-      setCache({
-        ...cache,
-        order: filtered,
-        responses: responses
-      })
-    };
-
-    if (authState === "authenticated") {
-      effect();
-    }
-  }, [data.selectedID, authState]);
 
   if (authState !== "authenticated") {
     return (
@@ -212,7 +139,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
           description="Select your board"
         />
         <div className="board-select-container">
-          {availableBoards.loading ? (
+          {boardsLoading ? (
             <div className="loading" style={{marginLeft: "4px"}}>
               Loading... <Spinner size={16} />
             </div>
@@ -220,9 +147,9 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
             (
               <select 
                 onChange={onBoardSelect} 
-                defaultValue={data.selectedID === null ? availableBoards.boards[0].id : data.selectedID}
+                defaultValue={data.selectedID === null ? boards[0].id : data.selectedID}
               >
-                {availableBoards.boards.map((board: Board) => {
+                {boards.map((board: Board) => {
                   return (
                     <option key={board.id} value={board.id}>
                       {board.name}
@@ -241,10 +168,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
             description={`Select up to ${MAX_LISTS} lists to watch`}
           />
           <div className="list-select-container">
-            { (availableLists.loading || availableBoards.loading) ? (
+            { listsLoading || boardsLoading ? (
               <div className="loading">Loading... <Spinner size={16} /></div>
             ) : ( 
-              availableLists.lists.map((list: List, index) => {
+              lists.map((list: List, index) => {
                 return (
                   <ListCheckbox   
                     key={list.id}

@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { checkAuth, runAuthFlow } from "../utils/auth";
+import { AuthState } from "../types";
 
 export default function useAuth() {
-    const [authState, setAuthState] = useState<"authenticated" | "unauthenticated" | "pending">("unauthenticated");
+    const [authState, setAuthState] = useState<AuthState>("unauthenticated");
     const [authError, setAuthError] = useState<string | null>(null);
    
     // check authentication status on load
