@@ -53,23 +53,23 @@ export type Item = {
 export type Cache = {
   order: List[]; // order of responses for rendering
   responses: Map<string, TrelloItemsResponse>; // map list ids to the corresponding API response
+  authState: "authenticated" | "pending" | "unauthenticated",
 }
 
 export type Data = {
   selectedID: string | null; // selected board ID
   selectedLists: List[]; // currently selected lists
-  authState: "authenticated" | "pending" | "unauthenticated"
 };
 
 export type Props = API<Data, Cache>;
 
 export const defaultData: Data = {
   selectedID: null,
-  selectedLists: [],
-  authState: "unauthenticated"
+  selectedLists: [],  
 };
 
 export const defaultCache: Cache = {
   order: [],
   responses: new Map<string, TrelloItemsResponse>(),
+  authState: "unauthenticated"
 }

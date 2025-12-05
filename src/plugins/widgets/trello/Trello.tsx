@@ -1,10 +1,13 @@
-import React, { FC, useEffect, useRef, useState } from "react";
-import { defaultData, Props, List, defaultCache, TrelloItemsResponse } from "./types";
-import { getItems } from "./api";
-import DisplayList from "./ui/DisplayList/DisplayList";
+import React, { FC, useEffect, useRef } from "react";
+import { defaultData, Props, List, defaultCache } from "./types";
 import "./Trello.sass";
+import useAuth from "./hooks/useAuth";
+import DisplayList from "./ui/DisplayList/DisplayList";
+import { getItems } from "./utils/api";
+
 
 const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache }) => {
+  const { authState } = useAuth();
   const hasLoadedRef = useRef<boolean>(false);
 
   // fetch data on load
@@ -36,13 +39,13 @@ const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache 
       });
     };
 
-    if (data.authState === "authenticated") {
+    if (authState === "authenticated") {
       effect();
       hasLoadedRef.current = true;
     }
-  }, [data.authState, cache]);
+  }, [authState, cache]);
 
-  // refetch data when cache is updated
+  // refetch data when items in cache are changed
   useEffect(() => {
     const effect = async () => {
       await Promise.all(
@@ -66,7 +69,7 @@ const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache 
   return (
     <>
       {
-        data.authState !== "authenticated"  ?  
+        authState !== "authenticated"  ?  
         <p>Sign into Trello to use me</p> : 
         !!cache && cache.order.length === 0 ? 
         <p>Add some lists to view</p> 

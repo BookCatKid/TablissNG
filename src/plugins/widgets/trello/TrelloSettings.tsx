@@ -2,15 +2,17 @@ import React, { ChangeEvent, FC, useEffect, useState } from "react";
 import { BoardPreferences, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
-import { runAuthFlow, checkAuth } from "./utils/auth";
+import { runAuthFlow } from "./utils/auth";
 import { applyPreferences, getPreferences, setPreferences } from "./utils/preferences";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
-import { getBoards, getLists } from "./api";
+import useAuth from "./hooks/useAuth";
+import { getBoards, getLists } from "./utils/api";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
+  const { authState, authError, authenticate, signOut } = useAuth();
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
@@ -24,49 +26,30 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     loading: boolean;
   }>({ lists: [], loading: true });
 
-  useEffect(() => {
-    const effect = async () => {
-      const auth = await checkAuth();
-      setData({...data, authState: auth ? "authenticated" : "unauthenticated"});
-    }
-    effect();
-  }, []);
-
   const onAuthenticateClick = async () => {
-    setData({ ...data, authState: "pending"});
-    try {
-      await runAuthFlow();
-      if (!data.selectedID) {
-        console.log("First time sign in");
-        // first-time sign in / sign in after reset
-        setData({ ...data, selectedID: null, authState: "authenticated"});
-        setError(false);
-        return;
-      }
+    await authenticate();
+    if (!data.selectedID) {
+      // first-time sign in / sign in after reset
+      setCache({...cache });
+      setError(false);
+      return;
+    }
 
-      // user has preferences already
-      console.log("Loading preference ", data.selectedID);
-      // attempt load preferences if selected board id exists
-      const preferences = await getPreferences(data.selectedID);
-      if (!preferences) {
-        console.log("Stale error");
-        // error caused by selected id that no longer exists
-        setData({ ...data, authState: "authenticated"});
-        setError(true);
-      } else {
-        console.log("Loading preferences");
-        setData({ ...data, selectedLists: preferences.selectedLists, authState: "authenticated" })
-        setError(false);
-      }
-    } catch (err) {
+    // attempt to load preferences
+    const preferences = await getPreferences(data.selectedID);
+    if (!preferences) {
+      // error caused by selected id that no longer exists
+      setCache({ ...cache });
       setError(true);
-      setData({ ...data, authState: "unauthenticated"});
+    } else {
+      setData({ ...data, selectedLists: preferences.selectedLists });
+      setCache({ ...cache });
+      setError(false);
     }
   }
 
   const onSignout = async () => {
-    // clear session token and preferences
-    await browser.storage.local.clear();
+    await signOut();
     // reset data and clear cache
     setData(defaultData);
     setCache(defaultCache);
@@ -74,7 +57,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
    setData({ ...data, selectedID: event.target.value });
-   setCache(defaultCache);
+    setCache(defaultCache);
   }
 
   const onListCheckboxSelect = (listID: string) => {
@@ -148,10 +131,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       }
     };
 
-    if (data.authState === "authenticated") {
+    if (authState === "authenticated") {
       effect();
     }
-  }, [data.authState]);
+  }, [authState]);
 
   // when a board is selected fetch the lists under it
   useEffect(() => {
@@ -190,12 +173,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       })
     };
 
-    if (data.authState === "authenticated") {
+    if (authState === "authenticated") {
       effect();
     }
-  }, [data.selectedID, data.authState]);
+  }, [data.selectedID, authState]);
 
-  if (data.authState !== "authenticated") {
+  if (authState !== "authenticated") {
     return (
       <>
         <label>
@@ -213,8 +196,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
             />
           }
         </label>
-        <Button disabled={data.authState === "pending"} primary onClick={onAuthenticateClick}>
-          { data.authState === "unauthenticated" ? "Authenticate" : "Authenticating..." }
+        <Button disabled={authState === "pending"} primary onClick={onAuthenticateClick}>
+          { authState === "unauthenticated" ? "Authenticate" : "Authenticating..." }
         </Button>
       </>
     );

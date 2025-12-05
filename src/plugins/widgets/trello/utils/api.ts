@@ -1,5 +1,5 @@
-import { Board, List, TrelloListItem } from "./types";
-import { getToken } from "./utils/auth";
+import { Board, List, TrelloListItem } from "../types";
+import { getToken } from "./auth";
 
 export const getBoards = async () => {
     const token = await getToken();
