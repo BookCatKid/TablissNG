@@ -26,5 +26,5 @@ export default function useBoards(data: Data, setData: (data: Data) => void, aut
         }
     }, [authState]);
 
-    return { boards, isLoading }
+    return { boards, isLoading  }
 }

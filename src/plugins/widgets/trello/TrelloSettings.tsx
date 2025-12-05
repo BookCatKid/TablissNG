@@ -1,14 +1,12 @@
-import React, { ChangeEvent, FC, useEffect, useState } from "react";
-import { BoardPreferences, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
+import React, { ChangeEvent, FC, useRef, useState } from "react";
+import { defaultCache, defaultData, Props } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
-import { runAuthFlow } from "./utils/auth";
-import { applyPreferences, getPreferences, setPreferences } from "./utils/preferences";
+import {  getPreferences } from "./utils/preferences";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
 import useAuth from "./hooks/useAuth";
-import { getBoards, getLists } from "./utils/api";
 import useBoards from "./hooks/useBoards";
 import useLists from "./hooks/useLists";
 
@@ -24,6 +22,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
+  const pendingSelectionsRef = useRef<Set<string>>(new Set<string>());
+  const debounceTimeoutRef = useRef<number>(null);
+  const DEBOUNCE_INTERVAL = 650;
+
   const onAuthenticateClick = async () => {
     await authenticate();
     if (!data.selectedID) {
@@ -37,11 +39,9 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     const preferences = await getPreferences(data.selectedID);
     if (!preferences) {
       // error caused by selected id that no longer exists
-      setCache({ ...cache });
       setError(true);
     } else {
       setData({ ...data, selectedLists: preferences.selectedLists });
-      setCache({ ...cache });
       setError(false);
     }
   }
@@ -68,10 +68,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     if (action === "REMOVE") {
       // set to unchecked
       setSelectedListCount(count => count - 1);
+      pendingSelectionsRef.current.delete(listID);
     } else {
       // set to checked
       if (selectedListCount + 1 > MAX_LISTS) return;
       setSelectedListCount(count => count + 1); 
+      pendingSelectionsRef.current.add(listID);
     }
    
     // update checked lists in the settings UI
@@ -80,7 +82,16 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     });
 
     setLists(updatedOptions);
-    updatePreferencesAndUI(listID, updatedOptions, action);
+
+    // debouncing logic for rapid selection
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
+    debounceTimeoutRef.current = setTimeout(() => {
+      updatePreferencesAndUI(listID, updatedOptions, action);
+      pendingSelectionsRef.current.clear();
+    }, DEBOUNCE_INTERVAL);
   }
 
   if (authState !== "authenticated") {
