@@ -1,8 +1,7 @@
 import React, { ChangeEvent, FC, useRef, useState } from "react";
-import { defaultCache, defaultData, Props } from "./types";
+import { BoardPreference, defaultCache, defaultData, Props } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
-import {  getPreferences } from "./utils/preferences";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
@@ -18,32 +17,14 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     lists, 
     setLists, 
     isLoading: listsLoading, 
-    updatePreferencesAndUI } = useLists(data, cache, setCache, authState);
+    updateUI } = useLists(data, cache, setCache, authState);
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
-  const [error, setError] = useState<boolean>(false);
-
   const pendingSelectionsRef = useRef<Set<string>>(new Set<string>());
   const debounceTimeoutRef = useRef<number>(null);
   const DEBOUNCE_INTERVAL = 650;
 
   const onAuthenticateClick = async () => {
     await authenticate();
-    if (!data.selectedID) {
-      // first-time sign in / sign in after reset
-      setCache({...cache });
-      setError(false);
-      return;
-    }
-
-    // attempt to load preferences
-    const preferences = await getPreferences(data.selectedID);
-    if (!preferences) {
-      // error caused by selected id that no longer exists
-      setError(true);
-    } else {
-      setData({ ...data, selectedLists: preferences.selectedLists });
-      setError(false);
-    }
   }
 
   const onSignout = async () => {
@@ -54,7 +35,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   }
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
-   setData({ ...data, selectedID: event.target.value });
+    setData({ ...data, selectedID: event.target.value });
     setCache(defaultCache);
   }
 
@@ -89,7 +70,14 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      updatePreferencesAndUI(listID, updatedOptions, action);
+      // set preference
+      const filtered = updatedOptions.filter((list: List ) => { return list.watch });
+      const newPreference: BoardPreference = { boardId: data.selectedID!, lists: filtered };
+
+      const updated = data.preferences;
+      updated[data.selectedID!] = newPreference;
+      setData({ ...data, preferences: updated });
+      updateUI(listID, filtered, action);
       pendingSelectionsRef.current.clear();
     }, DEBOUNCE_INTERVAL);
   }
@@ -98,7 +86,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     return (
       <>
         <label>
-          { error ? 
+          { authError ? 
             <FormattedMessage 
               id="plugins.trello.authenticate.error"
               defaultMessage="Error occurred during authentication"

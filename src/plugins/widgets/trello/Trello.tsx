@@ -5,7 +5,6 @@ import useAuth from "./hooks/useAuth";
 import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
 
-
 const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache }) => {
   const { authState } = useAuth();
   const hasLoadedRef = useRef<boolean>(false);
@@ -24,7 +23,6 @@ const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache 
       let updatedResponses = cache.responses;
       results.forEach(result => {
         if (result) {
-          console.log(result.items);
           updatedResponses = updatedResponses.set(result.listId, {
             ...result.response,
             loading: false,
@@ -53,7 +51,6 @@ const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache 
           if (response.loading) {
             const items = await getItems(response.listId);
             if (items) {
-              console.log(items);
               setCache({
                 ...cache,
                 responses: cache.responses.set(response.listId, { ...response, loading: false, items: items })

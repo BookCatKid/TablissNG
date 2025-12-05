@@ -6,8 +6,9 @@ export type AuthState = "authenticated" | "pending" | "unauthenticated";
  * Locally saved preferences
  * Stored in local storage with boardID as the key 
  */
-export type BoardPreferences = {
-  selectedLists: List[];
+export type BoardPreference = {
+  boardId: string;
+  lists: List[];
 }
 
 /**
@@ -59,14 +60,14 @@ export type Cache = {
 
 export type Data = {
   selectedID: string | null; // selected board ID
-  selectedLists: List[]; // currently selected lists
+  preferences: Record<string, BoardPreference>;
 };
 
 export type Props = API<Data, Cache>;
 
 export const defaultData: Data = {
   selectedID: null,
-  selectedLists: [],  
+  preferences: {},
 };
 
 export const defaultCache: Cache = {
