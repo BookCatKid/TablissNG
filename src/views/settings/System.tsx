@@ -391,6 +391,7 @@ const System: React.FC = () => {
           onChange={(e) => setAutoHideSettings(e.target.checked)}
         />
       </label>
+
     </div>
   );
 };

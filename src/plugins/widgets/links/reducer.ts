@@ -6,7 +6,10 @@ type State = Link[];
 export function reducer(state: State, action: Action) {
   switch (action.type) {
     case "ADD_LINK":
-      return state.concat({ id: Date.now().toString(36) + Math.random().toString(36).slice(2), url: "https://" });
+      return state.concat({
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+        url: "https://",
+      });
 
     case "REMOVE_LINK":
       return state.filter((_, index) => index !== action.data.index);

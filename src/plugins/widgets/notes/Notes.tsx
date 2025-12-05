@@ -1,6 +1,7 @@
 import React from "react";
 import { API } from "../../types";
 import { Data, defaultData } from "./data";
+import { sanitizeRichText } from "../../../utils/richText";
 import Input from "./Input";
 import ReactMarkdown from "react-markdown";
 import { Icon } from "@iconify/react";
@@ -20,10 +21,53 @@ const Notes: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
     [keyBind.toUpperCase(), keyBind.toLowerCase()],
   );
 
+  const allowInlineEditing = !data.richTextEnabled;
+  const renderPlaceholder = () => (
+    <div
+      className="placeholder"
+      style={{
+        display: "flex",
+        justifyContent: data.iconAlign || "flex-start",
+      }}
+    >
+      {data.placeholderStyle === "icon" ? (
+        <Icon icon="feather:edit" />
+      ) : (
+        <>
+          <Icon icon="feather:edit-3" />
+          <span>
+            <FormattedMessage
+              id="plugins.notes.clickToAdd"
+              defaultMessage="Click to add note"
+            />
+          </span>
+        </>
+      )}
+    </div>
+  );
+
+  const renderContent = () => {
+    if (!data.notes[0].contents) {
+      return renderPlaceholder();
+    }
+    if (data.markdownEnabled && !data.richTextEnabled) {
+      return <ReactMarkdown>{data.notes[0].contents}</ReactMarkdown>;
+    }
+    if (data.richTextEnabled) {
+      return (
+        <div
+          className="notes-rich"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichText(data.notes[0].contents) }}
+        />
+      );
+    }
+    return data.notes[0].contents;
+  };
+
   return (
     <div className="Notes" style={{ textAlign: data.textAlign || "left" }}>
       <div>
-        {isEditing ? (
+        {allowInlineEditing && isEditing ? (
           <Input
             value={data.notes[0].contents}
             onChange={(contents) => {
@@ -33,37 +77,18 @@ const Notes: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
           />
         ) : (
           <div
-            onClick={() => setIsEditing(true)}
-            style={{ cursor: "pointer" }}
+            onClick={() => {
+              if (allowInlineEditing) {
+                setIsEditing(true);
+              }
+            }}
+            style={{ cursor: allowInlineEditing ? "pointer" : "default" }}
             className={data.markdownEnabled ? "markdown-content" : ""}
           >
-            {data.notes[0].contents ? (
-              data.markdownEnabled ? (
-                <ReactMarkdown>{data.notes[0].contents}</ReactMarkdown>
-              ) : (
-                data.notes[0].contents
-              )
-            ) : (
-              <div
-                className="placeholder"
-                style={{
-                  display: "flex",
-                  justifyContent: data.iconAlign || "flex-start",
-                }}
-              >
-                {data.placeholderStyle === "icon" ? (
-                  <Icon icon="feather:edit" />
-                ) : (
-                  <>
-                    <Icon icon="feather:edit-3" />
-                    <span><FormattedMessage
-                  id="plugins.notes.clickToAdd"
-                  defaultMessage="Click to add note"
-                /></span>
-                  </>
-                )}
-              </div>
-            )}
+            {renderContent()}
+            {data.richTextEnabled ? (
+              <p className="notes-rich-hint">Use the text editor panel to edit rich text.</p>
+            ) : null}
           </div>
         )}
       </div>

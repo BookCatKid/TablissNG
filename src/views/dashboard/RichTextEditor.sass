@@ -1,0 +1,88 @@
+.RichTextEditor
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+
+  .toolbar
+    display: flex
+    flex-wrap: wrap
+    gap: 0.35rem
+    padding: 0.35rem
+    background: rgba(255, 255, 255, 0.04)
+    border: 1px solid rgba(255, 255, 255, 0.08)
+    border-radius: 12px
+
+    button,
+    select
+      appearance: none
+      border: none
+      background: rgba(255, 255, 255, 0.1)
+      color: inherit
+      border-radius: 8px
+      padding: 0.35rem 0.5rem
+      cursor: pointer
+      display: flex
+      align-items: center
+      gap: 0.15rem
+      font-size: 0.85rem
+      transition: background 0.2s ease
+
+      &:hover
+        background: rgba(255, 255, 255, 0.2)
+
+    select
+      padding-right: 1.5rem
+
+    .toolbar-divider
+      width: 1px
+      background: rgba(255, 255, 255, 0.12)
+      margin: 0 0.25rem
+
+    .emoji-picker
+      position: relative
+
+      .emoji-list
+        position: absolute
+        top: 110%
+        left: 0
+        display: grid
+        grid-template-columns: repeat(6, 1fr)
+        gap: 0.25rem
+        padding: 0.5rem
+        background: rgba(14, 16, 24, 0.95)
+        border: 1px solid rgba(255, 255, 255, 0.1)
+        border-radius: 12px
+        opacity: 0
+        pointer-events: none
+        transform: translateY(-5px)
+        transition: opacity 0.2s ease, transform 0.2s ease
+        z-index: 20
+
+      &:hover .emoji-list,
+      &:focus-within .emoji-list
+        opacity: 1
+        pointer-events: auto
+        transform: translateY(0)
+
+      .emoji-list button
+        padding: 0.25rem
+        font-size: 1.25rem
+
+  .editor-surface
+    border-radius: 14px
+    border: 1px solid rgba(255, 255, 255, 0.15)
+    background: rgba(6, 8, 16, 0.85)
+    min-height: 220px
+    padding: 0.85rem
+    line-height: 1.5
+    font-size: 1rem
+    overflow-y: auto
+    cursor: text
+
+    &:focus
+      outline: 2px solid rgba(99, 164, 255, 0.6)
+
+    &:empty:before
+      content: attr(data-placeholder)
+      color: rgba(255, 255, 255, 0.4)
+      pointer-events: none

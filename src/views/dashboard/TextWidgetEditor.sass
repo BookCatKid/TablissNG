@@ -1,0 +1,171 @@
+.text-widget-editor-backdrop
+  position: fixed
+  inset: 0
+  background: rgba(0, 0, 0, 0.6)
+  backdrop-filter: blur(4px)
+  z-index: 2500
+
+.TextWidgetEditor
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: min(520px, 92vw)
+  max-height: 90vh
+  display: flex
+  flex-direction: column
+  padding: 1rem 1.25rem
+  border-radius: 18px
+  background: rgba(20, 22, 32, 0.96)
+  border: 1px solid rgba(255, 255, 255, 0.12)
+  color: #f6f8ff
+  z-index: 2600
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55)
+
+  .editor-header
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: 1rem
+    margin-bottom: 0.75rem
+
+    h3
+      display: flex
+      align-items: center
+      gap: 0.5rem
+      margin: 0
+      font-size: 1.05rem
+
+    .close-btn
+      appearance: none
+      border: none
+      width: 32px
+      height: 32px
+      border-radius: 50%
+      background: rgba(255, 255, 255, 0.12)
+      color: inherit
+      display: grid
+      place-items: center
+      cursor: pointer
+      transition: background 0.2s ease
+
+      &:hover
+        background: rgba(255, 255, 255, 0.25)
+
+  .editor-content
+    overflow-y: auto
+    padding-right: 0.5rem
+    display: flex
+    flex-direction: column
+    gap: 1rem
+
+  .editor-section
+    display: flex
+    flex-direction: column
+    gap: 0.75rem
+
+  .helper-text
+    font-size: 0.85rem
+    color: rgba(255, 255, 255, 0.65)
+    margin: 0
+
+  .warning-card
+    display: flex
+    align-items: flex-start
+    gap: 0.5rem
+    padding: 0.75rem
+    border-radius: 12px
+    background: rgba(255, 202, 88, 0.1)
+    border: 1px solid rgba(255, 202, 88, 0.3)
+    font-size: 0.85rem
+
+  .custom-text-layout
+    display: flex
+    gap: 1rem
+    flex-wrap: wrap
+
+    .entry-sidebar
+      min-width: 150px
+      display: flex
+      flex-direction: column
+      gap: 0.4rem
+
+      button
+        width: 100%
+        justify-content: flex-start
+
+      .ghost
+        border: 1px dashed rgba(255, 255, 255, 0.3)
+        background: transparent
+
+      .sidebar-hint
+        font-size: 0.75rem
+        color: rgba(255, 255, 255, 0.6)
+        margin-top: 0.25rem
+
+      button
+        background: rgba(255, 255, 255, 0.08)
+        border: 1px solid transparent
+        border-radius: 10px
+        padding: 0.4rem 0.5rem
+        color: inherit
+        cursor: pointer
+        transition: background 0.2s ease, border-color 0.2s ease
+
+        &.active
+          border-color: rgba(87, 177, 255, 0.6)
+          background: rgba(87, 177, 255, 0.15)
+
+    .entry-editor
+      flex: 1
+      min-width: 260px
+      display: flex
+      flex-direction: column
+      gap: 0.5rem
+
+      .entry-actions
+        display: flex
+        justify-content: flex-end
+
+        .danger
+          background: rgba(255, 97, 110, 0.15)
+          border: 1px solid rgba(255, 97, 110, 0.4)
+          color: #ff616e
+          border-radius: 999px
+          padding: 0.35rem 1rem
+          display: flex
+          align-items: center
+          gap: 0.35rem
+          cursor: pointer
+          transition: opacity 0.2s ease
+
+          &:disabled
+            opacity: 0.3
+            cursor: default
+
+  .editor-footer
+    margin-top: 0.5rem
+    display: flex
+    justify-content: flex-end
+    gap: 0.75rem
+
+    button
+      appearance: none
+      border: none
+      border-radius: 999px
+      padding: 0.55rem 1.4rem
+      font-weight: 600
+      cursor: pointer
+
+      &.ghost
+        background: transparent
+        border: 1px solid rgba(255, 255, 255, 0.4)
+        color: inherit
+
+      &.primary
+        background: linear-gradient(120deg, #57b1ff, #a855f7)
+        color: white
+
+      &:disabled
+        opacity: 0.4
+        cursor: default

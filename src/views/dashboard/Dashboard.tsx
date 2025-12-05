@@ -4,15 +4,23 @@ import Background from "./Background";
 import "./Dashboard.sass";
 import Overlay from "./Overlay";
 import Widgets from "./Widgets";
+import AddWidgetButton from "./AddWidgetButton";
+import CustomCodeEditor from "./CustomCodeEditor";
+import TextWidgetEditor from "./TextWidgetEditor";
+
+const baseClasses = ["Dashboard", "fullscreen"];
 
 const Dashboard: React.FC = () => {
   const { isDark } = useTheme();
-  const theme = isDark ? 'dark' : '';
+  const className = [...baseClasses, isDark ? "dark" : null].filter(Boolean).join(" ");
 
   return (
-    <div className={`Dashboard fullscreen ${theme}`}>
+    <div className={className}>
       <Background />
       <Widgets />
+      <AddWidgetButton />
+      <TextWidgetEditor />
+      <CustomCodeEditor />
       <Overlay />
     </div>
   );

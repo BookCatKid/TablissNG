@@ -6,13 +6,13 @@
     border-radius: 1.25rem
     transition: all 0.25s ease-out
     font-size: 1.1rem
+    z-index: 2000
 
     .on-hover
         opacity: 0
         transition: all 0.25s ease-out
 
     &:hover
-        opacity: 1
         background-color: rgba(0, 0, 0, 0.65)
 
         .on-hover
@@ -22,11 +22,51 @@
             color: #3498db
             filter: none
 
-    a, span
+    a, span, button
         margin: 0 0.25em
+
+    button
+        background: none
+        border: none
+        color: inherit
+        font: inherit
+        padding: 0
+        cursor: pointer
+
+        &.active svg
+            color: #00fff5
+            filter: drop-shadow(0 0 6px rgba(0, 255, 245, 0.4))
 
     svg, i
         transition: stroke 0.25s ease-out
 
 .light .Overlay:hover
     background-color: rgba(255, 255, 255, 0.65)
+
+// HUD Mode Styling for Overlay
+.Dashboard.hud-mode .Overlay
+    background: linear-gradient(135deg, rgba(0, 40, 60, 0.7) 0%, rgba(0, 20, 40, 0.9) 100%)
+    border: 1px solid rgba(0, 255, 245, 0.5)
+    border-radius: 8px
+    backdrop-filter: blur(10px)
+    box-shadow: 0 0 20px rgba(0, 255, 245, 0.4), inset 0 0 15px rgba(0, 255, 245, 0.1)
+    padding: 0.75rem
+
+    &:hover
+        background: linear-gradient(135deg, rgba(0, 40, 60, 0.85) 0%, rgba(0, 20, 40, 1) 100%)
+        border-color: rgba(0, 255, 245, 0.8)
+        box-shadow: 0 0 30px rgba(0, 255, 245, 0.6), inset 0 0 20px rgba(0, 255, 245, 0.2)
+
+    a, span, button
+        color: #00fff5
+        text-shadow: 0 0 8px rgba(0, 255, 245, 0.6)
+
+        svg
+            color: #00fff5
+            filter: drop-shadow(0 0 5px rgba(0, 255, 245, 0.8))
+
+    .on-hover
+        opacity: 0.7
+        
+        &:hover
+            opacity: 1important

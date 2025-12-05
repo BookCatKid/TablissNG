@@ -12,8 +12,10 @@ export function getTimeCode(time: Date) {
 }
 
 // Get quote by time code
-export async function getQuoteByTimeCode(timeCode: string, sfw: boolean): Promise<Quote> {
-
+export async function getQuoteByTimeCode(
+  timeCode: string,
+  sfw: boolean,
+): Promise<Quote> {
   const res = await fetch(`${apiEndpoint}/${timeCode}.json`, { mode: "cors" });
   let body: any[] = await res.json();
 
@@ -37,14 +39,16 @@ export async function getQuoteByTimeCode(timeCode: string, sfw: boolean): Promis
 
   const cleanText = (input: string): string => {
     return input
-        .replace(/<br\s*\/?>/gi, " ") // <br /> becomes a space
-        .replace(/&amp;/gi, "&");      // &amp; becomes an &
+      .replace(/<br\s*\/?>/gi, " ") // <br /> becomes a space
+      .replace(/&amp;/gi, "&"); // &amp; becomes an &
   };
 
   const decodedQuote = {
     ...quote,
     quote_first: quote.quote_first ? cleanText(quote.quote_first) : "",
-    quote_time_case: quote.quote_time_case ? cleanText(quote.quote_time_case) : "",
+    quote_time_case: quote.quote_time_case
+      ? cleanText(quote.quote_time_case)
+      : "",
     quote_last: quote.quote_last ? cleanText(quote.quote_last) : "",
   };
 

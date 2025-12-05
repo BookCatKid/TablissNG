@@ -8,7 +8,6 @@ import "./Widgets.sass";
 const Widgets: React.FC = () => {
   const focus = useValue(db, "focus");
   const widgets = useSelector(db, selectWidgets);
-
     // NOTE: old todo: (probobly no longer relevent though) (from original maintainer) one day we'll have `Array.groupBy` accepted by tc39
 
   const grouped: Partial<Record<WidgetPosition, WidgetState[]>> = {};
@@ -36,10 +35,18 @@ const Widgets: React.FC = () => {
       <div className="container">
         {!focus &&
           slots.map(([position, widgets]) => (
-            <Slot key={position} position={position} widgets={widgets} />
+            <Slot
+              key={position}
+              position={position}
+              widgets={widgets}
+            />
           ))}
         {cssSlots.map(([position, widgets]) => (
-          <Slot key={`css-${position}`} position={position} widgets={widgets} />
+          <Slot
+            key={`css-${position}`}
+            position={position}
+            widgets={widgets}
+          />
         ))}
       </div>
     </div>

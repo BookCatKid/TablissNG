@@ -77,7 +77,9 @@ async function getRandomBibleVerse(): Promise<{
 }> {
   try {
     // Try to fetch from remote source first
-    const res = await fetch("https://raw.githubusercontent.com/lquartararo/versescraper/refs/heads/main/bibleVerses.ts");
+    const res = await fetch(
+      "https://raw.githubusercontent.com/lquartararo/versescraper/refs/heads/main/bibleVerses.ts",
+    );
     const text = await res.text();
 
     // Extract the array from the text content
@@ -176,15 +178,16 @@ export async function getQuote(
     category === "developerexcuses"
       ? await getDeveloperExcuse()
       : category === "randomBible"
-      ? await getRandomBibleVerse()
-      : category === "dwyl"
-      ? await getRandomDwylQuote()
-      : category === "quotable"
-      ? await getRandomQuotableQuote()
-      : {
-        quote: "Selected category is invalid, pease create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
-        author: "Simon"
-      };
+        ? await getRandomBibleVerse()
+        : category === "dwyl"
+          ? await getRandomDwylQuote()
+          : category === "quotable"
+            ? await getRandomQuotableQuote()
+            : {
+                quote:
+                  "Selected category is invalid, pease create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
+                author: "Simon",
+              };
   // : category === "bible"
   //   ? await getBibleVerse()
   //   : await getQuoteOfTheDay(category);

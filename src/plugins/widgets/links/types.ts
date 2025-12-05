@@ -55,7 +55,13 @@ export type DisplayProps = Link & {
 
 export const defaultData: Data = {
   columns: 1,
-  links: [{ id: 'default-link', url: "https://github.com/BookCatKid/TablissNG", name: "TablissNG" }],
+  links: [
+    {
+      id: "default-link",
+      url: "https://github.com/BookCatKid/TablissNG",
+      name: "TablissNG",
+    },
+  ],
   visible: true,
   linkOpenStyle: false,
   linksNumbered: false,

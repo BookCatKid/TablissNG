@@ -31,7 +31,7 @@ export const setBackground = (key: string): void => {
 // Widget actions
 
 /** Add a new widget */
-export const addWidget = (key: string): void => {
+export const addWidget = (key: string, displayOverride?: Partial<WidgetDisplay>): string => {
   const id = createId();
   const widgets = selectWidgets();
   const order = widgets.length > 0 ? widgets[widgets.length - 1].order + 1 : 0;
@@ -39,8 +39,9 @@ export const addWidget = (key: string): void => {
     id,
     key,
     order,
-    display: { position: "middleCentre" },
+    display: { position: "middleCentre", ...displayOverride },
   });
+  return id;
 };
 
 /** Remove a widget */
@@ -107,7 +108,7 @@ export const importStore = (dump: any): void => {
     // Unknown version
     throw new TypeError("Unknown settings version");
   }
-  // @ts-ignore
+  // @ts-expect-error - prefix typing is incorrect but runtime iterator works
   Object.entries(dump).forEach(([key, val]) => DB.put(db, key, val));
 };
 
@@ -126,6 +127,6 @@ export const resetStore = (): void => {
 };
 
 const clear = (db: DB.Database): void => {
-  // @ts-ignore
+  // @ts-expect-error - prefix typing is incorrect but runtime iterator works
   for (const [key] of DB.prefix(db, "")) DB.del(db, key);
 };

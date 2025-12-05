@@ -1,15 +1,20 @@
 import React from "react";
+import { Icon } from "@iconify/react";
 import { defineMessages, useIntl } from "react-intl";
 import { ErrorContext } from "../../contexts/error";
 import { UiContext } from "../../contexts/ui";
 import { toggleFocus } from "../../db/action";
 import { db } from "../../db/state";
 import { useFullscreen, useKeyPress } from "../../hooks";
-import { useValue, useKey } from "../../lib/db/react";
-import { Icon } from "@iconify/react";
+import { useKey, useValue } from "../../lib/db/react";
 import "./Overlay.sass";
 
 const messages = defineMessages({
+  addWidgetHint: {
+    id: "dashboard.addWidgetHint",
+    defaultMessage: "Add widget",
+    description: "Hover hint text for the add widget icon",
+  },
   settingsHint: {
     id: "dashboard.settingsHint",
     defaultMessage: "Customise Tabliss",
@@ -38,92 +43,136 @@ const messages = defineMessages({
   },
 });
 
-type Position = 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight';
+type Position = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 
-const mapping: Record<Position, React.CSSProperties> = {
+const positionStyles: Record<Position, React.CSSProperties> = {
   topLeft: {
-    top: '0',
-    bottom: 'auto',
-    left: '0',
+    top: "0",
+    bottom: "auto",
+    left: "0",
   },
   topRight: {
-    top: '0',
-    right: '0',
-    left: 'auto',
-    flexDirection: 'row-reverse'
+    top: "0",
+    right: "0",
+    left: "auto",
+    flexDirection: "row-reverse",
   },
   bottomLeft: {
-    bottom: '0',
-    top: 'auto',
-    left: '0',
+    bottom: "0",
+    top: "auto",
+    left: "0",
   },
   bottomRight: {
-    bottom: '0',
-    right: '0',
-    top: 'auto',
-    left: 'auto',
-    flexDirection: 'row-reverse'
-  }
+    bottom: "0",
+    right: "0",
+    top: "auto",
+    left: "auto",
+    flexDirection: "row-reverse",
+  },
 };
+
+type CreditKey =
+  | "unsplashPhoto"
+  | "unsplashLocation"
+  | "wikimediaTitle"
+  | "wikimediaCopyright"
+  | "giphy"
+  | "apod";
+
+const creditSelectors: Record<CreditKey, string> = {
+  unsplashPhoto: ".credit .photo",
+  unsplashLocation: ".credit .location-wrapper",
+  wikimediaTitle: ".wikimedia-credit-title",
+  wikimediaCopyright: ".wikimedia-credit-copyright",
+  giphy: ".credit:has(.giphy-logo)",
+  apod: ".apod-credit",
+};
+
+const creditTransforms: Record<Position, Partial<Record<CreditKey, string>>> = {
+  topLeft: {},
+  topRight: {},
+  bottomLeft: {
+    unsplashPhoto: "translateY(-2.5em)",
+    wikimediaTitle: "translateY(-2em)",
+    giphy: "translateY(-2em)",
+    apod: "translateY(-3em)",
+  },
+  bottomRight: {
+    unsplashLocation: "translateY(-2.5em)",
+    wikimediaCopyright: "translateY(-3em)",
+  },
+};
+
+const baseOverlayClass = "Overlay";
 
 const Overlay: React.FC = () => {
   const intl = useIntl();
   const focus = useValue(db, "focus");
   const { errors } = React.useContext(ErrorContext);
-  const { pending, toggleErrors, toggleSettings } = React.useContext(UiContext);
-  const [hideSettingsIcon] = useKey(db, "hideSettingsIcon");
+  const {
+    pending,
+    toggleErrors,
+    toggleSettings,
+    toggleAddWidget,
+    addWidgetOpen,
+  } = React.useContext(UiContext);
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
 
-  useKeyPress(toggleFocus, ["w"]);
-  useKeyPress(toggleSettings, ["s"]);
+  useKeyPress(toggleFocus, ["w", "W"]);
+  useKeyPress(toggleSettings, ["s", "S"]);
+  useKeyPress(toggleAddWidget, ["q", "Q"]);
 
-  // Hooks inside a condition? Works because the condition always resolves the same
   const [isFullscreen, handleToggleFullscreen] = useFullscreen();
-  if (handleToggleFullscreen) useKeyPress(handleToggleFullscreen, ["f"]);
+  const handleFullscreenKeyPress = React.useCallback(() => {
+    if (handleToggleFullscreen) {
+      handleToggleFullscreen();
+    }
+  }, [handleToggleFullscreen]);
+  useKeyPress(handleFullscreenKeyPress, ["f"]);
 
-  const unsplashCreditPhotoElement = document.querySelector(".credit .photo") as HTMLElement;
-  const unsplashCreditLocationElement = document.querySelector(".credit .location-wrapper") as HTMLElement;
-  const wikimediaTitleCredit = document.querySelector(".wikimedia-credit-title") as HTMLElement;
-  const wikimediaCopyrightCredit = document.querySelector(".wikimedia-credit-copyright") as HTMLElement;
-  const giphyCreditElement = document.querySelector(".credit:has(.giphy-logo)") as HTMLElement;
-  const apodCreditElement = document.querySelector(".apod-credit") as HTMLElement;
+  React.useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    const transforms = creditTransforms[settingsIconPosition as Position] ?? {};
+    Object.entries(creditSelectors).forEach(([key, selector]) => {
+      const element = document.querySelector(selector) as HTMLElement | null;
+      if (!element) {
+        return;
+      }
+      element.style.transform = transforms[key as CreditKey] ?? "0";
+    });
+  }, [settingsIconPosition]);
 
-  if (unsplashCreditPhotoElement) {
-    unsplashCreditPhotoElement.style.transform = settingsIconPosition === "bottomLeft" ? "translateY(-2.5em)" : "0";
-  }
-  if (unsplashCreditLocationElement) {
-    unsplashCreditLocationElement.style.transform = settingsIconPosition === "bottomRight" ? "translateY(-2.5em)" : "0";
-  }
-  if (wikimediaTitleCredit) {
-    wikimediaTitleCredit.style.transform = settingsIconPosition === "bottomLeft" ? "translateY(-2em)" : "0";
-  }
-  if (wikimediaCopyrightCredit) {
-    wikimediaCopyrightCredit.style.transform = settingsIconPosition === "bottomRight" ? "translateY(-3em)" : "0";
-  }
-  if (giphyCreditElement) {
-    giphyCreditElement.style.transform = settingsIconPosition === "bottomLeft" ? "translateY(-2em)" : "0";
-  }
-  if (apodCreditElement) {
-    apodCreditElement.style.transform = settingsIconPosition === "bottomLeft" ? "translateY(-3em)" : "0";
-  }
+  const overlayClassName = [baseOverlayClass, settingsIconPosition]
+    .filter(Boolean)
+    .join(" ");
+  const positioning = positionStyles[settingsIconPosition as Position] ?? positionStyles.topLeft;
 
   return (
-    <div 
-      className={`Overlay ${settingsIconPosition}`} 
-      style={mapping[settingsIconPosition as Position] || mapping.topLeft}
-    >
-      <a 
-        onClick={toggleSettings} 
+    <div className={overlayClassName} style={positioning}>
+      <button
+        type="button"
+        className={addWidgetOpen ? "active" : ""}
+        onClick={toggleAddWidget}
+        title={`${intl.formatMessage(messages.addWidgetHint)} (Q)`}
+        aria-pressed={addWidgetOpen}
+      >
+        <Icon icon="feather:plus-circle" />
+      </button>
+
+      <button
+        type="button"
+        onClick={toggleSettings}
         title={`${intl.formatMessage(messages.settingsHint)} (S)`}
-        className={hideSettingsIcon ? "on-hover" : ""}
       >
         <Icon icon="feather:settings" />
-      </a>
+      </button>
 
       {errors.length > 0 ? (
-        <a onClick={toggleErrors} title={intl.formatMessage(messages.errorHint)}>
+        <button type="button" onClick={toggleErrors} title={intl.formatMessage(messages.errorHint)}>
           <Icon icon="feather:alert-triangle" />
-        </a>
+        </button>
       ) : null}
 
       {pending > 0 ? (
@@ -132,22 +181,24 @@ const Overlay: React.FC = () => {
         </span>
       ) : null}
 
-      <a
+      <button
+        type="button"
         className={focus ? "" : "on-hover"}
         onClick={toggleFocus}
         title={`${intl.formatMessage(messages.focusHint)} (W)`}
       >
         <Icon icon={`feather:${focus ? "eye-off" : "eye"}`} />
-      </a>
+      </button>
 
       {handleToggleFullscreen ? (
-        <a
+        <button
+          type="button"
           className="on-hover"
           onClick={handleToggleFullscreen}
           title={`${intl.formatMessage(messages.fullscreenHint)} (F)`}
         >
           <Icon icon={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`} />
-        </a>
+        </button>
       ) : null}
     </div>
   );
