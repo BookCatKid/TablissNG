@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { AuthState, Data, Cache, List, TrelloItemsResponse } from "../types";
+import { AuthState, Data, Cache, List, TrelloItemsResponse, BoardPreferences } from "../types";
 import { getLists } from "../utils/api";
-import { applyPreferences, getPreferences } from "../utils/preferences";
+import { applyPreferences, getPreferences, setPreferences } from "../utils/preferences";
 
 export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void, authState: AuthState) {
     const [lists, setLists] = useState<List[]>([]);
@@ -47,5 +47,32 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         }
     }, [data.selectedID, authState]);
 
-    return { lists, setLists, isLoading }
+    const updatePreferencesAndUI = async (listId: string, selections: List[], action: "ADD" | "REMOVE") => {
+        const filtered = selections.filter((list: List ) => { return list.watch });
+        const newPreferences: BoardPreferences = {selectedLists: filtered };
+        setPreferences(data.selectedID, newPreferences); 
+
+        // update UI
+        if (action === "ADD") {
+            // update with new order of display and
+            // create new pending fetch operation
+            setCache({
+                ...cache, 
+                order: filtered, 
+                responses: cache.responses.set(listId, { 
+                listId: listId, 
+                items: [], 
+                loading: true } as TrelloItemsResponse
+                )
+            });
+        } else {
+        cache.responses.delete(listId);
+        setCache({
+            ...cache,
+            order: filtered
+        });
+        }
+    }
+
+    return { lists, setLists, isLoading, updatePreferencesAndUI }
 }

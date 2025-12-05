@@ -16,7 +16,11 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   const MAX_LISTS = 6; // maximum lists a user can select
   const { authState, authError, authenticate, signOut } = useAuth();
   const { boards, isLoading: boardsLoading } = useBoards(data, setData, authState);
-  const { lists, setLists, isLoading: listsLoading } = useLists(data, cache, setCache, authState);
+  const { 
+    lists, 
+    setLists, 
+    isLoading: listsLoading, 
+    updatePreferencesAndUI } = useLists(data, cache, setCache, authState);
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const [error, setError] = useState<boolean>(false);
 
@@ -60,8 +64,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       return;
     }
 
-    const operation: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
-    if (operation === "REMOVE") {
+    const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
+    if (action === "REMOVE") {
       // set to unchecked
       setSelectedListCount(count => count - 1);
     } else {
@@ -70,39 +74,13 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       setSelectedListCount(count => count + 1); 
     }
    
-    const updated = lists.map((list: List) => { 
+    // update checked lists in the settings UI
+    const updatedOptions = lists.map((list: List) => { 
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
 
-    // update settings UI
-    setLists(updated);
-
-    // get updated lists that are being watched
-    const filtered = updated.filter((list: List ) => { return list.watch });
-    const newPreferences: BoardPreferences = {selectedLists: filtered };
-    setPreferences(data.selectedID, newPreferences); 
-    setData({...data, selectedLists: filtered});
-
-    // update UI
-    if (operation === "ADD") {
-      // update with new order of display and
-      // create new pending fetch operation
-      setCache({
-        ...cache, 
-        order: filtered, 
-        responses: cache.responses.set(listID, { 
-          listId: listID, 
-          items: [], 
-          loading: true } as TrelloItemsResponse
-        )
-      });
-    } else {
-      cache.responses.delete(listID);
-      setCache({
-        ...cache,
-        order: filtered
-      });
-    }
+    setLists(updatedOptions);
+    updatePreferencesAndUI(listID, updatedOptions, action);
   }
 
   if (authState !== "authenticated") {
