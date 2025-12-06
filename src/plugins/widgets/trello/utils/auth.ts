@@ -1,3 +1,4 @@
+import { AuthState } from "../types";
 
 /**
  * Creates authentication popup then calls callback endpoint to generate JWT

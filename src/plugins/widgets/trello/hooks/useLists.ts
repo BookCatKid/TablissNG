@@ -52,6 +52,7 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         if (action === "ADD") {
             // update with new order of display and
             // create new pending fetch operation
+            console.log("UPDATING UI");
             setCache({
                 ...cache, 
                 order: selections, 

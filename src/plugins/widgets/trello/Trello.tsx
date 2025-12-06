@@ -1,20 +1,23 @@
 import React, { FC, useEffect, useRef } from "react";
-import { defaultData, Props, List, defaultCache } from "./types";
+import { Props, List, defaultCache } from "./types";
 import "./Trello.sass";
 import useAuth from "./hooks/useAuth";
 import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
 
-const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache }) => {
-  const { authState } = useAuth();
+const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
+  console.log(cache);
+  const { authState } = useAuth(cache, setCache);
   const hasLoadedRef = useRef<boolean>(false);
 
   // fetch data on load
   useEffect(() => {
     if (hasLoadedRef.current) return;
     const effect = async () => {
+      console.log("FETCHIN DATA ON LOAD");
       const results = await Promise.all(
         Array.from(cache.responses.values()).map(async (response) => {
+          console.log("Fetching items for ", response.listId);
           const items = await getItems(response.listId);
           return items ? { listId: response.listId, response, items } : null;
         })
@@ -37,11 +40,11 @@ const Trello: FC<Props> = ({ data = defaultData, cache = defaultCache, setCache 
       });
     };
 
-    if (authState === "authenticated") {
+    if (!!authState && authState === "authenticated") {
       effect();
       hasLoadedRef.current = true;
     }
-  }, [authState, cache]);
+  }, [authState, cache.responses]);
 
   // refetch data when items in cache are changed
   useEffect(() => {

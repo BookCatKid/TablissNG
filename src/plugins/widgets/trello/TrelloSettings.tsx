@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FC, useRef, useState } from "react";
-import { BoardPreference, defaultCache, defaultData, Props } from "./types";
+import { BoardPreference, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
@@ -11,7 +11,7 @@ import useLists from "./hooks/useLists";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
-  const { authState, authError, authenticate, signOut } = useAuth();
+  const { authState, authError, signIn, signOut } = useAuth(cache, setCache);
   const { boards, isLoading: boardsLoading } = useBoards(data, setData, authState);
   const { 
     lists, 
@@ -21,10 +21,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const pendingSelectionsRef = useRef<Set<string>>(new Set<string>());
   const debounceTimeoutRef = useRef<number>(null);
-  const DEBOUNCE_INTERVAL = 650;
+  const DEBOUNCE_INTERVAL = 550;
 
   const onAuthenticateClick = async () => {
-    await authenticate();
+    await signIn();
   }
 
   const onSignout = async () => {
@@ -36,7 +36,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     setData({ ...data, selectedID: event.target.value });
-    setCache(defaultCache);
+    // reset all cache except auth state
+    setCache({
+      ...cache, 
+      order: [], 
+      responses: new Map<string, TrelloItemsResponse>() 
+    });
   }
 
   const onListCheckboxSelect = (listID: string) => {
@@ -70,9 +75,10 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      // set preference
+      // set preferences
       const filtered = updatedOptions.filter((list: List ) => { return list.watch });
       const newPreference: BoardPreference = { boardId: data.selectedID!, lists: filtered };
+      console.log("ADDING LISTS", filtered);
 
       const updated = data.preferences;
       updated[data.selectedID!] = newPreference;

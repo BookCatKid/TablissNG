@@ -56,6 +56,7 @@ export type Item = {
 export type Cache = {
   order: List[]; // order of responses for rendering
   responses: Map<string, TrelloItemsResponse>; // map list ids to the corresponding API response
+  authState: AuthState;
 }
 
 export type Data = {
@@ -73,4 +74,5 @@ export const defaultData: Data = {
 export const defaultCache: Cache = {
   order: [],
   responses: new Map<string, TrelloItemsResponse>(),
+  authState: "unauthenticated",
 }
