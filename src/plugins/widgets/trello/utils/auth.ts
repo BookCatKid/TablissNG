@@ -32,7 +32,7 @@ export const runAuthFlow = async () => {
 
         if (callbackResult.ok) {
             const json = await callbackResult.json();
-            const token = json.token;
+            const {token} = json;
             await browser.storage.local.set({ trelloSessionToken: token });
         }
     } catch (err) {
