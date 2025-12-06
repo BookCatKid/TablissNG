@@ -20,9 +20,9 @@ export const fetchImages = async ({
     Authorization: `Client-ID ${UNSPLASH_API_KEY}`,
   });
 
-  // if (!UNSPLASH_API_KEY) {
-  //   throw new Error("You must set the UNSPLASH_API_KEY environment variable.");
-  // }
+  if (!UNSPLASH_API_KEY) {
+    throw new Error("You must set the UNSPLASH_API_KEY environment variable.");
+  }
 
   params.set("count", "10");
 
