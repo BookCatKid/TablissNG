@@ -33,7 +33,7 @@ export const getLists = async (boardID: string) => {
         return null;
     }
 
-    const lists = (await fetchListRes.json()).lists;
+    const {lists} = await fetchListRes.json();
     return lists as List[];
 }
 
