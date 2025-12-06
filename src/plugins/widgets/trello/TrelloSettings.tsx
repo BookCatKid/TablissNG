@@ -75,10 +75,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       // run after debounce timeout
 
       // set preferences
-      const selectedLists = updatedOptions.filter((list: List ) => { return list.watch });
+      const selectedLists = updatedOptions.filter((list: List) => list.watch);
       const newPreference: BoardPreference = { boardId: data.selectedID!, lists: selectedLists };
-      const updated = data.preferences;
-      updated[data.selectedID!] = newPreference;
+      const updated = {
+        ...data.preferences,
+        [data.selectedID!]: newPreference,
+      };
       setData({ ...data, preferences: updated });
 
       // update the UI with the pending jobs and new selections
