@@ -1,5 +1,3 @@
-import { AuthState } from "../types";
-
 /**
  * Creates authentication popup then calls callback endpoint to generate JWT
  * Stores JWT in extension local storage
@@ -24,7 +22,7 @@ export const runAuthFlow = async () => {
     const token = tokenMatch ? tokenMatch[1] : null;
     try {
         // set token in database and return JWT
-        const callbackResult = await fetch("https://trellocallback-rrswz5h5iq-de.a.run.app ", {
+        const callbackResult = await fetch("https://trellocallback-rrswz5h5iq-de.a.run.app", {
             method: "POST",
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({ token: token })
