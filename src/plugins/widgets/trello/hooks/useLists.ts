@@ -56,10 +56,11 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
      */
     const updateUI = async (listId: string, selectedLists: List[], jobs: Set<TrelloItemsResponse>, action: "ADD" | "REMOVE") => {
         if (action === "ADD") {
-            const updatedFetchJobs = new Map<string, TrelloItemsResponse>();
+            const updatedFetchJobs = cache.responses;
             jobs.forEach(job => {
-                updatedFetchJobs.set(listId, job);
-            })
+                console.log("ADDING NEW JOB");
+                updatedFetchJobs.set(job.listId, job);
+            });
             
             // update with new order of display and
             // create new pending fetch operation
@@ -67,18 +68,15 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
             setCache({
                 ...cache, 
                 order: selectedLists, 
-                responses: cache.responses.set(listId, { 
-                    listId: listId, 
-                    items: [], 
-                    loading: true } as TrelloItemsResponse
-                )
+                responses: updatedFetchJobs,
             });
-        } else {
-        cache.responses.delete(listId);
-        setCache({
-            ...cache,
-            order: selectedLists
-        });
+        } else {                
+            // delete the job under the list being removed
+            cache.responses.delete(listId);
+            setCache({
+                ...cache,
+                order: selectedLists
+            });
         }
     }
 

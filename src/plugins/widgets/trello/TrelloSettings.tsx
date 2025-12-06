@@ -79,7 +79,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       // set preferences
       const selectedLists = updatedOptions.filter((list: List ) => { return list.watch });
       const newPreference: BoardPreference = { boardId: data.selectedID!, lists: selectedLists };
-
       const updated = data.preferences;
       updated[data.selectedID!] = newPreference;
       setData({ ...data, preferences: updated });
