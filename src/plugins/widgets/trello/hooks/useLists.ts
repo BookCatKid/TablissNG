@@ -47,15 +47,26 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         }
     }, [data.selectedID, authState]);
 
-    const updateUI = async (listId: string, selections: List[], action: "ADD" | "REMOVE") => {
-        // update UI
+
+    /**
+     * Update Trello UI with new fetch jobs
+     * @param listId 
+     * @param jobs 
+     * @param action 
+     */
+    const updateUI = async (listId: string, selectedLists: List[], jobs: Set<TrelloItemsResponse>, action: "ADD" | "REMOVE") => {
         if (action === "ADD") {
+            const updatedFetchJobs = new Map<string, TrelloItemsResponse>();
+            jobs.forEach(job => {
+                updatedFetchJobs.set(listId, job);
+            })
+            
             // update with new order of display and
             // create new pending fetch operation
             console.log("UPDATING UI");
             setCache({
                 ...cache, 
-                order: selections, 
+                order: selectedLists, 
                 responses: cache.responses.set(listId, { 
                     listId: listId, 
                     items: [], 
@@ -66,7 +77,7 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         cache.responses.delete(listId);
         setCache({
             ...cache,
-            order: selections
+            order: selectedLists
         });
         }
     }

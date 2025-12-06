@@ -9,7 +9,6 @@ import { AuthState, Cache } from "../types";
  * @returns 
  */
 export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) {
-    console.log("AUTH STATE ", cache.authState);
     const authState = cache.authState ?? "unauthenticated";
     const [authError, setAuthError] = useState<string | null>(null);
    
@@ -24,7 +23,12 @@ export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) 
                 setAuthState("unauthenticated");
             }
         }
-        effect();
+
+        // prevent cases where signing triggers the hook to sign the user back in
+        // if the useris attempting to sign out stop the hook
+        if (authState !== "pending") {
+            effect();
+        }
     }, []);
 
     const signIn = async () => {
@@ -44,9 +48,9 @@ export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) 
     }
 
     const signOut = async () => {
-        // clear session token and preferences
+        // clear session token 
+        setAuthState("pending");
         await browser.storage.local.clear();
-        setAuthState("unauthenticated");
     }
 
     return {authState, authError, signIn, signOut};

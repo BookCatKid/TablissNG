@@ -14,7 +14,6 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   useEffect(() => {
     if (hasLoadedRef.current) return;
     const effect = async () => {
-      console.log("FETCHIN DATA ON LOAD");
       const results = await Promise.all(
         Array.from(cache.responses.values()).map(async (response) => {
           console.log("Fetching items for ", response.listId);
@@ -44,7 +43,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       effect();
       hasLoadedRef.current = true;
     }
-  }, [authState, cache.responses]);
+  }, [authState]);
 
   // refetch data when items in cache are changed
   useEffect(() => {
@@ -75,13 +74,17 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         <p>Add some lists to view</p> 
         :
         <div className="display-list-container">
-        {  
-          cache.order.map((list: List) => {
-            const response = cache.responses.get(list.id);
-            return <DisplayList header={list.name} items={response?.items} loading={response?.loading} />
-          }           
-          )
-        }    
+          {  
+            cache.order.map((list: List) => {
+                const response = cache.responses.get(list.id);
+                return <DisplayList 
+                  header={list.name} 
+                  items={response?.items} 
+                  loading={response?.loading} 
+                />
+              }           
+            )
+          }    
         </div>
       }
     </>

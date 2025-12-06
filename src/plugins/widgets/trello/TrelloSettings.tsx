@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FC, useRef, useState } from "react";
-import { BoardPreference, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
+import { BoardPreference, createTrelloItemsResponse, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
@@ -19,7 +19,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     isLoading: listsLoading, 
     updateUI } = useLists(data, cache, setCache, authState);
   const [selectedListCount, setSelectedListCount] = useState<number>(0);
-  const pendingSelectionsRef = useRef<Set<string>>(new Set<string>());
+  const pendingJobsRef = useRef<Set<TrelloItemsResponse>>(new Set<TrelloItemsResponse>());
   const debounceTimeoutRef = useRef<number>(null);
   const DEBOUNCE_INTERVAL = 550;
 
@@ -52,22 +52,21 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
 
     const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
     if (action === "REMOVE") {
-      // set to unchecked
       setSelectedListCount(count => count - 1);
-      pendingSelectionsRef.current.delete(listID);
+      pendingJobsRef.current.forEach(job => job.listId === listID && pendingJobsRef.current.delete(job));
     } else {
-      // set to checked
       if (selectedListCount + 1 > MAX_LISTS) return;
       setSelectedListCount(count => count + 1); 
-      pendingSelectionsRef.current.add(listID);
+      pendingJobsRef.current.add(createTrelloItemsResponse(listID));
     }
    
-    // update checked lists in the settings UI
+    // update the settings UI
     const updatedOptions = lists.map((list: List) => { 
       return list.id === listID ? { ...list, watch: !list.watch } : list
     });
 
     setLists(updatedOptions);
+    // optimistically update UI with skeleton
 
     // debouncing logic for rapid selection
     if (debounceTimeoutRef.current) {
@@ -75,16 +74,19 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
+      // run after debounce timeout
+
       // set preferences
-      const filtered = updatedOptions.filter((list: List ) => { return list.watch });
-      const newPreference: BoardPreference = { boardId: data.selectedID!, lists: filtered };
-      console.log("ADDING LISTS", filtered);
+      const selectedLists = updatedOptions.filter((list: List ) => { return list.watch });
+      const newPreference: BoardPreference = { boardId: data.selectedID!, lists: selectedLists };
 
       const updated = data.preferences;
       updated[data.selectedID!] = newPreference;
       setData({ ...data, preferences: updated });
-      updateUI(listID, filtered, action);
-      pendingSelectionsRef.current.clear();
+
+      // update the UI with the pending jobs and new selections
+      updateUI(listID, selectedLists, pendingJobsRef.current, action);
+      pendingJobsRef.current.clear();
     }, DEBOUNCE_INTERVAL);
   }
 

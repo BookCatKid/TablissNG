@@ -21,10 +21,21 @@ export type DisplayList = {
   loading: boolean;
 }
 
+/**
+ * Represents a pending job to fetch items from a trello board
+ */
 export type TrelloItemsResponse = {
   listId: string;
   items: TrelloListItem[];
   loading: boolean;
+}
+
+export const createTrelloItemsResponse = (listId: string) => {
+  return {
+    listId: listId,
+    items: [],
+    loading: true
+  }  as TrelloItemsResponse
 }
 
 export type TrelloListItem = {
