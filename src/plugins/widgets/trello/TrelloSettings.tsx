@@ -18,7 +18,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     setLists, 
     isLoading: listsLoading, 
     updateUI } = useLists(data, cache, setCache, authState);
-  const [selectedListCount, setSelectedListCount] = useState<number>(0);
   const pendingJobsRef = useRef<Set<TrelloItemsResponse>>(new Set<TrelloItemsResponse>());
   const debounceTimeoutRef = useRef<number>(null);
   const DEBOUNCE_INTERVAL = 550;
@@ -50,13 +49,12 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       return;
     }
 
+    let updatedListCount = lists.filter(l => l.watch).length;
     const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
     if (action === "REMOVE") {
-      setSelectedListCount(count => count - 1);
       pendingJobsRef.current.forEach(job => job.listId === listID && pendingJobsRef.current.delete(job));
     } else {
-      if (selectedListCount + 1 > MAX_LISTS) return;
-      setSelectedListCount(count => count + 1); 
+      if (updatedListCount + 1 > MAX_LISTS) return;
       pendingJobsRef.current.add(createTrelloItemsResponse(listID));
     }
    
