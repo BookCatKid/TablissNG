@@ -20,6 +20,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - feat: add italics and underline options to widget font settings. [40d615d](https://github.com/BookCatKid/TablissNG/commit/40d615d)
 
+- feat: add perplexity search engine. [c504a5d](https://github.com/BookCatKid/TablissNG/commit/c504a5d)
+
+- feat: beta safari support (simple). [b0d63a8](https://github.com/BookCatKid/TablissNG/commit/b0d63a8)
+
 ### Changed
 
 - feat: change Unsplash "Tags" input to "Search Term". [8efe064](https://github.com/BookCatKid/TablissNG/commit/8efe064)
@@ -32,6 +36,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - chore: Change timezone label "Europe/Kiev" to "Europe/Kyiv". [46c9b61](https://github.com/BookCatKid/TablissNG/commit/46c9b61)
 
+- refactor(backgrounds): introduce a baseBackgorund so facilitate adding backgrounds. [9bb547f](https://github.com/BookCatKid/TablissNG/commit/9bb547f)
+
+- feat: clean up settings, remove ads. [7201357](https://github.com/BookCatKid/TablissNG/commit/7201357)
+
 ### Fixed
 
 - fix(Import): set display.scale to true by default. [116df62](https://github.com/BookCatKid/TablissNG/commit/116df62a21c3eb83d8756c2d657ce01fa0a680b3)
@@ -40,16 +48,29 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - fix(QuickLinks): text underline not appearing. [b2f8883](https://github.com/BookCatKid/TablissNG/commit/b2f8883)
 
+- fix: replace {{}} with [] for github-calendar translations. [0bf9d9e](https://github.com/BookCatKid/TablissNG/commit/0bf9d9e)
+
+- fix: remove drop-shadow from github-calendar. [aa6fd7e](https://github.com/BookCatKid/TablissNG/commit/aa6fd7e)
+
+- fix: unloaded github calendar now has correct colors dependent on theme. [04abb8a](https://github.com/BookCatKid/TablissNG/commit/04abb8a)
+
 ### Translations
 
 - Update translations (several cs.json updates, translated auto-hide settings menu, engines). [e7e1a40](https://github.com/BookCatKid/TablissNG/commit/e7e1a40), [6107f9a](https://github.com/BookCatKid/TablissNG/commit/6107f9a), [576a15b](https://github.com/BookCatKid/TablissNG/commit/576a15b)
 
 - add: Albanian translation. [98084fb](https://github.com/BookCatKid/TablissNG/commit/98084fb)
 
+- feat: clean up a few translations. [6198093](https://github.com/BookCatKid/TablissNG/commit/6198093)
+
 ### Chore / Cleanup
 
 - remove console.log and minor cleanup. [a6006ad](https://github.com/BookCatKid/TablissNG/commit/a6006ad)
+
 - chore: add npm-check scripts and remove unused deps. [07abb38](https://github.com/BookCatKid/TablissNG/commit/07abb38)
+
+- chore: slightly improve README. [ba5323c](https://github.com/BookCatKid/TablissNG/commit/ba5323c)
+
+- Add .gitattributes and workspace settings: normalize EOL to LF. [119945b](https://github.com/BookCatKid/TablissNG/commit/119945b)
 
 
 ## [1.5.1] - 8/4/2025 | Minor Feature and Bugfix Update
