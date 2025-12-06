@@ -19,7 +19,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     isLoading: listsLoading, 
     updateUI } = useLists(data, cache, setCache, authState);
   const pendingJobsRef = useRef<Set<TrelloItemsResponse>>(new Set<TrelloItemsResponse>());
-  const debounceTimeoutRef = useRef<number>(null);
+  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const DEBOUNCE_INTERVAL = 550;
 
   const onAuthenticateClick = async () => {
