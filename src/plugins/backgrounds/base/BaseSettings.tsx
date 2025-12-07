@@ -30,7 +30,7 @@ const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Prop
         {data.paused ? (
           <span className="text--grey">
             <FormattedMessage
-              id="plugins.backgrounds.paused"
+              id="backgrounds.base.paused"
               defaultMessage="(Paused)"
               description="Text shown when rotation is paused"
             />{" "}
@@ -45,8 +45,8 @@ const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Prop
         title
       ) : (
         <FormattedMessage
-          id="plugins.backgrounds.showNew"
-          defaultMessage="Show a new item"
+          id="backgrounds.base.showNewPhoto"
+          defaultMessage="Show a new photo"
         />
       )}
 

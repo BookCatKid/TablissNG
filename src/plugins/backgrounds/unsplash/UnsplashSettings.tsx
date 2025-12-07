@@ -26,13 +26,6 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       <BaseSettings
         data={data}
         setData={setData}
-        title={(
-          <FormattedMessage
-            id="backgrounds.unsplash.showNewPhoto"
-            defaultMessage="Show a new photo"
-            description="Show a new photo title"
-          />
-        )}
       />
 
       <label>
