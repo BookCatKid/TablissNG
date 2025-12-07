@@ -64,7 +64,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     });
 
     setLists(updatedOptions);
-    // optimistically update UI with skeleton
+    // TODO optimistically update UI with skeleton
 
     // debouncing logic for rapid selection
     if (debounceTimeoutRef.current) {

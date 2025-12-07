@@ -14,9 +14,9 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   useEffect(() => {
     if (hasLoadedRef.current) return;
     const effect = async () => {
+      console.log("TRELLO: fetching items for all selected lists");
       const results = await Promise.all(
         Array.from(cache.responses.values()).map(async (response) => {
-          console.log("Fetching items for ", response.listId);
           const items = await getItems(response.listId);
           return items ? { listId: response.listId, response, items } : null;
         })
@@ -45,9 +45,10 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     }
   }, [authState]);
 
-  // refetch data when items in cache are changed
+  // fetch data when items in cache are changed
   useEffect(() => {
     const effect = async () => {
+      console.log("TRELLO: fetching items for new jobs")
       await Promise.all(
         cache.responses.values().map(async (response) => {
           if (response.loading) {

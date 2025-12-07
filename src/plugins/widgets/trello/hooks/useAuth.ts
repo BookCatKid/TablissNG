@@ -19,6 +19,7 @@ export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) 
                 const auth = await checkAuth();
                 await setAuthState(auth ? "authenticated" : "unauthenticated");
             } catch (err) {
+                console.error("TRELLO AUTH CHECK ERROR: ", err);
                 setAuthError("Failed to check authentication status");
                 setAuthState("unauthenticated");
             }
@@ -38,6 +39,7 @@ export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) 
             await runAuthFlow();
             await setAuthState("authenticated");
         } catch (err) {
+            console.error("TRELLO SIGN IN ERROR: ", err);
             setAuthError("Failed to authenticate user");
             await setAuthState("unauthenticated");
         }
@@ -49,6 +51,7 @@ export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) 
 
     const signOut = async () => {
         // clear session token 
+        console.log("TRELLO: Signing out goodbye :)");
         setAuthState("pending");
         await browser.storage.local.clear();
     }

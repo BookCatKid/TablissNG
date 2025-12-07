@@ -58,13 +58,13 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         if (action === "ADD") {
             const updatedFetchJobs = cache.responses;
             jobs.forEach(job => {
-                console.log("ADDING NEW JOB");
+                console.log("TRELLO: Adding new fetch job ", job);
                 updatedFetchJobs.set(job.listId, job);
             });
             
             // update with new order of display and
             // create new pending fetch operation
-            console.log("UPDATING UI");
+            console.log("TRELLO: Updating UI from useLists.ts");
             setCache({
                 ...cache, 
                 order: selectedLists, 
