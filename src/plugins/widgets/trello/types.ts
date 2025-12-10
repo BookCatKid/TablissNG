@@ -21,27 +21,41 @@ export type DisplayList = {
   loading: boolean;
 }
 
-/**
- * Represents a pending job to fetch items from a trello board
- */
-export type TrelloItemsResponse = {
-  listId: string;
-  items: TrelloListItem[];
-  loading: boolean;
+
+export type TrelloBoardResponse = {
+  id: string;
+  name: string;
 }
 
-export const createTrelloItemsResponse = (listId: string) => {
-  return {
-    listId: listId,
-    items: [],
-    loading: true
-  }  as TrelloItemsResponse
+
+export type TrelloListResponse = {
+  id: string;
+  name: string;
 }
+
+export type TrelloItemsResponse = TrelloListItem[];
 
 export type TrelloListItem = {
   id: string;
   name: string;
   // add more attributes from api as fit
+}
+
+/**
+ * Represents a pending job to fetch items from a trello board
+ */
+export type FetchJob = {
+  listId: string;
+  items: TrelloListItem[];
+  loading: boolean;
+}
+
+export const createFetchJob = (listId: string) => {
+  return {
+    listId: listId,
+    items: [],
+    loading: true
+  }  as FetchJob
 }
 
 export type DisplayListItem = {
@@ -66,7 +80,7 @@ export type Item = {
 
 export type Cache = {
   order: List[]; // order of responses for rendering
-  responses: Map<string, TrelloItemsResponse>; // map list ids to the corresponding API response
+  responses: Map<string, FetchJob>; // map list ids to the corresponding API response
   authState: AuthState;
 }
 
@@ -84,6 +98,6 @@ export const defaultData: Data = {
 
 export const defaultCache: Cache = {
   order: [],
-  responses: new Map<string, TrelloItemsResponse>(),
+  responses: new Map<string, FetchJob>(),
   authState: "unauthenticated",
 }

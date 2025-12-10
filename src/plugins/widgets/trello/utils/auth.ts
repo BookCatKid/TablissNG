@@ -58,6 +58,25 @@ export const checkAuth = async () => {
     }
 }
 
+
+export const getUserFromJWT = async () => {
+    try {
+        const token = await getToken();
+        if (!token) {
+            return null;
+        }
+
+        if (!await checkAuth()) {
+            return null;
+        }
+
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return { accessToken: payload.accessToken, userId: payload.userId };
+    } catch (err) {
+        throw err;
+    }
+}
+
 export const getToken = async () => {
     const obj = await browser.storage.local.get("trelloSessionToken");
     const token: string | null = typeof obj["trelloSessionToken"] === "string" ? obj["trelloSessionToken"] : null;

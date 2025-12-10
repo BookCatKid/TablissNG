@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FC, useRef, useState } from "react";
-import { BoardPreference, createTrelloItemsResponse, defaultCache, defaultData, Props, TrelloItemsResponse } from "./types";
+import { BoardPreference, createFetchJob, defaultCache, defaultData, Props, FetchJob } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
@@ -18,7 +18,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     setLists, 
     isLoading: listsLoading, 
     updateUI } = useLists(data, cache, setCache, authState);
-  const pendingJobsRef = useRef<Set<TrelloItemsResponse>>(new Set<TrelloItemsResponse>());
+  const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const DEBOUNCE_INTERVAL = 550;
 
@@ -39,7 +39,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     setCache({
       ...cache, 
       order: [], 
-      responses: new Map<string, TrelloItemsResponse>() 
+      responses: new Map<string, FetchJob>() 
     });
   }
 
@@ -55,7 +55,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
       pendingJobsRef.current.forEach(job => job.listId === listID && pendingJobsRef.current.delete(job));
     } else {
       if (updatedListCount + 1 > MAX_LISTS) return;
-      pendingJobsRef.current.add(createTrelloItemsResponse(listID));
+      pendingJobsRef.current.add(createFetchJob(listID));
     }
    
     // update the settings UI

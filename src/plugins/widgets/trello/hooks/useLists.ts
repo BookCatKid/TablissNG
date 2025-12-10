@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AuthState, Data, Cache, List, TrelloItemsResponse, BoardPreference } from "../types";
+import { AuthState, Data, Cache, List, FetchJob, BoardPreference } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 
@@ -12,27 +12,28 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         setIsLoading(true);
         const effect = async () => {
             if (!data.selectedID) return;
+            console.log("TRELLO: Fetching lists");
             const lists = await getLists(data.selectedID);
             if (!lists) return;
-
-            // load preferences
-            if (!data.preferences.hasOwnProperty(data.selectedID)) {
+        
+            if (data.preferences === undefined || !(data.selectedID in data.preferences)) {
+                console.log("TRELLO: no preferences found");
                 setLists(lists);
                 setIsLoading(false);
                 return;
             }
 
             const preferences = data.preferences[data.selectedID];
-
+            console.log("TRELLO: Attempting to apply preferences");
             let listsWithPreferences = await applyPreferences(lists, preferences);
             setLists(listsWithPreferences);
             setIsLoading(false);
 
             // load new fetching jobs into cache
             const filtered = listsWithPreferences.filter(list => list.watch);
-            const responses = new Map<string, TrelloItemsResponse>();
+            const responses = new Map<string, FetchJob>();
             filtered.map(list => {
-                responses.set(list.id, { listId: list.id, items: [], loading: true} as TrelloItemsResponse)
+                responses.set(list.id, { listId: list.id, items: [], loading: true} as FetchJob)
             });
 
             setCache({
@@ -54,7 +55,7 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
      * @param jobs 
      * @param action 
      */
-    const updateUI = async (listId: string, selectedLists: List[], jobs: Set<TrelloItemsResponse>, action: "ADD" | "REMOVE") => {
+    const updateUI = async (listId: string, selectedLists: List[], jobs: Set<FetchJob>, action: "ADD" | "REMOVE") => {
         if (action === "ADD") {
             const updatedFetchJobs = cache.responses;
             jobs.forEach(job => {

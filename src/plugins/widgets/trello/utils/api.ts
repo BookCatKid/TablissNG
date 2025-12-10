@@ -1,64 +1,56 @@
-import { Board, List, TrelloListItem } from "../types";
-import { getToken } from "./auth";
+import { Board, Item, List, TrelloBoardResponse, TrelloItemsResponse, TrelloListItem, TrelloListResponse } from "../types";
+import { getUserFromJWT, getToken } from "./auth";
 
 export const getBoards = async () => {
-    const token = await getToken();
-    if (!token) {
+    const user = await getUserFromJWT();
+
+    if (!user) {
         return null;
     }
 
-   const fetchBoardRes = await fetch("https://api-rrswz5h5iq-de.a.run.app/v1/me/boards", { 
-        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
-    });
+   const fetchBoardRes = await fetch(`https://api.trello.com/1/members/${user.userId}/boards?key=${TRELLO_API_KEY}&token=${user.accessToken}`);
 
     if (!fetchBoardRes.ok) {
         return null;
     }
 
-    const boards = (await fetchBoardRes.json()).boards;
-    return boards as Board[];
+    const boardData: TrelloBoardResponse[] = await fetchBoardRes.json();
+    const boards: Board[] = boardData.map((data: TrelloBoardResponse) => ({ id: data.id, name: data.name } as Board));
+    return boards;
 }
 
-export const getLists = async (boardID: string) => {
-    const token = await getToken();
-    if (!token) {
+export const getLists = async (boardId: string) => {
+    const user = await getUserFromJWT();
+
+    if (!user) {
         return null;
     }
 
-    const fetchListRes = await fetch(`https://api-rrswz5h5iq-de.a.run.app/v1/me/boards/${boardID}/lists`, {
-        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
-    });
+    const fetchListRes = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?key=${TRELLO_API_KEY}&token=${user.accessToken}`)
 
     if (!fetchListRes.ok) {
         return null;
     }
 
-    const {lists} = await fetchListRes.json();
-    return lists as List[];
+    const listData: TrelloListResponse[] = await fetchListRes.json();
+    const lists: List[] = listData.map((data: TrelloListResponse) => ({ id: data.id, name: data.name, boardID: boardId, watch: false } as List));
+    console.log(lists);
+    return lists;
 }
 
-/**
- * Load lists under a board and preselect 
- * @param boardID 
- */
-export const getListsWithPreferences = async (boardID: string) => {
+export const getItems = async (listId: string) => {
+    const user = await getUserFromJWT();
 
-}
-
-export const getItems = async (listID: string) => {
-    const token = await getToken();
-    if (!token) {
+    if (!user) {
         return null;
     }
-
-    const fetchItemsRes = await fetch(`https://api-rrswz5h5iq-de.a.run.app/v1/me/lists/${listID}/items`, {
-        headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" },
-    });
+    const fetchItemsRes = await fetch(`https://api.trello.com/1/lists/${listId}/cards?key=${TRELLO_API_KEY}&token=${user.accessToken}`);
 
     if (!fetchItemsRes.ok) {
         return null;
     }
 
-    const items = await fetchItemsRes.json();
-    return items as TrelloListItem[];
+    const data: TrelloItemsResponse = await fetchItemsRes.json();
+    const items = data.map((item: TrelloListItem) => ({ id: item.id, name: item.name} as Item));
+    return items;
 }

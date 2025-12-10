@@ -8,6 +8,7 @@ export default function useBoards(data: Data, setData: (data: Data) => void, aut
 
     useEffect(() => {
         const effect = async () => {
+            console.log("TRELLO: Fetching boards");
             const boards = await getBoards();
             if (!boards) return; // add better error handling
             setBoards(boards);
