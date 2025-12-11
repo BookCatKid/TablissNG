@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { checkAuth, runAuthFlow,  } from "../utils/auth";
-import { AuthState, Cache } from "../types";
+import { useAuthStore } from "../stores/useAuthStore";
 
 /**
  * Hook for reading and setting authentication state. Bundles a client functions for signing in and out
@@ -8,53 +8,51 @@ import { AuthState, Cache } from "../types";
  * @param setCache  cache setter used for updating global authentication state since we can't use context providers
  * @returns 
  */
-export default function useAuth(cache: Cache, setCache: (cache: Cache) => void) {
-    const authState = cache.authState ?? "unauthenticated";
-    const [authError, setAuthError] = useState<string | null>(null);
-   
+export default function useAuth() {
+    const authStatus = useAuthStore((state) => state.status); 
+    const setAuthStatus = useAuthStore((state) => state.setStatus);
+    const [authError, setAuthError] = useState<string | null>("");
+
     // check authentication status on load and on any changes to cache
     useEffect(() => {
         const effect = async () => {
             try {
                 const auth = await checkAuth();
-                await setAuthState(auth ? "authenticated" : "unauthenticated");
+                setAuthStatus(auth ? "authenticated" : "unauthenticated");
             } catch (err) {
                 console.error("TRELLO AUTH CHECK ERROR: ", err);
                 setAuthError("Failed to check authentication status");
-                setAuthState("unauthenticated");
+                setAuthStatus("unauthenticated");
             }
         }
 
         // prevent cases where signing triggers the hook to sign the user back in
         // if the useris attempting to sign out stop the hook
-        if (authState !== "pending") {
+        if (authStatus !== "pending") {
             effect();
         }
     }, []);
 
     const signIn = async () => {
         console.log("Authenticating");
-        setAuthState("pending");
+        setAuthStatus("pending");
         try {
             await runAuthFlow();
-            await setAuthState("authenticated");
+            setAuthStatus("authenticated");
         } catch (err) {
             console.error("TRELLO SIGN IN ERROR: ", err);
             setAuthError("Failed to authenticate user");
-            await setAuthState("unauthenticated");
+            setAuthStatus("unauthenticated");
         }
     }
-
-    const setAuthState = (state: AuthState) => {
-        setCache({ ...cache, authState: state });
-    }
-
+    
     const signOut = async () => {
         // clear session token 
         console.log("TRELLO: Signing out goodbye :)");
-        setAuthState("pending");
+        setAuthStatus("pending");
         await browser.storage.local.clear();
+        setAuthStatus("unauthenticated");
     }
 
-    return {authState, authError, signIn, signOut};
+    return { authStatus, authError, signIn, signOut };
 }

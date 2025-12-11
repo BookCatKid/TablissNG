@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { AuthState, Board, Data } from "../types";
+import { Board, Data } from "../types";
 import { getBoards } from "../utils/api";
+import useAuth from "./useAuth";
 
-export default function useBoards(data: Data, setData: (data: Data) => void, authState: AuthState) {
+export default function useBoards(data: Data, setData: (data: Data) => void) {
+    const { authStatus } = useAuth();
     const [boards, setBoards] = useState<Board[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -22,10 +24,10 @@ export default function useBoards(data: Data, setData: (data: Data) => void, aut
             setIsLoading(false);
         };
 
-        if (authState === "authenticated") {
+        if (authStatus === "authenticated") {
             effect();
         }
-    }, [authState]);
+    }, [authStatus]);
 
     return { boards, isLoading  }
 }

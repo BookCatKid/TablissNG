@@ -1,7 +1,5 @@
 import { API } from "../../types";
 
-export type AuthState = "authenticated" | "pending" | "unauthenticated";
-
 /**
  * Locally saved preferences
  * Stored in local storage with boardID as the key 
@@ -81,7 +79,6 @@ export type Item = {
 export type Cache = {
   order: List[]; // order of responses for rendering
   responses: Map<string, FetchJob>; // map list ids to the corresponding API response
-  authState: AuthState;
 }
 
 export type Data = {
@@ -99,5 +96,4 @@ export const defaultData: Data = {
 export const defaultCache: Cache = {
   order: [],
   responses: new Map<string, FetchJob>(),
-  authState: "unauthenticated",
 }

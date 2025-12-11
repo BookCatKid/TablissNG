@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
-import { AuthState, Data, Cache, List, FetchJob, BoardPreference } from "../types";
+import { Data, Cache, List, FetchJob } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
+import useAuth from "./useAuth";
 
-export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void, authState: AuthState) {
+export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void) {
+    const { authStatus } = useAuth();
     const [lists, setLists] = useState<List[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -43,10 +45,10 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
             });
         };
 
-        if (authState === "authenticated") {
+        if (authStatus === "authenticated") {
             effect();
         }
-    }, [data.selectedID, authState]);
+    }, [data.selectedID, authStatus]);
 
 
     /**

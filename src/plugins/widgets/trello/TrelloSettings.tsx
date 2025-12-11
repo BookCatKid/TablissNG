@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useRef, useState } from "react";
+import React, { ChangeEvent, FC, useRef } from "react";
 import { BoardPreference, createFetchJob, defaultCache, defaultData, Props, FetchJob } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
@@ -11,13 +11,13 @@ import useLists from "./hooks/useLists";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
-  const { authState, authError, signIn, signOut } = useAuth(cache, setCache);
-  const { boards, isLoading: boardsLoading } = useBoards(data, setData, authState);
+  const { authStatus: authState, authError, signIn, signOut } = useAuth();
+  const { boards, isLoading: boardsLoading } = useBoards(data, setData);
   const { 
     lists, 
     setLists, 
     isLoading: listsLoading, 
-    updateUI } = useLists(data, cache, setCache, authState);
+    updateUI } = useLists(data, cache, setCache);
   const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const DEBOUNCE_INTERVAL = 550;
