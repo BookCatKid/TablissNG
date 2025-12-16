@@ -46,13 +46,15 @@ export type FetchJob = {
   listId: string;
   items: TrelloListItem[];
   loading: boolean;
+  skeleton: boolean;
 }
 
 export const createFetchJob = (listId: string) => {
   return {
     listId: listId,
     items: [],
-    loading: true
+    loading: true,
+    skeleton: true,
   }  as FetchJob
 }
 

@@ -16,13 +16,16 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       console.log("TRELLO: fetching items for all selected lists");
       const results = await Promise.all(
         Array.from(cache.responses.values()).map(async (response) => {
-          const items = await getItems(response.listId);
-          return items ? { listId: response.listId, response, items } : null;
+          if (!response.skeleton) {
+            const items = await getItems(response.listId);
+            return items ? { listId: response.listId, response, items } : null;  
+          }
         })
       );
 
       let updatedResponses = cache.responses;
       results.forEach(result => {
+        // resolve jobs
         if (result) {
           updatedResponses = updatedResponses.set(result.listId, {
             ...result.response,
@@ -50,7 +53,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       console.log("TRELLO: fetching items for new jobs")
       await Promise.all(
         cache.responses.values().map(async (response) => {
-          if (response.loading) {
+          if (response.loading && !response.skeleton) {
             const items = await getItems(response.listId);
             if (items) {
               setCache({

@@ -17,7 +17,8 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     lists, 
     setLists, 
     isLoading: listsLoading, 
-    updateUI } = useLists(data, cache, setCache);
+    updateUI,
+    updateUIWithSkeletons} = useLists(data, cache, setCache);
   const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const DEBOUNCE_INTERVAL = 550;
@@ -64,7 +65,17 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     });
 
     setLists(updatedOptions);
-    // TODO optimistically update UI with skeleton
+    const selectedLists = updatedOptions.filter((list: List) => list.watch);
+    const newPreference: BoardPreference = { boardId: data.selectedID!, lists: selectedLists };
+      const updated = {
+        ...data.preferences,
+        [data.selectedID!]: newPreference,
+      };
+      setData({ ...data, preferences: updated });
+
+    // optimistically update UI with skeletons
+    console.log("TRELLO: Updating skeletons");
+    updateUIWithSkeletons(updatedOptions.filter((list: List) => list.watch), pendingJobsRef.current);
 
     // debouncing logic for rapid selection
     if (debounceTimeoutRef.current) {
@@ -72,18 +83,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      // run after debounce timeout
-
-      // set preferences
-      const selectedLists = updatedOptions.filter((list: List) => list.watch);
-      const newPreference: BoardPreference = { boardId: data.selectedID!, lists: selectedLists };
-      const updated = {
-        ...data.preferences,
-        [data.selectedID!]: newPreference,
-      };
-      setData({ ...data, preferences: updated });
-
-      // update the UI with the pending jobs and new selections
+      // update the UI and set the skeleton jobs to actual jobs and new selections
       updateUI(listID, selectedLists, pendingJobsRef.current, action);
       pendingJobsRef.current.clear();
     }, DEBOUNCE_INTERVAL);

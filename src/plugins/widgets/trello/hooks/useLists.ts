@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Data, Cache, List, FetchJob } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
+import { createFetchJob } from "../types";
 import useAuth from "./useAuth";
 
 export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void) {
@@ -32,10 +33,11 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
             setIsLoading(false);
 
             // load new fetching jobs into cache
+            // and update ui
             const filtered = listsWithPreferences.filter(list => list.watch);
             const responses = new Map<string, FetchJob>();
             filtered.map(list => {
-                responses.set(list.id, { listId: list.id, items: [], loading: true} as FetchJob)
+                responses.set(list.id, { ...createFetchJob(list.id), skeleton: false } )
             });
 
             setCache({
@@ -50,9 +52,8 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         }
     }, [data.selectedID, authStatus]);
 
-
     /**
-     * Update Trello UI with new fetch jobs
+     * Update Trello UI with new fetch jobs under parameter listId
      * @param listId 
      * @param jobs 
      * @param action 
@@ -60,9 +61,11 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
     const updateUI = async (listId: string, selectedLists: List[], jobs: Set<FetchJob>, action: "ADD" | "REMOVE") => {
         if (action === "ADD") {
             const updatedFetchJobs = cache.responses;
+
+            // convert any skeletons into actual loading jobs
             jobs.forEach(job => {
                 console.log("TRELLO: Adding new fetch job ", job);
-                updatedFetchJobs.set(job.listId, job);
+                updatedFetchJobs.set(job.listId, {...job, skeleton: false} as FetchJob);
             });
             
             // update with new order of display and
@@ -83,5 +86,23 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         }
     }
 
-    return { lists, setLists, isLoading, updateUI }
+    /**
+     * Used for optimistic UI updates
+     * @param listId 
+     * @returns 
+     */
+    const updateUIWithSkeletons = async (lists: List[], jobs: Set<FetchJob>) => {
+        const updatedSkeletons = cache.responses;
+        jobs.forEach(job => {
+            updatedSkeletons.set(job.listId, job);
+        });
+
+        setCache({
+            ...cache,
+            order: lists,
+            responses: updatedSkeletons
+        });
+    }
+
+    return { lists, setLists, isLoading, updateUI, updateUIWithSkeletons }
 }
