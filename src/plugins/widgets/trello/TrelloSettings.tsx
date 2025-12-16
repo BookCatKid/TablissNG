@@ -148,7 +148,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
         <label>
           <FormattedMessage
             id="plugins.trello.listSelect"
-            defaultMessage={`Select up to ${MAX_LISTS} lists to watch`}
+            defaultMessage={"Select up to 6 lists to watch"}
             description={`Select up to ${MAX_LISTS} lists to watch`}
           />
           <div className="list-select-container">
