@@ -1,5 +1,5 @@
 import React from "react";
-import { DisplayList, TrelloItemsResponse, TrelloListItem } from "../../types";
+import { DisplayList, TrelloListItem, colourPalette } from "../../types";
 import Spinner from "../Spinner/Spinner";
 import "./DisplayList.sass";
 
@@ -16,7 +16,10 @@ export default function DisplayList({ header, items, loading  }: DisplayListComp
   </div> : 
   <div className="display-list-items">
     {items.map((item, i) => {
-      return <p key={i}>{item.name}</p>
+      return <p key={i}>
+      <div style={{width: "2.5rem", height: "0.26rem", background: colourPalette[item.labels[0]?.color]}} />
+      {item.name}
+      </p>
     })}
   </div>
 

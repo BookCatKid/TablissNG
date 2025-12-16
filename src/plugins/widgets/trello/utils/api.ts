@@ -51,6 +51,7 @@ export const getItems = async (listId: string) => {
     }
 
     const data: TrelloItemsResponse = await fetchItemsRes.json();
-    const items = data.map((item: TrelloListItem) => ({ id: item.id, name: item.name} as Item));
+    const items = data.map((item: TrelloListItem) => ({ id: item.id, name: item.name, labels: item.labels } as Item));
+    console.log(items);
     return items;
 }
