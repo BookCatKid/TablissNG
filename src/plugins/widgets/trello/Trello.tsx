@@ -6,8 +6,7 @@ import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
-  console.log(cache);
-  const { authState } = useAuth(cache, setCache);
+  const { authStatus } = useAuth();
   const hasLoadedRef = useRef<boolean>(false);
 
   // fetch data on load
@@ -39,11 +38,11 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       });
     };
 
-    if (!!authState && authState === "authenticated") {
+    if (authStatus === "authenticated") {
       effect();
       hasLoadedRef.current = true;
     }
-  }, [authState]);
+  }, [authStatus]);
 
   // fetch data when items in cache are changed
   useEffect(() => {
@@ -69,7 +68,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   return (
     <>
       {
-        authState !== "authenticated"  ?  
+        authStatus !== "authenticated"  ?  
         <p>Sign into Trello to use me</p> : 
         !!cache && cache.order.length === 0 ? 
         <p>Add some lists to view</p> 
