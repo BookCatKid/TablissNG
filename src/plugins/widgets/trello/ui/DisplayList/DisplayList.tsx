@@ -16,10 +16,19 @@ export default function DisplayList({ header, items, loading  }: DisplayListComp
   </div> : 
   <div className="display-list-items">
     {items.map((item, i) => {
-      return <p key={i}>
-      <div style={{width: "2.5rem", height: "0.26rem", background: colourPalette[item.labels[0]?.color]}} />
-      {item.name}
-      </p>
+      return (
+        <p key={i}>
+          <div className="labels-container">
+            {
+              item.labels.map(label => {
+                return <div style={{width: "2.5rem", height: "0.26rem", borderRadius: "0.5rem", marginBottom: "0.5rem", background: colourPalette[label.color]}} />
+              }) 
+            }
+          </div> 
+          <span>{item.name}</span>
+        </p>
+      )
+      
     })}
   </div>
 

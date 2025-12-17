@@ -40,7 +40,7 @@ export type TrelloListItem = {
   // add more attributes from api as fit
 }
 
-export type TrelloColor = 
+export type TrelloColour = 
   | 'green_light' | 'green_dark' | 'green'
   | 'yellow_light' | 'yellow_dark' | 'yellow'
   | 'orange_light' | 'orange_dark' | 'orange'
@@ -52,7 +52,7 @@ export type TrelloColor =
   | 'pink_light' | 'pink_dark' | 'pink'
   | 'black_light' | 'black_dark' | 'black';
 
-export const colourPalette: Record<TrelloColor, string> = {
+export const colourPalette: Record<TrelloColour, string> = {
   // Row 1 - light tones
   green_light: '#B8E6D5',
   yellow_light: '#F4E4A6',
@@ -97,7 +97,7 @@ export const colourPalette: Record<TrelloColor, string> = {
 };
 
 export type TrelloListItemLabel = {
-  color: TrelloColor;
+  color: TrelloColour;
   name: string;
 }
 
