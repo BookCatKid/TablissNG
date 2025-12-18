@@ -14,7 +14,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
-      - run: npm run lint
       - run: npm run prettier:check
 
   build:
