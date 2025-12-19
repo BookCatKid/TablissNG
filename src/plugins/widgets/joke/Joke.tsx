@@ -38,7 +38,11 @@ const Joke: React.FC<Props> = ({
 
       getJoke(data.categories, apiLocale)
         .then((joke) => {
-          const text = joke?.setup ?? joke?.joke;
+
+        const text =
+          isTwoPartJoke(joke) ? joke.setup :
+          isSingleJoke(joke) ? joke.joke :
+          "";
 
           // if joke is too long, retry
           if (text.length > 150) {
