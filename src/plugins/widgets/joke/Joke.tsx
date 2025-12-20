@@ -45,7 +45,7 @@ const Joke: React.FC<Props> = ({
           "";
 
           // if joke is too long, retry
-          if (text.length > 150) {
+          if (text.length > data.maxPreviewLength) {
             console.log("Joke too long, retrying...");
             return getJoke(data.categories, apiLocale);
           }

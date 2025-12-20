@@ -139,6 +139,23 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
+      <label>
+        <FormattedMessage
+            id="plugins.joke.maxLength"
+            defaultMessage="Max preview length"
+            description="Maximum length of joke to show on preview"
+          />
+        <input
+          type="number"
+          min="0"
+          onChange={(event) =>
+            setData({ ...data, maxPreviewLength: Number(event.target.value) })
+          }
+          placeholder="Maximum length of joke to show on preview"
+          value={data.maxPreviewLength}
+        />
+      </label>
+
       <p>
         <FormattedMessage
           {...pluginMessages.poweredBy}
