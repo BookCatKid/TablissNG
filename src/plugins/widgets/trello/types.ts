@@ -101,6 +101,12 @@ export type TrelloListItemLabel = {
   name: string;
 }
 
+export type Session = {
+  accessToken: string;
+  expires: number,
+  userId: string;
+}
+
 /**
  * Represents a pending job to fetch items from a trello board
  */

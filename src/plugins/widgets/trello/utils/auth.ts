@@ -1,3 +1,5 @@
+import { Session } from "../types";
+
 /**
  * Creates authentication popup then calls callback endpoint to generate JWT
  * Stores JWT in extension local storage
@@ -20,73 +22,46 @@ export const runAuthFlow = async () => {
     // receive token granted by Trello
     const tokenMatch = redirectResponse.match(/token=([^&]+)/);
     const token = tokenMatch ? tokenMatch[1] : null;
-    try {
-        // set token in database and return JWT
-        const callbackResult = await fetch("https://trellocallback-rrswz5h5iq-de.a.run.app", {
-            method: "POST",
-            headers: { "Content-Type": "application/json"},
-            body: JSON.stringify({ token: token })
-        });
 
-        if (callbackResult.ok) {
-            const json = await callbackResult.json();
-            const {token} = json;
-            await browser.storage.local.set({ trelloSessionToken: token });
-        }
-    } catch (err) {
-        console.error("Failed to authenticate: ", err);
-        throw err;
+    const expiry = Date.now() + 60 * 60 * 24 * 1000;
+    // get user id
+    const self = await fetch(`https://api.trello.com/1/members/me?key=${TRELLO_API_KEY}&token=${token}`)
+    if (!self.ok) {
+      return;  
     }
+
+    const userData = await self.json();
+    const id = userData["id"];
+    await browser.storage.local.set({ session: { userId: id, accessToken: token, expires: expiry } });
 }
 
 /**
- * Checks if the user is authenticated by checking the local JWT
+ * Checks if the user is authenticated by inspecting token expiry 
  * @returns 
  */
 export const checkAuth = async () => {
     try {
-        const token = await getToken();
+        const token = await getSession();
+        console.log("TOKEN ", token);
         if (!token) {
             return false;
         }
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const authenticated = payload.exp * 1000 > Date.now();
-        return authenticated;
+        const expiry = token.expires;
+        console.log(expiry);
+        console.log(Date.now());
+        return expiry > Date.now();
     } catch (err) {
         console.error(err);
         throw err;
     }
 }
 
-
-export const getUserFromJWT = async () => {
-    try {
-        const token = await getToken();
-        if (!token) {
-            return null;
-        }
-
-        if (!await checkAuth()) {
-            return null;
-        }
-
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return { accessToken: payload.accessToken, userId: payload.userId };
-    } catch (err) {
-        throw err;
-    }
-}
-
-export const getToken = async () => {
-    const obj = await browser.storage.local.get("trelloSessionToken");
-    const token: string | null = typeof obj["trelloSessionToken"] === "string" ? obj["trelloSessionToken"] : null;
+export const getSession = async () => {
+    const obj = await browser.storage.local.get("session");
+    console.log(obj);
+    const token: Session | null = typeof obj["session"] === "object" ? obj["session"] as Session : null;
 
     if (!token) return null;
-    return token
-}
-
-// returns the id of the authenticated user based on the token provided
-export const getAuthenticatedUser = async (token: string) => {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.id;
+    console.log(token);
+    return token;
 }

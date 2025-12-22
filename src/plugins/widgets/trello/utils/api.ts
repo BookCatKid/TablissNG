@@ -1,14 +1,14 @@
 import { Board, Item, List, TrelloBoardResponse, TrelloItemsResponse, TrelloListItem, TrelloListResponse } from "../types";
-import { getUserFromJWT, getToken } from "./auth";
+import { getSession } from "./auth";
 
 export const getBoards = async () => {
-    const user = await getUserFromJWT();
+    const session = await getSession();
 
-    if (!user) {
+    if (!session) {
         return null;
     }
 
-   const fetchBoardRes = await fetch(`https://api.trello.com/1/members/${user.userId}/boards?key=${TRELLO_API_KEY}&token=${user.accessToken}`);
+   const fetchBoardRes = await fetch(`https://api.trello.com/1/members/${session.userId}/boards?key=${TRELLO_API_KEY}&token=${session.accessToken}`);
 
     if (!fetchBoardRes.ok) {
         return null;
@@ -20,13 +20,13 @@ export const getBoards = async () => {
 }
 
 export const getLists = async (boardId: string) => {
-    const user = await getUserFromJWT();
+    const session = await getSession();
 
-    if (!user) {
+    if (!session) {
         return null;
     }
 
-    const fetchListRes = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?key=${TRELLO_API_KEY}&token=${user.accessToken}`)
+    const fetchListRes = await fetch(`https://api.trello.com/1/boards/${boardId}/lists?key=${TRELLO_API_KEY}&token=${session.accessToken}`)
 
     if (!fetchListRes.ok) {
         return null;
@@ -39,12 +39,13 @@ export const getLists = async (boardId: string) => {
 }
 
 export const getItems = async (listId: string) => {
-    const user = await getUserFromJWT();
+    const session = await getSession();
 
-    if (!user) {
+    if (!session) {
         return null;
     }
-    const fetchItemsRes = await fetch(`https://api.trello.com/1/lists/${listId}/cards?key=${TRELLO_API_KEY}&token=${user.accessToken}`);
+    
+    const fetchItemsRes = await fetch(`https://api.trello.com/1/lists/${listId}/cards?key=${TRELLO_API_KEY}&token=${session.accessToken}`);
 
     if (!fetchItemsRes.ok) {
         return null;
