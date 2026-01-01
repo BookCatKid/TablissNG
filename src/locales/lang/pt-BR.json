@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Piada do Dia",
   "plugins.joke.description": "Dê uma risada com piadas aleatórias.",
   "plugins.joke.keybind": "Tecla para revelar resposta",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Piadas",
   "plugins.joke.showANewJoke": "Mostrar uma nova piada",
   "plugins.js.Warning": "Aviso: esta funcionalidade é destinada a usuários avançados. Scripts personalizados podem quebrar a qualquer momento. O trecho será executado uma vez após o carregamento do painel. Tenha cuidado com listeners de eventos persistentes ao editar o trecho.",

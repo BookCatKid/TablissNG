@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Günün Şakası",
   "plugins.joke.description": "Rastgele şakalarla bir kahkaha atın.",
   "plugins.joke.keybind": "Cevabı göster kısayolu",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Şakalar",
   "plugins.joke.showANewJoke": "Yeni bir şaka göster",
   "plugins.js.Warning": "Uyarı: Bu işlevsellik ileri düzey kullanıcılar içindir. Özel\n          betikler her an bozulabilir. Kod parçacığı, pano\n          yüklendikten sonra bir kez çalışacaktır. Kod parçacığını düzenlerken\n          kalıcı olay dinleyicilerine dikkat edin.",

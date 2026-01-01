@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Daily Joke",
   "plugins.joke.description": "Get a laugh with random jokes.",
   "plugins.joke.keybind": "Reveal answer keybind",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Jokes",
   "plugins.joke.showANewJoke": "Show a new joke",
   "plugins.js.Warning": "Warning: this functionality is intended for advanced users. Custom\n          scripts may break at any time. The snippet will run once after the\n          dashboard has loaded. Be careful of persisting event listeners when\n          editing the snippet.",

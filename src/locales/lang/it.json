@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Daily Joke",
   "plugins.joke.description": "Get a laugh with random jokes.",
   "plugins.joke.keybind": "Reveal answer keybind",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Jokes",
   "plugins.joke.showANewJoke": "Show a new joke",
   "plugins.js.Warning": "Attenzione: questa funzionalità è destinata agli utenti avanzati. Gli script personalizzati\n          possono interrompersi in qualsiasi momento. Lo snippet verrà eseguito una volta dopo il\n          caricamento del dashboard. Fare attenzione alla persistenza degli ascoltatori di eventi\n          quando si modifica il codice.",

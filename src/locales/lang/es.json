@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Chiste diario",
   "plugins.joke.description": "Ríete con algunos chistes aleatorios.",
   "plugins.joke.keybind": "Tecla para revelar la respuesta",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Chistes",
   "plugins.joke.showANewJoke": "Mostrar un nuevo chiste",
   "plugins.js.Warning": "Cuidado: Esta característica está pensada para usuarios avanzados. Los scripts\n          podrían no ser funcionales. El código funcionará una vez que\n          el menú se haya cargado. Cuidado con los 'event listeners' continuos cuando\n          se está editando el código.",

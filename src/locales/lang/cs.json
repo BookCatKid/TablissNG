@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Denní vtip",
   "plugins.joke.description": "Zasmějte se náhodným vtipům.",
   "plugins.joke.keybind": "Klávesová zkratka pro zobrazení odpovědi",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Vtipy",
   "plugins.joke.showANewJoke": "Zobrazit nový vtip",
   "plugins.js.Warning": "Upozornění: Tato funkce je určena pro pokročilé uživatele. Vlastní skripty se mohou kdykoli rozbít. Úryvek se spustí jednou po načtení panelu. Buďte opatrní s přetrvávajícími posluchači událostí při úpravách úryvku.",

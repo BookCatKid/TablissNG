@@ -172,6 +172,7 @@
   "plugins.joke.dailyJoke": "Shaka e përditshme",
   "plugins.joke.description": "Shaka të rastësishme.",
   "plugins.joke.keybind": "Keybind për përgjigjen",
+  "plugins.joke.maxLength": "Max preview length",
   "plugins.joke.name": "Shaka",
   "plugins.joke.showANewJoke": "Shfaq një shaka të re",
   "plugins.js.Warning": "Kujdes: kjo veçori është për përdorues të avancuar. Script-et e personalizuara mund të prishen në çdo kohë. Fragmenti do të ekzekutohet pasi të ngarkohet dashboard-i. Keni kujdes me event listeners që mund të mbeten aktivë.",
