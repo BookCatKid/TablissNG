@@ -571,6 +571,18 @@ const Input: FC<Props> = (props) => {
           </div>
         </div>
       )}
+
+      <label>
+        <FormattedMessage id="plugins.links.input.keyboardShortcut" defaultMessage="Keyboard shortcut {number}" values={{ number: props.number }} />
+        <input
+          type="text"
+          value={props.keyboardShortcut || ""}
+          onChange={(event) => props.onChange({ keyboardShortcut: event.target.value })}
+          placeholder={props.number <= 9 ? String(props.number) : ""}
+          maxLength={1}
+        />
+      </label>
+
       <hr />
     </div>
   );

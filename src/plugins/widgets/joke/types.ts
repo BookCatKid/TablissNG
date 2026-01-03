@@ -69,6 +69,7 @@ export type Data = {
   categories: JokeAPICategory[];
   timeout: number;
   keyBind?: string;
+  maxPreviewLength: number
 };
 
 export type Cache = JokeAPIResponse;
@@ -79,4 +80,5 @@ export const defaultData: Data = {
   categories: ["any"],
   timeout: 5 * MINUTES,
   keyBind: "J",
+  maxPreviewLength: 150
 };

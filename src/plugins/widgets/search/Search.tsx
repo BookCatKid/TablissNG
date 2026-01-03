@@ -112,7 +112,7 @@ const Search: FC<Props> = ({ data = defaultData }) => {
   };
 
   const search = () => {
-    if (data.searchEngine == "default") {
+    if (data.searchEngine == "default" && BUILD_TARGET != "web") {
       browser.search.query({ text: searchInput.current!.value });
       return;
     }

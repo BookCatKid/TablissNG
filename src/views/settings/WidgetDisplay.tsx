@@ -1,5 +1,5 @@
 import React from "react";
-import { FormattedMessage, defineMessages } from "react-intl";
+import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { WidgetDisplay as WidgetDisplayType } from "../../db/state";
 import PositionInput from "./PositionInput";
 import "./WidgetDisplay.css";
@@ -15,10 +15,17 @@ const messages = defineMessages({
     id: "settings.position.edit",
     defaultMessage: "Edit Position",
     description: "Button text for editing widget position"
+  },
+  customClassPlaceholder: {
+    id: "settings.customClass.placeholder",
+    defaultMessage: "Enter a custom class for easier styling",
+    description: "Placeholder text for custom CSS class input"
   }
 });
 
 const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
+    const intl = useIntl();
+  
   return (
     <div className="WidgetDisplay">
       <PositionInput
@@ -139,12 +146,16 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
       </label>
 
       <label>
-        Custom CSS Class
+         <FormattedMessage
+          id="settings.customClass.title"
+          defaultMessage="Custom CSS Class"
+          description="Label for the custom CSS class input field"
+        />
         <br />
         <input
           type="text"
           value={display.customClass}
-          placeholder="Enter a custom class for easier styling"
+          placeholder={intl.formatMessage(messages.customClassPlaceholder)}
           onChange={(event) =>
             onChange({ customClass: event.target.value })
           }

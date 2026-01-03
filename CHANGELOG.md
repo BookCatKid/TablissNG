@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I also attempt to follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
-## [Unreleased]
+## [1.6.0] - 1/1/2026 | Large Feature and Bugfix Update (FINALLY)
 
 ### Added
 
@@ -26,6 +26,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - feat: beta safari support (simple). [b0d63a8](https://github.com/BookCatKid/TablissNG/commit/b0d63a8)
 
+- feat(links): add keyboard shortcut input. [8a936582](https://github.com/BookCatKid/TablissNG/commit/8a936582d96df2945f0419393fb147b3010c579a)
+
+- feat: state persistence when switching backgrounds. [840ad259](https://github.com/BookCatKid/TablissNG/commit/840ad259b732ff0566c4b0b05ff5e9e1a2ca8eca)
+
 ### Changed
 
 - feat: change Unsplash "Tags" input to "Search Term". [8efe064](https://github.com/BookCatKid/TablissNG/commit/8efe064)
@@ -42,6 +46,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - feat: clean up settings, remove ads. [7201357](https://github.com/BookCatKid/TablissNG/commit/7201357)
 
+- feat: use browser default sans-serif font. [a331ad0](https://github.com/BookCatKid/TablissNG/commit/a331ad036ec0ad8cb27dc80f6e0f11c6b2771632)
+
+- fix(Jokes): retry API call for long jokes. [8ff8a93](https://github.com/BookCatKid/TablissNG/commit/8ff8a933822b5f715785762eb2390f60a6a34e7f)
+
 ### Fixed
 
 - fix(Import): set display.scale to true by default. [116df62](https://github.com/BookCatKid/TablissNG/commit/116df62a21c3eb83d8756c2d657ce01fa0a680b3)
@@ -56,6 +64,8 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - fix: unloaded github calendar now has correct colors dependent on theme. [04abb8a](https://github.com/BookCatKid/TablissNG/commit/04abb8a)
 
+- fix(baseBackground): some translation stuff. [611a9156](https://github.com/BookCatKid/TablissNG/commit/611a915634de90c3756b8c723b9f6343ffb7fe40)
+
 ### Translations
 
 - Update translations (several cs.json updates, translated auto-hide settings menu, engines). [e7e1a40](https://github.com/BookCatKid/TablissNG/commit/e7e1a40), [6107f9a](https://github.com/BookCatKid/TablissNG/commit/6107f9a), [576a15b](https://github.com/BookCatKid/TablissNG/commit/576a15b)
@@ -63,6 +73,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 - add: Albanian translation. [98084fb](https://github.com/BookCatKid/TablissNG/commit/98084fb)
 
 - feat: clean up a few translations. [6198093](https://github.com/BookCatKid/TablissNG/commit/6198093)
+
+- i18n: Update German translations (#80). [5413ce65](https://github.com/BookCatKid/TablissNG/commit/5413ce655d83d9b28423a9e0b8168dcdab186859)
+
+- i18n: Updated Spanish translation (#76). [d143156c](https://github.com/BookCatKid/TablissNG/commit/d143156cf7a428b425d380fffdda75c69b897675)
 
 ### Chore / Cleanup
 
@@ -73,6 +87,12 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 - chore: slightly improve README. [ba5323c](https://github.com/BookCatKid/TablissNG/commit/ba5323c)
 
 - Add .gitattributes and workspace settings: normalize EOL to LF. [119945b](https://github.com/BookCatKid/TablissNG/commit/119945b)
+
+- chore: update deps. [8a7fc7fd](https://github.com/BookCatKid/TablissNG/commit/8a7fc7fd3f9bcbf63ce3a40d422a97cea55b036b)
+
+- ci: add build to pr ci. [96fb4c4f](https://github.com/BookCatKid/TablissNG/commit/96fb4c4f408e8cbf8a1189accf4dcee26ece12aa)
+
+- ci: add pr tests. [7e0a3025](https://github.com/BookCatKid/TablissNG/commit/7e0a3025d68dc38f68ab2b992289c56f9d9158a8)
 
 
 ## [1.5.1] - 8/4/2025 | Minor Feature and Bugfix Update

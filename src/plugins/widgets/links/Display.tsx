@@ -39,7 +39,7 @@ const messages = defineMessages({
   shortcutHint: {
     id: "plugins.links.shortcutHint",
     description: "Hover hint text for links with a keyboard shortcut",
-    defaultMessage: "Press {number} or click to visit",
+    defaultMessage: "Press {key} or click to visit",
   },
   standardHint: {
     id: "plugins.links.standardHint",
@@ -74,16 +74,16 @@ const Display: FC<Props> = ({
   customWidth,
   customHeight,
   conserveAspectRatio,
+  keyboardShortcut,
   onLinkClick,
 }) => {
   const intl = useIntl();
-  const title = useMemo(
-    () =>
-      number < 10
-        ? intl.formatMessage(messages.shortcutHint, { number })
-        : intl.formatMessage(messages.standardHint),
-    [intl, number],
-  );
+  const title = useMemo(() => {
+    const fallback = (typeof number !== "undefined" && number < 10) ? String(number) : undefined;
+    const label = keyboardShortcut && keyboardShortcut.length > 0 ? keyboardShortcut : fallback;
+    if (label && label.length > 0) return intl.formatMessage(messages.shortcutHint, { key: label });
+    return intl.formatMessage(messages.standardHint);
+  }, [intl, number, keyboardShortcut]);
   const domain = useMemo(() => getDomain(url), [url]);
   const parsedSvg = useMemo(() => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null), [SvgString, customWidth, customHeight]);
 

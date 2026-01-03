@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TablissNG",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "A beautiful, customizable New Tab page with backgrounds and widgets. This is a maintained fork with ongoing updates in the future.",
   "homepage_url": "https://github.com/BookCatKid/TablissNG",
   "chrome_url_overrides": {

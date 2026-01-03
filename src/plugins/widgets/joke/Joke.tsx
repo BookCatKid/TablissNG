@@ -33,8 +33,31 @@ const Joke: React.FC<Props> = ({
   useCachedEffect(
     () => {
       loader.push();
+
       const apiLocale = mapLocaleToJokeAPILang(locale);
-      getJoke(data.categories, apiLocale).then(setCache).finally(loader.pop);
+
+      getJoke(data.categories, apiLocale)
+        .then((joke) => {
+
+        const text =
+          isTwoPartJoke(joke) ? joke.setup :
+          isSingleJoke(joke) ? joke.joke :
+          "";
+
+          // if joke is too long, retry
+          if (text.length > data.maxPreviewLength) {
+            console.log("Joke too long, retrying...");
+            return getJoke(data.categories, apiLocale);
+          }
+
+          return joke;
+        })
+        .then((finalJoke) => {
+          setCache(finalJoke);
+        })
+        .finally(() => {
+          loader.pop();
+        });
     },
     cache?.timestamp ? cache.timestamp + data.timeout : 0,
     [data.categories],
