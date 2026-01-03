@@ -57,10 +57,9 @@ export const checkAuth = async () => {
 }
 
 export const getSession = async () => {
-    const obj = await browser.storage.local.get("session");
+    const obj = await browser.storage.local.get("trelloSession");
     console.log(obj);
-    const token: Session | null = typeof obj["session"] === "object" ? obj["session"] as Session : null;
-
+    const token: Session | null = typeof obj["trelloSession"] === "object" ? obj["trelloSession"] as Session : null;
     if (!token) return null;
     console.log(token);
     return token;
