@@ -51,17 +51,13 @@ export const widgetConfigs = [
   weather,
   workHours,
   timeTracker,
-  trello,
 ];
 
 if (BUILD_TARGET === "web") {
   widgetConfigs.push(js);
-  
-  // Trello module doesn't work under web
-  const index = widgetConfigs.indexOf(trello);
-  widgetConfigs.splice(index, 1);
 }
 if (BUILD_TARGET != "web" && BUILD_TARGET != "safari") {
   widgetConfigs.push(topSites);
   widgetConfigs.push(bookmarks);
+  widgetConfigs.push(trello);
 }
