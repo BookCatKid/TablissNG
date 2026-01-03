@@ -29,8 +29,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
 
   const onSignout = async () => {
     await signOut();
-    // reset data and clear cache
-    setData(defaultData);
     setCache(defaultCache);
   }
 
@@ -172,13 +170,6 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
         </label>
       </div>
       <div className="offset">
-        <label>
-          <FormattedMessage
-            id="plugins.trello.logout"
-            defaultMessage="Signing out will clear preferences"
-            description="Signing out will clear all preferences"
-          />
-        </label>
         <Button primary onClick={onSignout}>Sign Out</Button>
       </div>
     </>

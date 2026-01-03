@@ -47,9 +47,9 @@ export default function useAuth() {
     }
     
     const signOut = async () => {
-        // clear session token 
         console.log("TRELLO: Signing out goodbye :)");
         setAuthStatus("pending");
+        // clear session token 
         await browser.storage.local.clear();
         setAuthStatus("unauthenticated");
     }
