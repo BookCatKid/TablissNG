@@ -26,8 +26,8 @@ export default function useAuth() {
             }
         }
 
-        // prevent cases where signing triggers the hook to sign the user back in
-        // if the useris attempting to sign out stop the hook
+        // prevent cases where signing in triggers the hook to sign the user back in
+        // if the user is attempting to sign out stop the hook
         if (authStatus !== "pending") {
             effect();
         }

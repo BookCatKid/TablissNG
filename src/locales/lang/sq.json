@@ -328,7 +328,6 @@
   "plugins.trello.boardSelect": "Select your board",
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
-  "plugins.trello.logout": "Signing out will clear preferences",
   "plugins.trello.name": "Trello",
   "plugins.unknown.description": "Diçka shkoi keq.",
   "plugins.unknown.errorMessage": "Diçka shkoi keq, ndoshta është importuar një konfigurim i vjetruar ose i papërputhshëm? Nëse të duhet ndihmë, hap një çështje në",

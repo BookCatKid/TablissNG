@@ -328,7 +328,6 @@
   "plugins.trello.boardSelect": "Select your board",
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
-  "plugins.trello.logout": "Signing out will clear preferences",
   "plugins.trello.name": "Trello",
   "plugins.unknown.description": "Něco se pokazilo.",
   "plugins.unknown.errorMessage": "Něco se pokazilo, možná byl importován zastaralý nebo nekompatibilní konfigurační soubor? Pokud potřebujete pomoc, otevřete issue na",

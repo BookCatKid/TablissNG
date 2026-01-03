@@ -328,7 +328,6 @@
   "plugins.trello.boardSelect": "Select your board",
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
-  "plugins.trello.logout": "Signing out will clear preferences",
   "plugins.trello.name": "Trello",
   "plugins.unknown.description": "Algo deu errado.",
   "plugins.unknown.errorMessage": "Algo deu errado, talvez uma configuração desatualizada ou incompatível foi importada? Se precisar de qualquer ajuda, por favor abra uma issue no",
