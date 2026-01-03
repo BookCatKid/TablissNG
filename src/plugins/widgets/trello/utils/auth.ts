@@ -6,7 +6,7 @@ import { Session } from "../types";
  */
 export const runAuthFlow = async () => {
     const AUTH_URL_BASE = "https://trello.com/1/authorize" +
-        "?expiration=1day" +
+        "?expiration=30days" +
         "&callback_method=fragment" +
         "&scope=read" +
         "&response_type=token" +
