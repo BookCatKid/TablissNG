@@ -23,7 +23,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
     updateUIWithSkeletons} = useLists(data, cache, setCache);
   const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const DEBOUNCE_INTERVAL = 550;
+  const DEBOUNCE_INTERVAL = 525;
 
   const onAuthenticateClick = async () => {
     await signIn(trelloAuthFlow);
