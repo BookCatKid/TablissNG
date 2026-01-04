@@ -9,11 +9,9 @@ import useAuth from "../../../hooks/useAuth";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
-  const hasLoadedRef = useRef<boolean>(false);
 
-  // fetch data on load
+  // fetch data on page load
   useEffect(() => {
-    if (hasLoadedRef.current) return;
     const effect = async () => {
       console.log("TRELLO: fetching items for all selected lists");
       const results = await Promise.all(
@@ -47,13 +45,11 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
     if (authStatus === "authenticated") {
       effect();
-      hasLoadedRef.current = true;
     }
-  }, [authStatus]);
+  }, [authStatus, cache.responses]);
 
-  // fetch data when items in cache are changed
+  // fetch data when selected lists are changed
   useEffect(() => {
-
     const effect = async () => {
       console.log("TRELLO: fetching items for new jobs")
       await Promise.all(
