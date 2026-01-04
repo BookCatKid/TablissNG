@@ -151,7 +151,7 @@ if (isProduction) {
         {
           urlPattern: ({ url }) =>
             url.hostname === "github-contributions-api.jogruber.de" ||
-            url.hostname === "api.github.com" ||
+            url.href.startsWith("https://api.github.com/repos/BookCatKid/tablissNG") ||
             url.href.startsWith("https://api.unsplash.com/topics"),
 
           handler: "CacheFirst",
@@ -191,6 +191,9 @@ if (isProduction) {
             expiration: {
               maxEntries: 10,
               maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+            },
+             cacheableResponse: {
+                statuses: [0, 200]   // allow opaque (0) responses to be cached
             },
           },
         },
