@@ -4,7 +4,7 @@ import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 import { createFetchJob } from "../types";
 import { useTrelloAuthStore } from "../stores/useTrelloAuthStore";
-import useAuth from "../../../shared/hooks/useAuth";
+import useAuth from "../../../../hooks/useAuth";
 
 export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void) {
     const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);

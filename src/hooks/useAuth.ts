@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Session } from "../types/Session";
+import { Session } from "../plugins/shared/types/Session";
 import { StoreApi, UseBoundStore } from "zustand";
-import { AuthState } from "../interfaces/AuthState";
+import { AuthState } from "../plugins/shared/interfaces/AuthState";
 
 /**
  * Hook for reading and setting authentication state in widgets. Encapsulates client functions for signing in and out

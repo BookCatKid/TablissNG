@@ -5,7 +5,7 @@ import "./Trello.sass";
 import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
 import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
-import useAuth from "../../shared/hooks/useAuth";
+import useAuth from "../../../hooks/useAuth";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
