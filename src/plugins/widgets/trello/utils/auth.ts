@@ -32,7 +32,7 @@ export const runAuthFlow = async () => {
 
     const userData = await self.json();
     const id = userData["id"];
-    await browser.storage.local.set({ session: { userId: id, accessToken: token, expires: expiry } });
+    await browser.storage.local.set({ trelloSession: { userId: id, accessToken: token, expires: expiry } });
 }
 
 /**
