@@ -53,6 +53,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   // fetch data when items in cache are changed
   useEffect(() => {
+
     const effect = async () => {
       console.log("TRELLO: fetching items for new jobs")
       await Promise.all(

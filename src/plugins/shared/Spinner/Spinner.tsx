@@ -7,11 +7,9 @@ interface SpinnerProps {
   className?: string
 }
 
-const Spinner: FC<SpinnerProps> = ({
+export const Spinner: FC<SpinnerProps> = ({
   size,
   className = ""
 }) => {
   return <span style={{width: `${size}px`, height: `${size}px`}} className={`loader ${className}`}/>
 }
-
-export default Spinner;

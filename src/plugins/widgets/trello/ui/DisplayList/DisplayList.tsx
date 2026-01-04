@@ -1,6 +1,6 @@
 import React from "react";
 import { DisplayList, TrelloListItem, colourPalette } from "../../types";
-import Spinner from "../Spinner/Spinner";
+import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
 
 interface DisplayListComponentProps {

@@ -4,7 +4,7 @@ import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
-import Spinner from "./ui/Spinner/Spinner";
+import { Spinner } from "../../shared";
 import useAuth from "../../../hooks/useAuth";
 import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
 import useBoards from "./hooks/useBoards";
