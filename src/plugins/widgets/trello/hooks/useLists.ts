@@ -44,7 +44,6 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
             });
 
             setCache({
-                ...cache,
                 order: filtered,
                 responses: responses
             });
@@ -75,7 +74,6 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
             // create new pending fetch operation
             console.log("TRELLO: Updating UI from useLists.ts");
             setCache({
-                ...cache, 
                 order: selectedLists, 
                 responses: updatedFetchJobs,
             });

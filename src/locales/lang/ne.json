@@ -329,6 +329,8 @@
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
   "plugins.trello.name": "Trello",
+  "plugins.trello.noListsMessage": "Add some lists to view",
+  "plugins.trello.unauthenticatedMessage": "Sign into Trello to use me",
   "plugins.unknown.description": "Something went wrong.",
   "plugins.unknown.errorMessage": "Something went wrong, perhaps an outdated or incompatible config was imported? If you need any help whatsoever, please open an issue on",
   "plugins.unknown.name": "Unknown Widget",

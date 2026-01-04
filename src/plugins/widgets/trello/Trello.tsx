@@ -6,6 +6,7 @@ import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
 import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
 import useAuth from "../../../hooks/useAuth";
+import { FormattedMessage } from "react-intl";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
@@ -20,7 +21,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
             const session = await getSession();
             if (!session) return null;
             const items = await getItems(response.listId, session);
-            return items ? { listId: response.listId, response, items } : null;  
+            return items ? { listId: response.listId, response, items } : null; 
           }
         })
       );
@@ -75,9 +76,17 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     <>
       {
         authStatus !== "authenticated"  ?  
-        <p>Sign into Trello to use me</p> : 
+        <FormattedMessage 
+          id="plugins.trello.unauthenticatedMessage" 
+          defaultMessage={"Sign into Trello to use me"} 
+          description={"Sign into Trello to use me"} />
+        : 
         !!cache && cache.order.length === 0 ? 
-        <p>Add some lists to view</p> 
+        <FormattedMessage 
+          id="plugins.trello.noListsMessage"
+          defaultMessage={"Add some lists to view"}
+          description={"Add some lists to view"}
+        />
         :
         <div className="display-list-container">
           {  

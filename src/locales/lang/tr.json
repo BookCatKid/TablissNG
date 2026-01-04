@@ -329,6 +329,8 @@
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
   "plugins.trello.name": "Trello",
+  "plugins.trello.noListsMessage": "Add some lists to view",
+  "plugins.trello.unauthenticatedMessage": "Sign into Trello to use me",
   "plugins.unknown.description": "Bir şeyler ters gitti.",
   "plugins.unknown.errorMessage": "Bir şeyler ters gitti, belki de eski veya uyumsuz bir yapılandırma içe aktarıldı? Herhangi bir yardıma ihtiyacınız olursa, lütfen şu adreste bir konu açın:",
   "plugins.unknown.name": "Bilinmeyen Araç",

@@ -329,6 +329,8 @@
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select up to 6 lists to watch",
   "plugins.trello.name": "Trello",
+  "plugins.trello.noListsMessage": "Add some lists to view",
+  "plugins.trello.unauthenticatedMessage": "Sign into Trello to use me",
   "plugins.unknown.description": "Etwas ist schief gelaufen.",
   "plugins.unknown.errorMessage": "Etwas ist schief gelaufen, vielleicht wurde eine veraltete oder inkompatible Konfiguration importiert? Wenn du Hilfe benötigst, öffne bitte ein Problem bei",
   "plugins.unknown.name": "Unbekanntes Widget",
