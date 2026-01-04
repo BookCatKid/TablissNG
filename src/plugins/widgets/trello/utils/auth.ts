@@ -1,10 +1,9 @@
-import { Session } from "../types";
+import { TrelloSession } from "../types";
 
 /**
- * Creates authentication popup then calls callback endpoint to generate JWT
- * Stores JWT in extension local storage
+ * Creates authentication popup then creates and returns session object
  */
-export const runAuthFlow = async () => {
+export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
     const AUTH_URL_BASE = "https://trello.com/1/authorize" +
         "?expiration=30days" +
         "&callback_method=fragment" +
@@ -23,44 +22,24 @@ export const runAuthFlow = async () => {
     const tokenMatch = redirectResponse.match(/token=([^&]+)/);
     const token = tokenMatch ? tokenMatch[1] : null;
 
-    const expiry = Date.now() + 60 * 60 * 24 * 1000;
+    if (!token) {
+      return null;
+    }
+
+    const expiry = Date.now() + 60 * 60 * 24 * 30 * 1000;
+
     // get user id
     const self = await fetch(`https://api.trello.com/1/members/me?key=${TRELLO_API_KEY}&token=${token}`)
     if (!self.ok) {
-      return;  
+      return null;  
     }
 
     const userData = await self.json();
     const id = userData["id"];
-    await browser.storage.local.set({ session: { userId: id, accessToken: token, expires: expiry } });
-}
-
-/**
- * Checks if the user is authenticated by inspecting token expiry 
- * @returns 
- */
-export const checkAuth = async () => {
-    try {
-        const token = await getSession();
-        console.log("TOKEN ", token);
-        if (!token) {
-            return false;
-        }
-        const expiry = token.expires;
-        console.log(expiry);
-        console.log(Date.now());
-        return expiry > Date.now();
-    } catch (err) {
-        console.error(err);
-        throw err;
-    }
-}
-
-export const getSession = async () => {
-    const obj = await browser.storage.local.get("trelloSession");
-    console.log(obj);
-    const token: Session | null = typeof obj["trelloSession"] === "object" ? obj["trelloSession"] as Session : null;
-    if (!token) return null;
-    console.log(token);
-    return token;
+    return {
+      userId: id,
+      name: "trello",
+      accessToken: token,
+      expires: expiry,
+    } as TrelloSession;
 }

@@ -1,12 +1,14 @@
 import React, { FC, useEffect, useRef } from "react";
-import { Props, List, defaultCache } from "./types";
+import { Props, List, defaultCache, TrelloSession } from "./types";
 import "./Trello.sass";
-import useAuth from "./hooks/useAuth";
+
 import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
+import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
+import useAuth from "../../shared/hooks/useAuth";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
-  const { authStatus } = useAuth();
+  const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
   const hasLoadedRef = useRef<boolean>(false);
 
   // fetch data on load
@@ -17,7 +19,9 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       const results = await Promise.all(
         Array.from(cache.responses.values()).map(async (response) => {
           if (!response.skeleton) {
-            const items = await getItems(response.listId);
+            const session = await getSession();
+            if (!session) return null;
+            const items = await getItems(response.listId, session);
             return items ? { listId: response.listId, response, items } : null;  
           }
         })
@@ -54,7 +58,9 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       await Promise.all(
         cache.responses.values().map(async (response) => {
           if (response.loading && !response.skeleton) {
-            const items = await getItems(response.listId);
+            const session = await getSession();
+            if (!session) return null;
+            const items = await getItems(response.listId, session);
             if (items) {
               setCache({
                 ...cache,

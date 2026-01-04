@@ -1,4 +1,5 @@
 import { API } from "../../types";
+import { Session } from "../../shared/types/Session";
 
 /**
  * Locally saved preferences
@@ -101,9 +102,8 @@ export type TrelloListItemLabel = {
   name: string;
 }
 
-export type Session = {
+export interface TrelloSession extends Session {
   accessToken: string;
-  expires: number,
   userId: string;
 }
 

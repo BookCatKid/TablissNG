@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Data, Cache, List, FetchJob } from "../types";
+import { Data, Cache, List, FetchJob, TrelloSession } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 import { createFetchJob } from "../types";
-import useAuth from "./useAuth";
+import { useTrelloAuthStore } from "../stores/useTrelloAuthStore";
+import useAuth from "../../../shared/hooks/useAuth";
 
 export default function useLists(data: Data, cache: Cache, setCache: (cache: Cache) => void) {
-    const { authStatus } = useAuth();
+    const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
     const [lists, setLists] = useState<List[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -16,7 +17,9 @@ export default function useLists(data: Data, cache: Cache, setCache: (cache: Cac
         const effect = async () => {
             if (!data.selectedID) return;
             console.log("TRELLO: Fetching lists");
-            const lists = await getLists(data.selectedID);
+            const session = await getSession();
+            if (!session) return;
+            const lists = await getLists(data.selectedID, session);
             if (!lists) return;
         
             if (data.preferences === undefined || !(data.selectedID in data.preferences)) {

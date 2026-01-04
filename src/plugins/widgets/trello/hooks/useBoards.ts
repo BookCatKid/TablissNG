@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { Board, Data } from "../types";
+import { Board, Data, TrelloSession } from "../types";
 import { getBoards } from "../utils/api";
-import useAuth from "./useAuth";
+import useAuth from "../../../shared/hooks/useAuth";
+import { useTrelloAuthStore } from "../stores/useTrelloAuthStore";
 
 export default function useBoards(data: Data, setData: (data: Data) => void) {
-    const { authStatus } = useAuth();
+    const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
     const [boards, setBoards] = useState<Board[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const effect = async () => {
             console.log("TRELLO: Fetching boards");
-            const boards = await getBoards();
+            const session = await getSession();
+            if (!session) return;
+            const boards = await getBoards(session);
             if (!boards) return; // add better error handling
             setBoards(boards);
 

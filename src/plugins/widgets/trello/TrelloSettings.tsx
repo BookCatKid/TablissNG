@@ -1,17 +1,19 @@
 import React, { ChangeEvent, FC, useRef } from "react";
-import { BoardPreference, createFetchJob, defaultCache, defaultData, Props, FetchJob } from "./types";
+import { BoardPreference, createFetchJob, defaultCache, defaultData, Props, FetchJob, TrelloSession } from "./types";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import Spinner from "./ui/Spinner/Spinner";
-import useAuth from "./hooks/useAuth";
+import useAuth from "../../shared/hooks/useAuth";
+import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
 import useBoards from "./hooks/useBoards";
 import useLists from "./hooks/useLists";
+import { trelloAuthFlow } from "./utils/auth";
 
 const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const MAX_LISTS = 6; // maximum lists a user can select
-  const { authStatus: authState, authError, signIn, signOut } = useAuth();
+  const { authStatus: authState, authError, signIn, signOut } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
   const { 
     lists, 
@@ -24,7 +26,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
   const DEBOUNCE_INTERVAL = 550;
 
   const onAuthenticateClick = async () => {
-    await signIn();
+    await signIn(trelloAuthFlow);
   }
 
   const onSignout = async () => {
