@@ -122,7 +122,7 @@ const TrelloSettings: FC<Props> = ({ data = defaultData, setData, cache = defaul
           defaultMessage="Select your board"
           description="Select your board"
         />
-        <div className="board-select-container">
+        <div>
           {boardsLoading ? (
             <div className="loading" style={{marginLeft: "4px"}}>
               Loading... <Spinner size={16} />
