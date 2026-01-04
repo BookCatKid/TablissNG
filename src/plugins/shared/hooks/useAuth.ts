@@ -70,7 +70,7 @@ export default function useAuth<T extends Session>(
             if (!session) {
                 throw Error("Failed to authenticate");
             }
-            await browser.storage.local.set({ sessionName: { ...session }});
+            await browser.storage.local.set({ [sessionName]: { ...session }});
             setAuthStatus("authenticated");
         } catch (err) {
             console.error("TRELLO SIGN IN ERROR: ", err);
