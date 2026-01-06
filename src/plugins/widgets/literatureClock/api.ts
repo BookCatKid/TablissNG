@@ -38,7 +38,7 @@ export async function getQuoteByTimeCode(timeCode: string, sfw: boolean): Promis
   const cleanText = (input: string): string => {
     return input
         .replace(/<br\s*\/?>/gi, " ") // <br /> becomes a space
-        .replace(/&amp;/gi, "&")      // &amp; becomes an &
+        .replace(/&amp;/gi, "&");      // &amp; becomes an &
   };
 
   const decodedQuote = {

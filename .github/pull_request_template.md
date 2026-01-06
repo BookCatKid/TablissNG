@@ -4,6 +4,8 @@
 
 ## Type of Change
 
+<!-- To check off an item, you can place an "x" in betwen the brackets like "[x]". --> 
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
@@ -12,7 +14,7 @@
 
 ## Changelog Entry
 
-<!-- Add a changelog entry in the format used in CHANGELOG.md. This helps with creating releases. Then, paste your entry here. -->
+<!-- Add a changelog entry in the format used in CHANGELOG.md. This helps with creating releases. Please add the entry to CHANGELOG.md. -->
 
 ## Screenshots
 <!-- If your changes include visual changes, add screenshots here, otherwise delete this section -->
@@ -22,7 +24,9 @@
 
 ## Checklist
 
-- [ ] Tested in development environment
+<!-- To check off an item, you can place an "x" in betwen the brackets like "[x]". --> 
+
+- [ ] Tested in development environment <!-- Not necessary to test in all three, unless you are using browser apis or similar -->
 - [ ] Tested in Firefox
 - [ ] Tested in Chrome/Edge
 - [ ] Added or updated unit tests (if applicable)

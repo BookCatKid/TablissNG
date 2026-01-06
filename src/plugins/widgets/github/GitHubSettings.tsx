@@ -1,9 +1,11 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { DebounceInput } from "../../shared";
 import { defaultData, Props } from "./types";
 
-const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
+const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
+  const intl = useIntl();
+  return (
   <div className="MessageSettings">
     <label>
       <FormattedMessage
@@ -70,6 +72,7 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         description="Label for click action dropdown"
       />
       <select
+        title={intl.formatMessage({ id: "plugins.github.clickAction" })}
         value={data.clickAction}
         onChange={(event) =>
           setData({ ...data, clickAction: event.target.value as 'none' | 'github' | 'profile' })
@@ -99,6 +102,7 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
       </select>
     </label>
   </div>
-);
+  );
+};
 
 export default GitHubSettings;

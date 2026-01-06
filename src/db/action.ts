@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { DB } from "../lib";
 import migrateFrom2 from "./migrations/migrate2";
 import { selectWidgets } from "./select";
-import { cache, db, WidgetDisplay } from "./state";
+import { cache, db, WidgetDisplay, BackgroundDisplay } from "./state";
 
 export const createId = (): string => nanoid(12);
 
@@ -11,21 +11,63 @@ export const createId = (): string => nanoid(12);
 /** Change the background */
 export const setBackground = (key: string): void => {
   const current = DB.get(db, "background");
-  const id = createId();
+
+  const defaultDisplay: BackgroundDisplay = {
+    blur: 0,
+    luminosity: -0.2,
+    nightDim: false,
+    scale: true,
+    nightStart: "21:00",
+    nightEnd: "05:00",
+  };
+
+  // Save current background id and display for later restore.
+  try {
+    DB.put(db, (`background/id/${current.key}`) as any, current.id as any);
+    const displayKey = (`background/display/${current.key}`) as any;
+    try {
+      const isDefault =
+        JSON.stringify(current.display || {}) === JSON.stringify(defaultDisplay);
+      if (isDefault) {
+        // Remove any stored default display.
+        DB.del(db, displayKey);
+      } else {
+        DB.put(db, displayKey, current.display as any);
+      }
+    } catch {}
+    // Backup plugin data for this background
+    try {
+      const currentData = DB.get(db, (`data/${current.id}`) as any);
+      if (typeof currentData !== "undefined") {
+        DB.put(db, (`background/data/${current.key}`) as any, currentData);
+      }
+    } catch {}
+  } catch {}
+
+  // Reuse a previously allocated id for this key so that any plugin
+  // specific `data/{id}` remains available when switching back.
+  const prevId = DB.get(db, (`background/id/${key}`) as any) as unknown as string;
+  const prevDisplay = DB.get(db, (`background/display/${key}`) as any) as BackgroundDisplay | undefined;
+  const id = prevId || createId();
+
+  // Restore per-background plugin data into `data/{id}` if missing.
+  try {
+    const existingData = DB.get(db, `data/${id}`);
+    if (typeof existingData === "undefined") {
+      const storedData = DB.get(db, (`background/data/${key}`) as any);
+      if (typeof storedData !== "undefined") {
+        DB.put(db, `data/${id}`, storedData);
+      }
+    }
+  } catch (err) {
+    console.warn('Failed to restore plugin data:', err);
+  }
+
   DB.put(db, "background", {
     id,
     key,
-    display: {
-      blur: 0,
-      luminosity: -0.2,
-      nightDim: false,
-      scale: true,
-      nightStart: "21:00", // 9 PM
-      nightEnd: "05:00", // 5 AM
-    },
+    display: prevDisplay || defaultDisplay,
   });
-  DB.del(db, `data/${current.id}`);
-  DB.del(cache, current.id);
 };
 
 // Widget actions

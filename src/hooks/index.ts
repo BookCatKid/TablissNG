@@ -11,3 +11,5 @@ export * from "./useTheme";
 export * from "./useTime";
 export * from "./useToggle";
 export * from "./useIsNight";
+export * from "./useBackgroundRotation";
+export * from "./useArrayRotation";

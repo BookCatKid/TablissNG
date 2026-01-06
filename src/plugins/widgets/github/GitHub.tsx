@@ -1,7 +1,8 @@
 import React, { FC } from "react";
-import GitHubCalendar from "react-github-calendar";
+import { GitHubCalendar } from "react-github-calendar";
 import { useIntl } from "react-intl";
 import { useFormatMessages } from "../../../hooks/useFormatMessages";
+import { useTheme } from "../../../hooks/useTheme";
 import { monthMessages, weekdayMessages, legendMessages, messages } from "./messages";
 import { Props, defaultData } from "./types";
 
@@ -10,6 +11,7 @@ const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
   const months = useFormatMessages(monthMessages);
   const weekdays = useFormatMessages(weekdayMessages);
   const legend = useFormatMessages(legendMessages);
+  const { isDark } = useTheme();
 
   if (!data.username) return null;
 
@@ -24,7 +26,7 @@ const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
       weekdays.sun, weekdays.mon, weekdays.tue, weekdays.wed,
       weekdays.thu, weekdays.fri, weekdays.sat
     ],
-    totalCount: intl.formatMessage(messages.totalCount),
+    totalCount: intl.formatMessage(messages.totalCount).replace('[count]', '{{count}}').replace('[year]', '{{year}}'),
     legend: {
       less: legend.less,
       more: legend.more
@@ -43,11 +45,16 @@ const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
       }}
     >
       <GitHubCalendar
-        hideColorLegend={!data.showColorLegend}
-        hideMonthLabels={!data.showMonthLabels}
-        hideTotalCount={!data.showTotalCount}
+        showColorLegend={data.showColorLegend}
+        showMonthLabels={data.showMonthLabels}
+        showTotalCount={data.showTotalCount}
         username={data.username}
         labels={labels}
+        colorScheme={isDark ? "dark" : "light"}
+        theme={{
+          light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
+          dark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+        }}
       />
     </a>
   );

@@ -36,9 +36,10 @@ const Settings: React.FC = () => {
       confirm(
         intl.formatMessage({
           id: "settings.reset.confirm",
-          defaultMessage: "Are you sure you want to delete all of your TablissNG settings? This cannot be undone.",
-          description: "Confirmation message when resetting settings"
-        })
+          defaultMessage:
+            "Are you sure you want to delete all of your TablissNG settings? This cannot be undone.",
+          description: "Confirmation message when resetting settings",
+        }),
       )
     )
       resetStore();
@@ -101,15 +102,17 @@ const Settings: React.FC = () => {
         <div
           className="settings-hover-area"
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             bottom: 0,
-            width: '330px',
-            left: settingsOnRight ? 'auto' : 0,
-            right: settingsOnRight ? 0 : 'auto',
+            width: "330px",
+            left: settingsOnRight ? "auto" : 0,
+            right: settingsOnRight ? 0 : "auto",
             borderRadius: settingsOnRight ? "1rem 0 0 1rem" : "0 1rem 1rem 0",
-            background: isDark ? 'rgba(45, 45, 45, 0.25)' : 'rgba(0, 0, 0, 0.25)',
-            transition: 'background 0.3s ease'
+            background: isDark
+              ? "rgba(45, 45, 45, 0.25)"
+              : "rgba(0, 0, 0, 0.25)",
+            transition: "background 0.3s ease",
           }}
           onMouseEnter={() => setIsHovered(true)}
         />
@@ -123,7 +126,7 @@ const Settings: React.FC = () => {
           borderRadius: settingsOnRight ? "1rem 0 0 1rem" : "0 1rem 1rem 0",
           opacity: !autoHideSettings || isHovered ? 1 : 0,
           visibility: !autoHideSettings || isHovered ? "visible" : "hidden",
-          transition: "opacity 0.3s ease, visibility 0.3s ease"
+          transition: "opacity 0.3s ease, visibility 0.3s ease",
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -156,39 +159,6 @@ const Settings: React.FC = () => {
             TablissNG v{VERSION} {DEV ? "DEV " : ""}
           </span>
         </div>
-        {React.useMemo(() => (
-          <p style={{ textAlign: "center", marginTop: 0, marginBottom: 0 }}>
-            <GitHubButton
-              href="https://github.com/BookCatKid/tablissNG/subscription"
-              data-icon="octicon-eye"
-              data-size="large"
-              data-show-count="true"
-              data-color-scheme={isDark ? "dark" : "light"}
-              aria-label="Watch BookCatKid/tablissNG on GitHub"
-            >
-              <FormattedMessage
-                id="settings.github.watch"
-                defaultMessage="Watch"
-                description="GitHub Watch button text"
-              />
-            </GitHubButton>
-            <span style={{ margin: "0 1rem" }} />
-            <GitHubButton
-              href="https://github.com/BookCatKid/tablissNG"
-              data-icon="octicon-star"
-              data-size="large"
-              data-show-count="true"
-              data-color-scheme={isDark ? "dark" : "light"}
-              aria-label="Star BookCatKid/tablissNG on GitHub"
-            >
-              <FormattedMessage
-                id="settings.github.star"
-                defaultMessage="Star"
-                description="GitHub Star button text"
-              />
-            </GitHubButton>
-          </p>
-        ), [isDark])}
         <Background />
         <Widgets />
         <System />
@@ -228,42 +198,100 @@ const Settings: React.FC = () => {
         </p>
         {/* Only relevant for the web build where IndexedDB may be evicted. Hide for extension builds to avoid confusing prompts in Firefox/Chromium. */}
         {BUILD_TARGET === "web" && <Persist />}
+
         <div style={{ textAlign: "center" }} className="Widget">
-          <h4><FormattedMessage
-          id="support"
-          defaultMessage="Support TablissNG"
-          description="Support TablissNG button text"
-        /></h4>
-          <p>
-            <a
-              href="https://github.com/BookCatKid/tablissNG/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button button--primary"
-            >
-              <Icon icon="feather:github" />{" "}
-              <FormattedMessage
-                id="settings.support.star"
-                defaultMessage="Star the github repository! 🌟😍"
-                description="Call to action to star the GitHub repository"
-              />
-            </a>
-          </p>
-          <p style={{ marginTop: "1rem" }} className="Widget">
-            <a
-              href="https://github.com/BookCatKid/tablissNG/blob/main/CONTRIBUTING.md"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button button--primary"
-            >
-              <Icon icon="feather:code" />{" "}
-              <FormattedMessage
-                id="settings.support.contribute"
-                defaultMessage="Contribute to the project! 😍🌟"
-                description="Call to action to contribute to the project"
-              />
-            </a>
-          </p>
+          <h4>
+            <FormattedMessage
+              id="support"
+              defaultMessage="Support TablissNG"
+              description="Support TablissNG button text"
+            />
+          </h4>
+
+          {React.useMemo(
+            () => (
+              <div
+                style={{
+                  marginTop: "14px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "14px",
+                  width: "100%",
+                }}
+              >
+                <div style={{ width: "100%" }}>
+                  <GitHubButton
+                    href="https://github.com/BookCatKid/tablissNG"
+                    data-icon="octicon-repo"
+                    data-size="large"
+                    data-show-count="false"
+                    data-color-scheme={isDark ? "dark" : "light"}
+                    aria-label="Open repository BookCatKid/tablissNG on GitHub"
+                  >
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "0.4rem",
+                        width: "100%",
+                      }}
+                    >
+                      <Icon icon="feather:code" />{" "}
+                      <FormattedMessage
+                        id="settings.support.contribute"
+                        defaultMessage="Contribute to the project!"
+                        description="Call to action to contribute to the project"
+                      />
+                    </span>
+                  </GitHubButton>
+                </div>
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    width: "100%",
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <GitHubButton
+                      href="https://github.com/BookCatKid/tablissNG/subscription"
+                      data-icon="octicon-eye"
+                      data-size="large"
+                      data-show-count="true"
+                      data-color-scheme={isDark ? "dark" : "light"}
+                      aria-label="Watch BookCatKid/tablissNG on GitHub"
+                    >
+                      <FormattedMessage
+                        id="settings.github.watch"
+                        defaultMessage="Watch"
+                        description="GitHub Watch button text"
+                      />
+                    </GitHubButton>
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <GitHubButton
+                      href="https://github.com/BookCatKid/tablissNG"
+                      data-icon="octicon-star"
+                      data-size="large"
+                      data-show-count="true"
+                      data-color-scheme={isDark ? "dark" : "light"}
+                      aria-label="Star BookCatKid/tablissNG on GitHub"
+                    >
+                      <FormattedMessage
+                        id="settings.github.star"
+                        defaultMessage="Star"
+                        description="GitHub Star button text"
+                      />
+                    </GitHubButton>
+                  </div>
+                </div>
+              </div>
+            ),
+            [isDark],
+          )}
         </div>
 
         <FormattedMessage

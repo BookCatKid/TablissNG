@@ -1,13 +1,24 @@
 import React, { FC, useMemo, useEffect } from "react";
 
+import { defineMessages, useIntl } from "react-intl";
 import { useKeyPress, useToggle } from "../../../hooks";
 import { Icon } from "@iconify/react";
 import Display from "./Display";
 import { Props, defaultData, defaultCache } from "./types";
 import "./Links.sass";
 
+const messages = defineMessages({
+  showQuickLinks: {
+    id: "plugins.links.showQuickLinks",
+    description: "Tooltip to show quick links",
+    defaultMessage: "Show quick links",
+  },
+});
+
 const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache }) => {
   const [visible, toggleVisible] = useToggle();
+
+  const intl = useIntl();
 
   // Ensure all links have unique IDs to prevent React key errors
   useEffect(() => {
@@ -59,16 +70,28 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
     });
   }, [data.links, data.sortBy]);
 
+  const keyToIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    sortedLinks.forEach((link, idx) => {
+      if (link.keyboardShortcut && link.keyboardShortcut.length > 0) {
+        map.set(link.keyboardShortcut, idx);
+      } else {
+        map.set(String(idx + 1), idx);
+      }
+    });
+    return map;
+  }, [sortedLinks]);
+
   useKeyPress(
     ({ key }) => {
-      const index = Number(key) - 1;
-      if (sortedLinks[index]) {
+      const index = keyToIndex.get(key);
+      if (index !== undefined && sortedLinks[index]) {
         data.linkOpenStyle
           ? window.open(sortedLinks[index].url, "_blank")
           : window.location.assign(sortedLinks[index].url);
       }
     },
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+    Array.from(keyToIndex.keys()),
   );
 
   return (
@@ -95,7 +118,7 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
           />
         ))
       ) : (
-        <a onClick={toggleVisible} title="Show quick links">
+        <a onClick={toggleVisible} title={intl.formatMessage(messages.showQuickLinks)}>
           <Icon icon="fe:insert-link" />
         </a>
       )}

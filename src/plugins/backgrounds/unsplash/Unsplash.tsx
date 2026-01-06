@@ -1,10 +1,8 @@
 import React from "react";
-import { useRotatingCache } from "../../../hooks";
-import Backdrop from "../../../views/shared/Backdrop";
 import { buildLink, fetchImages } from "./api";
-import { defaultData, Props } from "./types";
-import "./Unsplash.sass";
-import UnsplashCredit from "./UnsplashCredit";
+import { defaultData, Image as UnsplashImage, Props } from "./types";
+import { useBackgroundRotation } from "../../../hooks";
+import BaseBackground from "../base/BaseBackground";
 
 const Unsplash: React.FC<Props> = ({
   cache,
@@ -30,66 +28,33 @@ const Unsplash: React.FC<Props> = ({
     }
   }, []);
 
-  // Get current item from rotating cache
-  const item = useRotatingCache(
-    () => {
+  const { item, go, handlePause } = useBackgroundRotation({
+    fetch: () => {
       loader.push();
       return fetchImages(data).finally(loader.pop);
     },
-    { cache, setCache },
-    data.paused ? Number.MAX_SAFE_INTEGER : data.timeout * 1000,
-    [data.by, data.collections, data.featured, data.search, (Array.isArray(data.topics) ? data.topics : [data.topics]).join(',')],
-  );
-
-  // Populate browser cache with the next image
-  React.useEffect(() => {
-    if (cache && cache.items[cache.cursor + 1]) {
-      const next = new Image();
-      next.src = buildLink(cache.items[cache.cursor + 1].src);
-      next.onload = loader.pop;
-      next.onerror = loader.pop;
-      loader.push();
-    }
-  }, [cache]);
+    cacheObj: { cache, setCache },
+    data,
+    setData,
+    loader,
+    deps: [data.by, data.collections, data.featured, data.search, (Array.isArray(data.topics) ? data.topics : [data.topics]).join(',')],
+    buildUrl: (i: UnsplashImage) => buildLink(i.src),
+  });
 
   const url = item ? buildLink(item.src) : null;
 
-  const go = (amount: number) =>
-    cache && cache.items[cache.cursor + amount]
-      ? () =>
-          setCache({
-            ...cache!,
-            cursor: cache!.cursor + amount,
-            rotated: Date.now(),
-          })
-      : null;
-
-  const handlePause = () => {
-    setData({
-      ...data,
-      paused: !data.paused,
-    });
-  };
-
   return (
-    <div className="Unsplash fullscreen">
-      <Backdrop
-        className="image fullscreen"
-        ready={url !== null}
-        url={url}
-      />
-
-      {item ? (
-        <UnsplashCredit
-          credit={item.credit}
-          locationSource={data.locationSource}
-          paused={data.paused ?? false}
-          onPause={handlePause}
-          onPrev={go(-1)}
-          onNext={go(1)}
-        />
-      ) : null}
-    </div>
+    <BaseBackground
+      containerClassName="Unsplash fullscreen"
+      url={url}
+      ready={url !== null}
+      credit={item ? item.credit : null}
+      locationSource={data.locationSource}
+      paused={data.paused ?? false}
+      onPause={handlePause}
+      onPrev={go(-1)}
+      onNext={go(1)}
+    />
   );
 };
 

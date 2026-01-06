@@ -117,7 +117,7 @@ export const legendMessages = defineMessages({
 export const messages = defineMessages({
   totalCount: {
     id: "plugins.github.totalCount",
-    defaultMessage: "{{count}} contributions in {{year}}",
+    defaultMessage: "[count] contributions in [year]",
     description: "Total count text for GitHub calendar",
   },
 });

@@ -1,10 +1,10 @@
 import React from "react";
-import { defineMessages } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import { ErrorContext } from "../../contexts/error";
 import { UiContext } from "../../contexts/ui";
 import { toggleFocus } from "../../db/action";
 import { db } from "../../db/state";
-import { useFormatMessages, useFullscreen, useKeyPress } from "../../hooks";
+import { useFullscreen, useKeyPress } from "../../hooks";
 import { useValue, useKey } from "../../lib/db/react";
 import { Icon } from "@iconify/react";
 import "./Overlay.sass";
@@ -67,7 +67,7 @@ const mapping: Record<Position, React.CSSProperties> = {
 };
 
 const Overlay: React.FC = () => {
-  const translated = useFormatMessages(messages);
+  const intl = useIntl();
   const focus = useValue(db, "focus");
   const { errors } = React.useContext(ErrorContext);
   const { pending, toggleErrors, toggleSettings } = React.useContext(UiContext);
@@ -114,20 +114,20 @@ const Overlay: React.FC = () => {
     >
       <a 
         onClick={toggleSettings} 
-        title={`${translated.settingsHint} (S)`}
+        title={`${intl.formatMessage(messages.settingsHint)} (S)`}
         className={hideSettingsIcon ? "on-hover" : ""}
       >
         <Icon icon="feather:settings" />
       </a>
 
       {errors.length > 0 ? (
-        <a onClick={toggleErrors} title={translated.errorHint}>
+        <a onClick={toggleErrors} title={intl.formatMessage(messages.errorHint)}>
           <Icon icon="feather:alert-triangle" />
         </a>
       ) : null}
 
       {pending > 0 ? (
-        <span title={translated.loadingHint}>
+        <span title={intl.formatMessage(messages.loadingHint)}>
           <Icon icon="feather:zap" />
         </span>
       ) : null}
@@ -135,7 +135,7 @@ const Overlay: React.FC = () => {
       <a
         className={focus ? "" : "on-hover"}
         onClick={toggleFocus}
-        title={`${translated.focusHint} (W)`}
+        title={`${intl.formatMessage(messages.focusHint)} (W)`}
       >
         <Icon icon={`feather:${focus ? "eye-off" : "eye"}`} />
       </a>
@@ -144,7 +144,7 @@ const Overlay: React.FC = () => {
         <a
           className="on-hover"
           onClick={handleToggleFullscreen}
-          title={`${translated.fullscreenHint} (F)`}
+          title={`${intl.formatMessage(messages.fullscreenHint)} (F)`}
         >
           <Icon icon={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`} />
         </a>

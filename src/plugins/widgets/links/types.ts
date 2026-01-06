@@ -5,6 +5,7 @@ export type Link = {
   name?: string;
   icon?: string;
   url: string;
+  keyboardShortcut?: string;
   lastUsed?: number;
   iconSize?: number;
   IconString?: string;
