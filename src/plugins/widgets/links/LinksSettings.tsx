@@ -4,7 +4,7 @@ import { useSavedReducer } from "../../../hooks";
 import Input from "./Input";
 import { addLink, removeLink, reorderLink, updateLink } from "./actions";
 import { reducer } from "./reducer";
-import { Link, Props, defaultData, defaultCache, Data } from "./types";
+import { Data, Link, Props, defaultCache, defaultData } from "./types";
 
 const LinksSettings: FC<Props> = ({ data = defaultData, setData, cache = defaultCache, setCache }) => {
   const saveLinks = (links: Link[]) => setData({ ...data, links });
@@ -19,10 +19,11 @@ const LinksSettings: FC<Props> = ({ data = defaultData, setData, cache = default
           return (a.name || '').localeCompare(b.name || '');
         case 'icon':
           return (a.icon || '').localeCompare(b.icon || '');
-        case 'lastUsed':
+        case 'lastUsed': {
           const bTime = b.lastUsed || 0;
           const aTime = a.lastUsed || 0;
           return bTime - aTime; // Most recent first
+        }
         default:
           return 0;
       }

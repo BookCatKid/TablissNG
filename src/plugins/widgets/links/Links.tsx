@@ -1,11 +1,11 @@
-import React, { FC, useMemo, useEffect } from "react";
+import React, { FC, useEffect, useMemo } from "react";
 
+import { Icon } from "@iconify/react";
 import { defineMessages, useIntl } from "react-intl";
 import { useKeyPress, useToggle } from "../../../hooks";
-import { Icon } from "@iconify/react";
 import Display from "./Display";
-import { Props, defaultData, defaultCache } from "./types";
 import "./Links.sass";
+import { Props, defaultCache, defaultData } from "./types";
 
 const messages = defineMessages({
   showQuickLinks: {
@@ -60,10 +60,11 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
           return (a.name || '').localeCompare(b.name || '');
         case 'icon':
           return (a.icon || '').localeCompare(b.icon || '');
-        case 'lastUsed':
+        case 'lastUsed': {
           const bTime = b.lastUsed || 0;
           const aTime = a.lastUsed || 0;
           return bTime - aTime; // Most recent first
+        }
         default:
           return 0;
       }
@@ -85,10 +86,13 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
   useKeyPress(
     ({ key }) => {
       const index = keyToIndex.get(key);
+
       if (index !== undefined && sortedLinks[index]) {
-        data.linkOpenStyle
-          ? window.open(sortedLinks[index].url, "_blank")
-          : window.location.assign(sortedLinks[index].url);
+        if (data.linkOpenStyle) {
+          window.open(sortedLinks[index].url, "_blank");
+        } else {
+          window.location.assign(sortedLinks[index].url);
+        }
       }
     },
     Array.from(keyToIndex.keys()),

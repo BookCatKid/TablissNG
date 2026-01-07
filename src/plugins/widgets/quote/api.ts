@@ -1,6 +1,6 @@
 import { API } from "../../types";
-import { Quote } from "./types";
 import { bibleVerses } from "./bibleVerses";
+import { Quote } from "./types";
 
 // Get developer excuse
 async function getDeveloperExcuse(): Promise<{ quote: string }> {
@@ -227,7 +227,7 @@ function cleanQuote(quote: string) {
   quote = quote.replace(dash, "—");
 
   // We add a period at the end of the quote if need be.
-  const closingPunctuation = new RegExp(/[.\?!…’]$/);
+  const closingPunctuation = new RegExp(/[.?!…’]$/);
   if (!quote.match(closingPunctuation)) quote = quote + ".";
 
   return quote;

@@ -2,10 +2,10 @@ import React from "react";
 
 import Backdrop from "../../../views/shared/Backdrop";
 
-import { defaultData, Props } from "./types";
 import { getPicture } from "./api";
-import ApodTitle from "./ApodTitle";
 import "./Apod.sass";
+import ApodTitle from "./ApodTitle";
+import { defaultData, Props } from "./types";
 
 const Apod: React.FC<Props> = ({
   cache,
@@ -24,7 +24,7 @@ const Apod: React.FC<Props> = ({
 
   const extractYouTubeId = React.useCallback((url: string): string | null => {
     const match = url.match(
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
+      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
     );
     return match ? match[1] : null;
   }, []);

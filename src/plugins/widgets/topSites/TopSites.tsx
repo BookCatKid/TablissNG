@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
-import { Props, Cache, defaultCache, defaultData } from './types';
 import Display from '../links/Display';
 import './TopSites.sass';
+import { Props, defaultCache, defaultData } from './types';
 
 export const truncateText = (text: string, maxLength: number): string => {
     if (maxLength === 0 || text.length <= maxLength) return text;
@@ -17,7 +17,7 @@ export const cleanTitle = (title: string, url: string): string => {
     // TODO: If the title is a url then do something
 
     // Remove common separators and their content
-    let cleaned = title
+    const cleaned = title
         .split(/[•|–|-]|:/)[0]  // Split on common separators
         .split(' - ')[0]        // Handle dash with spaces
         .trim();
