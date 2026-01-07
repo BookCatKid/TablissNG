@@ -32,10 +32,18 @@
     "test": "tsc -p tsconfig.test.json && jest",
     "translations": "node ./scripts/translations.js",
     "deps:check": "npx npm-check",
-    "deps:update": "npx npm-check -u"
+    "deps:update": "npx npm-check -u",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
+    "@swc/core": "^1.15.2",
     "core-js": "^3.47.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
@@ -72,10 +80,12 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "file-loader": "^6.2.0",
+    "husky": "^9.1.7",
     "glob": "^13.0.0",
     "globals": "^16.5.0",
     "html-webpack-plugin": "^5.6.5",
     "jest": "^30.2.0",
+    "lint-staged": "^16.2.7",
     "mini-css-extract-plugin": "^2.9.4",
     "prettier": "^3.7.4",
     "raw-loader": "^4.0.2",

@@ -53,7 +53,7 @@ export const pluginMessages = defineMessages({
     id: "plugins.freeMove.save",
     defaultMessage: "Save Position",
     description: "Save Position button title",
-  }
+  },
 });
 
 export const timingMessages = defineMessages({
@@ -115,5 +115,5 @@ export const backgroundMessages = defineMessages({
     id: "backgrounds.date",
     defaultMessage: "Date",
     description: "Label for date input",
-  }
+  },
 });

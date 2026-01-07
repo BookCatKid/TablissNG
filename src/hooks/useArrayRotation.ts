@@ -32,7 +32,11 @@ export function useArrayRotation<T>({
     setCursor((c) => Math.min(c, items.length - 1));
   }, [items.length]);
 
-  const timeoutMs = data ? (data.paused ? Number.MAX_SAFE_INTEGER : (data.timeout ?? 0) * 1000) : 0;
+  const timeoutMs = data
+    ? data.paused
+      ? Number.MAX_SAFE_INTEGER
+      : (data.timeout ?? 0) * 1000
+    : 0;
 
   // advance on timeout
   React.useEffect(() => {
