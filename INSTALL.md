@@ -1,12 +1,18 @@
 # How to Download the extension and add it to your browser
 
+<a href="https://addons.mozilla.org/en-US/firefox/addon/tablissng/"><img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" height="70"></a>
+<a href="https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png" alt="Get the Extension on Chrome" height="70" style="border: 1px solid transparent; border-radius:6px;"></a>
+<a href="https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Get_it_from_Microsoft_Badge.svg/320px-Get_it_from_Microsoft_Badge.svg.png" alt="Get the Extension on Edge" height="70" style="border: 1px solid transparent; border-radius:4px;"></a>
+
+**Recommended:** The best way to install TablissNG is via the official browser stores (Chrome Web Store, Firefox Add-ons, or the Edge Add-On store) because they provide automatic updates and make installation easy.
+
 ## Step 1: Download the Extension
 
 ### Option 1: Download from GitHub Releases (Recommended)
 
 1. **Go to the [Releases page](https://github.com/BookCatKid/TablissNG/releases)** of the repository
-2. Find the latest release
-3. Download the appropriate file:
+2. Find the latest release. For the absolute latest development builds, prefer the Nightly release (tag `nightly-auto`). If you need stability, use the latest stable release instead.
+3. Download the appropriate file: (for Nightly builds, the filenames will include `-nightly`)
    - For Firefox: `tabliss-firefox-signed.xpi` (This file may not exist, if you need it and it is not available, please see [Downloading signed xpi from firefox store](#Downloading-signed-xpi-from-firefox-store))
    - For Chrome/Chromium: `tabliss-chromium.zip`
    - For Firefox (unsigned version): `tabliss-firefox.zip` (expert)

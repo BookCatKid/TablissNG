@@ -1,4 +1,6 @@
-# TablissNG
+<p align="left">
+  <img src="src/views/shared/tabliss.svg" alt="TablissNG logo" width="400" />
+</p>
 
 > A beautiful, customisable New Tab page for Firefox and Chrome.
 

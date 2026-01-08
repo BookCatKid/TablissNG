@@ -38,6 +38,7 @@ jobs:
           - chromium
           - firefox
           - web
+          - safari
     steps:
       - uses: actions/checkout@v4
         with:
@@ -251,6 +252,8 @@ jobs:
           zip -r ../../tabliss-chromium.zip ./*
           cd ../tabliss-web
           zip -r ../../tabliss-web.zip ./*
+          cd ../tabliss-safari
+          zip -r ../../tabliss-safari.zip ./*
           cd ../..
       - name: Get version without v prefix
         id: version
@@ -262,7 +265,7 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Version ${{ steps.version.outputs.version }}
           tag_name: ${{ steps.version.outputs.ref }}
@@ -270,6 +273,7 @@ jobs:
             tabliss-firefox.zip
             tabliss-chromium.zip
             tabliss-web.zip
+            tabliss-safari.zip
           draft: true
           prerelease: false
           generate_release_notes: true

@@ -11,7 +11,7 @@ const webpack = require("webpack");
 const buildTarget = process.env.BUILD_TARGET || "web";
 const isProduction = process.env.NODE_ENV === "production";
 const isWeb = buildTarget === "web";
-const version = require("./package.json").version;
+const { version } = require("./package.json");
 
 const config = {
   performance: {
@@ -35,7 +35,7 @@ const config = {
     rules: [
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"],
+        use: [isWeb ? MiniCssExtractPlugin.loader : "style-loader", "css-loader"],
       },
       {
         test: /\.(gif|jpe?g|png)$/,
@@ -47,7 +47,7 @@ const config = {
       },
       {
         test: /\.sass$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+        use: [isWeb ? MiniCssExtractPlugin.loader : "style-loader", "css-loader", "sass-loader"],
       },
       {
         test: /\.svg$/,

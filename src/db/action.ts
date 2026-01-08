@@ -23,11 +23,12 @@ export const setBackground = (key: string): void => {
 
   // Save current background id and display for later restore.
   try {
-    DB.put(db, (`background/id/${current.key}`) as any, current.id as any);
-    const displayKey = (`background/display/${current.key}`) as any;
+    DB.put(db, `background/id/${current.key}` as any, current.id as any);
+    const displayKey = `background/display/${current.key}` as any;
     try {
       const isDefault =
-        JSON.stringify(current.display || {}) === JSON.stringify(defaultDisplay);
+        JSON.stringify(current.display || {}) ===
+        JSON.stringify(defaultDisplay);
       if (isDefault) {
         // Remove any stored default display.
         DB.del(db, displayKey);
@@ -37,30 +38,32 @@ export const setBackground = (key: string): void => {
     } catch {}
     // Backup plugin data for this background
     try {
-      const currentData = DB.get(db, (`data/${current.id}`) as any);
+      const currentData = DB.get(db, `data/${current.id}` as any);
       if (typeof currentData !== "undefined") {
-        DB.put(db, (`background/data/${current.key}`) as any, currentData);
+        DB.put(db, `background/data/${current.key}` as any, currentData);
       }
     } catch {}
   } catch {}
 
   // Reuse a previously allocated id for this key so that any plugin
   // specific `data/{id}` remains available when switching back.
-  const prevId = DB.get(db, (`background/id/${key}`) as any) as unknown as string;
-  const prevDisplay = DB.get(db, (`background/display/${key}`) as any) as BackgroundDisplay | undefined;
+  const prevId = DB.get(db, `background/id/${key}` as any) as unknown as string;
+  const prevDisplay = DB.get(db, `background/display/${key}` as any) as
+    | BackgroundDisplay
+    | undefined;
   const id = prevId || createId();
 
   // Restore per-background plugin data into `data/{id}` if missing.
   try {
     const existingData = DB.get(db, `data/${id}`);
     if (typeof existingData === "undefined") {
-      const storedData = DB.get(db, (`background/data/${key}`) as any);
+      const storedData = DB.get(db, `background/data/${key}` as any);
       if (typeof storedData !== "undefined") {
         DB.put(db, `data/${id}`, storedData);
       }
     }
   } catch (err) {
-    console.warn('Failed to restore plugin data:', err);
+    console.warn("Failed to restore plugin data:", err);
   }
 
   DB.put(db, "background", {
