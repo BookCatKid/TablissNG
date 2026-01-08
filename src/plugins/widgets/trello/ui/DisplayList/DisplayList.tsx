@@ -1,11 +1,11 @@
 import React from "react";
-import { DisplayList, TrelloListItem, colourPalette } from "../../types";
+import { DisplayList, Item, colourPalette } from "../../types";
 import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
 
 interface DisplayListComponentProps {
   header: string;
-  items: TrelloListItem[] | undefined;
+  items: Item[] | undefined;
   loading: boolean | undefined;
 }
 
