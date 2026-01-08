@@ -16,7 +16,7 @@ const ListCheckbox: FC<ListCheckboxProps> = ({
   checked = false,
   onChange,
 }) => {
-  const handleChange = (event: ChangeEvent) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.stopPropagation();
     onChange(listID);
   };
