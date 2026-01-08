@@ -4,69 +4,61 @@ import {
   List,
   TrelloBoardResponse,
   TrelloItemsResponse,
-  TrelloListItem,
   TrelloListResponse,
   TrelloSession,
 } from "../types";
 
-export const getBoards = async (session: TrelloSession) => {
-  const fetchBoardRes = await fetch(
-    `https://api.trello.com/1/members/${session.userId}/boards?key=${TRELLO_API_KEY}&token=${session.accessToken}`,
-  );
+/**
+ * Make authenticated call to Trello's API
+ * and transform the response into a TData array
+ * @param path
+ * @param session
+ * @param transform
+ * @returns
+ */
+const trelloFetch = async <TResponse, TData>(
+  path: string,
+  session: TrelloSession,
+  transform: (data: TResponse) => TData,
+) => {
+  const url = `https://api.trello.com/1/${path}?key=${TRELLO_API_KEY}&token=${session.accessToken}`;
+  const response = await fetch(url);
 
-  if (!fetchBoardRes.ok) {
+  if (!response.ok) {
     return null;
   }
 
-  const boardData: TrelloBoardResponse[] = await fetchBoardRes.json();
-  const boards: Board[] = boardData.map(
-    (data: TrelloBoardResponse) =>
-      ({
-        id: data.id,
-        name: data.name,
-      }) as Board,
+  const data: TResponse = await response.json();
+  return transform(data);
+};
+
+export const getBoards = async (session: TrelloSession) => {
+  return trelloFetch<TrelloBoardResponse[], Board[]>(
+    `members/${session.userId}/boards`,
+    session,
+    (data) => data.map((item) => ({ id: item.id, name: item.name }) as Board),
   );
-  return boards;
 };
 
 export const getLists = async (boardId: string, session: TrelloSession) => {
-  const fetchListRes = await fetch(
-    `https://api.trello.com/1/boards/${boardId}/lists?key=${TRELLO_API_KEY}&token=${session.accessToken}`,
+  return trelloFetch<TrelloListResponse[], List[]>(
+    `boards/${boardId}/lists`,
+    session,
+    (data) =>
+      data.map(
+        (item) => ({ id: item.id, name: item.name, watch: false }) as List,
+      ),
   );
-
-  if (!fetchListRes.ok) {
-    return null;
-  }
-
-  const listData: TrelloListResponse[] = await fetchListRes.json();
-  const lists: List[] = listData.map(
-    (data: TrelloListResponse) =>
-      ({
-        id: data.id,
-        name: data.name,
-        watch: false,
-      }) as List,
-  );
-  return lists;
 };
 
 export const getItems = async (listId: string, session: TrelloSession) => {
-  const fetchItemsRes = await fetch(
-    `https://api.trello.com/1/lists/${listId}/cards?key=${TRELLO_API_KEY}&token=${session.accessToken}`,
+  return trelloFetch<TrelloItemsResponse[], Item[]>(
+    `lists/${listId}/cards`,
+    session,
+    (data) =>
+      data.map(
+        (item) =>
+          ({ id: item.id, name: item.name, labels: item.labels }) as Item,
+      ),
   );
-
-  if (!fetchItemsRes.ok) {
-    return null;
-  }
-
-  const data: TrelloItemsResponse = await fetchItemsRes.json();
-  const items = data.map(
-    (item: TrelloListItem) =>
-      ({
-        id: item.id,
-        name: item.name,
-        labels: item.labels,
-      }) as Item,
-  );
-  return items;
 };
