@@ -15,7 +15,8 @@
   },
   "permissions": [
     "storage",
-    "search"
+    "search",
+    "identity"
   ],
   "optional_permissions": [
     "bookmarks",

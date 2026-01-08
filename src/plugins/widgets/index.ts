@@ -25,6 +25,7 @@ import topSites from "./topSites";
 import weather from "./weather";
 import workHours from "./workHours";
 import timeTracker from "./timeTracker";
+import trello from "./trello";
 
 export const widgetConfigs = [
   // nba,
@@ -58,4 +59,5 @@ if (BUILD_TARGET === "web") {
 if (BUILD_TARGET != "web" && BUILD_TARGET != "safari") {
   widgetConfigs.push(topSites);
   widgetConfigs.push(bookmarks);
+  widgetConfigs.push(trello);
 }

@@ -10,6 +10,8 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ### Added
 
+- feat(trello): added Trello integration. [7e3c9b9](https://github.com/John-Ling/TablissNG/commit/7e3c9b9968dd6639a3f985e73f1d236b30c39916)
+
 - feat(Persist): improve errors and remove on non-web builds. [98195e8](https://github.com/BookCatKid/TablissNG/commit/98195e8)
 
 - feat(storage): add SAVE_BATCH_TIMEOUT to prevent storage errors. [b587897](https://github.com/BookCatKid/TablissNG/commit/b587897)
