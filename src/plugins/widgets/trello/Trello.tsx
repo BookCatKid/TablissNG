@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef } from "react";
+import React, { FC, useEffect } from "react";
 import { Props, List, defaultCache, TrelloSession } from "./types";
 import "./Trello.sass";
 
@@ -9,7 +9,10 @@ import useAuth from "../../../hooks/useAuth";
 import { FormattedMessage } from "react-intl";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
-  const { authStatus, getSession } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
+  const { authStatus, getSession } = useAuth<TrelloSession>(
+    "trello",
+    useTrelloAuthStore,
+  );
 
   // fetch data on page load
   useEffect(() => {
@@ -21,38 +24,38 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
             const session = await getSession();
             if (!session) return null;
             const items = await getItems(response.listId, session);
-            return items ? { listId: response.listId, response, items } : null; 
+            return items ? { listId: response.listId, response, items } : null;
           }
-        })
+        }),
       );
 
-      let updatedResponses = cache.responses;
-      results.forEach(result => {
+      const updatedResponses = new Map(cache.responses);
+      results.forEach((result) => {
         // resolve jobs
         if (result) {
-          updatedResponses = updatedResponses.set(result.listId, {
+          updatedResponses.set(result.listId, {
             ...result.response,
             loading: false,
-            items: result.items
+            items: result.items,
           });
         }
       });
 
       setCache({
         ...cache,
-        responses: updatedResponses
+        responses: updatedResponses,
       });
     };
 
     if (authStatus === "authenticated") {
       effect();
     }
-  }, [authStatus, cache.responses]);
+  }, [authStatus]);
 
   // fetch data when selected lists are changed
   useEffect(() => {
     const effect = async () => {
-      console.log("TRELLO: fetching items for new jobs")
+      console.log("TRELLO: fetching items for new jobs");
       await Promise.all(
         cache.responses.values().map(async (response) => {
           if (response.loading && !response.skeleton) {
@@ -62,48 +65,51 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
             if (items) {
               setCache({
                 ...cache,
-                responses: cache.responses.set(response.listId, { ...response, loading: false, items: items })
+                responses: cache.responses.set(response.listId, {
+                  ...response,
+                  loading: false,
+                  items: items,
+                }),
               });
             }
           }
-        })
-      )
-    }   
+        }),
+      );
+    };
     effect();
   }, [cache.order]);
 
   return (
     <>
-      {
-        authStatus !== "authenticated"  ?  
-        <FormattedMessage 
-          id="plugins.trello.unauthenticatedMessage" 
-          defaultMessage={"Sign into Trello to use me"} 
-          description={"Sign into Trello to use me"} />
-        : 
-        !!cache && cache.order.length === 0 ? 
-        <FormattedMessage 
+      {authStatus !== "authenticated" ? (
+        <FormattedMessage
+          id="plugins.trello.unauthenticatedMessage"
+          defaultMessage={"Sign into Trello to use me"}
+          description={"Sign into Trello to use me"}
+        />
+      ) : !cache.order || (!!cache && cache.order.length === 0) ? (
+        <FormattedMessage
           id="plugins.trello.noListsMessage"
           defaultMessage={"Add some lists to view"}
           description={"Add some lists to view"}
         />
-        :
+      ) : (
         <div className="display-list-container">
-          {  
-            cache.order.map((list: List) => {
-                const response = cache.responses.get(list.id);
-                return <DisplayList 
-                  header={list.name} 
-                  items={response?.items} 
-                  loading={response?.loading} 
-                />
-              }           
-            )
-          }    
+          {cache.order.map((list: List) => {
+            const response = cache.responses.get(list.id);
+            return (
+              <DisplayList
+                key={list.id}
+                header={list.name}
+                items={response?.items}
+                loading={response?.loading}
+              />
+            );
+          })}
         </div>
-      }
+      )}
     </>
-  )
-}
+  );
+};
 
 export default Trello;
