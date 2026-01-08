@@ -23,7 +23,7 @@ export default function DisplayList({
       <div className="display-list-items">
         {items.map((item, i) => {
           return (
-            <div key={i}>
+            <div key={i} className="display-list-item-content">
               <div className="labels-container">
                 {item.labels.map((label) => {
                   return (
