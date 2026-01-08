@@ -18,25 +18,17 @@
 .display-list-items
     width: 30vh
     height: 31vh
-    overflow-y: auto
+    overflow-y: overlay
     scrollbar-color: #444 #2d2d2d03 !important
     scrollbar-width: thin
-    padding-right: 10px
+    scrollbar-gutter: stable
+    padding-right: 16px
 
 
 .display-list-item-content
     overflow-wrap: anywhere
     word-break: break-word
     padding: 0.25rem 0
-
-.display-list-items::-webkit-scrollbar-button 
-  display: none
-
-.display-list-items:not(:hover) 
-    scrollbar-width: none
-
-.display-list-items:not(:hover)::-webkit-scrollbar 
-    scrollbar-width: none
 
 .labels-container
     display: flex
