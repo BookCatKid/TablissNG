@@ -151,8 +151,7 @@ if (isProduction) {
         {
           urlPattern: ({ url }) =>
             url.hostname === "github-contributions-api.jogruber.de" ||
-            url.href.startsWith("https://api.github.com/repos/BookCatKid/tablissNG") ||
-            url.href.startsWith("https://api.unsplash.com/topics"),
+            url.href.startsWith("https://api.github.com/repos/BookCatKid/tablissNG"),
 
           handler: "CacheFirst",
           options: {
