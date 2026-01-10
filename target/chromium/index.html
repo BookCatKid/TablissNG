@@ -7,8 +7,16 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
     />
-    <link rel="shortcut icon" href="/icons/128.png" />
-    <title> </title>
+
+    <link rel="shortcut icon" href="icons/128.png" id="tabliss-favicon" />
+    <script>
+      (function() {
+        var custom = localStorage.getItem('tabliss/favicon');
+        if (custom) {
+          document.getElementById('tabliss-favicon').href = custom;
+        }
+      })();
+    </script>
     <style>
       body {background-color: #000;}
     </style>

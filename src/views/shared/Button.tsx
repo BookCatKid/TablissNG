@@ -6,7 +6,7 @@ type Props = JSX.IntrinsicElements["button"] & {
 
 const Button: FC<Props> = ({ className, children, primary, ...props }) => (
   <button
-    className={`button ${primary ? "button--primary" : ""} ${className}`}
+    className={`button ${primary ? "button--primary" : ""} ${className || ""}`}
     {...props}
   >
     {children}
