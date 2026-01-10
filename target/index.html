@@ -13,15 +13,8 @@
     <link rel="manifest" href="pwa.json" />
     <% } %>
 
-    <link rel="shortcut icon" href="icons/128.png" id="tabliss-favicon" />
-    <script>
-      (function() {
-        var custom = localStorage.getItem('tabliss/favicon');
-        if (custom) {
-          document.getElementById('tabliss-favicon').href = custom;
-        }
-      })();
-    </script>
+    <link rel="shortcut icon" href="data:," id="tabliss-favicon" />
+    <script src="favicon-loader.js"></script>
 
     <title> </title>
     <style>

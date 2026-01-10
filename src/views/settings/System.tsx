@@ -1,11 +1,10 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 import { db, FaviconMode } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import TimeZoneInput from "../shared/timeZone/TimeZoneInput";
 import { useSystemTheme } from "../../hooks";
 import { Icon, IconButton } from "../shared";
-import Button from "../shared/Button";
 
 const positions = [
   {
@@ -27,6 +26,7 @@ const positions = [
 ] as const;
 
 const System: React.FC = () => {
+  const intl = useIntl();
   const [locale, setLocale] = useKey(db, "locale");
   const [timeZone, setTimeZone] = useKey(db, "timeZone");
   const [highlightingEnabled, setHighlightingEnabled] = useKey(
@@ -388,14 +388,19 @@ const System: React.FC = () => {
             <div>
               <input
                 type="file"
-                accept="image/png, image/jpeg, image/gif, image/svg+xml"
+                accept="image/*"
                 style={{ display: "none" }}
                 id="favicon-upload"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
-                    if (file.size > 500 * 1024) {
-                      alert("Image must be smaller than 500KB");
+                    if (file.size > 8192) {
+                      alert(
+                        intl.formatMessage({
+                          id: "settings.favicon.error.size",
+                          defaultMessage: "Image must be smaller than 8KB",
+                        }),
+                      );
                       return;
                     }
                     const reader = new FileReader();
@@ -404,24 +409,35 @@ const System: React.FC = () => {
                       setFavicon({ ...favicon, data: result });
                     };
                     reader.onerror = () => {
-                      alert("Failed to read file. Please try again.");
+                      alert(
+                        intl.formatMessage({
+                          id: "settings.favicon.error.read",
+                          defaultMessage:
+                            "Failed to read file. Please try again.",
+                        }),
+                      );
                     };
                     reader.readAsDataURL(file);
                   }
                 }}
               />
-              <Button primary style={{ width: "100%" }}>
-                <label
-                  htmlFor="favicon-upload"
-                  style={{ cursor: "pointer", margin: 0 }}
-                >
-                  <FormattedMessage
-                    id="settings.selectFile"
-                    defaultMessage="Select Image"
-                    description="Select image file button"
-                  />
-                </label>
-              </Button>
+              <label
+                className="button button--primary"
+                htmlFor="favicon-upload"
+                style={{
+                  cursor: "pointer",
+                  margin: 0,
+                  width: "100%",
+                  textAlign: "center",
+                  display: "inline-block",
+                }}
+              >
+                <FormattedMessage
+                  id="settings.selectFile"
+                  defaultMessage="Select Image"
+                  description="Select image file button"
+                />
+              </label>
             </div>
           )}
         </div>
