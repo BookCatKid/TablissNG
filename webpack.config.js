@@ -80,7 +80,8 @@ const config = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: `./target/${buildTarget}/index.html`,
+      template: "./target/index.html",
+      buildTarget,
     }),
     new MiniCssExtractPlugin({
       filename: isWeb ? "[name].[contenthash:12].css" : "[name].css",
@@ -169,7 +170,7 @@ if (isProduction) {
             url.href.startsWith("https://www.google.com/s2/favicons") ||
             url.hostname === "icons.duckduckgo.com" ||
             url.hostname === "favicone.com",
-            
+
           handler: "StaleWhileRevalidate",
           options: {
             cacheName: "tabliss-cache-swr",
