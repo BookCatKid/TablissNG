@@ -14,6 +14,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npm run prettier:check
+      - run: npm run lint
 
   build:
     name: Build ${{ matrix.build_target }}
