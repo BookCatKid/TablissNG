@@ -29,7 +29,7 @@ const migrateWeb = async (): Promise<void> => {
         migrateCache();
         clearDangling();
       } catch {
-        // 
+        //
       }
     }
     localStorage.removeItem(key);

@@ -36,7 +36,7 @@ export const setBackground = (key: string): void => {
         DB.put(db, displayKey, current.display as any);
       }
     } catch {
-        // 
+      //
     }
     // Backup plugin data for this background
     try {
@@ -45,10 +45,10 @@ export const setBackground = (key: string): void => {
         DB.put(db, `background/data/${current.key}` as any, currentData);
       }
     } catch {
-        // 
+      //
     }
   } catch {
-    // 
+    //
   }
 
   // Reuse a previously allocated id for this key so that any plugin
