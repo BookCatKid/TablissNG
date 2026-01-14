@@ -6,7 +6,7 @@
  * strict Content Security Policies (CSP) that block inline scripts.
  */
 (function() {
-  const href = "icons/128.png";
+  let href = "icons/128.png";
   const custom = localStorage.getItem('tabliss/favicon');
   if (custom) {
     href = custom;
