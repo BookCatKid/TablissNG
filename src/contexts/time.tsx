@@ -28,7 +28,7 @@ const TimeProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     return () => clearInterval(interval);
   }, [timeZone]);
 
-  return <TimeContext value={time}>{children}</TimeContext>;
+  return <TimeContext.Provider value={time}>{children}</TimeContext.Provider>;
 };
 
 export default TimeProvider;
