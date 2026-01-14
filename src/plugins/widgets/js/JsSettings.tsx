@@ -23,11 +23,12 @@ const JsSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-      <button onClick={handleSave} className="button button--primary"><FormattedMessage
-          {...pluginMessages.apply}
-        /></button>
+      <button onClick={handleSave} className="button button--primary">
+        <FormattedMessage {...pluginMessages.apply} />
+      </button>
 
-      <p className="info"><FormattedMessage
+      <p className="info">
+        <FormattedMessage
           id="plugins.js.Warning"
           defaultMessage="Warning: this functionality is intended for advanced users. Custom
           scripts may break at any time. The snippet will run once after the
@@ -35,7 +36,6 @@ const JsSettings: FC<Props> = ({ data = defaultData, setData }) => {
           editing the snippet."
           description="JavaScript warning title"
         />
-
       </p>
     </div>
   );

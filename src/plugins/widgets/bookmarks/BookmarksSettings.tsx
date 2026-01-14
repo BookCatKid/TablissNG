@@ -8,7 +8,9 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
   useEffect(() => {
     const checkPermission = async () => {
-      const granted = await browser.permissions.contains({ permissions: ["bookmarks"] });
+      const granted = await browser.permissions.contains({
+        permissions: ["bookmarks"],
+      });
       setHasPermission(granted);
       if (granted) {
         const treeData = await browser.bookmarks.getTree();
@@ -40,7 +42,9 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         selected={tree.id === data.rootBookmark}
         dangerouslySetInnerHTML={{
           __html: pad + (tree.title || tree.id),
-        }} />);
+        }}
+      />,
+    );
 
     if (tree.children) {
       for (const item of tree.children) {
@@ -57,7 +61,9 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         Root bookmark folder
         <select
           onChange={(evt) =>
-            setData({ ...data, rootBookmark: evt.target.value })}>
+            setData({ ...data, rootBookmark: evt.target.value })
+          }
+        >
           {items}
         </select>
       </label>
@@ -67,19 +73,29 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <select
           value={data.navigationStyle}
           onChange={(evt) =>
-            setData({ ...data, navigationStyle: evt.target.value as 'drill-down' | 'expand-collapse' | 'auto-expanded' })}>
+            setData({
+              ...data,
+              navigationStyle: evt.target.value as
+                | "drill-down"
+                | "expand-collapse"
+                | "auto-expanded",
+            })
+          }
+        >
           <option value="drill-down">Drill-down navigation</option>
           <option value="expand-collapse">Expandable folders</option>
           <option value="auto-expanded">Auto-expanded tree</option>
         </select>
       </label>
 
-      {data.navigationStyle === 'expand-collapse' && (
+      {data.navigationStyle === "expand-collapse" && (
         <label>
           <input
             type="checkbox"
             checked={data.rememberExpanded ?? true}
-            onChange={e => setData({ ...data, rememberExpanded: e.target.checked })}
+            onChange={(e) =>
+              setData({ ...data, rememberExpanded: e.target.checked })
+            }
           />
           Remember expanded folders
         </label>
@@ -113,9 +129,7 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.wrap}
-          onChange={(event) =>
-            setData({ ...data, wrap: !data.wrap })
-          }
+          onChange={(event) => setData({ ...data, wrap: !data.wrap })}
         />
         Wrap long titles
       </label>
@@ -127,7 +141,10 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <select
           value={data.iconProvider}
           onChange={(event) =>
-            setData({ ...data, iconProvider: event.target.value as Data['iconProvider'] })
+            setData({
+              ...data,
+              iconProvider: event.target.value as Data["iconProvider"],
+            })
           }
         >
           <option value="_default">Default</option>

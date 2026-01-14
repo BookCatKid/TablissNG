@@ -20,14 +20,19 @@ const alignments = [
   },
 ] as const;
 
-const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
+const NotesSettings: React.FC<API<Data>> = ({
+  data = defaultData,
+  setData,
+}) => {
   return (
     <div className="NotesSettings">
       <label>
         <input
           type="checkbox"
           checked={data.markdownEnabled}
-          onChange={(e) => setData({ ...data, markdownEnabled: e.target.checked })}
+          onChange={(e) =>
+            setData({ ...data, markdownEnabled: e.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.notes.enableMarkdown"
@@ -36,10 +41,12 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
       </label>
 
       <div>
-        <label><FormattedMessage
-          id="plugins.notes.textAlignment"
-          defaultMessage="Text Alignment"
-        /></label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.textAlignment"
+            defaultMessage="Text Alignment"
+          />
+        </label>
         <div className="alignment">
           {alignments.map((alignment) => (
             <IconButton
@@ -95,7 +102,9 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
         <input
           type="text"
           maxLength={1}
-          onChange={(event) => setData({ ...data, keyBind: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, keyBind: event.target.value })
+          }
           value={data.keyBind}
         />
       </label>

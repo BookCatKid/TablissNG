@@ -15,13 +15,16 @@ interface Props {
   onNext: (() => void) | null;
 }
 
-const getLocationUrl = (location: string | undefined, locationSource: string | undefined) => {
+const getLocationUrl = (
+  location: string | undefined,
+  locationSource: string | undefined,
+) => {
   if (!location || !locationSource) return "#";
   const urls = {
     "google-maps": `https://www.google.com/maps/search/?api=1&query=${location}`,
-    "google": `https://www.google.com/search?tbm=isch&q=${location}`,
-    "duckduckgo": `https://duckduckgo.com/?q=${location}&iax=images&ia=images`,
-    "unsplash": `https://unsplash.com/s/photos/${encodeURIComponent(location.replace(/\s+/g, '-').toLowerCase())}`,
+    google: `https://www.google.com/search?tbm=isch&q=${location}`,
+    duckduckgo: `https://duckduckgo.com/?q=${location}&iax=images&ia=images`,
+    unsplash: `https://unsplash.com/s/photos/${encodeURIComponent(location.replace(/\s+/g, "-").toLowerCase())}`,
   };
   return urls[locationSource as keyof typeof urls];
 };

@@ -94,7 +94,6 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - ci: add pr tests. [7e0a3025](https://github.com/BookCatKid/TablissNG/commit/7e0a3025d68dc38f68ab2b992289c56f9d9158a8)
 
-
 ## [1.5.1] - 8/4/2025 | Minor Feature and Bugfix Update
 
 ### Added

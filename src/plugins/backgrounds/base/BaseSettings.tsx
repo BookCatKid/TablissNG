@@ -16,8 +16,15 @@ interface Props<T extends BaseSettingsData> {
 
 const knownIntervals = [0, 300, 900, 3600, 86400, 604800];
 
-const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Props<T>) => {
-  const valueForSelect = data.timeout !== undefined && knownIntervals.includes(data.timeout) ? data.timeout : -1;
+const BaseSettings = <T extends BaseSettingsData>({
+  data,
+  setData,
+  title,
+}: Props<T>) => {
+  const valueForSelect =
+    data.timeout !== undefined && knownIntervals.includes(data.timeout)
+      ? data.timeout
+      : -1;
 
   const handleTimeoutChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = Number(event.target.value);

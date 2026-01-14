@@ -6,9 +6,7 @@ import { pluginMessages } from "../../../locales/messages";
 const GreetingSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="GreetingSettings">
     <label>
-      <FormattedMessage
-        {...pluginMessages.yourName}
-      />
+      <FormattedMessage {...pluginMessages.yourName} />
       <input
         type="text"
         value={data.name}

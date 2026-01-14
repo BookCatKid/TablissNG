@@ -15,7 +15,7 @@ type ErrorState = {
 
 export const ErrorContext = React.createContext<ErrorAPI>(null as any);
 
-const ErrorProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const ErrorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [state, setState] = React.useState<ErrorState>({ errors: [] });
   const push = React.useCallback(
     (error: ErrorItem) =>
@@ -23,15 +23,11 @@ const ErrorProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
     [setState],
   );
 
-  return (
-    <ErrorContext.Provider value={{ ...state, push }}>
-      {children}
-    </ErrorContext.Provider>
-  );
+  return <ErrorContext value={{ ...state, push }}>{children}</ErrorContext>;
 };
 
 /** Push error to the error log */
 export const usePushError = (): ErrorAPI["push"] =>
-  React.useContext(ErrorContext).push;
+  React.use(ErrorContext).push;
 
 export default ErrorProvider;

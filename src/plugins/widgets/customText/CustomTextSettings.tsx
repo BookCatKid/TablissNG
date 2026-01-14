@@ -33,38 +33,35 @@ const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
           description="Label for text rotation interval dropdown"
         />
         <select
-          value={data.timeout === 0 || data.timeout === 300 || data.timeout === 900 || data.timeout === 3600 || data.timeout === 86400 || data.timeout === 604800 ? data.timeout : -1}
+          value={
+            data.timeout === 0 ||
+            data.timeout === 300 ||
+            data.timeout === 900 ||
+            data.timeout === 3600 ||
+            data.timeout === 86400 ||
+            data.timeout === 604800
+              ? data.timeout
+              : -1
+          }
           onChange={handleTimeoutChange}
         >
           <option value="0">
-            <FormattedMessage
-              {...timingMessages.everyNewTab}
-            />
+            <FormattedMessage {...timingMessages.everyNewTab} />
           </option>
           <option value="300">
-            <FormattedMessage
-              {...timingMessages.every5min}
-            />
+            <FormattedMessage {...timingMessages.every5min} />
           </option>
           <option value="900">
-            <FormattedMessage
-              {...timingMessages.every15min}
-            />
+            <FormattedMessage {...timingMessages.every15min} />
           </option>
           <option value="3600">
-            <FormattedMessage
-              {...timingMessages.everyHour}
-            />
+            <FormattedMessage {...timingMessages.everyHour} />
           </option>
           <option value="86400">
-            <FormattedMessage
-              {...timingMessages.everyDay}
-            />
+            <FormattedMessage {...timingMessages.everyDay} />
           </option>
           <option value="604800">
-            <FormattedMessage
-              {...timingMessages.everyWeek}
-            />
+            <FormattedMessage {...timingMessages.everyWeek} />
           </option>
           {/* TODO: Add the custom interval for the unplash background too */}
           <option value="-1">
@@ -77,21 +74,28 @@ const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
         </select>
       </label>
 
-      {data.timeout !== 0 && data.timeout !== 300 && data.timeout !== 900 && data.timeout !== 3600 && data.timeout !== 86400 && data.timeout !== 604800 && (
-        <label>
-          <FormattedMessage
-            id="plugins.customText.customIntervalSeconds"
-            defaultMessage="Custom Interval (seconds)"
-            description="Label for custom interval input in seconds"
-          />
-          <input
-            type="number"
-            min="0"
-            value={data.timeout}
-            onChange={(event) => setData({ ...data, timeout: Number(event.target.value) })}
-          />
-        </label>
-      )}
+      {data.timeout !== 0 &&
+        data.timeout !== 300 &&
+        data.timeout !== 900 &&
+        data.timeout !== 3600 &&
+        data.timeout !== 86400 &&
+        data.timeout !== 604800 && (
+          <label>
+            <FormattedMessage
+              id="plugins.customText.customIntervalSeconds"
+              defaultMessage="Custom Interval (seconds)"
+              description="Label for custom interval input in seconds"
+            />
+            <input
+              type="number"
+              min="0"
+              value={data.timeout}
+              onChange={(event) =>
+                setData({ ...data, timeout: Number(event.target.value) })
+              }
+            />
+          </label>
+        )}
 
       <label>
         <FormattedMessage
@@ -117,7 +121,9 @@ const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
           type="text"
           value={data.separator}
           disabled={data.atNewline}
-          onChange={(event) => setData({ ...data, separator: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, separator: event.target.value })
+          }
         />
       </label>
 
@@ -126,7 +132,11 @@ const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
           type="checkbox"
           checked={data.atNewline}
           onChange={(event) => {
-            setData({ ...data, separator: "", atNewline: event.target.checked });
+            setData({
+              ...data,
+              separator: "",
+              atNewline: event.target.checked,
+            });
           }}
         />{" "}
         <FormattedMessage

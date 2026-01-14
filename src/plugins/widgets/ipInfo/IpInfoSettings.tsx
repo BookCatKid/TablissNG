@@ -11,10 +11,10 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         onChange={() => setData({ ...data, displayCity: !data.displayCity })}
       />
       <FormattedMessage
-          id="plugins.ipInfo.displayCity"
-          defaultMessage="Display City"
-          description="Display City title"
-        />
+        id="plugins.ipInfo.displayCity"
+        defaultMessage="Display City"
+        description="Display City title"
+      />
     </label>
 
     <label>
@@ -26,10 +26,10 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
         }
       />
       <FormattedMessage
-          id="plugins.ipInfo.displayCountry"
-          defaultMessage="Display Country"
-          description="Display Country title"
-        />
+        id="plugins.ipInfo.displayCountry"
+        defaultMessage="Display Country"
+        description="Display Country title"
+      />
     </label>
 
     <label>
@@ -62,7 +62,9 @@ const IpInfoSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
       <input
         type="checkbox"
         checked={data.clickToRefresh}
-        onChange={() => setData({ ...data, clickToRefresh: !data.clickToRefresh })}
+        onChange={() =>
+          setData({ ...data, clickToRefresh: !data.clickToRefresh })
+        }
       />{" "}
       <FormattedMessage
         id="plugins.ipInfo.clickToRefresh"

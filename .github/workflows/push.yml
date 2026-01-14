@@ -15,6 +15,7 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run prettier:check
+      - run: npm run lint
 
   build:
     name: Build ${{ matrix.build_target }}
@@ -57,7 +58,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: build
-    if: github.ref == 'refs/heads/main'  # Only deploy on main branch
+    if: github.ref == 'refs/heads/main' # Only deploy on main branch
     runs-on: ubuntu-latest
     permissions:
       pages: write

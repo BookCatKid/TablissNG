@@ -41,5 +41,5 @@ export type BookmarkTreeNode = {
   dateAdded?: number;
   dateGroupModified?: number;
   children?: BookmarkTreeNode[];
-  type?: 'bookmark' | 'folder' | 'separator';
+  type?: "bookmark" | "folder" | "separator";
 };

@@ -1,8 +1,10 @@
 import React, { FC, useState, useEffect } from "react";
 import { useDebounce } from "../../hooks";
 
-interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+interface Props extends Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange"
+> {
   onChange: (value: string) => void;
   value?: string;
   wait?: number;

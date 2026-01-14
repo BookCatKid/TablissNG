@@ -1,6 +1,6 @@
 import { API } from "../../types";
 
-export type Data = {};
+export type Data = unknown;
 
 export type Cache = File[];
 

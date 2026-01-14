@@ -32,7 +32,10 @@ export const fetchImages = async ({
       break;
 
     case "topics":
-      params.set("topics", (Array.isArray(topics) ? topics : [topics]).join(","));
+      params.set(
+        "topics",
+        (Array.isArray(topics) ? topics : [topics]).join(","),
+      );
       params.set("orientation", "landscape");
       break;
 
@@ -48,7 +51,6 @@ export const fetchImages = async ({
 
   const res = await fetch(`${url}?${params}`, { headers, cache: "no-cache" });
   const body = await res.json();
-
 
   if (res.status != 200) {
     const empty: Image[] = [

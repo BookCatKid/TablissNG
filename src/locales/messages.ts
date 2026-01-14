@@ -116,4 +116,9 @@ export const backgroundMessages = defineMessages({
     defaultMessage: "Date",
     description: "Label for date input",
   },
+  locale: {
+    id: "backgrounds.locale",
+    defaultMessage: "Locale",
+    description: "Label for locale selection",
+  },
 });

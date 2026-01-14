@@ -16,40 +16,40 @@ import "./Input.sass";
 const messages = defineMessages({
   githubIssue: {
     id: "plugins.links.input.githubIssue",
-    defaultMessage: "this GitHub issue"
+    defaultMessage: "this GitHub issue",
   },
   optional: {
     id: "plugins.links.input.optional",
-    defaultMessage: "optional"
+    defaultMessage: "optional",
   },
   removeLink: {
     id: "plugins.links.input.removeLink",
-    defaultMessage: "Remove link"
+    defaultMessage: "Remove link",
   },
   moveDown: {
     id: "plugins.links.input.moveDown",
-    defaultMessage: "Move link down"
+    defaultMessage: "Move link down",
   },
   moveUp: {
     id: "plugins.links.input.moveUp",
-    defaultMessage: "Move link up"
+    defaultMessage: "Move link up",
   },
   custom: {
     id: "plugins.links.input.custom",
-    defaultMessage: "Custom"
+    defaultMessage: "Custom",
   },
   websiteIcons: {
     id: "plugins.links.input.websiteIcons",
-    defaultMessage: "Website Icons"
+    defaultMessage: "Website Icons",
   },
   iconifyIcons: {
     id: "plugins.links.input.iconifyIcons",
-    defaultMessage: "Iconify Icons"
+    defaultMessage: "Iconify Icons",
   },
   searchIcons: {
     id: "plugins.links.input.searchIcons",
-    defaultMessage: "Search icons..."
-  }
+    defaultMessage: "Search icons...",
+  },
 });
 
 type Props = Link & {
@@ -167,7 +167,11 @@ const Input: FC<Props> = (props) => {
     if (props.icon === "_favicon") {
       props.onChange({ icon: "_favicon_google" });
     } else if (props.icon && !getSelectValues().includes(props.icon)) {
-      props.onChange({ iconifyValue: props.icon, iconifyIdentifier: "feather:", icon: "_feather" });
+      props.onChange({
+        iconifyValue: props.icon,
+        iconifyIdentifier: "feather:",
+        icon: "_feather",
+      });
     }
   }, [props.icon]);
 
@@ -175,31 +179,42 @@ const Input: FC<Props> = (props) => {
     <div className="LinkInput">
       <h5>
         <div className="title--buttons">
-          <IconButton onClick={props.onRemove} title={intl.formatMessage(messages.removeLink)}>
+          <IconButton
+            onClick={props.onRemove}
+            title={intl.formatMessage(messages.removeLink)}
+          >
             <RemoveIcon />
           </IconButton>
           {props.onMoveDown && (
-            <IconButton onClick={props.onMoveDown} title={intl.formatMessage(messages.moveDown)}>
+            <IconButton
+              onClick={props.onMoveDown}
+              title={intl.formatMessage(messages.moveDown)}
+            >
               <DownIcon />
             </IconButton>
           )}
           {props.onMoveUp && (
-            <IconButton onClick={props.onMoveUp} title={intl.formatMessage(messages.moveUp)}>
+            <IconButton
+              onClick={props.onMoveUp}
+              title={intl.formatMessage(messages.moveUp)}
+            >
               <UpIcon />
             </IconButton>
           )}
         </div>
 
-        {props.number <= 9
-          ? <FormattedMessage
-              id="plugins.links.input.keyboardShortcut"
-              defaultMessage="Keyboard shortcut {number}"
-              values={{ number: props.number }}
-            />
-          : <FormattedMessage
-              id="plugins.links.input.shortcut"
-              defaultMessage="Shortcut"
-            />}
+        {props.number <= 9 ? (
+          <FormattedMessage
+            id="plugins.links.input.keyboardShortcut"
+            defaultMessage="Keyboard shortcut {number}"
+            values={{ number: props.number }}
+          />
+        ) : (
+          <FormattedMessage
+            id="plugins.links.input.shortcut"
+            defaultMessage="Shortcut"
+          />
+        )}
       </h5>
 
       <label>
@@ -213,8 +228,7 @@ const Input: FC<Props> = (props) => {
       </label>
 
       <label>
-        <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />
-        {" "}
+        <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />{" "}
         <span className="text--grey">
           (<FormattedMessage {...messages.optional} />)
         </span>
@@ -226,8 +240,7 @@ const Input: FC<Props> = (props) => {
       </label>
 
       <label>
-        <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />
-        {" "}
+        <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />{" "}
         <span className="text--grey">
           (<FormattedMessage {...messages.optional} />)
         </span>
@@ -237,36 +250,63 @@ const Input: FC<Props> = (props) => {
           onChange={(event) => props.onChange({ icon: event.target.value })}
         >
           <option value="">
-            <FormattedMessage id="plugins.links.input.none" defaultMessage="None" />
+            <FormattedMessage
+              id="plugins.links.input.none"
+              defaultMessage="None"
+            />
           </option>
           <optgroup label={intl.formatMessage(messages.websiteIcons)}>
             <option value="_favicon_google">
-              <FormattedMessage id="plugins.links.input.fromGoogle" defaultMessage="From Google" />
+              <FormattedMessage
+                id="plugins.links.input.fromGoogle"
+                defaultMessage="From Google"
+              />
             </option>
             <option value="_favicon_duckduckgo">
-              <FormattedMessage id="plugins.links.input.fromDuckDuckGo" defaultMessage="From DuckDuckGo" />
+              <FormattedMessage
+                id="plugins.links.input.fromDuckDuckGo"
+                defaultMessage="From DuckDuckGo"
+              />
             </option>
             <option value="_favicon_favicone">
-              <FormattedMessage id="plugins.links.input.fromFavicone" defaultMessage="From Favicone" />
+              <FormattedMessage
+                id="plugins.links.input.fromFavicone"
+                defaultMessage="From Favicone"
+              />
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.custom)}>
             <option value="_custom_iconify">
-              <FormattedMessage id="plugins.links.input.fromIconify" defaultMessage="From Iconify" />
+              <FormattedMessage
+                id="plugins.links.input.fromIconify"
+                defaultMessage="From Iconify"
+              />
             </option>
             <option value="_custom_svg">
-              <FormattedMessage id="plugins.links.input.customSvgHtml" defaultMessage="Custom SVG HTML" />
+              <FormattedMessage
+                id="plugins.links.input.customSvgHtml"
+                defaultMessage="Custom SVG HTML"
+              />
             </option>
             <option value="_custom_ico">
-              <FormattedMessage id="plugins.links.input.customImageUrl" defaultMessage="Custom Image URL" />
+              <FormattedMessage
+                id="plugins.links.input.customImageUrl"
+                defaultMessage="Custom Image URL"
+              />
             </option>
             <option value="_custom_upload">
-              <FormattedMessage id="plugins.links.input.uploadCustomIcon" defaultMessage="Upload Custom Icon" />
+              <FormattedMessage
+                id="plugins.links.input.uploadCustomIcon"
+                defaultMessage="Upload Custom Icon"
+              />
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
             <option value="_feather">
-              <FormattedMessage id="plugins.links.input.feather" defaultMessage="Feather" />
+              <FormattedMessage
+                id="plugins.links.input.feather"
+                defaultMessage="Feather"
+              />
             </option>
           </optgroup>
         </select>
@@ -311,7 +351,7 @@ const Input: FC<Props> = (props) => {
           />
           <textarea
             value={props.SvgString}
-            style={{ resize: "vertical"}}
+            style={{ resize: "vertical" }}
             onChange={(event) =>
               props.onChange({ SvgString: event.target.value })
             }
@@ -375,28 +415,29 @@ const Input: FC<Props> = (props) => {
       {isFeather && (
         <div className="icon-picker">
           <button onClick={handleOpenModal} className="custom-select">
-            {props.iconifyValue ?
+            {props.iconifyValue ? (
               <FormattedMessage
                 id="plugins.links.input.openIconPicker"
                 defaultMessage="Open icon picker"
-              /> :
+              />
+            ) : (
               <FormattedMessage
                 id="plugins.links.input.chooseIcon"
                 defaultMessage="Choose an Icon"
               />
-            }
+            )}
           </button>
-          
+
           {/* Show currently selected Feather icon with preview */}
           {props.iconifyValue && (
             <div className="selected-icon-display">
               <div className="icon-preview">
-                <Icon 
-                  icon={`feather:${props.iconifyValue}`} 
-                />
+                <Icon icon={`feather:${props.iconifyValue}`} />
               </div>
               <div className="icon-info">
-                <span className="icon-name">{props.iconifyValue.replace(/-/g, " ")}</span>
+                <span className="icon-name">
+                  {props.iconifyValue.replace(/-/g, " ")}
+                </span>
               </div>
             </div>
           )}
@@ -573,11 +614,17 @@ const Input: FC<Props> = (props) => {
       )}
 
       <label>
-        <FormattedMessage id="plugins.links.input.keyboardShortcut" defaultMessage="Keyboard shortcut {number}" values={{ number: props.number }} />
+        <FormattedMessage
+          id="plugins.links.input.keyboardShortcut"
+          defaultMessage="Keyboard shortcut {number}"
+          values={{ number: props.number }}
+        />
         <input
           type="text"
           value={props.keyboardShortcut || ""}
-          onChange={(event) => props.onChange({ keyboardShortcut: event.target.value })}
+          onChange={(event) =>
+            props.onChange({ keyboardShortcut: event.target.value })
+          }
           placeholder={props.number <= 9 ? String(props.number) : ""}
           maxLength={1}
         />

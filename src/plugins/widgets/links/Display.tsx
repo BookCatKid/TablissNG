@@ -79,40 +79,57 @@ const Display: FC<Props> = ({
 }) => {
   const intl = useIntl();
   const title = useMemo(() => {
-    const fallback = (typeof number !== "undefined" && number < 10) ? String(number) : undefined;
-    const label = keyboardShortcut && keyboardShortcut.length > 0 ? keyboardShortcut : fallback;
-    if (label && label.length > 0) return intl.formatMessage(messages.shortcutHint, { key: label });
+    const fallback =
+      typeof number !== "undefined" && number < 10 ? String(number) : undefined;
+    const label =
+      keyboardShortcut && keyboardShortcut.length > 0
+        ? keyboardShortcut
+        : fallback;
+    if (label && label.length > 0)
+      return intl.formatMessage(messages.shortcutHint, { key: label });
     return intl.formatMessage(messages.standardHint);
   }, [intl, number, keyboardShortcut]);
   const domain = useMemo(() => getDomain(url), [url]);
-  const parsedSvg = useMemo(() => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null), [SvgString, customWidth, customHeight]);
+  const parsedSvg = useMemo(
+    () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
+    [SvgString, customWidth, customHeight],
+  );
 
   const handleClick = (e: React.MouseEvent) => {
     // Prevent default behavior for special URLs
-    if (url.startsWith('about:') ||           // Browser internal pages (about:blank, about:config)
-      url.startsWith('chrome:') ||          // Chrome browser internal pages (chrome:settings)
-      url.startsWith('edge:') ||            // Edge browser internal pages (edge:settings)
-      url.startsWith('file:') ||            // Local file system URLs (file:///path)
-      url.startsWith('chrome-extension:') || // Chrome extension pages (chrome-extension://id)
-      url.startsWith('moz-extension:') ||    // Firefox extension pages (moz-extension://id)
-      url.startsWith('ms-settings:') ||      // Windows system settings (ms-settings:display)
-      url.startsWith('view-source:')) {      // View page source (view-source:https://example.com)
+    if (
+      url.startsWith("about:") || // Browser internal pages (about:blank, about:config)
+      url.startsWith("chrome:") || // Chrome browser internal pages (chrome:settings)
+      url.startsWith("edge:") || // Edge browser internal pages (edge:settings)
+      url.startsWith("file:") || // Local file system URLs (file:///path)
+      url.startsWith("chrome-extension:") || // Chrome extension pages (chrome-extension://id)
+      url.startsWith("moz-extension:") || // Firefox extension pages (moz-extension://id)
+      url.startsWith("ms-settings:") || // Windows system settings (ms-settings:display)
+      url.startsWith("view-source:")
+    ) {
+      // View page source (view-source:https://example.com)
       e.preventDefault();
 
-      if (BUILD_TARGET === 'firefox') {
-        alert('Sorry, Firefox restricts access to this type of URL. This is completely out of my control. Please copy and paste the URL into your address bar manually.');
+      if (BUILD_TARGET === "firefox") {
+        alert(
+          "Sorry, Firefox restricts access to this type of URL. This is completely out of my control. Please copy and paste the URL into your address bar manually.",
+        );
         return;
       }
 
       if (linkOpenStyle) {
-        browser.tabs.create({
-          url: url,
-          active: true
-        }).catch(console.error);
+        browser.tabs
+          .create({
+            url: url,
+            active: true,
+          })
+          .catch(console.error);
       } else {
-        browser.tabs.update({
-          url: url
-        }).catch(console.error);
+        browser.tabs
+          .update({
+            url: url,
+          })
+          .catch(console.error);
       }
     }
 
@@ -131,15 +148,25 @@ const Display: FC<Props> = ({
       {linksNumbered ? <span className="LinkNumber">{number} </span> : null}
       {icon === "_favicon_duckduckgo" && domain ? (
         <i>
-          <img alt={domain} src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} />
+          <img
+            alt={domain}
+            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+          />
         </i>
-      ) : icon === "_favicon_google" && domain || icon === "_favicon" && domain ? (
+      ) : (icon === "_favicon_google" && domain) ||
+        (icon === "_favicon" && domain) ? (
         <i>
-          <img alt={domain} src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`} />
+          <img
+            alt={domain}
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`}
+          />
         </i>
       ) : icon === "_favicon_favicone" && domain ? (
         <i>
-          <img alt={domain} src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`} />
+          <img
+            alt={domain}
+            src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`}
+          />
         </i>
       ) : icon === "_custom_iconify" && IconString ? (
         <i>
@@ -153,7 +180,9 @@ const Display: FC<Props> = ({
             src={IconStringIco}
             alt={name}
             style={{
-              width: conserveAspectRatio ? `${customWidth}px` : `${customWidth}px`,
+              width: conserveAspectRatio
+                ? `${customWidth}px`
+                : `${customWidth}px`,
               height: conserveAspectRatio ? "auto" : `${customHeight}px`,
               display: "inline-block",
             }}
@@ -168,7 +197,9 @@ const Display: FC<Props> = ({
               alt={name}
               src={cache[iconCacheKey].data}
               style={{
-                width: conserveAspectRatio ? `${customWidth}px` : `${customWidth}px`,
+                width: conserveAspectRatio
+                  ? `${customWidth}px`
+                  : `${customWidth}px`,
                 height: conserveAspectRatio ? "auto" : `${customHeight}px`,
                 display: "inline-block",
               }}
@@ -177,7 +208,15 @@ const Display: FC<Props> = ({
         </i>
       ) : icon === "_feather" ? (
         <i>
-          <Icon icon={iconifyValue ? iconifyIdentifier + iconifyValue : "feather:bookmark"} width={customWidth} height={customHeight} />
+          <Icon
+            icon={
+              iconifyValue
+                ? iconifyIdentifier + iconifyValue
+                : "feather:bookmark"
+            }
+            width={customWidth}
+            height={customHeight}
+          />
         </i>
       ) : icon ? (
         <i>

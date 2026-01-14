@@ -23,7 +23,8 @@ const Time: FC<Props> = ({ data = defaultData }) => {
   let time = useTime(timeZone ? "absolute" : "zoned");
 
   const h3Ref = useRef<HTMLHeadingElement | null>(null);
-  const color = h3Ref.current && window.getComputedStyle(h3Ref.current).color || "white";
+  const color =
+    (h3Ref.current && window.getComputedStyle(h3Ref.current).color) || "white";
 
   if (timeZone) {
     time = toZonedTime(time, timeZone);
@@ -53,9 +54,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
         </>
       )}
 
-      {name && (
-        <h2>{name}</h2>
-      )}
+      {name && <h2>{name}</h2>}
 
       {showDate && (
         <>

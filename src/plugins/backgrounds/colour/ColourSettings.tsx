@@ -7,10 +7,10 @@ const ColourSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="ColourSettings">
     <label>
       <FormattedMessage
-          id="backgrounds.colour.colour"
-          defaultMessage="Colour"
-          description="Colour title"
-        />
+        id="backgrounds.colour.colour"
+        defaultMessage="Colour"
+        description="Colour title"
+      />
       <input
         type="color"
         value={data.colour}

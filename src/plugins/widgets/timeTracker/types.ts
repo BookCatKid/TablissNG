@@ -17,5 +17,5 @@ export const defaultData: Data = {
   showCompletedMessage: true,
   displayMode: "compact",
   italicizeTime: false,
-  timeZone: null
+  timeZone: null,
 };

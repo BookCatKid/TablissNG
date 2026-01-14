@@ -15,7 +15,7 @@ type UiContext = UiState & {
 
 export const UiContext = React.createContext({} as unknown as UiContext);
 
-const UiProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const UiProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [state, setState] = React.useState<UiState>({
     errors: false,
     pending: 0,
@@ -36,11 +36,7 @@ const UiProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
     [],
   );
 
-  return (
-    <UiContext.Provider value={{ ...state, ...methods }}>
-      {children}
-    </UiContext.Provider>
-  );
+  return <UiContext value={{ ...state, ...methods }}>{children}</UiContext>;
 };
 
 export default UiProvider;

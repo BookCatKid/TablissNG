@@ -7,7 +7,7 @@ import Widgets from "./Widgets";
 
 const Dashboard: React.FC = () => {
   const { isDark } = useTheme();
-  const theme = isDark ? 'dark' : '';
+  const theme = isDark ? "dark" : "";
 
   return (
     <div className={`Dashboard fullscreen ${theme}`}>

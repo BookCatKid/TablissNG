@@ -50,11 +50,13 @@ const TimeZoneInput: React.FC<Props> = ({ timeZone, onChange }) => {
       value={timeZone || ""}
       onChange={(event) => onChange(event.target.value || null)}
     >
-      <option value=""><FormattedMessage
+      <option value="">
+        <FormattedMessage
           id="timeZone.automatic"
           defaultMessage="Automatic"
           description="Automatic title"
-        /></option>
+        />
+      </option>
       {zoneOptions ? (
         zoneOptions.map((option) => (
           <option key={option.id} value={option.id}>

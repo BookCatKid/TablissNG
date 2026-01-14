@@ -96,6 +96,4 @@ const Weather: React.FC<Props> = ({
   );
 };
 
- 
-
 export default Weather;

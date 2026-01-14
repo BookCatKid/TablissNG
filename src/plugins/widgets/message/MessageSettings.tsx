@@ -6,8 +6,8 @@ const messages = defineMessages({
   messagePlaceholder: {
     id: "plugins.message.messagePlaceholder",
     defaultMessage: "Write something fun",
-    description: "Placeholder text for message input"
-  }
+    description: "Placeholder text for message input",
+  },
 });
 
 const MessageSettings: FC<Props> = ({ data = defaultData, setData }) => {
@@ -23,7 +23,7 @@ const MessageSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
         <textarea
           rows={3}
-          style={{ resize: "vertical"}}
+          style={{ resize: "vertical" }}
           placeholder={intl.formatMessage(messages.messagePlaceholder)}
           value={data.messages[0]}
           onChange={(event) => setData({ messages: [event.target.value] })}
