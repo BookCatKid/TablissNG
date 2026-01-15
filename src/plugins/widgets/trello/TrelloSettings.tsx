@@ -17,7 +17,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
 import useBoards from "./hooks/useBoards";
 import useLists from "./hooks/useLists";
-import { trelloAuthFlow } from "./utils/auth";
+import { trelloAuthFlow, onTrelloSignOut } from "./utils/auth";
 
 const TrelloSettings: FC<Props> = ({
   data = defaultData,
@@ -31,7 +31,9 @@ const TrelloSettings: FC<Props> = ({
     signIn,
     signOut,
   } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
+
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
+
   const {
     lists,
     setLists,
@@ -39,6 +41,7 @@ const TrelloSettings: FC<Props> = ({
     updateUI,
     updateUIWithSkeletons,
   } = useLists(data, cache, setCache);
+
   const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
   const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const DEBOUNCE_INTERVAL = 525;
@@ -48,7 +51,7 @@ const TrelloSettings: FC<Props> = ({
   };
 
   const onSignout = async () => {
-    await signOut();
+    await signOut(onTrelloSignOut);
     setCache(defaultCache);
   };
 
@@ -68,7 +71,6 @@ const TrelloSettings: FC<Props> = ({
       return;
     }
 
-    const updatedListCount = lists.filter((l) => l.watch).length;
     const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
     if (action === "REMOVE") {
       pendingJobsRef.current.forEach(
@@ -89,6 +91,7 @@ const TrelloSettings: FC<Props> = ({
       boardId: data.selectedID!,
       lists: selectedLists,
     };
+
     const updated = {
       ...data.preferences,
       [data.selectedID!]: newPreference,
@@ -108,7 +111,7 @@ const TrelloSettings: FC<Props> = ({
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
-      // update the UI and set the skeleton jobs to actual jobs and new selections
+      // update the UI and set the skeleton jobs to actual jobs and newest selections
       updateUI(listID, selectedLists, pendingJobsRef.current, action);
       pendingJobsRef.current.clear();
     }, DEBOUNCE_INTERVAL);

@@ -64,6 +64,11 @@ export default function useAuth<T extends Session>(
     }
   }, []);
 
+  /**
+   * Attempts to authenticate user via an authentication method
+   * Saves resulting session in local storage and adjusts state
+   * @param authFlow
+   */
   const signIn = async (authFlow: () => Promise<T | null>) => {
     console.log("Authenticating");
     setAuthStatus("pending");
@@ -81,11 +86,19 @@ export default function useAuth<T extends Session>(
     }
   };
 
-  const signOut = async () => {
+  /**
+   * Clears session token and runs optional callback onSignOut for side effects
+   * @param onSignOut
+   */
+  const signOut = async (onSignOut?: (session: T) => Promise<void>) => {
     console.log("TRELLO: Signing out goodbye :)");
     setAuthStatus("pending");
     setAuthError("");
+    const session = await getSession();
     await browser.storage.local.remove(sessionName);
+    if (onSignOut && session) {
+      await onSignOut(session);
+    }
     setAuthStatus("unauthenticated");
   };
 
