@@ -57,12 +57,7 @@ const TrelloSettings: FC<Props> = ({
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     setData({ ...data, selectedID: event.target.value });
-    // reset all cache except auth state
-    setCache({
-      ...cache,
-      order: [],
-      responses: new Map<string, FetchJob>(),
-    });
+    setCache(defaultCache);
   };
 
   const onListCheckboxSelect = (listID: string) => {
