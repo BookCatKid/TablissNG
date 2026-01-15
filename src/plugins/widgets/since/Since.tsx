@@ -6,11 +6,9 @@ import { Props, defaultData } from "./types";
 import "./Since.sass";
 
 const Since: FC<Props> = ({ data = defaultData }) => {
-
   const from = useTime().getTime();
   const to = data.time;
   const diff = ((to - from) / 1000) | 0;
-
 
   return (
     <div className="Since">

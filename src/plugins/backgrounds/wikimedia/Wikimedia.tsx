@@ -5,16 +5,21 @@ import WikimediaTitle from "./WikimediaTitle";
 import "./Wikimedia.sass";
 import { defaultData, Props } from "./types";
 
-const Wikimedia: React.FC<Props> = ({ cache, data = defaultData, setCache }) => {
+const Wikimedia: React.FC<Props> = ({
+  cache,
+  data = defaultData,
+  setCache,
+}) => {
   const [picture, setPicture] = React.useState(cache);
   const mounted = React.useRef(false);
 
   React.useEffect(() => {
-    const formattedDate = data.date === "custom" && data.customDate
-      ? formatDateForApi(data.customDate)
-      : formatDateForApi(new Date().toISOString());
+    const formattedDate =
+      data.date === "custom" && data.customDate
+        ? formatDateForApi(data.customDate)
+        : formatDateForApi(new Date().toISOString());
     const language = "en";
-    const params = { language, formattedDate};
+    const params = { language, formattedDate };
     fetchFeaturedContent(params).then((result) => {
       setCache(result);
       if (mounted.current || !picture) setPicture(result);
@@ -41,4 +46,3 @@ const Wikimedia: React.FC<Props> = ({ cache, data = defaultData, setCache }) => 
 };
 
 export default Wikimedia;
-

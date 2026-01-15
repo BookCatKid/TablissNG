@@ -45,16 +45,16 @@ const Backdrop: React.FC<Props> = ({
   }
 
   return (
-    <div className="fullscreen" style={{backgroundColor: luminosity > 0 ? "white" : "black"}}>
-      <CrossFade
-        contentKey={url || ''}
-        timeout={2500}
-      >
-        <div 
+    <div
+      className="fullscreen"
+      style={{ backgroundColor: luminosity > 0 ? "white" : "black" }}
+    >
+      <CrossFade contentKey={url || ""} timeout={2500}>
+        <div
           style={{
             ...style,
-            backgroundImage: url ? `url(${url})` : undefined
-          }} 
+            backgroundImage: url ? `url(${url})` : undefined,
+          }}
           {...rest}
         >
           {children}
@@ -65,4 +65,3 @@ const Backdrop: React.FC<Props> = ({
 };
 
 export default Backdrop;
-

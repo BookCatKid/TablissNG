@@ -1,6 +1,6 @@
 import React from "react";
-import { FormattedMessage } from "react-intl";
-import { db } from "../../db/state";
+import { FormattedMessage, useIntl } from "react-intl";
+import { db, FaviconMode } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import TimeZoneInput from "../shared/timeZone/TimeZoneInput";
 import { useSystemTheme } from "../../hooks";
@@ -26,13 +26,27 @@ const positions = [
 ] as const;
 
 const System: React.FC = () => {
+  const intl = useIntl();
   const [locale, setLocale] = useKey(db, "locale");
   const [timeZone, setTimeZone] = useKey(db, "timeZone");
-  const [highlightingEnabled, setHighlightingEnabled] = useKey(db, "highlightingEnabled");
-  const [hideSettingsIcon, setHideSettingsIcon] = useKey(db, "hideSettingsIcon");
-  const [settingsIconPosition, setSettingsIconPosition] = useKey(db, "settingsIconPosition");
+  const [highlightingEnabled, setHighlightingEnabled] = useKey(
+    db,
+    "highlightingEnabled",
+  );
+  const [hideSettingsIcon, setHideSettingsIcon] = useKey(
+    db,
+    "hideSettingsIcon",
+  );
+  const [settingsIconPosition, setSettingsIconPosition] = useKey(
+    db,
+    "settingsIconPosition",
+  );
   const [themePreference, setThemePreference] = useKey(db, "themePreference");
-  const [autoHideSettings, setAutoHideSettings] = useKey(db, "autoHideSettings");
+  const [autoHideSettings, setAutoHideSettings] = useKey(
+    db,
+    "autoHideSettings",
+  );
+  const [favicon, setFavicon] = useKey(db, "favicon");
   const systemIsDark = useSystemTheme();
 
   function setHighlighting(checked: boolean) {
@@ -47,10 +61,10 @@ const System: React.FC = () => {
     }
   }
 
-  const handleThemeChange = (value: 'light' | 'dark' | 'system') => {
+  const handleThemeChange = (value: "light" | "dark" | "system") => {
     setThemePreference(value);
-    const isDark = value === 'system' ? systemIsDark : value === 'dark';
-    document.body.className = isDark ? 'dark' : '';
+    const isDark = value === "system" ? systemIsDark : value === "dark";
+    document.body.className = isDark ? "dark" : "";
   };
 
   return (
@@ -73,11 +87,13 @@ const System: React.FC = () => {
           margin: 0,
         }}
       >
-        <span><FormattedMessage
-          id="language"
-          defaultMessage="Language"
-          description="Language title"
-        /></span>
+        <span>
+          <FormattedMessage
+            id="language"
+            defaultMessage="Language"
+            description="Language title"
+          />
+        </span>
         <select
           value={locale}
           onChange={(event) => setLocale(event.target.value)}
@@ -263,7 +279,9 @@ const System: React.FC = () => {
         </span>
         <select
           value={themePreference}
-          onChange={(e) => handleThemeChange(e.target.value as 'light' | 'dark' | 'system')}
+          onChange={(e) =>
+            handleThemeChange(e.target.value as "light" | "dark" | "system")
+          }
         >
           <option value="light">
             <FormattedMessage
@@ -287,6 +305,142 @@ const System: React.FC = () => {
             />
           </option>
         </select>
+      </label>
+
+      <label
+        style={{
+          alignItems: "baseline",
+          display: "grid",
+          gridGap: "0 0.5rem",
+          gridTemplateColumns: "1fr 2fr",
+          width: "100%",
+          margin: 0,
+        }}
+      >
+        <span>
+          <FormattedMessage
+            id="settings.favicon"
+            defaultMessage="Favicon"
+            description="Favicon setting label"
+          />
+        </span>
+        <div>
+          <select
+            value={favicon.mode}
+            onChange={(e) => {
+              setFavicon({ ...favicon, mode: e.target.value as FaviconMode });
+            }}
+          >
+            <option value="default">
+              <FormattedMessage
+                id="settings.favicon.mode.default"
+                defaultMessage="Default"
+              />
+            </option>
+            <option value="size32">
+              <FormattedMessage
+                id="settings.favicon.mode.size32"
+                defaultMessage="32x32 Icon"
+              />
+            </option>
+            <option value="size48">
+              <FormattedMessage
+                id="settings.favicon.mode.size48"
+                defaultMessage="48x48 Icon"
+              />
+            </option>
+            <option value="size96">
+              <FormattedMessage
+                id="settings.favicon.mode.size96"
+                defaultMessage="96x96 Icon"
+              />
+            </option>
+            <option value="size128">
+              <FormattedMessage
+                id="settings.favicon.mode.size128"
+                defaultMessage="128x128 Icon"
+              />
+            </option>
+            <option value="custom">
+              <FormattedMessage
+                id="settings.favicon.mode.custom"
+                defaultMessage="File Upload..."
+              />
+            </option>
+            <option value="url">
+              <FormattedMessage
+                id="settings.favicon.mode.url"
+                defaultMessage="Custom URL..."
+              />
+            </option>
+          </select>
+
+          {favicon.mode === "url" && (
+            <input
+              type="text"
+              placeholder="https://example.com/favicon.ico"
+              value={favicon.url || ""}
+              onChange={(e) => setFavicon({ ...favicon, url: e.target.value })}
+            />
+          )}
+
+          {favicon.mode === "custom" && (
+            <div>
+              <input
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                id="favicon-upload"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > 8192) {
+                      alert(
+                        intl.formatMessage({
+                          id: "settings.favicon.error.size",
+                          defaultMessage: "Image must be smaller than 8KB",
+                        }),
+                      );
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                      const result = ev.target?.result as string;
+                      setFavicon({ ...favicon, data: result });
+                    };
+                    reader.onerror = () => {
+                      alert(
+                        intl.formatMessage({
+                          id: "settings.favicon.error.read",
+                          defaultMessage:
+                            "Failed to read file. Please try again.",
+                        }),
+                      );
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
+              <label
+                className="button button--primary"
+                htmlFor="favicon-upload"
+                style={{
+                  cursor: "pointer",
+                  margin: 0,
+                  width: "100%",
+                  textAlign: "center",
+                  display: "inline-block",
+                }}
+              >
+                <FormattedMessage
+                  id="settings.selectFile"
+                  defaultMessage="Select Image"
+                  description="Select image file button"
+                />
+              </label>
+            </div>
+          )}
+        </div>
       </label>
 
       <label
@@ -379,7 +533,7 @@ const System: React.FC = () => {
         }}
       >
         <span>
-        <FormattedMessage
+          <FormattedMessage
             id="settings.hideMenu"
             defaultMessage="Auto-hide Settings Menu"
             description="Automaticaly hide settings label"

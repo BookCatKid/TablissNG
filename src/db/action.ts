@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import { DB } from "../lib";
 import migrateFrom2 from "./migrations/migrate2";
 import { selectWidgets } from "./select";
-import { cache, db, WidgetDisplay, BackgroundDisplay } from "./state";
+import { BackgroundDisplay, cache, db, WidgetDisplay } from "./state";
 
 export const createId = (): string => nanoid(12);
 
@@ -35,15 +35,21 @@ export const setBackground = (key: string): void => {
       } else {
         DB.put(db, displayKey, current.display as any);
       }
-    } catch {}
+    } catch {
+      //
+    }
     // Backup plugin data for this background
     try {
       const currentData = DB.get(db, `data/${current.id}` as any);
       if (typeof currentData !== "undefined") {
         DB.put(db, `background/data/${current.key}` as any, currentData);
       }
-    } catch {}
-  } catch {}
+    } catch {
+      //
+    }
+  } catch {
+    //
+  }
 
   // Reuse a previously allocated id for this key so that any plugin
   // specific `data/{id}` remains available when switching back.

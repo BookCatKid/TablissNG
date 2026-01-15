@@ -6,6 +6,7 @@ import media from "./media";
 import online from "./online";
 import unsplash from "./unsplash";
 import wikimedia from "./wikimedia";
+import bing from "./bing";
 
 export const backgroundConfigs = [
   apod,
@@ -15,5 +16,6 @@ export const backgroundConfigs = [
   media,
   online,
   unsplash,
+  bing,
   wikimedia,
 ];

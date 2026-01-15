@@ -36,5 +36,5 @@ export const messages = defineMessages({
   seconds: {
     id: "plugins.timeTracker.seconds",
     defaultMessage: "seconds",
-  }
+  },
 });

@@ -12,13 +12,13 @@ const messages = defineMessages({
   lighten: {
     id: "backgrounds.display.lighten",
     defaultMessage: "Lighten",
-    description: "Label for maximum luminosity"
+    description: "Label for maximum luminosity",
   },
   darken: {
     id: "backgrounds.display.darken",
     defaultMessage: "Darken",
-    description: "Label for minimum luminosity"
-  }
+    description: "Label for minimum luminosity",
+  },
 });
 
 const Background: React.FC = () => {
@@ -41,9 +41,9 @@ const Background: React.FC = () => {
   const sanitizeFilename = (filename: string): string => {
     // Remove illegal characters and trim
     return filename
-      .replace(/[/\\?%*:|"<>]/g, '-') // Replace illegal chars with dash
-      .replace(/\s+/g, '_')           // Replace spaces with underscore
-      .replace(/-+/g, '-')            // Replace multiple dashes with single dash
+      .replace(/[/\\?%*:|"<>]/g, "-") // Replace illegal chars with dash
+      .replace(/\s+/g, "_") // Replace spaces with underscore
+      .replace(/-+/g, "-") // Replace multiple dashes with single dash
       .trim();
   };
 
@@ -104,7 +104,9 @@ const Background: React.FC = () => {
 
       {plugin && (
         <div className="Widget">
-          <h4><FormattedMessage {...plugin.name} /></h4>
+          <h4>
+            <FormattedMessage {...plugin.name} />
+          </h4>
 
           {plugin.settingsComponent && (
             <div className="settings">
@@ -140,7 +142,8 @@ const Background: React.FC = () => {
                     id="backgrounds.display.blur"
                     defaultMessage="Blur"
                     description="Label for blur slider"
-                  /> <br />
+                  />{" "}
+                  <br />
                   <input
                     type="range"
                     list="blur-markers"
@@ -165,7 +168,8 @@ const Background: React.FC = () => {
                     id="backgrounds.display.luminosity"
                     defaultMessage="Luminosity"
                     description="Label for luminosity slider"
-                  /> <br />
+                  />{" "}
+                  <br />
                   <input
                     type="range"
                     list="luminosity-markers"
@@ -233,13 +237,14 @@ const Background: React.FC = () => {
                         id="backgrounds.display.nightStart"
                         defaultMessage="Night starts at"
                         description="Label for night start time input"
-                      /> <br />
+                      />{" "}
+                      <br />
                       <input
                         type="time"
                         value={data.display.nightStart}
                         onChange={(e) => {
                           setBackgroundDisplay({
-                            nightStart: e.target.value
+                            nightStart: e.target.value,
                           });
                         }}
                       />
@@ -250,13 +255,14 @@ const Background: React.FC = () => {
                         id="backgrounds.display.nightEnd"
                         defaultMessage="Night ends at"
                         description="Label for night end time input"
-                      /> <br />
+                      />{" "}
+                      <br />
                       <input
                         type="time"
                         value={data.display.nightEnd}
                         onChange={(e) => {
                           setBackgroundDisplay({
-                            nightEnd: e.target.value
+                            nightEnd: e.target.value,
                           });
                         }}
                       />

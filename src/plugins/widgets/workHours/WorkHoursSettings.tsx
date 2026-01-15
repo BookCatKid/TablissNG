@@ -19,10 +19,10 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
     <div className="WorkHoursSettings">
       <label>
         <FormattedMessage
-            id="plugins.workHours.startTime"
-            defaultMessage="Start time"
-            description="Start time title"
-          />
+          id="plugins.workHours.startTime"
+          defaultMessage="Start time"
+          description="Start time title"
+        />
         <input
           type="time"
           value={data.startTime}
@@ -33,24 +33,26 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
       <label>
         <FormattedMessage
-            id="plugins.workHours.endTime"
-            defaultMessage="End time"
-            description="End time title"
-          />
+          id="plugins.workHours.endTime"
+          defaultMessage="End time"
+          description="End time title"
+        />
         <input
           type="time"
           value={data.endTime}
-          onChange={(event) => setData({ ...data, endTime: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, endTime: event.target.value })
+          }
         />
       </label>
       <label>
         <FormattedMessage
-            id="plugins.workHours.flipPercentage"
-            defaultMessage="Flip percentage?"
-            description="Option to flip the percentage calculation"
-          />
+          id="plugins.workHours.flipPercentage"
+          defaultMessage="Flip percentage?"
+          description="Option to flip the percentage calculation"
+        />
         <input
-          style = {{marginLeft: "10px"}}
+          style={{ marginLeft: "10px" }}
           type="checkbox"
           checked={data.flipPercentage}
           onChange={(event) =>
@@ -59,7 +61,7 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-      {daysArray.map(day => (
+      {daysArray.map((day) => (
         <div key={day.index}>
           <label>
             <input

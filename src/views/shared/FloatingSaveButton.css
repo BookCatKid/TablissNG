@@ -9,7 +9,7 @@
   padding: 12px 20px;
   font-size: 16px;
   font-weight: 500;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
   cursor: grab;
   user-select: none;
@@ -42,5 +42,3 @@ body.dark .FloatingSaveButton:hover {
   width: 20px;
   height: 20px;
 }
-
-

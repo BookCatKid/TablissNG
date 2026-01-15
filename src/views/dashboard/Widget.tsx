@@ -1,7 +1,8 @@
 import React from "react";
 import { WidgetDisplay, WidgetPosition } from "../../db/state";
 import { setWidgetDisplay } from "../../db/action";
-import FloatingSaveButton from '../shared/FloatingSaveButton';
+import FloatingSaveButton from "../shared/FloatingSaveButton";
+import { parseFontFamilyAndFeatures } from "../../utils";
 
 interface WidgetProps extends WidgetDisplay {
   id: string;
@@ -29,7 +30,7 @@ const Widget: React.FC<WidgetProps> = ({
   xPercent = 50,
   yPercent = 50,
   isEditingPosition = false,
-  customClass
+  customClass,
 }) => {
   const widgetRef = React.useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -46,8 +47,14 @@ const Widget: React.FC<WidgetProps> = ({
       const availableHeight = window.innerHeight - (height || 0);
 
       // Use percentage of available space to prevent edge misalignment
-      const pixelX = Math.max(0, Math.min((xPercent / 100) * availableWidth, availableWidth));
-      const pixelY = Math.max(0, Math.min((yPercent / 100) * availableHeight, availableHeight));
+      const pixelX = Math.max(
+        0,
+        Math.min((xPercent / 100) * availableWidth, availableWidth),
+      );
+      const pixelY = Math.max(
+        0,
+        Math.min((yPercent / 100) * availableHeight, availableHeight),
+      );
 
       return { x: pixelX, y: pixelY };
     }
@@ -58,7 +65,15 @@ const Widget: React.FC<WidgetProps> = ({
 
   // Migration: Convert existing pixel coordinates to percentages if needed
   React.useEffect(() => {
-    if (position === "free" && xPercent === undefined && yPercent === undefined && x !== undefined && y !== undefined && width !== null && height !== null) {
+    if (
+      position === "free" &&
+      xPercent === undefined &&
+      yPercent === undefined &&
+      x !== undefined &&
+      y !== undefined &&
+      width !== null &&
+      height !== null
+    ) {
       // This is an existing widget without percentage coordinates, migrate it
       const availableWidth = window.innerWidth - width;
       const availableHeight = window.innerHeight - height;
@@ -67,7 +82,7 @@ const Widget: React.FC<WidgetProps> = ({
 
       setWidgetDisplay(id, {
         xPercent: newXPercent,
-        yPercent: newYPercent
+        yPercent: newYPercent,
       });
     }
   }, [position, x, y, xPercent, yPercent, id, width, height]);
@@ -95,45 +110,56 @@ const Widget: React.FC<WidgetProps> = ({
     setIsDragging(true);
     setDragStart({
       x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      y: e.clientY - rect.top,
     });
   };
 
-  const handleDrag = React.useCallback((e: MouseEvent) => {
-    if (!isDragging) return;
-    const newX = e.clientX - dragStart.x;
-    const newY = e.clientY - dragStart.y;
+  const handleDrag = React.useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
 
-    // Constrain to viewport bounds
-    const constrainedX = Math.max(0, Math.min(newX, window.innerWidth - (width || 0)));
-    const constrainedY = Math.max(0, Math.min(newY, window.innerHeight - (height || 0)));
+      // Constrain to viewport bounds
+      const constrainedX = Math.max(
+        0,
+        Math.min(newX, window.innerWidth - (width || 0)),
+      );
+      const constrainedY = Math.max(
+        0,
+        Math.min(newY, window.innerHeight - (height || 0)),
+      );
 
-    // Convert pixel coordinates to percentages based on available space
-    const availableWidth = window.innerWidth - (width || 0);
-    const availableHeight = window.innerHeight - (height || 0);
-    const newXPercent = availableWidth > 0 ? (constrainedX / availableWidth) * 100 : 0;
-    const newYPercent = availableHeight > 0 ? (constrainedY / availableHeight) * 100 : 0;
+      // Convert pixel coordinates to percentages based on available space
+      const availableWidth = window.innerWidth - (width || 0);
+      const availableHeight = window.innerHeight - (height || 0);
+      const newXPercent =
+        availableWidth > 0 ? (constrainedX / availableWidth) * 100 : 0;
+      const newYPercent =
+        availableHeight > 0 ? (constrainedY / availableHeight) * 100 : 0;
 
-    setOffset({ x: constrainedX, y: constrainedY });
-    setWidgetDisplay(id, {
-      position: "free",
-      x: constrainedX,
-      y: constrainedY,
-      xPercent: newXPercent,
-      yPercent: newYPercent
-    });
-  }, [isDragging, dragStart, id, width, height]);
+      setOffset({ x: constrainedX, y: constrainedY });
+      setWidgetDisplay(id, {
+        position: "free",
+        x: constrainedX,
+        y: constrainedY,
+        xPercent: newXPercent,
+        yPercent: newYPercent,
+      });
+    },
+    [isDragging, dragStart, id, width, height],
+  );
 
   React.useEffect(() => {
     if (!isDragging) return;
 
-    document.addEventListener('mousemove', handleDrag);
+    document.addEventListener("mousemove", handleDrag);
     const stopDragging = () => setIsDragging(false);
-    document.addEventListener('mouseup', stopDragging);
+    document.addEventListener("mouseup", stopDragging);
 
     return () => {
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', stopDragging);
+      document.removeEventListener("mousemove", handleDrag);
+      document.removeEventListener("mouseup", stopDragging);
     };
   }, [isDragging, handleDrag]);
 
@@ -146,30 +172,33 @@ const Widget: React.FC<WidgetProps> = ({
       setOffset(pixelPos);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [position, getPixelPosition]);
+
+  const parsedFont = parseFontFamilyAndFeatures(fontFamily || "");
 
   const styles: React.CSSProperties = {
     position: position === "free" ? "absolute" : "relative",
     color: colour,
-    fontFamily,
+    fontFamily: parsedFont.family || fontFamily,
     fontSize: `${fontSize}px`,
     fontWeight,
     fontStyle,
     textDecoration,
     transform: `scale(${scale}) rotate(${rotation}deg)`,
+    ...parsedFont.style,
     ...(position === "free" && {
       left: `${offset.x}px`,
       top: `${offset.y}px`,
-      width: width ? `${width}px` : 'auto',
-      whiteSpace: 'nowrap',
+      width: width ? `${width}px` : "auto",
+      whiteSpace: "nowrap",
       ...(isEditingPosition && {
         cursor: isDragging ? "grabbing" : "grab",
         userSelect: "none",
         touchAction: "none",
-      })
-    })
+      }),
+    }),
   };
 
   const handleSave = () => {
@@ -178,8 +207,10 @@ const Widget: React.FC<WidgetProps> = ({
     // Convert current pixel position to percentages based on available space
     const availableWidth = window.innerWidth - (width || 0);
     const availableHeight = window.innerHeight - (height || 0);
-    const newXPercent = availableWidth > 0 ? (offset.x / availableWidth) * 100 : 0;
-    const newYPercent = availableHeight > 0 ? (offset.y / availableHeight) * 100 : 0;
+    const newXPercent =
+      availableWidth > 0 ? (offset.x / availableWidth) * 100 : 0;
+    const newYPercent =
+      availableHeight > 0 ? (offset.y / availableHeight) * 100 : 0;
 
     setWidgetDisplay(id, {
       position: "free",
@@ -187,7 +218,7 @@ const Widget: React.FC<WidgetProps> = ({
       y: offset.y,
       xPercent: newXPercent,
       yPercent: newYPercent,
-      isEditingPosition: false
+      isEditingPosition: false,
     });
   };
 
@@ -196,7 +227,7 @@ const Widget: React.FC<WidgetProps> = ({
     classNames += ` ${customClass}`;
   }
   if (isEditingPosition) {
-    classNames += ' drag-selected';
+    classNames += " drag-selected";
   }
 
   const renderContent = () => {
@@ -210,35 +241,39 @@ const Widget: React.FC<WidgetProps> = ({
         onMouseDown={handleDragStart}
       >
         {textOutline && outlineStyle === "basic" ? (
-          <div style={{
-            textShadow: `
+          <div
+            style={{
+              textShadow: `
               -1px -1px 0 ${textOutlineColor},
               1px -1px 0 ${textOutlineColor},
               -1px 1px 0 ${textOutlineColor},
               1px 1px 0 ${textOutlineColor}
-            `
-          }}>
+            `,
+            }}
+          >
             {children}
           </div>
         ) : textOutline && outlineStyle === "advanced" ? (
           <>
-            <span style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              color: textOutlineColor,
-              zIndex: 0,
-              WebkitTextStroke: `${textOutlineSize * 2}px ${textOutlineColor}`,
-            }}>
+            <span
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                color: textOutlineColor,
+                zIndex: 0,
+                WebkitTextStroke: `${textOutlineSize * 2}px ${textOutlineColor}`,
+              }}
+            >
               {children}
             </span>
-            <span style={{ position: "relative", zIndex: 1 }}>
-              {children}
-            </span>
+            <span style={{ position: "relative", zIndex: 1 }}>{children}</span>
           </>
-        ) : children}
+        ) : (
+          children
+        )}
       </div>
     );
   };

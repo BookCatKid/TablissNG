@@ -22,5 +22,8 @@
     "bookmarks",
     "topSites"
   ],
+  "background": {
+    "service_worker": "service-worker.js"
+  },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAncIg0oMeeoC83bUlSnJm9BHOkW7QJ1h9qmE0Ucuxym7Ff3mlF1wWrA0PJ52vaspShq07KVrK6jghHScj7B0fbw5XGYAVhLffDI2B4uRq4DVn4cjEHm7Jg7NWvziitxOL+pNAK/gT5A1/PME/CgzNgIYQIlw7OGIE/nLHTrLrpeV/ffKjweyQIL9oIgiiBW9eKxz7LDfzVC6n1YDAO52KUa0Vx3Wvrr0zjT6B9A7s/fzYDQ66WCr1094J8H6CeZmLIafL2GHQprCrKxerr9i+ny98lbD9FkrBSl7qPbPXg4iYNP36hqTiLwCc5q4D2EY7tfbCWdNv1MCBuIVFU3GfFwIDAQAB"
 }

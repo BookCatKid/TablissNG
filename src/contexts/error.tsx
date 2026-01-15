@@ -15,7 +15,7 @@ type ErrorState = {
 
 export const ErrorContext = React.createContext<ErrorAPI>(null as any);
 
-const ErrorProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+const ErrorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [state, setState] = React.useState<ErrorState>({ errors: [] });
   const push = React.useCallback(
     (error: ErrorItem) =>

@@ -10,23 +10,20 @@ const messages = defineMessages({
   searchTermPlaceholder: {
     id: "backgrounds.unsplash.searchTerm.placeholder",
     defaultMessage: "Try landscapes or animals...",
-    description: "Placeholder text for search term input"
+    description: "Placeholder text for search term input",
   },
   collectionIdPlaceholder: {
     id: "backgrounds.unsplash.collectionId.placeholder",
     defaultMessage: "Collection ID number",
-    description: "Placeholder text for collection ID input"
-  }
+    description: "Placeholder text for collection ID input",
+  },
 });
 
 const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
   return (
     <div className="UnsplashSettings">
-      <BaseSettings
-        data={data}
-        setData={setData}
-      />
+      <BaseSettings data={data} setData={setData} />
 
       <label>
         <input
@@ -35,10 +32,10 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           onChange={() => setData({ ...data, by: "official" })}
         />{" "}
         <FormattedMessage
-            id="backgrounds.unsplash.officialCollection"
-            defaultMessage="Official Collection"
-            description="Official Collection title"
-          />
+          id="backgrounds.unsplash.officialCollection"
+          defaultMessage="Official Collection"
+          description="Official Collection title"
+        />
       </label>
 
       <label>
@@ -48,10 +45,10 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           onChange={() => setData({ ...data, by: "topics" })}
         />{" "}
         <FormattedMessage
-            id="backgrounds.unsplash.topic"
-            defaultMessage="Topic"
-            description="Unsplash label for searching by topics"
-          />
+          id="backgrounds.unsplash.topic"
+          defaultMessage="Topic"
+          description="Unsplash label for searching by topics"
+        />
       </label>
 
       <label>
@@ -61,10 +58,10 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           onChange={() => setData({ ...data, by: "search" })}
         />{" "}
         <FormattedMessage
-            id="backgrounds.unsplash.search"
-            defaultMessage="Search"
-            description="Search title"
-          />
+          id="backgrounds.unsplash.search"
+          defaultMessage="Search"
+          description="Search title"
+        />
       </label>
 
       <label>
@@ -74,10 +71,10 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           onChange={() => setData({ ...data, by: "collections" })}
         />{" "}
         <FormattedMessage
-            id="backgrounds.unsplash.collection"
-            defaultMessage="Collection"
-            description="Collection title"
-          />
+          id="backgrounds.unsplash.collection"
+          defaultMessage="Collection"
+          description="Collection title"
+        />
       </label>
 
       {data.by === "topics" && (
@@ -88,23 +85,26 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
             description="Unsplash label for topic multiselect"
           />
           <Select
-            options={topics.map(topic => ({ value: topic.id, label: topic.title }))}
+            options={topics.map((topic) => ({
+              value: topic.id,
+              label: topic.title,
+            }))}
             values={topics
-              .map(topic => ({ value: topic.id, label: topic.title }))
-              .filter(topic => data.topics.includes(topic.value))}
+              .map((topic) => ({ value: topic.id, label: topic.title }))
+              .filter((topic) => data.topics.includes(topic.value))}
             onChange={(selected) => {
               setData({
                 ...data,
-                topics: selected.map(item => item.value)
+                topics: selected.map((item) => item.value),
               });
             }}
             multi
             searchable
             dropdownHeight="300px"
             style={{
-              width: '100%',
-              marginTop: '0.5em',
-              borderRadius: '0.2em',
+              width: "100%",
+              marginTop: "0.5em",
+              borderRadius: "0.2em",
             }}
             contentRenderer={({ props }) => {
               if (props.values.length === 0) {
@@ -119,16 +119,23 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
                 );
               }
               return (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25em', padding: '0.25em' }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.25em",
+                    padding: "0.25em",
+                  }}
+                >
                   {props.values.map((item: any) => (
                     <span
                       key={item.value}
                       style={{
-                        background: '#3498db',
-                        color: 'white',
-                        padding: '2px 8px',
-                        borderRadius: '1em',
-                        fontSize: '0.9em',
+                        background: "#3498db",
+                        color: "white",
+                        padding: "2px 8px",
+                        borderRadius: "1em",
+                        fontSize: "0.9em",
                       }}
                     >
                       {item.label}
@@ -152,10 +159,10 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         <>
           <label>
             <FormattedMessage
-            id="backgrounds.unsplash.searchTerm"
-            defaultMessage="Search Term"
-            description="Search Term title"
-          />
+              id="backgrounds.unsplash.searchTerm"
+              defaultMessage="Search Term"
+              description="Search Term title"
+            />
             <DebounceInput
               type="text"
               value={data.search}
@@ -169,13 +176,15 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
             <input
               type="checkbox"
               checked={data.featured}
-              onChange={(event) => setData({ ...data, featured: !data.featured })}
+              onChange={(event) =>
+                setData({ ...data, featured: !data.featured })
+              }
             />{" "}
             <FormattedMessage
-            id="backgrounds.unsplash.onlyFeaturedImages"
-            defaultMessage="Only featured images"
-            description="Only featured images title"
-          />
+              id="backgrounds.unsplash.onlyFeaturedImages"
+              defaultMessage="Only featured images"
+              description="Only featured images title"
+            />
           </label>
         </>
       )}
@@ -206,7 +215,9 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         />
         <select
           value={data.locationSource}
-          onChange={(event) => setData({ ...data, locationSource: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, locationSource: event.target.value })
+          }
         >
           <option value="google-maps">
             <FormattedMessage

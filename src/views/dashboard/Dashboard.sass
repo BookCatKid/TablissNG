@@ -19,3 +19,35 @@
         &::placeholder
             color: inherit
             opacity: 0.5
+
+    // Offset credits and widgets when the settings icon is in the same corner. TODO: probably refactor the custom settings icon position again
+    &.topLeft
+        .Slot.topLeft
+            top: 2rem
+
+    &.topRight
+        .Slot.topRight
+            top: 2rem
+
+    &.bottomLeft
+        .Slot.bottomLeft,
+        .Slot.bottomCentre
+            bottom: 5rem
+
+        .credit .photo
+            transform: translateY(-2.5em)
+        .wikimedia-credit-title,
+        .credit:has(.giphy-logo)
+            transform: translateY(-2em)
+        .apod-credit
+            transform: translateY(-3em)
+
+    &.bottomRight
+        .Slot.bottomRight,
+        .Slot.bottomCentre
+            bottom: 5rem
+
+        .credit .location-wrapper
+            transform: translateY(-2.5em)
+        .wikimedia-credit-copyright
+            transform: translateY(-3em)

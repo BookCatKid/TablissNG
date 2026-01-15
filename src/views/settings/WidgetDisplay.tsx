@@ -14,18 +14,18 @@ const messages = defineMessages({
   editPosition: {
     id: "settings.position.edit",
     defaultMessage: "Edit Position",
-    description: "Button text for editing widget position"
+    description: "Button text for editing widget position",
   },
   customClassPlaceholder: {
     id: "settings.customClass.placeholder",
     defaultMessage: "Enter a custom class for easier styling",
-    description: "Placeholder text for custom CSS class input"
-  }
+    description: "Placeholder text for custom CSS class input",
+  },
 });
 
 const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
-    const intl = useIntl();
-  
+  const intl = useIntl();
+
   return (
     <div className="WidgetDisplay">
       <PositionInput
@@ -40,9 +40,11 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
 
       {display.position === "free" && (
         <div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
             <button
-              onClick={() => onChange({ isEditingPosition: !display.isEditingPosition })}
+              onClick={() =>
+                onChange({ isEditingPosition: !display.isEditingPosition })
+              }
               className={`button button--primary ${display.isEditingPosition ? "active" : ""}`}
             >
               <FormattedMessage
@@ -52,7 +54,15 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
               />
             </button>
             <button
-              onClick={() => {onChange({ x: window.innerWidth / 2, y: window.innerHeight / 2, xPercent: 50, yPercent: 50 }); window.location.reload();}}
+              onClick={() => {
+                onChange({
+                  x: window.innerWidth / 2,
+                  y: window.innerHeight / 2,
+                  xPercent: 50,
+                  yPercent: 50,
+                });
+                window.location.reload();
+              }}
               className="button button--primary"
             >
               <FormattedMessage
@@ -107,9 +117,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
           min="0"
           max="2"
           step="0.1"
-          onChange={(event) =>
-            onChange({ scale: Number(event.target.value) })
-          }
+          onChange={(event) => onChange({ scale: Number(event.target.value) })}
         />
         <datalist id="scale-markers">
           {/* <option value="0.5" label="-0.5" /> */}
@@ -146,7 +154,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
       </label>
 
       <label>
-         <FormattedMessage
+        <FormattedMessage
           id="settings.customClass.title"
           defaultMessage="Custom CSS Class"
           description="Label for the custom CSS class input field"
@@ -156,9 +164,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
           type="text"
           value={display.customClass}
           placeholder={intl.formatMessage(messages.customClassPlaceholder)}
-          onChange={(event) =>
-            onChange({ customClass: event.target.value })
-          }
+          onChange={(event) => onChange({ customClass: event.target.value })}
         />
       </label>
     </div>

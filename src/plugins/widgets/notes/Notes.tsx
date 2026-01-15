@@ -56,10 +56,12 @@ const Notes: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
                 ) : (
                   <>
                     <Icon icon="feather:edit-3" />
-                    <span><FormattedMessage
-                  id="plugins.notes.clickToAdd"
-                  defaultMessage="Click to add note"
-                /></span>
+                    <span>
+                      <FormattedMessage
+                        id="plugins.notes.clickToAdd"
+                        defaultMessage="Click to add note"
+                      />
+                    </span>
                   </>
                 )}
               </div>

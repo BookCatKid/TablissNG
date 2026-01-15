@@ -35,7 +35,10 @@ const config = {
     rules: [
       {
         test: /\.css$/,
-        use: [isWeb ? MiniCssExtractPlugin.loader : "style-loader", "css-loader"],
+        use: [
+          isWeb ? MiniCssExtractPlugin.loader : "style-loader",
+          "css-loader",
+        ],
       },
       {
         test: /\.(gif|jpe?g|png)$/,
@@ -47,7 +50,11 @@ const config = {
       },
       {
         test: /\.sass$/,
-        use: [isWeb ? MiniCssExtractPlugin.loader : "style-loader", "css-loader", "sass-loader"],
+        use: [
+          isWeb ? MiniCssExtractPlugin.loader : "style-loader",
+          "css-loader",
+          "sass-loader",
+        ],
       },
       {
         test: /\.svg$/,
@@ -61,10 +68,10 @@ const config = {
             loader: "ts-loader",
             options: {
               transpileOnly: true,
-              experimentalWatchApi: true
-            }
-          }
-        ]
+              experimentalWatchApi: true,
+            },
+          },
+        ],
       },
     ],
   },
@@ -80,7 +87,8 @@ const config = {
       ],
     }),
     new HtmlWebpackPlugin({
-      template: `./target/${buildTarget}/index.html`,
+      template: "./target/index.html",
+      buildTarget,
     }),
     new MiniCssExtractPlugin({
       filename: isWeb ? "[name].[contenthash:12].css" : "[name].css",
@@ -100,27 +108,27 @@ const config = {
     warnings: true,
   },
   cache: {
-    type: 'filesystem',
+    type: "filesystem",
     buildDependencies: {
-      config: [__filename]
-    }
+      config: [__filename],
+    },
   },
   optimization: {
     splitChunks: {
-      chunks: 'all',
+      chunks: "all",
       cacheGroups: {
         vendors: {
           test: /[\\/]node_modules[\\/]/,
-          priority: -10
+          priority: -10,
         },
         default: {
           minChunks: 2,
           priority: -20,
-          reuseExistingChunk: true
-        }
-      }
-    }
-  }
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
 };
 
 if (isProduction) {
@@ -140,11 +148,63 @@ if (!isWeb) {
   );
 }
 
-if (isWeb && isProduction) {
+if (isProduction) {
   config.plugins.push(
     new workbox.GenerateSW({
-      cacheId: "tabliss-cache",
-      dontCacheBustURLsMatching: /\.\w{12}\./,
+      exclude: [/.*/], // Disable precaching
+      disableDevLogs: true, // Enable logging if required
+      runtimeCaching: [
+        // Cache for APIs (short term)
+        {
+          urlPattern: ({ url }) =>
+            url.hostname === "github-contributions-api.jogruber.de" ||
+            url.href.startsWith(
+              "https://api.github.com/repos/BookCatKid/tablissNG",
+            ),
+
+          handler: "CacheFirst",
+          options: {
+            cacheName: "tabliss-cache-apis",
+            expiration: {
+              maxAgeSeconds: 24 * 60 * 60, // 1 day
+            },
+          },
+        },
+
+        // Cache favicons (long term)
+        {
+          urlPattern: ({ url }) =>
+            url.href.startsWith("https://www.google.com/s2/favicons") ||
+            url.hostname === "icons.duckduckgo.com" ||
+            url.hostname === "favicone.com",
+
+          handler: "StaleWhileRevalidate",
+          options: {
+            cacheName: "tabliss-cache-swr",
+            expiration: {
+              maxEntries: 50,
+              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+            },
+          },
+        },
+
+        // Cache images (long term)
+        {
+          urlPattern: ({ request }) => request.destination === "image",
+
+          handler: "CacheFirst",
+          options: {
+            cacheName: "tabliss-cache-images",
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+            },
+            cacheableResponse: {
+              statuses: [0, 200], // allow opaque (0) responses to be cached
+            },
+          },
+        },
+      ],
     }),
   );
 }

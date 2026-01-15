@@ -14,5 +14,8 @@
   },
   "permissions": [
     "storage"
-  ]
+  ],
+  "background": {
+    "service_worker": "service-worker.js"
+  }
 }

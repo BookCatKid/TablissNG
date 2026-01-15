@@ -16,7 +16,10 @@ const ToggleSection: React.FC<Props> = ({ name, children }) => {
     <>
       <p>
         <a onClick={toggleOpen}>
-          {isOpen ? intl.formatMessage(sectionMessages.close) : intl.formatMessage(sectionMessages.open)} {name}
+          {isOpen
+            ? intl.formatMessage(sectionMessages.close)
+            : intl.formatMessage(sectionMessages.open)}{" "}
+          {name}
         </a>
       </p>
 

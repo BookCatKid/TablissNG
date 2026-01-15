@@ -1,7 +1,11 @@
 import React, { FC, useRef, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
 import { useKeyPress } from "../../../hooks";
-import { getSuggestions, getWikipediaSuggestions, WikipediaSuggestionResult } from "./getSuggestions";
+import {
+  getSuggestions,
+  getWikipediaSuggestions,
+  WikipediaSuggestionResult,
+} from "./getSuggestions";
 import Suggestions from "./Suggestions";
 import { Props, defaultData } from "./types";
 import { buildUrl, getSearchUrl, getSuggestUrl } from "./utils";
@@ -20,10 +24,12 @@ const Search: FC<Props> = ({ data = defaultData }) => {
   const previousValue = useRef("");
 
   const [active, setActive] = useState<number>();
-  const [suggestions, setSuggestions] = useState<(string | WikipediaSuggestionResult)[]>();
+  const [suggestions, setSuggestions] =
+    useState<(string | WikipediaSuggestionResult)[]>();
 
   const intl = useIntl();
-  const placeholder = data.placeholderText || intl.formatMessage(messages.placeholder);
+  const placeholder =
+    data.placeholderText || intl.formatMessage(messages.placeholder);
 
   const keyBind = data.keyBind ?? "G";
   useKeyPress(
@@ -65,15 +71,14 @@ const Search: FC<Props> = ({ data = defaultData }) => {
     event.preventDefault();
 
     switch (event.key) {
-
       case "ArrowUp": {
         const upTo = !active ? suggestions.length - 1 : active - 1;
         const upSuggestion = suggestions[upTo];
-        searchInput.current!.value = typeof upSuggestion === "string" ? upSuggestion : upSuggestion.title;
+        searchInput.current!.value =
+          typeof upSuggestion === "string" ? upSuggestion : upSuggestion.title;
         setActive(upTo);
         break;
       }
-
 
       case "ArrowDown": {
         const downTo =
@@ -81,7 +86,10 @@ const Search: FC<Props> = ({ data = defaultData }) => {
             ? 0
             : active + 1;
         const downSuggestion = suggestions[downTo];
-        searchInput.current!.value = typeof downSuggestion === "string" ? downSuggestion : downSuggestion.title;
+        searchInput.current!.value =
+          typeof downSuggestion === "string"
+            ? downSuggestion
+            : downSuggestion.title;
         setActive(downTo);
         break;
       }
@@ -117,7 +125,10 @@ const Search: FC<Props> = ({ data = defaultData }) => {
       return;
     }
     window.location.assign(
-      buildUrl(searchInput.current!.value, getSearchUrl(data.searchEngine, data.searchEngineCustom)),
+      buildUrl(
+        searchInput.current!.value,
+        getSearchUrl(data.searchEngine, data.searchEngineCustom),
+      ),
     );
   };
 

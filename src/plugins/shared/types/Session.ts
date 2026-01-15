@@ -1,4 +1,3 @@
-
 /**
  * Defines a generic authenticated session
  * this shouldn't be used on its own and should be extended with other interfaces as needed

@@ -9,6 +9,6 @@ const Unknown: FC = () => (
       description="The text to display on the dashboard when an unknown widget is encountered"
     />
   </p>
-)
+);
 
 export default Unknown;

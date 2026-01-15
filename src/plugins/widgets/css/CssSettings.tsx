@@ -5,11 +5,11 @@ import { Props, defaultData } from "./types";
 const CssSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="CssSettings">
     <label>
-    <FormattedMessage
-          id="plugins.css.cssSnippet"
-          defaultMessage="CSS Snippet"
-          description="CSS Snippet title"
-        />
+      <FormattedMessage
+        id="plugins.css.cssSnippet"
+        defaultMessage="CSS Snippet"
+        description="CSS Snippet title"
+      />
       <textarea
         rows={3}
         style={{ resize: "vertical", fontFamily: "monospace" }}
@@ -19,13 +19,12 @@ const CssSettings: FC<Props> = ({ data = defaultData, setData }) => (
     </label>
 
     <p className="info">
-    <FormattedMessage
-          id="plugins.css.Warning"
-          defaultMessage="Warning: this functionality is intended for advanced users. Custom styles
+      <FormattedMessage
+        id="plugins.css.Warning"
+        defaultMessage="Warning: this functionality is intended for advanced users. Custom styles
           may break at any time."
-          description="Warning CSS title"
-        />
-
+        description="Warning CSS title"
+      />
     </p>
   </div>
 );

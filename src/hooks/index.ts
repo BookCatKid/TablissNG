@@ -13,3 +13,4 @@ export * from "./useToggle";
 export * from "./useIsNight";
 export * from "./useBackgroundRotation";
 export * from "./useArrayRotation";
+export * from "./useFavicon";

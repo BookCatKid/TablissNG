@@ -27,6 +27,23 @@ export interface State {
   themePreference: "light" | "dark" | "system";
   /** Whether to auto-hide settings menu when not hovering */
   autoHideSettings: boolean;
+  /** Favicon settings */
+  favicon: FaviconState;
+}
+
+export type FaviconMode =
+  | "default"
+  | "size32"
+  | "size48"
+  | "size96"
+  | "size128"
+  | "custom"
+  | "url";
+
+export interface FaviconState {
+  mode: FaviconMode;
+  url: string;
+  data: string | null;
 }
 
 export interface BackgroundState {
@@ -124,6 +141,11 @@ const initData: State = {
   settingsIconPosition: "topLeft",
   themePreference: "system",
   autoHideSettings: false,
+  favicon: {
+    mode: "default",
+    url: "",
+    data: null,
+  },
 };
 
 // Database storage

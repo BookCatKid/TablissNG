@@ -11,24 +11,24 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
     <div className="SearchSettings">
       <label>
         <FormattedMessage
-            id="plugins.search.provider"
-            defaultMessage="Search Provider"
-            description="Search Provider title"
-          />
+          id="plugins.search.provider"
+          defaultMessage="Search Provider"
+          description="Search Provider title"
+        />
         <select
           onChange={(event) =>
             setData({ ...data, searchEngine: event.target.value })
           }
           value={data.searchEngine}
         >
-          { BUILD_TARGET != "web" && (
+          {BUILD_TARGET != "web" && (
             <option key="default" value="default">
               <FormattedMessage
                 id="plugins.search.default"
                 defaultMessage="Browser Default"
                 description="Default search engine option"
               />
-          </option>
+            </option>
           )}
           {engines.map(({ key, name }) => (
             <option key={key} value={key}>
@@ -94,19 +94,21 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-    <label>
-      <FormattedMessage
-        id="plugins.search.keybind"
-        defaultMessage="Search keybind"
-        description="Search keybind title"
-      />
-      <input
-        type="text"
-        maxLength={1}
-        onChange={(event) => setData({ ...data, keyBind: event.target.value })}
-        value={data.keyBind}
-      />
-    </label>
+      <label>
+        <FormattedMessage
+          id="plugins.search.keybind"
+          defaultMessage="Search keybind"
+          description="Search keybind title"
+        />
+        <input
+          type="text"
+          maxLength={1}
+          onChange={(event) =>
+            setData({ ...data, keyBind: event.target.value })
+          }
+          value={data.keyBind}
+        />
+      </label>
 
       <label>
         <FormattedMessage

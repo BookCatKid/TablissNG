@@ -37,7 +37,13 @@ const Unsplash: React.FC<Props> = ({
     data,
     setData,
     loader,
-    deps: [data.by, data.collections, data.featured, data.search, (Array.isArray(data.topics) ? data.topics : [data.topics]).join(',')],
+    deps: [
+      data.by,
+      data.collections,
+      data.featured,
+      data.search,
+      (Array.isArray(data.topics) ? data.topics : [data.topics]).join(","),
+    ],
     buildUrl: (i: UnsplashImage) => buildLink(i.src),
   });
 

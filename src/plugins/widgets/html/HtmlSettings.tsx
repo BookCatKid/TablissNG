@@ -42,9 +42,7 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </p>
 
       <button className="button button--primary" onClick={handleSave}>
-        <FormattedMessage
-          {...pluginMessages.apply}
-        />
+        <FormattedMessage {...pluginMessages.apply} />
       </button>
     </div>
   );

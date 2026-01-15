@@ -10,9 +10,7 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
   return (
     <div className="TimeSettings">
       <label>
-        <FormattedMessage
-          {...pluginMessages.yourName}
-        />
+        <FormattedMessage {...pluginMessages.yourName} />
         <input
           type="text"
           value={data.name}
@@ -77,7 +75,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="color"
           value={data.onColor}
-          onChange={(event) => setData({ ...data, onColor: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, onColor: event.target.value })
+          }
         />
       </label>
 
@@ -90,7 +90,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="color"
           value={data.offColor}
-          onChange={(event) => setData({ ...data, offColor: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, offColor: event.target.value })
+          }
         />
       </label>
     </div>

@@ -6,11 +6,11 @@ import { DebounceInput } from "../../shared";
 const GiphySettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="GiphySettings">
     <label>
-    <FormattedMessage
-          id="backgrounds.giphy.tag"
-          defaultMessage="Tag"
-          description="Tag title"
-        />
+      <FormattedMessage
+        id="backgrounds.giphy.tag"
+        defaultMessage="Tag"
+        description="Tag title"
+      />
       <DebounceInput
         type="text"
         value={data.tag}
@@ -18,11 +18,13 @@ const GiphySettings: FC<Props> = ({ data = defaultData, setData }) => (
         wait={500}
       />
     </label>
-    <p className="info"><FormattedMessage
-          id="backgrounds.giphy.tag.info"
-          defaultMessage="Separate multiple tags with a comma"
-          description="Tag info"
-        /></p>
+    <p className="info">
+      <FormattedMessage
+        id="backgrounds.giphy.tag.info"
+        defaultMessage="Separate multiple tags with a comma"
+        description="Tag info"
+      />
+    </p>
 
     <label>
       <input
@@ -31,10 +33,10 @@ const GiphySettings: FC<Props> = ({ data = defaultData, setData }) => (
         onChange={() => setData({ ...data, nsfw: !data.nsfw })}
       />{" "}
       <FormattedMessage
-          id="backgrounds.giphy.safeSearch"
-          defaultMessage="Include NSFW content"
-          description="Include NSFW content checkbox label"
-        />
+        id="backgrounds.giphy.safeSearch"
+        defaultMessage="Include NSFW content"
+        description="Include NSFW content checkbox label"
+      />
     </label>
   </div>
 );

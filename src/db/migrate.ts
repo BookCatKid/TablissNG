@@ -28,7 +28,9 @@ const migrateWeb = async (): Promise<void> => {
         importStore(JSON.parse(data));
         migrateCache();
         clearDangling();
-      } catch {}
+      } catch {
+        //
+      }
     }
     localStorage.removeItem(key);
   }

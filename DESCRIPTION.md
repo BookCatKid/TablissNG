@@ -29,27 +29,27 @@ We care about your privacy and your experience. TablissNG is private, fast, and 
 
 ## Widgets
 
- - **Binary Clock**: Display the current time in binary format.
- - **Bitcoin Mempool**: Get the current block height.
- - **Countdown**: Literally counting down the days.
- - **Custom CSS**: Make your new tab more style-ish (advanced users).
- - **Custom HTML**: Add static HTML (advanced users).
- - **Custom Text**: Display random text from a list.
- - **Github Calendar**: Get motivated by green squares.
- - **Greeting**: Be personally greeted all day.
- - **IP Info**: Display your IP address and location details.
- - **Jokes**: Get a laugh with random jokes.
- - **Literature Clock**: Check the time, with sophistication.
- - **Message**: Add your own text.
- - **Notes**: Keep track of your thoughts and ideas.
- - **Quick Links**: Add custom links to your favorite sites.
- - **Quotes**: Be inspired (or not, there's categories).
- - **Search**: Search the web using your favorite engine.
- - **Time Since**: Track time elapsed since a specific date.
- - **Time**: Display the current time in various formats.
- - **todo**: Add reminders to procrastinate.
- - **Weather**: Display current weather conditions for your location.
- - **Work Hours**: Track your working hours and time remaining.
+- **Binary Clock**: Display the current time in binary format.
+- **Bitcoin Mempool**: Get the current block height.
+- **Countdown**: Literally counting down the days.
+- **Custom CSS**: Make your new tab more style-ish (advanced users).
+- **Custom HTML**: Add static HTML (advanced users).
+- **Custom Text**: Display random text from a list.
+- **Github Calendar**: Get motivated by green squares.
+- **Greeting**: Be personally greeted all day.
+- **IP Info**: Display your IP address and location details.
+- **Jokes**: Get a laugh with random jokes.
+- **Literature Clock**: Check the time, with sophistication.
+- **Message**: Add your own text.
+- **Notes**: Keep track of your thoughts and ideas.
+- **Quick Links**: Add custom links to your favorite sites.
+- **Quotes**: Be inspired (or not, there's categories).
+- **Search**: Search the web using your favorite engine.
+- **Time Since**: Track time elapsed since a specific date.
+- **Time**: Display the current time in various formats.
+- **todo**: Add reminders to procrastinate.
+- **Weather**: Display current weather conditions for your location.
+- **Work Hours**: Track your working hours and time remaining.
 
 ## Development & Contributing
 

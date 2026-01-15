@@ -9,7 +9,13 @@ type Props = {
   colorCircles: boolean;
 };
 
-const Analogue: FC<Props> = ({ time, showMinutes, showSeconds, colorCircles, color }) => {
+const Analogue: FC<Props> = ({
+  time,
+  showMinutes,
+  showSeconds,
+  colorCircles,
+  color,
+}) => {
   const hoursAngle = time.getHours() * 30 + time.getMinutes() * 0.5;
   const minutesAngle = time.getHours() * 360 + time.getMinutes() * 6;
   const secondsAngle =
@@ -18,7 +24,13 @@ const Analogue: FC<Props> = ({ time, showMinutes, showSeconds, colorCircles, col
   return (
     <div className="Time Analogue">
       <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="50" r="45" className="bezel theme-stroke" style={{ stroke: colorCircles ? color : "white" }} />
+        <circle
+          cx="50"
+          cy="50"
+          r="45"
+          className="bezel theme-stroke"
+          style={{ stroke: colorCircles ? color : "white" }}
+        />
 
         <line
           x1="50"
@@ -51,7 +63,13 @@ const Analogue: FC<Props> = ({ time, showMinutes, showSeconds, colorCircles, col
           />
         )}
 
-        <circle cx="50" cy="50" r="3" className="cap theme-fill" style={{ fill: colorCircles ? color : "white" }} />
+        <circle
+          cx="50"
+          cy="50"
+          r="3"
+          className="cap theme-fill"
+          style={{ fill: colorCircles ? color : "white" }}
+        />
       </svg>
     </div>
   );

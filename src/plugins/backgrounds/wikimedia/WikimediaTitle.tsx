@@ -8,10 +8,13 @@ interface Props {
 
 const Credit: React.FC<Props> = ({ title, copyright }) => (
   <div className="title" style={{ lineHeight: 0 }}>
-    <p className="wikimedia-credit-title" dangerouslySetInnerHTML={{ __html: title }}></p>
+    <p
+      className="wikimedia-credit-title"
+      dangerouslySetInnerHTML={{ __html: title }}
+    ></p>
     {copyright && (
       <p
-        className = "wikimedia-credit-copyright"
+        className="wikimedia-credit-copyright"
         style={{ textAlign: "right" }}
         dangerouslySetInnerHTML={{ __html: `&copy; ${copyright}` }}
       ></p>
@@ -20,4 +23,3 @@ const Credit: React.FC<Props> = ({ title, copyright }) => (
 );
 
 export default Credit;
-

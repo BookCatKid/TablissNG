@@ -10,39 +10,39 @@ const messages = defineMessages({
   cityOrLocation: {
     id: "plugins.weather.cityOrLocation",
     defaultMessage: "City or location",
-    description: "City or location placeholder"
+    description: "City or location placeholder",
   },
   latitude: {
     id: "plugins.weather.latitude",
     defaultMessage: "Latitude",
-    description: "Latitude title and placeholder"
+    description: "Latitude title and placeholder",
   },
   longitude: {
     id: "plugins.weather.longitude",
     defaultMessage: "Longitude",
-    description: "Longitude title and placeholder"
+    description: "Longitude title and placeholder",
   },
   enterCoordinates: {
     id: "plugins.weather.enterCoordinates",
     defaultMessage: "Enter coordinates",
-    description: "Link text to switch to coordinate input"
+    description: "Link text to switch to coordinate input",
   },
   searchForCity: {
     id: "plugins.weather.searchForCity",
     defaultMessage: "Search for city",
-    description: "Link text to switch to city search"
+    description: "Link text to switch to city search",
   },
   unableToFindLocation: {
     id: "plugins.weather.unableToFindLocation",
     defaultMessage: "Unable to find location. Please try again.",
-    description: "Message displayed when location cannot be found"
+    description: "Message displayed when location cannot be found",
   },
   cannotDetermineLocation: {
     id: "plugins.weather.cannotDetermineLocation",
     defaultMessage: "Cannot determine your location: {err}",
-    description: "Message displayed when location cannot be determined"
-  }
-})
+    description: "Message displayed when location cannot be determined",
+  },
+});
 
 type Props = {
   latitude?: number;
@@ -66,7 +66,9 @@ const GeocodeInput: React.FC<Props> = ({ onChange }) => {
   return (
     <form onSubmit={handleGeocode}>
       <div className="grid" style={{ gridTemplateColumns: "1fr auto" }}>
-        <label htmlFor="LocationInput__query"><FormattedMessage {...messages.searchForCity}/></label>
+        <label htmlFor="LocationInput__query">
+          <FormattedMessage {...messages.searchForCity} />
+        </label>
 
         <div />
 
@@ -98,7 +100,13 @@ const CoordinateInput: React.FC<Props> = ({
   const handleLocate = () => {
     requestLocation()
       .then(onChange)
-      .catch((err) => alert(intl.formatMessage(messages.cannotDetermineLocation, { err: err.message })));
+      .catch((err) =>
+        alert(
+          intl.formatMessage(messages.cannotDetermineLocation, {
+            err: err.message,
+          }),
+        ),
+      );
   };
 
   return (
@@ -111,9 +119,13 @@ const CoordinateInput: React.FC<Props> = ({
             : "1fr 1fr",
         }}
       >
-        <label htmlFor="LocationInput__latitude"><FormattedMessage {...messages.latitude} /></label>
+        <label htmlFor="LocationInput__latitude">
+          <FormattedMessage {...messages.latitude} />
+        </label>
 
-        <label htmlFor="LocationInput__longitude"><FormattedMessage {...messages.longitude} /></label>
+        <label htmlFor="LocationInput__longitude">
+          <FormattedMessage {...messages.longitude} />
+        </label>
 
         {geolocationAvailable && <div />}
 
@@ -168,7 +180,11 @@ const LocationInput: React.FC<Props> = ({ onChange, ...props }) => {
       )}
 
       <a onClick={toggleLookUp}>
-        {lookUp ? <FormattedMessage {...messages.enterCoordinates} /> : <FormattedMessage {...messages.searchForCity} />}
+        {lookUp ? (
+          <FormattedMessage {...messages.enterCoordinates} />
+        ) : (
+          <FormattedMessage {...messages.searchForCity} />
+        )}
       </a>
     </div>
   );

@@ -23,7 +23,12 @@ const WorkHours: React.FC<Props> = ({ data = defaultData }) => {
   );
 };
 
-const hoursProgress = (current: Date, start: Date, end: Date, flipPercentage: boolean): number => {
+const hoursProgress = (
+  current: Date,
+  start: Date,
+  end: Date,
+  flipPercentage: boolean,
+): number => {
   if (current < start) return 0;
   if (current > end) return 100;
 
