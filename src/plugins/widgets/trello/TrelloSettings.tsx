@@ -25,7 +25,6 @@ const TrelloSettings: FC<Props> = ({
   cache = defaultCache,
   setCache,
 }) => {
-  const MAX_LISTS = 6; // maximum lists a user can select
   const {
     authStatus: authState,
     authError,
@@ -76,7 +75,6 @@ const TrelloSettings: FC<Props> = ({
         (job) => job.listId === listID && pendingJobsRef.current.delete(job),
       );
     } else {
-      if (updatedListCount + 1 > MAX_LISTS) return;
       pendingJobsRef.current.add(createFetchJob(listID));
     }
 
@@ -152,8 +150,8 @@ const TrelloSettings: FC<Props> = ({
       <label>
         <FormattedMessage
           id="plugins.trello.boardSelect"
-          defaultMessage="Select your board"
-          description="Select your board"
+          defaultMessage="Select board"
+          description="Select board"
         />
         <div>
           {boardsLoading ? (
@@ -182,8 +180,8 @@ const TrelloSettings: FC<Props> = ({
         <label>
           <FormattedMessage
             id="plugins.trello.listSelect"
-            defaultMessage={"Select up to 6 lists to watch"}
-            description={`Select up to ${MAX_LISTS} lists to watch`}
+            defaultMessage={"Select lists"}
+            description={`Select lists`}
           />
           <div className="list-select-container">
             {listsLoading || boardsLoading ? (
