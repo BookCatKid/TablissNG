@@ -4,14 +4,14 @@ import "./Trello.sass";
 
 import DisplayList from "./ui/DisplayList/DisplayList";
 import { getItems } from "./utils/api";
-import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
+import { trelloAuthStore } from "./stores/trelloAuthStore";
 import useAuth from "../../../hooks/useAuth";
 import { FormattedMessage } from "react-intl";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
-    useTrelloAuthStore,
+    trelloAuthStore,
   );
 
   // fetch data on page load

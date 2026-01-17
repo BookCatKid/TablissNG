@@ -14,7 +14,7 @@ import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import { Spinner } from "../../shared";
 import useAuth from "../../../hooks/useAuth";
-import { useTrelloAuthStore } from "./stores/useTrelloAuthStore";
+import { trelloAuthStore } from "./stores/trelloAuthStore";
 import useBoards from "./hooks/useBoards";
 import useLists from "./hooks/useLists";
 import { trelloAuthFlow, onTrelloSignOut } from "./utils/auth";
@@ -30,7 +30,7 @@ const TrelloSettings: FC<Props> = ({
     authError,
     signIn,
     signOut,
-  } = useAuth<TrelloSession>("trello", useTrelloAuthStore);
+  } = useAuth<TrelloSession>("trello", trelloAuthStore);
 
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
 

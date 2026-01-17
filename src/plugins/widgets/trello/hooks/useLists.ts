@@ -3,7 +3,7 @@ import { Data, Cache, List, FetchJob, TrelloSession } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 import { createFetchJob } from "../types";
-import { useTrelloAuthStore } from "../stores/useTrelloAuthStore";
+import { trelloAuthStore } from "../stores/trelloAuthStore";
 import useAuth from "../../../../hooks/useAuth";
 
 export default function useLists(
@@ -13,7 +13,7 @@ export default function useLists(
 ) {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
-    useTrelloAuthStore,
+    trelloAuthStore,
   );
   const [lists, setLists] = useState<List[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
