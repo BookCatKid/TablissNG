@@ -59,7 +59,6 @@ For now the only way to install the safari extension is to install developer mod
 5. You should be brought to the `Extensions` tab and now click on the checkbox next to extension to enable it.
 6. Click `Use for new windows and tabs` to allow TablissNG to overide your new tab page. (If its not working select TablissNG for the two `New * open with` options)
 
-
 ## Notes
 
 - If you need extra help just create an issue and I will help.
