@@ -1,0 +1,79 @@
+/* MoveableWrapper styles for react-moveable controls */
+
+/* Control box styling */
+.moveable-control-box {
+  --moveable-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Line styling (edges of the control box) */
+.moveable-line {
+  background: rgba(255, 255, 255, 0.6) !important;
+  height: 1px !important;
+}
+
+/* Control point styling (corners and rotate handle) */
+.moveable-control {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(100, 100, 100, 0.8) !important;
+  border-radius: 50% !important;
+  width: 12px !important;
+  height: 12px !important;
+  margin-top: -6px !important;
+  margin-left: -6px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Rotation control styling */
+.moveable-rotation-control {
+  width: 16px !important;
+  height: 16px !important;
+  margin-top: -8px !important;
+  margin-left: -8px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(100, 100, 100, 0.8) !important;
+}
+
+/* Rotation line */
+.moveable-rotation-line {
+  background: rgba(255, 255, 255, 0.6) !important;
+  width: 1px !important;
+  height: 30px !important;
+}
+
+/* Hover states */
+.moveable-control:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  transform: scale(1.2);
+  transition: transform 0.15s ease;
+}
+
+/* Guideline styling */
+.moveable-guideline {
+  background: #3498db !important;
+  z-index: 9999 !important;
+  opacity: 1 !important;
+  box-shadow: 0 0 4px rgba(52, 152, 219, 0.5) !important;
+}
+
+.moveable-guideline.moveable-horizontal {
+  height: 1px !important;
+  width: 100vw !important;
+  left: 0 !important;
+}
+
+.moveable-guideline.moveable-vertical {
+  width: 1px !important;
+  height: 100vh !important;
+  top: 0 !important;
+}
+
+/* Snap digit styling */
+.moveable-snap-digit {
+  color: #3498db !important;
+  font-size: 10px !important;
+  font-weight: bold !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  padding: 2px 4px !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2) !important;
+}

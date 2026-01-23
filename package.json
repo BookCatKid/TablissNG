@@ -52,6 +52,7 @@
     "react-github-calendar": "^5.0.2",
     "react-intl": "^7.1.14",
     "react-markdown": "^10.1.0",
+    "react-moveable": "^0.56.0",
     "tlds": "^1.261.0",
     "webextension-polyfill": "^0.12.0"
   },

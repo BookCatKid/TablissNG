@@ -25,7 +25,7 @@ const messages = defineMessages({
 
 const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
     const intl = useIntl();
-  
+
   return (
     <div className="WidgetDisplay">
       <PositionInput
@@ -66,7 +66,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
             <p className="info">
               <FormattedMessage
                 id="settings.position.drag"
-                defaultMessage="Drag the widget to adjust its position"
+                defaultMessage="Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate."
                 description="Help text shown when editing widget position"
               />
             </p>
