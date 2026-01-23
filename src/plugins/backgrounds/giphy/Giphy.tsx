@@ -25,11 +25,7 @@ const Giphy: React.FC<Props> = ({
 
   return (
     <div className="Giphy fullscreen">
-      <Backdrop
-        className="gif fullscreen"
-        url={url}
-      >
-      </Backdrop>
+      <Backdrop className="gif fullscreen" url={url}></Backdrop>
       <Credit link={gif.link} />
     </div>
   );

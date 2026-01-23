@@ -11,10 +11,10 @@ const NbaSettings: FC<Props> = ({ data = defaultData, setData }) => (
         onChange={() => setData({ ...data, displayLogo: !data.displayLogo })}
       />{" "}
       <FormattedMessage
-          id="plugins.nba.displayTeamLogo"
-          defaultMessage="Display team logo"
-          description="Display team logo title"
-        />
+        id="plugins.nba.displayTeamLogo"
+        defaultMessage="Display team logo"
+        description="Display team logo title"
+      />
     </label>
   </div>
 );

@@ -37,7 +37,7 @@ const messages = defineMessages({
     id: "settings.actions.moveUp",
     defaultMessage: "Move widget up",
     description: "Button title for moving widget up",
-  }
+  },
 });
 
 interface Config {
@@ -78,7 +78,9 @@ const Widget: React.FC<Props> = ({
 
         <IconButton
           onClick={toggleIsOpen}
-          title={intl.formatMessage(isOpen ? messages.closeSettings : messages.editSettings)}
+          title={intl.formatMessage(
+            isOpen ? messages.closeSettings : messages.editSettings,
+          )}
         >
           <Icon name="settings" />
         </IconButton>
@@ -219,7 +221,9 @@ const Widget: React.FC<Props> = ({
                   type="checkbox"
                   checked={plugin.display.fontStyle === "italic"}
                   onChange={(event) =>
-                    setDisplay({ fontStyle: event.target.checked ? "italic" : "normal" })
+                    setDisplay({
+                      fontStyle: event.target.checked ? "italic" : "normal",
+                    })
                   }
                 />{" "}
                 <FormattedMessage
@@ -234,7 +238,11 @@ const Widget: React.FC<Props> = ({
                   type="checkbox"
                   checked={plugin.display.textDecoration === "underline"}
                   onChange={(event) =>
-                    setDisplay({ textDecoration: event.target.checked ? "underline" : "none" })
+                    setDisplay({
+                      textDecoration: event.target.checked
+                        ? "underline"
+                        : "none",
+                    })
                   }
                 />{" "}
                 <FormattedMessage
@@ -245,11 +253,12 @@ const Widget: React.FC<Props> = ({
               </label>
 
               <label>
-              <FormattedMessage
-          id="colour"
-          defaultMessage="Colour"
-          description="Colour title"
-        /> <br />
+                <FormattedMessage
+                  id="colour"
+                  defaultMessage="Colour"
+                  description="Colour title"
+                />{" "}
+                <br />
                 <input
                   type="color"
                   value={plugin.display.colour ?? "#ffffff"}

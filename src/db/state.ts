@@ -27,6 +27,23 @@ export interface State {
   themePreference: "light" | "dark" | "system";
   /** Whether to auto-hide settings menu when not hovering */
   autoHideSettings: boolean;
+  /** Favicon settings */
+  favicon: FaviconState;
+}
+
+export type FaviconMode =
+  | "default"
+  | "size32"
+  | "size48"
+  | "size96"
+  | "size128"
+  | "custom"
+  | "url";
+
+export interface FaviconState {
+  mode: FaviconMode;
+  url: string;
+  data: string | null;
 }
 
 export interface BackgroundState {
@@ -42,7 +59,19 @@ export interface BackgroundDisplay {
   scale?: boolean;
   nightStart?: string; // format "HH:mm" e.g. "21:00"
   nightEnd?: string; // format "HH:mm" e.g. "05:00"
+  position?: BackgroundPosition;
 }
+
+export type BackgroundPosition =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "top left"
+  | "top right"
+  | "bottom left"
+  | "bottom right";
 
 export interface WidgetState {
   id: string;
@@ -98,6 +127,7 @@ const initData: State = {
       scale: true,
       nightStart: "21:00", // 9 PM
       nightEnd: "05:00", // 5 AM
+      position: "center",
     },
   },
   "widget/default-time": {
@@ -124,6 +154,11 @@ const initData: State = {
   settingsIconPosition: "topLeft",
   themePreference: "system",
   autoHideSettings: false,
+  favicon: {
+    mode: "default",
+    url: "",
+    data: null,
+  },
 };
 
 // Database storage

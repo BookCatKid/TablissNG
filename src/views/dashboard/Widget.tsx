@@ -3,6 +3,7 @@ import { WidgetDisplay } from "../../db/state";
 import { setWidgetDisplay } from "../../db/action";
 import FloatingSaveButton from "../shared/FloatingSaveButton";
 import MoveableWrapper from "./MoveableWrapper";
+import { parseFontFamilyAndFeatures } from "../../utils";
 
 interface WidgetProps extends WidgetDisplay {
   id: string;
@@ -96,6 +97,8 @@ const Widget: React.FC<WidgetProps> = ({
     };
   }, [position, getPixelPosition]);
 
+  const parsedFont = parseFontFamilyAndFeatures(fontFamily || "");
+
   // Handle transform updates from MoveableWrapper
   const handleTransformEnd = React.useCallback(
     (transform: {
@@ -142,11 +145,12 @@ const Widget: React.FC<WidgetProps> = ({
   const styles: React.CSSProperties = {
     position: position === "free" ? "absolute" : "relative",
     color: colour,
-    fontFamily,
+    fontFamily: parsedFont.family || fontFamily,
     fontSize: `${fontSize}px`,
     fontWeight,
     fontStyle,
     textDecoration,
+    ...parsedFont.style,
     // Only apply scale/rotation if NOT editing (moveable handles this during edit)
     transform: isEditingPosition
       ? undefined

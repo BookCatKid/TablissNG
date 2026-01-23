@@ -17,12 +17,11 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
       {data.latitude && data.latitude ? (
         <>
           <label>
-
-          <FormattedMessage
-            id="plugins.weather.locationName"
-            defaultMessage="Location display name"
-            description="Location name title"
-          />
+            <FormattedMessage
+              id="plugins.weather.locationName"
+              defaultMessage="Location display name"
+              description="Location name title"
+            />
 
             <input
               type="text"
@@ -49,16 +48,13 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               defaultMessage="Show extended details"
               description="Show extended details title"
             />
-
           </label>
 
           <label>
             <input
               type="checkbox"
               checked={data.showCity}
-              onChange={() =>
-                setData({ ...data, showCity: !data.showCity })
-              }
+              onChange={() => setData({ ...data, showCity: !data.showCity })}
             />{" "}
             <FormattedMessage
               id="plugins.weather.showCity"
@@ -67,7 +63,6 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
             />
           </label>
 
-
           <label>
             <input
               type="radio"
@@ -75,11 +70,10 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               onChange={() => setData({ ...data, units: "si" })}
             />{" "}
             <FormattedMessage
-            id="plugins.weather.metricUnits"
-            defaultMessage="Metric units"
-            description="Metric units title"
-          />
-
+              id="plugins.weather.metricUnits"
+              defaultMessage="Metric units"
+              description="Metric units title"
+            />
           </label>
 
           <label>
@@ -89,10 +83,10 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               onChange={() => setData({ ...data, units: "us" })}
             />{" "}
             <FormattedMessage
-            id="plugins.weather.imperialUnits"
-            defaultMessage="Imperial units"
-            description="Imperial units title"
-          />
+              id="plugins.weather.imperialUnits"
+              defaultMessage="Imperial units"
+              description="Imperial units title"
+            />
           </label>
 
           <p>
@@ -102,10 +96,10 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               target="_blank"
             >
               <FormattedMessage
-            id="plugins.weather.dataBy"
-            defaultMessage="Weather data by Open-Meteo.com"
-            description="Weather data title"
-          />
+                id="plugins.weather.dataBy"
+                defaultMessage="Weather data by Open-Meteo.com"
+                description="Weather data title"
+              />
             </a>
           </p>
         </>

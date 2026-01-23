@@ -14,7 +14,10 @@ type Options<T, D extends RotationData> = {
   buildUrl?: (item: T) => string | null;
 };
 
-export function useBackgroundRotation<T, D extends RotationData = RotationData>({
+export function useBackgroundRotation<
+  T,
+  D extends RotationData = RotationData,
+>({
   fetch,
   cacheObj,
   data,
@@ -23,7 +26,11 @@ export function useBackgroundRotation<T, D extends RotationData = RotationData>(
   deps = [],
   buildUrl,
 }: Options<T, D>) {
-  const timeout = data ? (data.paused ? Number.MAX_SAFE_INTEGER : (data.timeout ?? 0) * 1000) : 0;
+  const timeout = data
+    ? data.paused
+      ? Number.MAX_SAFE_INTEGER
+      : (data.timeout ?? 0) * 1000
+    : 0;
 
   const item = useRotatingCache<T>(fetch, cacheObj, timeout, deps);
 
@@ -52,7 +59,12 @@ export function useBackgroundRotation<T, D extends RotationData = RotationData>(
     (amount: number) => {
       const cache = cacheObj.cache;
       if (cache && cache.items[cache.cursor + amount]) {
-        return () => cacheObj.setCache({ ...cache, cursor: cache.cursor + amount, rotated: Date.now() });
+        return () =>
+          cacheObj.setCache({
+            ...cache,
+            cursor: cache.cursor + amount,
+            rotated: Date.now(),
+          });
       }
       return null;
     },

@@ -5,7 +5,10 @@ import { DebounceInput } from "../../shared";
 import { WikimediaDate, defaultData, Props } from "./types";
 import { backgroundMessages } from "../../../locales/messages";
 
-const WikimediaSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
+const WikimediaSettings: React.FC<Props> = ({
+  data = defaultData,
+  setData,
+}) => (
   <div className="ApodSettings">
     <label>
       <FormattedMessage {...backgroundMessages.dateOfPicture} />

@@ -93,6 +93,60 @@ export async function addIconData(iconName: string) {
   }
 }
 
+/**
+ * Parse a font-family string that may include OpenType features using the
+ * syntax `Family:feat1&feat2` (e.g. `Cambria:onum&smcp`). If the family
+ * name contains quoted text ("..."), any colon inside quotes is ignored.
+ * Returns the family (trimmed) and a ready-to-spread `style` object when
+ * OpenType features are present (e.g. `{ fontFeatureSettings: "'onum' 1" }`).
+ */
+export function parseFontFamilyAndFeatures(value: string | undefined) {
+  if (!value) return { family: "", style: undefined };
+
+  const str = value.trim();
+  let family = str;
+  let features: string | undefined;
+
+  // quoted font name (supports single or double quotes)
+  if (str.startsWith('"') || str.startsWith("'")) {
+    const quote = str[0];
+    const end = str.indexOf(quote, 1);
+    if (end !== -1) {
+      family = str.slice(1, end);
+      if (str[end + 1] === ":")
+        features = (str.slice(end + 2) || undefined)?.trim();
+    }
+  } else {
+    const idx = str.lastIndexOf(":");
+    if (idx !== -1) {
+      family = str.slice(0, idx).trim();
+      features = (str.slice(idx + 1) || undefined)?.trim();
+    }
+  }
+
+  const rawFeatures = features || undefined;
+
+  // Inline formatting: convert shorthand like "onum&smcp" into
+  // a CSS `font-feature-settings` string: `'onum' 1, 'smcp' 1`.
+  let formatted: string | undefined;
+  if (rawFeatures) {
+    const s = rawFeatures.trim();
+    if (s) {
+      formatted = s
+        .split(/&|\s+/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((p) => `'${p}' 1`)
+        .join(", ");
+    }
+  }
+
+  return {
+    family,
+    style: formatted ? { fontFeatureSettings: formatted } : undefined,
+  };
+}
+
 export function selectUnit(from: number, to: number) {
   const secs = (from - to) / 1000;
   if (Math.abs(secs) < 45) {

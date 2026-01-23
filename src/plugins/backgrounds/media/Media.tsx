@@ -14,17 +14,14 @@ const Media: React.FC<Props> = ({ cache = defaultCache }) => {
   const item = cache[index];
   const url = useObjectUrl(item);
   const background = useValue(db, "background");
-  const { scale } = background.display;
+  const { scale, position } = background.display;
 
   if (!item || !url) return null;
 
   const isVideo = item.type.match(/^video\/(mp4|webm|ogg)$/);
 
   return (
-    <Backdrop
-      className="Image fullscreen"
-      url={isVideo ? undefined : url}
-    >
+    <Backdrop className="Image fullscreen" url={isVideo ? undefined : url}>
       {isVideo && (
         <video
           autoPlay
@@ -32,7 +29,8 @@ const Media: React.FC<Props> = ({ cache = defaultCache }) => {
           className="video"
           src={url}
           style={{
-            objectFit: scale ? "cover" : "contain"
+            objectFit: scale ? "cover" : "contain",
+            objectPosition: position,
           }}
         />
       )}

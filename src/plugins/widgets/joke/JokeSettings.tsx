@@ -67,29 +67,19 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           }
         >
           <option value={5 * MINUTES}>
-            <FormattedMessage
-              {...timingMessages.every5min}
-            />
+            <FormattedMessage {...timingMessages.every5min} />
           </option>
           <option value={15 * MINUTES}>
-            <FormattedMessage
-              {...timingMessages.every15min}
-            />
+            <FormattedMessage {...timingMessages.every15min} />
           </option>
           <option value={HOURS}>
-            <FormattedMessage
-              {...timingMessages.everyHour}
-            />
+            <FormattedMessage {...timingMessages.everyHour} />
           </option>
           <option value={24 * HOURS}>
-            <FormattedMessage
-              {...timingMessages.everyDay}
-            />
+            <FormattedMessage {...timingMessages.everyDay} />
           </option>
           <option value={7 * 24 * HOURS}>
-            <FormattedMessage
-              {...timingMessages.everyWeek}
-            />
+            <FormattedMessage {...timingMessages.everyWeek} />
           </option>
         </select>
       </label>
@@ -118,7 +108,9 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
               />{" "}
               <FormattedMessage
                 id={category.name}
-                defaultMessage={category.key.charAt(0).toUpperCase() + category.key.slice(1)}
+                defaultMessage={
+                  category.key.charAt(0).toUpperCase() + category.key.slice(1)
+                }
               />
             </label>
           );
@@ -134,17 +126,19 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="text"
           maxLength={1}
-          onChange={(event) => setData({ ...data, keyBind: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, keyBind: event.target.value })
+          }
           value={data.keyBind}
         />
       </label>
 
       <label>
         <FormattedMessage
-            id="plugins.joke.maxLength"
-            defaultMessage="Max preview length"
-            description="Maximum length of joke to show on preview"
-          />
+          id="plugins.joke.maxLength"
+          defaultMessage="Max preview length"
+          description="Maximum length of joke to show on preview"
+        />
         <input
           type="number"
           min="0"
@@ -157,9 +151,7 @@ const JokeSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <p>
-        <FormattedMessage
-          {...pluginMessages.poweredBy}
-        />{" "}
+        <FormattedMessage {...pluginMessages.poweredBy} />{" "}
         <a
           href="https://jokeapi.dev/"
           target="_blank"

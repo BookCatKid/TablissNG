@@ -1,17 +1,17 @@
 .Bookmarks
-  text-align: left
-  padding-right: 10px
+  &:not(.quick-links)
+    text-align: left
+    padding-right: 10px
 
-  i, img
-    margin-top: 0.1em
-    margin-right: 0.5em
-    width: 16px
-    height: 16px
-    display: inline-block
-    vertical-align: text-bottom
+  .folder, .bookmark
+    i, img
+      margin-top: 0.1em
+      margin-right: 0.5em
+      display: inline-block
+      vertical-align: text-bottom
 
-  img
-    object-fit: contain
+    img
+      object-fit: contain
 
   .folder
     margin-top: 0.6em

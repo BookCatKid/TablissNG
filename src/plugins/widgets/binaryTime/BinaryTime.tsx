@@ -24,14 +24,18 @@ interface BinaryDigitGroupProps {
 
 const Pip: FC<PipProps> = ({ isOn, onColor, offColor }) => (
   <div
-    className={`pip ${isOn ? 'pip--on' : ''}`}
+    className={`pip ${isOn ? "pip--on" : ""}`}
     style={{
-      backgroundColor: isOn ? onColor : offColor
+      backgroundColor: isOn ? onColor : offColor,
     }}
   ></div>
 );
 
-const BinaryDigit: FC<BinaryDigitProps> = ({ base2NumberAsArray, onColor, offColor }) => (
+const BinaryDigit: FC<BinaryDigitProps> = ({
+  base2NumberAsArray,
+  onColor,
+  offColor,
+}) => (
   <div className="binary-digit">
     {base2NumberAsArray.map((pip, idx) => (
       <Pip key={idx} isOn={pip === 1} onColor={onColor} offColor={offColor} />
@@ -39,10 +43,19 @@ const BinaryDigit: FC<BinaryDigitProps> = ({ base2NumberAsArray, onColor, offCol
   </div>
 );
 
-const BinaryDigitGroup: FC<BinaryDigitGroupProps> = ({ group, onColor, offColor }) => (
+const BinaryDigitGroup: FC<BinaryDigitGroupProps> = ({
+  group,
+  onColor,
+  offColor,
+}) => (
   <div className="binary-digit-group">
     {group.map((binaryDigit, idx) => (
-      <BinaryDigit key={idx} base2NumberAsArray={binaryDigit} onColor={onColor} offColor={offColor} />
+      <BinaryDigit
+        key={idx}
+        base2NumberAsArray={binaryDigit}
+        onColor={onColor}
+        offColor={offColor}
+      />
     ))}
   </div>
 );
@@ -69,7 +82,7 @@ function numberAsBinaryArrayPair(number: number): number[][] {
     pair[0] = numberToBinary(0);
     pair[1] = numberToBinary(number);
   } else {
-    const numberAsArray = String(number).split('');
+    const numberAsArray = String(number).split("");
     pair[0] = numberToBinary(parseInt(numberAsArray[0], 10));
     pair[1] = numberToBinary(parseInt(numberAsArray[1], 10));
   }
@@ -78,7 +91,15 @@ function numberAsBinaryArrayPair(number: number): number[][] {
 }
 
 const BinaryTime: FC<Props> = ({ data = defaultData }) => {
-  const { name, showHours, showMinutes, showSeconds, onColor, offColor, timeZone } = data;
+  const {
+    name,
+    showHours,
+    showMinutes,
+    showSeconds,
+    onColor,
+    offColor,
+    timeZone,
+  } = data;
   const [digits, setDigits] = useState<number[][][]>([[], [], []]);
 
   let time = useTime(timeZone ? "absolute" : "zoned");
@@ -96,7 +117,7 @@ const BinaryTime: FC<Props> = ({ data = defaultData }) => {
       const newDigits = [
         ...(showHours ? [numberAsBinaryArrayPair(hours)] : []),
         ...(showMinutes ? [numberAsBinaryArrayPair(minutes)] : []),
-        ...(showSeconds ? [numberAsBinaryArrayPair(seconds)] : [])
+        ...(showSeconds ? [numberAsBinaryArrayPair(seconds)] : []),
       ];
 
       setDigits(newDigits);
@@ -109,7 +130,12 @@ const BinaryTime: FC<Props> = ({ data = defaultData }) => {
     <div className="BinaryTime">
       <div className="binary-clock">
         {digits.map((digit, idx) => (
-          <BinaryDigitGroup key={idx} group={digit} onColor={onColor} offColor={offColor} />
+          <BinaryDigitGroup
+            key={idx}
+            group={digit}
+            onColor={onColor}
+            offColor={offColor}
+          />
         ))}
       </div>
       {name && <h2>{name}</h2>}

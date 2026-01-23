@@ -3,7 +3,9 @@ import { reducer } from "./reducer";
 
 describe("links/reducer()", () => {
   it("should add new links", () => {
-    expect(reducer([], addLink())).toEqual([{ id: expect.any(String), url: "https://" }]);
+    expect(reducer([], addLink())).toEqual([
+      { id: expect.any(String), url: "https://" },
+    ]);
     expect(
       reducer([{ id: "1", url: "https://tabliss.io/" }], { type: "ADD_LINK" }),
     ).toEqual([
@@ -87,7 +89,10 @@ describe("links/reducer()", () => {
   });
 
   it("should handle removing the last link", () => {
-    const state = reducer([{ id: "1", url: "https://tabliss.io/" }], removeLink(0));
+    const state = reducer(
+      [{ id: "1", url: "https://tabliss.io/" }],
+      removeLink(0),
+    );
     expect(state).toEqual([]);
   });
 

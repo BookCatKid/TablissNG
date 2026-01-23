@@ -1,15 +1,18 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
+import eslintReact from "@eslint-react/eslint-plugin";
+import eslint from "@eslint/js";
+import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
-import pluginReact from "eslint-plugin-react";
 
-
-/** @type {import('eslint').Linter.Config[]} */
-export default [
-  {files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"]},
-  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
-  {languageOptions: { globals: globals.browser }},
-  pluginJs.configs.recommended,
-  ...tseslint.configs.recommended,
-  pluginReact.configs.flat.recommended,
-];
+/** @type {import('eslint').Linter.Config} */
+export default defineConfig(
+  eslint.configs.recommended,
+  tseslint.configs.recommended,
+  eslintReact.configs["recommended-typescript"],
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+      "@typescript-eslint/ban-ts-comment": "warn",
+    },
+  },
+);

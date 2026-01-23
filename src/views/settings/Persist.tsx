@@ -42,7 +42,6 @@ const Persist: React.FC = () => {
     check();
   }, []);
 
-
   const handleClick = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -82,50 +81,50 @@ const Persist: React.FC = () => {
         />
       </p>
 
-          {persisted === true ? (
-            <p className="info">
+      {persisted === true ? (
+        <p className="info">
+          <FormattedMessage
+            id="settings.persist.persisted"
+            defaultMessage="Settings are persisted"
+            description="Message shown when settings are persisted"
+          />
+        </p>
+      ) : (
+        <>
+          <button
+            className="button button--primary"
+            onClick={handleClick}
+            disabled={loading}
+          >
+            {loading ? (
               <FormattedMessage
-                id="settings.persist.persisted"
-                defaultMessage="Settings are persisted"
-                description="Message shown when settings are persisted"
+                id="settings.persist.persisting"
+                defaultMessage="Persisting…"
+                description="Button text shown while requesting persistent storage"
               />
-            </p>
-          ) : (
-            <>
-              <button
-                className="button button--primary"
-                onClick={handleClick}
-                disabled={loading}
-              >
-                {loading ? (
-                  <FormattedMessage
-                    id="settings.persist.persisting"
-                    defaultMessage="Persisting…"
-                    description="Button text shown while requesting persistent storage"
-                  />
-                ) : (
-                  <FormattedMessage
-                    id="settings.persist.button"
-                    defaultMessage="Persist Settings"
-                    description="Persist Settings button"
-                  />
-                )}
-              </button>
+            ) : (
+              <FormattedMessage
+                id="settings.persist.button"
+                defaultMessage="Persist Settings"
+                description="Persist Settings button"
+              />
+            )}
+          </button>
 
-              {errorMessage ? (
-                <div>
-                  <p>
-                    <FormattedMessage
-                      id="settings.persist.error"
-                      defaultMessage="Could not persist settings at this time."
-                      description="Persist Settings error"
-                    />
-                  </p>
-                  <p className="info">{errorMessage}</p>
-                </div>
-              ) : null}
-            </>
-          )}
+          {errorMessage ? (
+            <div>
+              <p>
+                <FormattedMessage
+                  id="settings.persist.error"
+                  defaultMessage="Could not persist settings at this time."
+                  description="Persist Settings error"
+                />
+              </p>
+              <p className="info">{errorMessage}</p>
+            </div>
+          ) : null}
+        </>
+      )}
     </div>
   );
 };

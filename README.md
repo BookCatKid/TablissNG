@@ -1,4 +1,6 @@
-# TablissNG
+<p align="left">
+  <img src="src/views/shared/tabliss.svg" alt="TablissNG logo" width="400" />
+</p>
 
 > A beautiful, customisable New Tab page for Firefox and Chrome.
 
@@ -70,7 +72,11 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 <a href="https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png" alt="Get the Extension on Chrome" height="70" style="border: 1px solid transparent; border-radius:6px;"></a>
 <a href="https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Get_it_from_Microsoft_Badge.svg/320px-Get_it_from_Microsoft_Badge.svg.png" alt="Get the Extension on Edge" height="70" style="border: 1px solid transparent; border-radius:4px;"></a>
 
-The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tabliss-a-beautiful-new/mkaphhbkcccpgkfaifhhdfckagnkcmhm) (edge addon might be outdated, contact me if you are actually using it.). If you want to use safari, see [INSTALL.md](INSTALL.md).
+The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm). If you want to use safari, see [INSTALL.md](INSTALL.md).
+
+**Nightly Builds (Firefox):**
+- **Nightly** (v1.6.1.1): [Install Nightly](https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.1.xpi)
+
 If you want to install the extension manually, or want nightly builds, see [INSTALL.md](INSTALL.md).
 
 ## Running Locally
@@ -131,6 +137,7 @@ Then, fill in your API keys:
 GIPHY_API_KEY=your_key_here
 UNSPLASH_API_KEY=your_key_here
 NASA_API_KEY=your_key_here
+TRELLO_API_KEY=your_key_here # this requires the correct redirect URI to be set up in your Trello app settings: https://53dad6be72180770ccc08f0a6e2fc8a64dcf7b42.extensions.allizom.org and https://dlaogejjiafeobgofajdlkkhjlignalk.chromiumapp.org should work for firefox and chromium respectively.
 ```
 
 ## Credits

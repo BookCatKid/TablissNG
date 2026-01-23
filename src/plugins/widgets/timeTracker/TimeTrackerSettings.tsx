@@ -13,10 +13,10 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
     const date = new Date(timestamp);
     // Format to local timezone YYYY-MM-DDThh:mm
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
@@ -24,9 +24,9 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
   // Update timestamp from date string, preserving the timezone
   const updateDateTime = (dateTimeString: string) => {
     // Parse the input value as a local date
-    const [datePart, timePart] = dateTimeString.split('T');
-    const [year, month, day] = datePart.split('-').map(Number);
-    const [hours, minutes] = timePart.split(':').map(Number);
+    const [datePart, timePart] = dateTimeString.split("T");
+    const [year, month, day] = datePart.split("-").map(Number);
+    const [hours, minutes] = timePart.split(":").map(Number);
 
     // Create date in local timezone
     const date = new Date();
@@ -56,7 +56,7 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <label>
-        <FormattedMessage  {...pluginMessages.timeZone} />
+        <FormattedMessage {...pluginMessages.timeZone} />
         <TimeZoneInput
           timeZone={data.timeZone}
           onChange={(timeZone) => setData({ ...data, timeZone })}
@@ -74,7 +74,7 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
           onChange={(event) => setData({ ...data, title: event.target.value })}
           placeholder={intl.formatMessage({
             id: "plugins.timeTracker.eventNamePlaceholder",
-            defaultMessage: "Event name"
+            defaultMessage: "Event name",
           })}
         />
       </label>
@@ -118,7 +118,10 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <select
           value={data.displayMode}
           onChange={(event) =>
-            setData({ ...data, displayMode: event.target.value as "compact" | "detailed" })
+            setData({
+              ...data,
+              displayMode: event.target.value as "compact" | "detailed",
+            })
           }
         >
           <option value="compact">

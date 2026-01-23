@@ -3,7 +3,5 @@
   "transform": {
     "^.+\\.(t|j)sx?$": ["@swc/jest"]
   },
-  "transformIgnorePatterns": [
-    "node_modules/(?!(nanoid)/)"
-  ]
+  "transformIgnorePatterns": ["node_modules/(?!(nanoid)/)"]
 }

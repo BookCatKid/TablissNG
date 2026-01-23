@@ -9,7 +9,9 @@ const GradientSettings: FC<Props> = ({ data = defaultData, setData }) => (
       <input
         type="checkbox"
         checked={data.isRandom}
-        onChange={(event) => setData({ ...data, isRandom: event.target.checked })}
+        onChange={(event) =>
+          setData({ ...data, isRandom: event.target.checked })
+        }
       />{" "}
       <FormattedMessage
         id="backgrounds.gradient.useRandomGradients"

@@ -19,7 +19,13 @@ const Backdrop: React.FC<Props> = ({
   const focus = useValue(db, "focus");
   // TODO: Consider passing display in via prop
   const background = useValue(db, "background");
-  const { blur, luminosity = 0, nightDim, scale } = background.display;
+  const {
+    blur,
+    luminosity = 0,
+    nightDim,
+    scale,
+    position,
+  } = background.display;
   const isNight = useIsNight();
 
   style = { ...style };
@@ -44,17 +50,21 @@ const Backdrop: React.FC<Props> = ({
     style["backgroundRepeat"] = "no-repeat";
   }
 
+  if (position) {
+    style["backgroundPosition"] = position;
+  }
+
   return (
-    <div className="fullscreen" style={{backgroundColor: luminosity > 0 ? "white" : "black"}}>
-      <CrossFade
-        contentKey={url || ''}
-        timeout={2500}
-      >
-        <div 
+    <div
+      className="fullscreen"
+      style={{ backgroundColor: luminosity > 0 ? "white" : "black" }}
+    >
+      <CrossFade contentKey={url || ""} timeout={2500}>
+        <div
           style={{
             ...style,
-            backgroundImage: url ? `url(${url})` : undefined
-          }} 
+            backgroundImage: url ? `url(${url})` : undefined,
+          }}
           {...rest}
         >
           {children}
@@ -65,4 +75,3 @@ const Backdrop: React.FC<Props> = ({
 };
 
 export default Backdrop;
-

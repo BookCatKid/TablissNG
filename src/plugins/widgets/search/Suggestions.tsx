@@ -34,7 +34,9 @@ const Suggestions: FC<Props> = ({
           return (
             <div
               key={index}
-              className={"suggestion-item" + (index === active ? " active" : "")}
+              className={
+                "suggestion-item" + (index === active ? " active" : "")
+              }
               onClick={() => onSelect(suggestion)}
               onMouseEnter={() => setActive(index)}
               onMouseLeave={() => setActive(undefined)}
@@ -42,12 +44,18 @@ const Suggestions: FC<Props> = ({
               role="button"
             >
               {suggestion.thumbnailUrl && (
-                <img src={suggestion.thumbnailUrl} alt="" className="suggestion-thumb" />
+                <img
+                  src={suggestion.thumbnailUrl}
+                  alt=""
+                  className="suggestion-thumb"
+                />
               )}
               <div className="suggestion-content">
                 <div className="suggestion-title">{suggestion.title}</div>
                 {suggestion.description && (
-                  <div className="suggestion-desc">{suggestion.description}</div>
+                  <div className="suggestion-desc">
+                    {suggestion.description}
+                  </div>
                 )}
               </div>
             </div>

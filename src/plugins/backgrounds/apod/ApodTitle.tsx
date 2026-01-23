@@ -11,4 +11,3 @@ const Credit: React.FC<Props> = ({ title, copyright }) => (
 );
 
 export default Credit;
-

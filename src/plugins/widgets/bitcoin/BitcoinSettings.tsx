@@ -7,18 +7,18 @@ const messages = defineMessages({
   colorMempool: {
     id: "plugins.bitcoin.colorMempool",
     defaultMessage: "Mempool",
-    description: "Mempool color label"
+    description: "Mempool color label",
   },
   colorMonochrome: {
     id: "plugins.bitcoin.colorMonochrome",
     defaultMessage: "Monochrome",
-    description: "Monochrome color label"
+    description: "Monochrome color label",
   },
   colorTransparent: {
     id: "plugins.bitcoin.colorTransparent",
     defaultMessage: "Transparent",
-    description: "Transparent color label"
-  }
+    description: "Transparent color label",
+  },
 });
 
 const colors = ["mempool", "monochrome", "transparent"];
@@ -44,7 +44,9 @@ const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
               setData({ ...data, color: color as Data["color"] });
             }}
           />
-          {intl.formatMessage(messages[`color${capitalize(color)}` as keyof typeof messages])}
+          {intl.formatMessage(
+            messages[`color${capitalize(color)}` as keyof typeof messages],
+          )}
         </label>
       ))}
 
@@ -54,7 +56,8 @@ const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           id="plugins.bitcoin.blocksLabel"
           defaultMessage="Number of Blocks"
           description="Label for number of blocks slider"
-        /> <br />
+        />{" "}
+        <br />
         <input
           type="range"
           list="numberOfBlocks-markers"

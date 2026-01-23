@@ -38,11 +38,11 @@ const Joke: React.FC<Props> = ({
 
       getJoke(data.categories, apiLocale)
         .then((joke) => {
-
-        const text =
-          isTwoPartJoke(joke) ? joke.setup :
-          isSingleJoke(joke) ? joke.joke :
-          "";
+          const text = isTwoPartJoke(joke)
+            ? joke.setup
+            : isSingleJoke(joke)
+              ? joke.joke
+              : "";
 
           // if joke is too long, retry
           if (text.length > data.maxPreviewLength) {
@@ -81,12 +81,17 @@ const Joke: React.FC<Props> = ({
     <div className="joke-container">
       {isSingleJoke(cache) && <h5>{cache.joke}</h5>}
 
-      {isTwoPartJoke(cache) && <TwoPartJoke joke={cache} keyBind={data.keyBind} />}
+      {isTwoPartJoke(cache) && (
+        <TwoPartJoke joke={cache} keyBind={data.keyBind} />
+      )}
     </div>
   );
 };
 
-const TwoPartJoke: React.FC<{ joke: TwoPartJokeAPIResponse; keyBind?: string }> = ({ joke, keyBind = "J" }) => {
+const TwoPartJoke: React.FC<{
+  joke: TwoPartJokeAPIResponse;
+  keyBind?: string;
+}> = ({ joke, keyBind = "J" }) => {
   const isJokeAQuestion = joke.setup.slice(-1) === "?";
   const [showAnswer, setShowAnswer] = useState(false);
 

@@ -7,7 +7,12 @@ import { defaultData, Props } from "./types";
 
 const EXPIRE_IN = 1 * HOURS;
 
-const Quote: React.FC<Props> = ({ cache, data = defaultData, setCache, loader }) => {
+const Quote: React.FC<Props> = ({
+  cache,
+  data = defaultData,
+  setCache,
+  loader,
+}) => {
   useCachedEffect(
     () => {
       getQuote(loader, data.category ?? "quotable").then(setCache);

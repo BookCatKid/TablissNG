@@ -6,6 +6,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I also attempt to follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
+## [1.6.1] - 1/15/2026 | New logos, better caching, a Trello widget, Bing wallpapers and more!
+
+Finally changed the logo to something different from Tabliss's logo! This release includes a lot of community contributions, so thanks a ton to everyone who helped out!
+
+### Added
+
+- feat: implement favicon changing (#85). [44bc62ce](https://github.com/BookCatKid/TablissNG/commit/44bc62ce)
+
+- feat: add bing daily wallpaper. [ce9dadb4](https://github.com/BookCatKid/TablissNG/commit/ce9dadb4)
+
+- feat: add opentype font features parsing support. [2f34128d](https://github.com/BookCatKid/TablissNG/commit/2f34128d)
+
+- Enable better offline support with workbox (#66). [b4c5f165](https://github.com/BookCatKid/TablissNG/commit/b4c5f165)
+
+- feat(trello): added Trello integration (#73). [7e3c9b9](https://github.com/John-Ling/TablissNG/commit/7e3c9b9968dd6639a3f985e73f1d236b30c39916), [62e8b5f5](https://github.com/BookCatKid/TablissNG/commit/62e8b5f5)
+
+### Fixed
+
+- fix(Search): use correct search engine even on default. [a059570f](https://github.com/BookCatKid/TablissNG/commit/a059570f)
+
+- fix: maybe fix extension dev builds on non-web. [d4589fef](https://github.com/BookCatKid/TablissNG/commit/d4589fef)
+
+### Changed
+
+- feat: small improvements to custom settings icons position. [57316369](https://github.com/BookCatKid/TablissNG/commit/57316369)
+
+- feat: fix workbox on chrome (and safari). [49cfd0ec](https://github.com/BookCatKid/TablissNG/commit/49cfd0ec)
+
+- feat(Prettier): fix glob pattern (#84). [2e809d72](https://github.com/BookCatKid/TablissNG/commit/2e809d72)
+
+- feat: new logos!. [12bee649](https://github.com/BookCatKid/TablissNG/commit/12bee649), [0506376d](https://github.com/BookCatKid/TablissNG/commit/0506376d), [44432f2f](https://github.com/BookCatKid/TablissNG/commit/44432f2f)
+
+- feat(Chromium): include key to preserve extension id on dev. [e2a19a81](https://github.com/BookCatKid/TablissNG/commit/e2a19a81)
+
+### Chore / Cleanup
+
+- Fix ESLint errors (#83). [92921bfc](https://github.com/BookCatKid/TablissNG/commit/92921bfc)
+
+- chore: run prettier to fix tests. [ca41f40e](https://github.com/BookCatKid/TablissNG/commit/ca41f40e)
+
+- Add Husky hooks (#68). [4c12b606](https://github.com/BookCatKid/TablissNG/commit/4c12b606)
+
+- ci: add safari to releases. [e141c006](https://github.com/BookCatKid/TablissNG/commit/e141c006)
+
+- ci: auto nightly releases. [35d782ba](https://github.com/BookCatKid/TablissNG/commit/35d782ba), [25f30991](https://github.com/BookCatKid/TablissNG/commit/25f30991)
+
 ## [1.6.0] - 1/1/2026 | Large Feature and Bugfix Update (FINALLY)
 
 ### Added
@@ -91,7 +137,6 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 - ci: add build to pr ci. [96fb4c4f](https://github.com/BookCatKid/TablissNG/commit/96fb4c4f408e8cbf8a1189accf4dcee26ece12aa)
 
 - ci: add pr tests. [7e0a3025](https://github.com/BookCatKid/TablissNG/commit/7e0a3025d68dc38f68ab2b992289c56f9d9158a8)
-
 
 ## [1.5.1] - 8/4/2025 | Minor Feature and Bugfix Update
 

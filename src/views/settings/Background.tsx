@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { setBackground } from "../../db/action";
-import { BackgroundDisplay, db } from "../../db/state";
+import { BackgroundDisplay, BackgroundPosition, db } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import { backgroundConfigs, getConfig } from "../../plugins";
 import { sectionMessages } from "../../locales/messages";
@@ -12,13 +12,13 @@ const messages = defineMessages({
   lighten: {
     id: "backgrounds.display.lighten",
     defaultMessage: "Lighten",
-    description: "Label for maximum luminosity"
+    description: "Label for maximum luminosity",
   },
   darken: {
     id: "backgrounds.display.darken",
     defaultMessage: "Darken",
-    description: "Label for minimum luminosity"
-  }
+    description: "Label for minimum luminosity",
+  },
 });
 
 const Background: React.FC = () => {
@@ -41,9 +41,9 @@ const Background: React.FC = () => {
   const sanitizeFilename = (filename: string): string => {
     // Remove illegal characters and trim
     return filename
-      .replace(/[/\\?%*:|"<>]/g, '-') // Replace illegal chars with dash
-      .replace(/\s+/g, '_')           // Replace spaces with underscore
-      .replace(/-+/g, '-')            // Replace multiple dashes with single dash
+      .replace(/[/\\?%*:|"<>]/g, "-") // Replace illegal chars with dash
+      .replace(/\s+/g, "_") // Replace spaces with underscore
+      .replace(/-+/g, "-") // Replace multiple dashes with single dash
       .trim();
   };
 
@@ -104,7 +104,9 @@ const Background: React.FC = () => {
 
       {plugin && (
         <div className="Widget">
-          <h4><FormattedMessage {...plugin.name} /></h4>
+          <h4>
+            <FormattedMessage {...plugin.name} />
+          </h4>
 
           {plugin.settingsComponent && (
             <div className="settings">
@@ -140,7 +142,8 @@ const Background: React.FC = () => {
                     id="backgrounds.display.blur"
                     defaultMessage="Blur"
                     description="Label for blur slider"
-                  /> <br />
+                  />{" "}
+                  <br />
                   <input
                     type="range"
                     list="blur-markers"
@@ -165,7 +168,8 @@ const Background: React.FC = () => {
                     id="backgrounds.display.luminosity"
                     defaultMessage="Luminosity"
                     description="Label for luminosity slider"
-                  /> <br />
+                  />{" "}
+                  <br />
                   <input
                     type="range"
                     list="luminosity-markers"
@@ -210,6 +214,87 @@ const Background: React.FC = () => {
                 </label>
 
                 <label>
+                  <FormattedMessage
+                    id="backgrounds.position"
+                    defaultMessage="Position"
+                    description="Label for background position selection"
+                  />{" "}
+                  <br />
+                  <select
+                    value={data.display.position ?? "center"}
+                    onChange={(e) => {
+                      setBackgroundDisplay({
+                        position: e.target.value as BackgroundPosition,
+                      });
+                    }}
+                  >
+                    <option value="center">
+                      <FormattedMessage
+                        id="backgrounds.position.center"
+                        defaultMessage="Center"
+                        description="Center background position"
+                      />
+                    </option>
+                    <option value="top">
+                      <FormattedMessage
+                        id="backgrounds.position.top"
+                        defaultMessage="Top"
+                        description="Top background position"
+                      />
+                    </option>
+                    <option value="bottom">
+                      <FormattedMessage
+                        id="backgrounds.position.bottom"
+                        defaultMessage="Bottom"
+                        description="Bottom background position"
+                      />
+                    </option>
+                    <option value="left">
+                      <FormattedMessage
+                        id="backgrounds.position.left"
+                        defaultMessage="Left"
+                        description="Left background position"
+                      />
+                    </option>
+                    <option value="right">
+                      <FormattedMessage
+                        id="backgrounds.position.right"
+                        defaultMessage="Right"
+                        description="Right background position"
+                      />
+                    </option>
+                    <option value="top left">
+                      <FormattedMessage
+                        id="backgrounds.position.topLeft"
+                        defaultMessage="Top Left"
+                        description="Top left background position"
+                      />
+                    </option>
+                    <option value="top right">
+                      <FormattedMessage
+                        id="backgrounds.position.topRight"
+                        defaultMessage="Top Right"
+                        description="Top right background position"
+                      />
+                    </option>
+                    <option value="bottom left">
+                      <FormattedMessage
+                        id="backgrounds.position.bottomLeft"
+                        defaultMessage="Bottom Left"
+                        description="Bottom left background position"
+                      />
+                    </option>
+                    <option value="bottom right">
+                      <FormattedMessage
+                        id="backgrounds.position.bottomRight"
+                        defaultMessage="Bottom Right"
+                        description="Bottom right background position"
+                      />
+                    </option>
+                  </select>
+                </label>
+
+                <label>
                   <input
                     type="checkbox"
                     checked={data.display.nightDim}
@@ -233,13 +318,14 @@ const Background: React.FC = () => {
                         id="backgrounds.display.nightStart"
                         defaultMessage="Night starts at"
                         description="Label for night start time input"
-                      /> <br />
+                      />{" "}
+                      <br />
                       <input
                         type="time"
                         value={data.display.nightStart}
                         onChange={(e) => {
                           setBackgroundDisplay({
-                            nightStart: e.target.value
+                            nightStart: e.target.value,
                           });
                         }}
                       />
@@ -250,13 +336,14 @@ const Background: React.FC = () => {
                         id="backgrounds.display.nightEnd"
                         defaultMessage="Night ends at"
                         description="Label for night end time input"
-                      /> <br />
+                      />{" "}
+                      <br />
                       <input
                         type="time"
                         value={data.display.nightEnd}
                         onChange={(e) => {
                           setBackgroundDisplay({
-                            nightEnd: e.target.value
+                            nightEnd: e.target.value,
                           });
                         }}
                       />

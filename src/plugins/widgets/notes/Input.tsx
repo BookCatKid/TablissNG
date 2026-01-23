@@ -1,8 +1,10 @@
 import React from "react";
 import { useKeyPress } from "../../../hooks";
 
-interface Props
-  extends Omit<React.HTMLAttributes<HTMLSpanElement>, "onChange"> {
+interface Props extends Omit<
+  React.HTMLAttributes<HTMLSpanElement>,
+  "onChange"
+> {
   onChange: (value: string) => void;
   value: string;
   onBlur?: () => void;

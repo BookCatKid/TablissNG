@@ -6,10 +6,10 @@ const TodoSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="SearchSettings">
     <label>
       <FormattedMessage
-          id="plugins.tasks.toShow"
-          defaultMessage="Tasks to show"
-          description="Tasks to show title"
-        />
+        id="plugins.tasks.toShow"
+        defaultMessage="Tasks to show"
+        description="Tasks to show title"
+      />
       <input
         type="number"
         min="0"
@@ -23,10 +23,10 @@ const TodoSettings: FC<Props> = ({ data = defaultData, setData }) => (
 
     <label>
       <FormattedMessage
-          id="plugins.tasks.newTasksKeybind"
-          defaultMessage="New task keybind"
-          description="New task keybind title"
-        />
+        id="plugins.tasks.newTasksKeybind"
+        defaultMessage="New task keybind"
+        description="New task keybind title"
+      />
       <input
         type="text"
         maxLength={1}
@@ -45,10 +45,10 @@ const TodoSettings: FC<Props> = ({ data = defaultData, setData }) => (
         checked={data.dailyRoutine}
       />
       <FormattedMessage
-          id="plugins.tasks.dailyRoutine"
-          defaultMessage="Daily routine"
-          description="Daily routine title"
-        />
+        id="plugins.tasks.dailyRoutine"
+        defaultMessage="Daily routine"
+        description="Daily routine title"
+      />
     </label>
   </div>
 );
