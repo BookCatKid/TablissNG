@@ -1,8 +1,8 @@
 import React from "react";
 import { WidgetDisplay } from "../../db/state";
 import { setWidgetDisplay } from "../../db/action";
-import FloatingSaveButton from '../shared/FloatingSaveButton';
-import MoveableWrapper from './MoveableWrapper';
+import FloatingSaveButton from "../shared/FloatingSaveButton";
+import MoveableWrapper from "./MoveableWrapper";
 
 interface WidgetProps extends WidgetDisplay {
   id: string;
@@ -30,7 +30,7 @@ const Widget: React.FC<WidgetProps> = ({
   xPercent = 50,
   yPercent = 50,
   isEditingPosition = false,
-  customClass
+  customClass,
 }) => {
   const widgetRef = React.useRef<HTMLDivElement>(null);
 
@@ -51,7 +51,12 @@ const Widget: React.FC<WidgetProps> = ({
 
   // Migration: Convert existing pixel coordinates to percentages if needed
   React.useEffect(() => {
-    if (position === "free" && (xPercent === undefined || yPercent === undefined) && x !== undefined && y !== undefined) {
+    if (
+      position === "free" &&
+      (xPercent === undefined || yPercent === undefined) &&
+      x !== undefined &&
+      y !== undefined
+    ) {
       if (widgetRef.current) {
         const travelX = window.innerWidth - widgetRef.current.offsetWidth;
         const travelY = window.innerHeight - widgetRef.current.offsetHeight;
@@ -79,37 +84,40 @@ const Widget: React.FC<WidgetProps> = ({
     };
 
     // Listen for window resize
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Listen for widget's own size changes (e.g. content updates)
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(widgetRef.current);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       resizeObserver.disconnect();
     };
   }, [position, getPixelPosition]);
 
   // Handle transform updates from MoveableWrapper
-  const handleTransformEnd = React.useCallback((transform: {
-    x?: number;
-    y?: number;
-    xPercent?: number;
-    yPercent?: number;
-    scale?: number;
-    rotation?: number;
-  }) => {
-    setWidgetDisplay(id, {
-      position: "free",
-      ...transform,
-    });
+  const handleTransformEnd = React.useCallback(
+    (transform: {
+      x?: number;
+      y?: number;
+      xPercent?: number;
+      yPercent?: number;
+      scale?: number;
+      rotation?: number;
+    }) => {
+      setWidgetDisplay(id, {
+        position: "free",
+        ...transform,
+      });
 
-    // Update local offset if position changed
-    if (transform.x !== undefined && transform.y !== undefined) {
-      setOffset({ x: transform.x, y: transform.y });
-    }
-  }, [id]);
+      // Update local offset if position changed
+      if (transform.x !== undefined && transform.y !== undefined) {
+        setOffset({ x: transform.x, y: transform.y });
+      }
+    },
+    [id],
+  );
 
   const handleSave = () => {
     if (widgetRef.current) {
@@ -124,7 +132,7 @@ const Widget: React.FC<WidgetProps> = ({
         y: offset.y,
         xPercent: newXPercent,
         yPercent: newYPercent,
-        isEditingPosition: false
+        isEditingPosition: false,
       });
     } else {
       setWidgetDisplay(id, { isEditingPosition: false });
@@ -140,13 +148,15 @@ const Widget: React.FC<WidgetProps> = ({
     fontStyle,
     textDecoration,
     // Only apply scale/rotation if NOT editing (moveable handles this during edit)
-    transform: isEditingPosition ? undefined : `scale(${scale}) rotate(${rotation}deg)`,
+    transform: isEditingPosition
+      ? undefined
+      : `scale(${scale}) rotate(${rotation}deg)`,
     ...(position === "free" && {
       left: `${offset.x}px`,
       top: `${offset.y}px`,
-      display: 'inline-block',
-      whiteSpace: 'nowrap',
-    })
+      display: "inline-block",
+      whiteSpace: "nowrap",
+    }),
   };
 
   let classNames = `Widget ${fontWeight ? "weight-override" : ""}`;
@@ -154,48 +164,48 @@ const Widget: React.FC<WidgetProps> = ({
     classNames += ` ${customClass}`;
   }
   if (isEditingPosition) {
-    classNames += ' drag-selected';
+    classNames += " drag-selected";
   }
 
   const renderContent = () => {
     const outlineStyle = textOutline ? (textOutlineStyle ?? "basic") : null;
 
     return (
-      <div
-        ref={widgetRef}
-        className={classNames}
-        style={styles}
-      >
+      <div ref={widgetRef} className={classNames} style={styles}>
         {textOutline && outlineStyle === "basic" ? (
-          <div style={{
-            textShadow: `
+          <div
+            style={{
+              textShadow: `
               -1px -1px 0 ${textOutlineColor},
               1px -1px 0 ${textOutlineColor},
               -1px 1px 0 ${textOutlineColor},
               1px 1px 0 ${textOutlineColor}
-            `
-          }}>
+            `,
+            }}
+          >
             {children}
           </div>
         ) : textOutline && outlineStyle === "advanced" ? (
           <>
-            <span style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              color: textOutlineColor,
-              zIndex: 0,
-              WebkitTextStroke: `${textOutlineSize * 2}px ${textOutlineColor}`,
-            }}>
+            <span
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                color: textOutlineColor,
+                zIndex: 0,
+                WebkitTextStroke: `${textOutlineSize * 2}px ${textOutlineColor}`,
+              }}
+            >
               {children}
             </span>
-            <span style={{ position: "relative", zIndex: 1 }}>
-              {children}
-            </span>
+            <span style={{ position: "relative", zIndex: 1 }}>{children}</span>
           </>
-        ) : children}
+        ) : (
+          children
+        )}
       </div>
     );
   };
