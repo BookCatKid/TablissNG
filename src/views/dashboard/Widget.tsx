@@ -1,7 +1,10 @@
 import React from "react";
 import { WidgetDisplay } from "../../db/state";
 import { setWidgetDisplay } from "../../db/action";
-import FloatingSaveButton from "../shared/FloatingSaveButton";
+import { Icon } from "@iconify/react";
+import { FormattedMessage } from "react-intl";
+import { pluginMessages } from "../../locales/messages";
+import FloatingButton from "../shared/FloatingButton";
 import MoveableWrapper from "./MoveableWrapper";
 import { parseFontFamilyAndFeatures } from "../../utils";
 
@@ -228,7 +231,15 @@ const Widget: React.FC<WidgetProps> = ({
           onTransformEnd={handleTransformEnd}
         />
       )}
-      {isEditingPosition && <FloatingSaveButton onClick={handleSave} />}
+      {isEditingPosition && (
+        <FloatingButton onClick={handleSave}>
+          <Icon
+            icon="feather:check"
+            style={{ marginRight: "8px", verticalAlign: "middle" }}
+          />
+          <FormattedMessage {...pluginMessages.freeMoveSave} />
+        </FloatingButton>
+      )}
     </>
   );
 };

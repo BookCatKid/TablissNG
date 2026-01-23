@@ -181,46 +181,6 @@ $scrollbar-thumb-hover-dark: #555555
             &:hover
                 background-color: color.adjust($dark-input-bg, $lightness: 25%)
 
-    .button
-        border: 0
-        border-radius: 2em
-        color: white
-        cursor: pointer
-        display: inline-block
-        padding: 0.5em 1em
-        text-decoration: none
-        transition: background 0.25s ease-out
-        text-align: center
-        font-weight: 500
-
-        &:disabled
-            background-color: #bdc3c7
-            cursor: default
-
-            .dark &
-                background-color: $dark-border
-
-        &--primary
-            background-color: #3498db
-            &:hover
-                background: color.adjust(#3498db, $lightness: -10%)
-            &:active
-                background: color.adjust(#3498db, $lightness: -20%)
-
-        &--secondary
-            background: color.adjust(#bdc3c7, $lightness: -20%)
-            &:hover
-                background: color.adjust(#bdc3c7, $lightness: -30%)
-            &:active
-                background: color.adjust(#bdc3c7, $lightness: -40%)
-
-            .dark &
-                background: color.adjust($dark-border, $lightness: 10%)
-                &:hover
-                    background: color.adjust($dark-border, $lightness: 20%)
-                &:active
-                    background: color.adjust($dark-border, $lightness: 30%)
-
     hr
         border: 1px solid #ecf0f1
         margin: 1rem 0
@@ -258,3 +218,43 @@ $scrollbar-thumb-hover-dark: #555555
 
         &:hover
             background-color: color.adjust(#3498db, $lightness: -20%) !important
+
+.button
+    border: 0
+    border-radius: 2em
+    color: white
+    cursor: pointer
+    display: inline-block
+    padding: 0.5em 1em
+    text-decoration: none
+    transition: background 0.25s ease-out
+    text-align: center
+    font-weight: 500
+
+    &:disabled
+        background-color: #bdc3c7
+        cursor: default
+
+        .dark &
+            background-color: $dark-border
+
+    &--primary
+        background-color: #3498db
+        &:hover
+            background: color.adjust(#3498db, $lightness: -10%)
+        &:active
+            background: color.adjust(#3498db, $lightness: -20%)
+
+    &--secondary
+        background: color.adjust(#bdc3c7, $lightness: -20%)
+        &:hover
+            background: color.adjust(#bdc3c7, $lightness: -30%)
+        &:active
+            background: color.adjust(#bdc3c7, $lightness: -40%)
+
+        .dark &
+            background: color.adjust($dark-border, $lightness: 10%)
+            &:hover
+                background: color.adjust($dark-border, $lightness: 20%)
+            &:active
+                background: color.adjust($dark-border, $lightness: 30%)

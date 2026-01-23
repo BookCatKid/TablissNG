@@ -50,7 +50,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       targetRef.current.style.transform = `rotate(${rotation}deg) scale(${scale})`;
     }
 
-    setMoveableKey(prev => prev + 1);
+    setMoveableKey((prev) => prev + 1);
   }, [isEditing, rotation, scale, x, y, targetRef]);
 
   // State for screen guidelines to allow snapping to edges/center
@@ -58,7 +58,9 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
     vertical: [0, Math.round(window.innerWidth / 2), window.innerWidth],
     horizontal: [0, Math.round(window.innerHeight / 2), window.innerHeight],
   });
-  const [elementGuidelines, setElementGuidelines] = React.useState<Element[]>([]);
+  const [elementGuidelines, setElementGuidelines] = React.useState<Element[]>(
+    [],
+  );
   const [isShiftPressed, setIsShiftPressed] = React.useState(false);
 
   // Handle shift key for rotation snapping
@@ -87,9 +89,9 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
     window.addEventListener("resize", handleResize);
 
     // Find other widgets to snap to
-    const otherWidgets = Array.from(document.querySelectorAll(".Widget")).filter(
-      (el) => el !== targetRef.current
-    );
+    const otherWidgets = Array.from(
+      document.querySelectorAll(".Widget"),
+    ).filter((el) => el !== targetRef.current);
     setElementGuidelines(otherWidgets);
 
     return () => window.removeEventListener("resize", handleResize);
@@ -144,12 +146,10 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       key={moveableKey}
       target={targetRef}
       container={null}
-
       // Enable features
       draggable={true}
       rotatable={true}
       scalable={true}
-
       // Snapping settings
       snappable={true}
       snapHorizontalThreshold={15}
@@ -159,28 +159,26 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       elementGuidelines={elementGuidelines}
       isDisplayInnerSnapDigit={true}
       snapDirections={{
-        "top": true,
-        "left": true,
-        "bottom": true,
-        "right": true,
-        "center": true,
-        "middle": true
+        top: true,
+        left: true,
+        bottom: true,
+        right: true,
+        center: true,
+        middle: true,
       }}
       elementSnapDirections={{
-        "top": true,
-        "left": true,
-        "bottom": true,
-        "right": true,
-        "center": true,
-        "middle": true
+        top: true,
+        left: true,
+        bottom: true,
+        right: true,
+        center: true,
+        middle: true,
       }}
-
       // Visual settings
       keepRatio={true}
       throttleDrag={1}
-      throttleRotate={isShiftPressed ? 45 : 1}
+      throttleRotate={isShiftPressed ? 15 : 1}
       throttleScale={0.01}
-
       // Drag events - use translate delta
       onDrag={({ target, translate }) => {
         frameRef.current.translate = translate as [number, number];
@@ -214,7 +212,6 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
         // Reset translate for next drag
         frameRef.current.translate = [0, 0];
       }}
-
       // Rotate events
       onRotate={({ target, rotation: newRotation }) => {
         frameRef.current.rotate = newRotation;
@@ -225,7 +222,6 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
           rotation: frameRef.current.rotate,
         });
       }}
-
       // Scale events
       onScale={({ target, scale: newScale }) => {
         frameRef.current.scale = newScale as [number, number];
@@ -233,7 +229,8 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
         target.style.transform = `translate(${frameRef.current.translate[0]}px, ${frameRef.current.translate[1]}px) rotate(${frameRef.current.rotate}deg) scale(${uniformScale})`;
       }}
       onScaleEnd={() => {
-        const uniformScale = (frameRef.current.scale[0] + frameRef.current.scale[1]) / 2;
+        const uniformScale =
+          (frameRef.current.scale[0] + frameRef.current.scale[1]) / 2;
         onTransformEnd({
           scale: uniformScale,
         });

@@ -61,7 +61,6 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
                   xPercent: 50,
                   yPercent: 50,
                 });
-                window.location.reload();
               }}
               className="button button--primary"
             >
