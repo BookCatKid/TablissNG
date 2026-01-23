@@ -36,7 +36,11 @@ const UiProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     [],
   );
 
-  return <UiContext value={{ ...state, ...methods }}>{children}</UiContext>;
+  return (
+    <UiContext.Provider value={{ ...state, ...methods }}>
+      {children}
+    </UiContext.Provider>
+  );
 };
 
 export default UiProvider;

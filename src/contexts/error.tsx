@@ -23,11 +23,15 @@ const ErrorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     [setState],
   );
 
-  return <ErrorContext value={{ ...state, push }}>{children}</ErrorContext>;
+  return (
+    <ErrorContext.Provider value={{ ...state, push }}>
+      {children}
+    </ErrorContext.Provider>
+  );
 };
 
 /** Push error to the error log */
 export const usePushError = (): ErrorAPI["push"] =>
-  React.use(ErrorContext).push;
+  React.useContext(ErrorContext).push;
 
 export default ErrorProvider;
