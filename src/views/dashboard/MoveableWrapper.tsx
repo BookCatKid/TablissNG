@@ -1,6 +1,5 @@
 import React from "react";
 import Moveable from "react-moveable";
-import "./MoveableWrapper.css";
 
 interface MoveableWrapperProps {
   targetRef: React.RefObject<HTMLDivElement | null>;
