@@ -227,8 +227,11 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
         target.style.transform = `translate(${frameRef.current.translate[0]}px, ${frameRef.current.translate[1]}px) rotate(${newRotation}deg) scale(${frameRef.current.scale[0]})`;
       }}
       onRotateEnd={() => {
+        // Normalize rotation to [-180, 180] range to match the settings slider
+        const normalizedRotation =
+          ((((frameRef.current.rotate + 180) % 360) + 360) % 360) - 180;
         onTransformEnd({
-          rotation: frameRef.current.rotate,
+          rotation: normalizedRotation,
         });
       }}
       // Scale events
