@@ -1,9 +1,23 @@
+import { RotatingCache } from "../../../hooks";
 import { API } from "../../types";
 
-export type Data = unknown;
+export type Data = {
+  paused?: boolean;
+  timeout?: number;
+};
 
-export type Cache = File[];
+export type Cache = RotatingCache<File>;
 
 export type Props = API<Data, Cache>;
 
-export const defaultCache: Cache = [];
+export const defaultCache: Cache = {
+  items: [],
+  cursor: 0,
+  rotated: 0,
+  deps: [],
+};
+
+export const defaultData: Data = {
+  paused: false,
+  timeout: 900,
+};

@@ -12,6 +12,7 @@ export interface Data {
   topics: string[];
   timeout: number;
   locationSource: string;
+  showTitle: boolean;
 }
 
 export interface Image {
@@ -37,4 +38,5 @@ export const defaultData: Data = {
   topics: ["bo8jQKTaE0Y"],
   timeout: 900,
   locationSource: "google-maps",
+  showTitle: true,
 };

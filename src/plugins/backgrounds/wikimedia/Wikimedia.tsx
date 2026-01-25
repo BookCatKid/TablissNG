@@ -1,8 +1,6 @@
 import React from "react";
-import Backdrop from "../../../views/shared/Backdrop";
+import BaseBackground from "../base/BaseBackground";
 import { fetchFeaturedContent, formatDateForApi } from "./api";
-import WikimediaTitle from "./WikimediaTitle";
-import "./Wikimedia.sass";
 import { defaultData, Props } from "./types";
 
 const Wikimedia: React.FC<Props> = ({
@@ -27,21 +25,44 @@ const Wikimedia: React.FC<Props> = ({
     mounted.current = true;
   }, [data.customDate, data.date]);
 
-  return (
-    <div className="Wikimedia fullscreen">
-      <Backdrop
-        className="picture fullscreen"
-        ready={!!picture?.image?.image?.source}
-        url={picture?.image?.image?.source}
-      >
-        {picture && data.showTitle && (
-          <WikimediaTitle
-            title={picture.image?.description?.html || ""}
-            copyright={picture.image?.artist?.html || ""}
+  const leftInfo = picture?.image?.description?.html
+    ? [
+        {
+          label: (
+            <span
+              dangerouslySetInnerHTML={{
+                __html: picture.image.description.html.replace(
+                  '"//',
+                  '"https://',
+                ),
+              }}
+            />
+          ),
+        },
+      ]
+    : [];
+
+  const rightInfo = picture?.image?.artist?.html
+    ? {
+        label: (
+          <span
+            dangerouslySetInnerHTML={{
+              __html: `© ${picture.image.artist.html.replace('"//', '"https://')}`,
+            }}
           />
-        )}
-      </Backdrop>
-    </div>
+        ),
+      }
+    : null;
+
+  return (
+    <BaseBackground
+      containerClassName="Wikimedia fullscreen"
+      url={picture?.image?.image?.source ?? null}
+      showControls={false}
+      showInfo={data.showTitle}
+      leftInfo={leftInfo}
+      rightInfo={rightInfo}
+    />
   );
 };
 

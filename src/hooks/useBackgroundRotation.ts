@@ -1,6 +1,7 @@
 import React from "react";
 import { RotatingCache, useRotatingCache } from "./useCache";
 import { Cache, Loader } from "../plugins/types";
+import { wrap } from "../utils";
 
 type RotationData = { paused?: boolean; timeout?: number };
 
@@ -58,15 +59,17 @@ export function useBackgroundRotation<
   const go = React.useCallback(
     (amount: number) => {
       const cache = cacheObj.cache;
-      if (cache && cache.items[cache.cursor + amount]) {
-        return () =>
-          cacheObj.setCache({
-            ...cache,
-            cursor: cache.cursor + amount,
-            rotated: Date.now(),
-          });
-      }
-      return null;
+      if (!cache || cache.items.length === 0) return null;
+
+      return () => {
+        const nextCursor = wrap(cache.cursor + amount, cache.items.length);
+
+        cacheObj.setCache({
+          ...cache,
+          cursor: nextCursor,
+          rotated: Date.now(),
+        });
+      };
     },
     [cacheObj],
   );

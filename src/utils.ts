@@ -186,3 +186,16 @@ export function selectUnit(from: number, to: number) {
     unit: "year" as const,
   };
 }
+
+/**
+ * Safely wraps a cursor value within the bounds of a given length.
+ * This uses a true modulo operation that correctly handles negative numbers.
+ *
+ * @param cursor The current cursor index
+ * @param length The total number of items
+ * @returns A safe, wrapped index within [0, length - 1]
+ */
+export function wrap(cursor: number, length: number): number {
+  if (length <= 0) return 0;
+  return ((cursor % length) + length) % length;
+}

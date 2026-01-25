@@ -1,8 +1,21 @@
 import React from "react";
+import { FormattedMessage } from "react-intl";
 import { buildLink, fetchImages } from "./api";
 import { defaultData, Image as UnsplashImage, Props } from "./types";
 import { useBackgroundRotation } from "../../../hooks";
 import BaseBackground from "../base/BaseBackground";
+
+const UTM = "?utm_source=Start&utm_medium=referral&utm_campaign=api-credit";
+
+const getLocationUrl = (location: string, source: string) => {
+  const urls = {
+    "google-maps": `https://www.google.com/maps/search/?api=1&query=${location}`,
+    google: `https://www.google.com/search?tbm=isch&q=${location}`,
+    duckduckgo: `https://duckduckgo.com/?q=${location}&iax=images&ia=images`,
+    unsplash: `https://unsplash.com/s/photos/${encodeURIComponent(location.replace(/\s+/g, "-").toLowerCase())}`,
+  } as const;
+  return urls[source as keyof typeof urls] || "#";
+};
 
 const Unsplash: React.FC<Props> = ({
   cache,
@@ -49,13 +62,44 @@ const Unsplash: React.FC<Props> = ({
 
   const url = item ? buildLink(item.src) : null;
 
+  const credits = item
+    ? [
+        {
+          label: (
+            <FormattedMessage
+              id="plugins.unsplash.photoLink"
+              description="Photo link text"
+              defaultMessage="Photo"
+            />
+          ),
+          url: item.credit.imageLink + UTM,
+        },
+        {
+          label: item.credit.userName,
+          url: item.credit.userLink + UTM,
+        },
+        {
+          label: "Unsplash",
+          url: "https://unsplash.com/" + UTM,
+        },
+      ]
+    : [];
+
+  const location =
+    item?.credit.location && data.locationSource
+      ? {
+          label: item.credit.location,
+          url: getLocationUrl(item.credit.location, data.locationSource),
+        }
+      : null;
+
   return (
     <BaseBackground
       containerClassName="Unsplash fullscreen"
       url={url}
-      ready={url !== null}
-      credit={item ? item.credit : null}
-      locationSource={data.locationSource}
+      showInfo={data.showTitle}
+      leftInfo={credits}
+      rightInfo={location}
       paused={data.paused ?? false}
       onPause={handlePause}
       onPrev={go(-1)}
