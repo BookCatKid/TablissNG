@@ -71,9 +71,6 @@ const PositionInput: React.FC<Props> = ({ value, onChange }) => (
           >
             <Icon name={position.icon} />
           </IconButton>
-          {position.value === "free" && (
-            <span className="beta-badge">BETA</span>
-          )}
         </div>
       ))}
     </div>

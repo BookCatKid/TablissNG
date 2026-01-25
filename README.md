@@ -55,7 +55,7 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 - Widgets
   - Time Tracker, Bitcoin Mempool, Top Sites, Binary Clock, Bookmarks, Custom HTML.
   - Enhancements: Daily Routine for Todos, Bible verses in Quotes, Markdown in Notes
-  - "Free Move" mode for dragging widgets (very beta, but functional)
+  - "Free Move" mode for dragging widgets (Now out of beta 🎉)
 
 - Backgrounds & Visuals
   - Wikimedia Image of the Day, NASA APOD
