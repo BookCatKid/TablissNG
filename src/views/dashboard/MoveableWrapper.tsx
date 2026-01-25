@@ -103,6 +103,18 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!targetRef.current) return;
+
+      // Don't interfere if the user is typing in an input or textarea
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.tagName === "SELECT" ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       const step = e.shiftKey ? 10 : 1;
       let dx = 0;
       let dy = 0;
