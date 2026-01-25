@@ -447,7 +447,7 @@
   "settings.persist.persisting": "Persisting…",
   "settings.persist.title": "Uložit nastavení",
   "settings.position": "Pozice",
-  "settings.position.drag": "Přetáhněte widget pro úpravu pozice",
+  "settings.position.drag": "Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments.",
   "settings.position.edit": "Upravit pozici",
   "settings.position.reset": "Obnovit pozici",
   "settings.reset": "obnovit",

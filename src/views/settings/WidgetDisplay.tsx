@@ -75,7 +75,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
             <p className="info">
               <FormattedMessage
                 id="settings.position.drag"
-                defaultMessage="Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate."
+                defaultMessage="Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments."
                 description="Help text shown when editing widget position"
               />
             </p>

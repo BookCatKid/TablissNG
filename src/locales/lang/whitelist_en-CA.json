@@ -8,11 +8,11 @@
   "dashboard.focusHint",
   "dashboard.fullscreenHint",
   "dashboard.loadingHint",
-  "plugins.unsplash.photoLink",
   "plugins.weather.high",
   "plugins.weather.low",
   "plugins.weather.apparent",
   "plugins.weather.humidity",
   "plugins.search.placeholder",
-  "plugins.links.standardHint"
+  "plugins.links.standardHint",
+  "plugins.unsplash.photoLink"
 ]

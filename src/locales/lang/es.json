@@ -447,7 +447,7 @@
   "settings.persist.persisting": "Guardando…",
   "settings.persist.title": "Configuración persistente",
   "settings.position": "Posición",
-  "settings.position.drag": "Arrastra el widget para ajusta su posición",
+  "settings.position.drag": "Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments.",
   "settings.position.edit": "Editar posición",
   "settings.position.reset": "Reiniciar posición",
   "settings.reset": "reset",

@@ -63,7 +63,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   );
   const [isShiftPressed, setIsShiftPressed] = React.useState(false);
 
-  // Handle shift key for rotation snapping
+  // Handle keys for interaction modifiers
   React.useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Shift") {
@@ -163,7 +163,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       rotatable={true}
       scalable={true}
       // Snapping settings
-      snappable={true}
+      snappable={!isShiftPressed}
       snapHorizontalThreshold={15}
       snapVerticalThreshold={15}
       verticalGuidelines={guidelines.vertical}

@@ -447,7 +447,7 @@
   "settings.persist.persisting": "Persisting…",
   "settings.persist.title": "Ayarları Kalıcı Yap",
   "settings.position": "Konum",
-  "settings.position.drag": "Konumunu ayarlamak için aracı sürükleyin",
+  "settings.position.drag": "Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments.",
   "settings.position.edit": "Konumu Düzenle",
   "settings.position.reset": "Konumu Sıfırla",
   "settings.reset": "sıfırla",
