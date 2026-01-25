@@ -27,8 +27,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   y,
   onTransformEnd,
 }) => {
-  // Force re-render key when position changes to reset moveable state
-  const [moveableKey, setMoveableKey] = React.useState(0);
+  const moveableRef = React.useRef<Moveable>(null);
 
   // Track cumulative transform during interactions
   const frameRef = React.useRef({
@@ -37,7 +36,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
     scale: [scale, scale] as [number, number],
   });
 
-  // Reset frame when editing starts or props change
+  // Reset frame when editing starts or base transform changes
   React.useEffect(() => {
     frameRef.current = {
       translate: [0, 0],
@@ -45,12 +44,13 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
       scale: [scale, scale],
     };
 
-    // Apply initial transform to target so Moveable can calculate the correct box
+    // Apply initial transform to target
     if (targetRef.current) {
       targetRef.current.style.transform = `rotate(${rotation}deg) scale(${scale})`;
     }
 
-    setMoveableKey((prev) => prev + 1);
+    // Update moveable box after style changes
+    moveableRef.current?.updateRect();
   }, [isEditing, rotation, scale, x, y, targetRef]);
 
   // State for screen guidelines to allow snapping to edges/center
@@ -155,7 +155,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
 
   return (
     <Moveable
-      key={moveableKey}
+      ref={moveableRef}
       target={targetRef}
       container={null}
       // Enable features
@@ -202,11 +202,11 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
         const newX = x + frameRef.current.translate[0];
         const newY = y + frameRef.current.translate[1];
 
-        // Reset the transform (position will be set via CSS left/top)
-        target.style.transform = `rotate(${frameRef.current.rotate}deg) scale(${frameRef.current.scale[0]})`;
+        // We DO NOT reset target.style.transform here to avoid flickering.
+        // The parent component (Widget.tsx) will re-render with new left/top values,
+        // and MoveableWrapper's useEffect will reset the frame and transform.
 
         // Calculate percentages for responsive positioning using travel space
-        // (Viewport Width - Widget Width) is the total distance the widget can move
         const el = target as HTMLElement;
         const travelX = window.innerWidth - el.offsetWidth;
         const travelY = window.innerHeight - el.offsetHeight;
@@ -220,9 +220,6 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
           xPercent,
           yPercent,
         });
-
-        // Reset translate for next drag
-        frameRef.current.translate = [0, 0];
       }}
       // Rotate events
       onRotate={({ target, rotation: newRotation }) => {
