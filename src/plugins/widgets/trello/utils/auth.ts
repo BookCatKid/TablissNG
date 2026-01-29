@@ -42,7 +42,7 @@ export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
       await revokeStaleSession(staleSession);
     }
   } catch (error) {
-    console.error(`TRELLO: Failed to clear previous session ${error}`);
+    console.warn(`TRELLO: Failed to clear previous session ${error}`);
   }
 
   const expiry = Date.now() + 60 * 60 * 24 * 30 * 1000; // tokens live for 1 month
@@ -89,7 +89,7 @@ const revokeStaleSession = async (stale: TrelloSession) => {
     );
 
     if (!revokeResult.ok) {
-      console.error("TRELLO: Failed to revoke previous token");
+      console.warn("TRELLO: Failed to revoke previous token");
     } else {
       console.log("TRELLO: Successfully revoked previous token");
     }
