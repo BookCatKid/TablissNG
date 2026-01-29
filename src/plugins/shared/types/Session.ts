@@ -5,4 +5,4 @@
 export type Session = {
   name: string; // key to identify session token in local storage
   expires: number;
-}
+};
