@@ -30,14 +30,19 @@ export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
   }
 
   // Attempt to clear previous stale session
-  const obj = await browser.storage.local.get(SESSION_NAME);
-  const staleSession =
-    typeof obj[SESSION_NAME] === "object"
-      ? (obj[SESSION_NAME] as TrelloSession)
-      : null;
+  let staleSession: TrelloSession | null = null;
 
-  if (staleSession) {
-    await revokeStaleSession(staleSession);
+  try {
+    const obj = await browser.storage.local.get(SESSION_NAME);
+    staleSession =
+      typeof obj[SESSION_NAME] === "object"
+        ? (obj[SESSION_NAME] as TrelloSession)
+        : null;
+    if (staleSession) {
+      await revokeStaleSession(staleSession);
+    }
+  } catch (error) {
+    console.error(`TRELLO: Failed to clear previous session ${error}`);
   }
 
   const expiry = Date.now() + 60 * 60 * 24 * 30 * 1000; // tokens live for 1 month
@@ -88,9 +93,7 @@ const revokeStaleSession = async (stale: TrelloSession) => {
     } else {
       console.log("TRELLO: Successfully revoked previous token");
     }
-  } catch {
-    console.error(
-      "TRELLO: Failed to make HTTP delete request for removing token",
-    );
+  } catch (error) {
+    console.warn(`TRELLO: Failed to delete stale token ${error}`);
   }
 };
