@@ -1,11 +1,7 @@
 import React from "react";
-
-import Backdrop from "../../../views/shared/Backdrop";
-
-import { getPicture } from "./api";
-import "./Apod.sass";
-import ApodTitle from "./ApodTitle";
 import { defaultData, Props } from "./types";
+import { getPicture } from "./api";
+import BaseBackground from "../base/BaseBackground";
 
 const Apod: React.FC<Props> = ({
   cache,
@@ -17,8 +13,11 @@ const Apod: React.FC<Props> = ({
   const mounted = React.useRef(false);
 
   React.useEffect(() => {
-    getPicture(data, loader).then(setCache);
-    if (mounted.current || !picture) getPicture(data, loader).then(setPicture);
+    const isUpdate = mounted.current;
+    getPicture(data, loader).then((result) => {
+      setCache(result);
+      if (isUpdate || !picture) setPicture(result);
+    });
     mounted.current = true;
   }, [data.customDate, data.date]);
 
@@ -38,19 +37,33 @@ const Apod: React.FC<Props> = ({
             ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
             : picture?.thumbnail_url || "";
         })();
+  const leftInfo =
+    picture && picture.title && picture.date
+      ? [
+          {
+            label: picture.title,
+            url: `https://apod.nasa.gov/apod/ap${picture.date.toString().replace(/-/g, "").substring(2)}.html`,
+          },
+        ]
+      : [];
+
+  const rightInfo =
+    picture && picture.copyright
+      ? {
+          label: picture.copyright,
+          url: `https://www.google.com/search?q=${encodeURIComponent(picture.copyright)}`,
+        }
+      : null;
 
   return (
-    <div className="Apod fullscreen">
-      <Backdrop
-        className="picture fullscreen"
-        ready={!!imageUrl}
-        url={imageUrl}
-      >
-        {picture && data.showTitle && (
-          <ApodTitle title={picture.title} copyright={picture.copyright} />
-        )}
-      </Backdrop>
-    </div>
+    <BaseBackground
+      containerClassName="Apod fullscreen"
+      url={imageUrl ?? null}
+      showControls={false}
+      showInfo={data.showTitle}
+      leftInfo={leftInfo}
+      rightInfo={rightInfo}
+    />
   );
 };
 

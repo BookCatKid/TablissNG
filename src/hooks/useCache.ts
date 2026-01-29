@@ -1,6 +1,7 @@
 import { EffectCallback, useEffect, useMemo, useRef } from "react";
 import { Cache } from "../plugins";
 import { useTime } from "./useTime";
+import { wrap } from "../utils";
 
 /**
  * A cached effect that automatically reruns after the expires time or on deps change.
@@ -42,50 +43,73 @@ export function useRotatingCache<T>(
   timeout: number,
   deps: unknown[],
 ): T | undefined {
+  const isValidCache =
+    !!cache &&
+    Array.isArray(cache.items) &&
+    typeof cache.cursor === "number" &&
+    typeof cache.rotated === "number";
   // Find cursor
   const time = useTime("absolute").getTime();
   const boot = useRef(true);
   const cursor = useMemo(() => {
-    if (cache) {
-      if (
-        (timeout === 0 && boot.current) ||
-        (timeout !== 0 && time > cache.rotated + timeout)
-      ) {
-        const cursor = cache.cursor + 1;
-        setCache({ ...cache, cursor, rotated: Date.now() });
-        boot.current = false;
-        return cursor;
-      }
+    if (!isValidCache) return 0;
+
+    if (
+      (timeout === 0 && boot.current) ||
+      (timeout !== 0 && time > cache.rotated + timeout)
+    ) {
+      const cursor = cache.cursor + 1;
+      setCache({ ...cache, cursor, rotated: Date.now() });
       boot.current = false;
-      return cache.cursor;
+      return cursor;
     }
-    return 0;
+    boot.current = false;
+    return cache.cursor;
   }, [cache, time, timeout]);
 
   // Fetch more when cursor reaches end
   useEffect(() => {
-    if (cache && cursor >= cache.items.length - 1) {
-      // fetch more
-      fetch().then((items) =>
+    if (
+      isValidCache &&
+      Array.isArray(cache.items) &&
+      cursor >= cache.items.length - 1
+    ) {
+      // fetch more; preserve up to the last 10 existing items
+      fetch().then((items) => {
+        if (items.length === 0) {
+          return;
+        }
+        const preserved = cache.items.slice(-10);
+        const newItems = [...preserved, ...items];
+        // place cursor on the last preserved item so the next rotation moves into new items
+        const newCursor = Math.max(0, preserved.length - 1);
         setCache({
           ...cache,
-          items: [...cache.items.slice(-10), ...items],
-          cursor: 9,
-        }),
-      );
+          items: newItems,
+          cursor: newCursor,
+        });
+      });
     }
   }, [cursor]);
 
   // Refresh of deps change
   useEffect(() => {
-    if (!cache || !areDepsEqual(deps, cache.deps)) {
+    if (!isValidCache || !areDepsEqual(deps, cache?.deps ?? [])) {
       fetch().then((items) =>
         setCache({ items, cursor: 0, rotated: Date.now(), deps }),
       );
     }
-  }, [...deps, cache]);
+  }, [cache?.deps, ...deps]);
 
-  return cache ? cache.items[cursor] : undefined;
+  if (!isValidCache) return undefined;
+  const { items } = cache;
+  if (!Array.isArray(items) || typeof cursor !== "number") return undefined;
+
+  // Final safety check to ensure cursor is within bounds for the current render
+  if (items.length === 0) return undefined;
+  const safeCursor = wrap(cursor, items.length);
+
+  return items[safeCursor];
 }
 
 /**

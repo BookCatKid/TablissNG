@@ -70,19 +70,19 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: tabliss-firefox
-      - run: zip release.zip ./* -r; mv release.zip ../release.zip; rm -rf *
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref }}
-      - run: zip source.zip ./* -r; mv source.zip ../source.zip; rm -rf *
-      - run: mv ../release.zip release.zip; mv ../source.zip source.zip
-      - uses: yayuyokitano/firefox-addon@v0.0.6-alpha
-        with:
-          api_key: ${{ secrets.AMO_ISSUER }}
-          api_secret: ${{ secrets.AMO_SECRET }}
-          guid: "extension@tabliss-maintained"
-          xpi_path: release.zip
-          src_path: source.zip
+          path: dist/firefox
+      - name: Install web-ext
+        run: npm install --global web-ext
+      - name: Submit to Firefox Add-ons
+        run: |
+          web-ext sign \
+            --source-dir=dist/firefox \
+            --api-key=${{ secrets.AMO_ISSUER }} \
+            --api-secret=${{ secrets.AMO_SECRET }} \
+            --channel=listed
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
 
   upload-chrome-store:
     needs: [build]
@@ -112,124 +112,23 @@ jobs:
     name: Upload extension to Edge Store
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
       - uses: actions/download-artifact@v4
         with:
           name: tabliss-chromium
-
+      - name: Remove key field from manifest
+        run: |
+          jq 'del(.key)' manifest.json > manifest.tmp.json
+          mv manifest.tmp.json manifest.json
       - name: Create Release ZIP
-        run: zip -r release.zip ./*
-
-      # -----------------------
-      # Upload to Microsoft Edge Store
-      # -----------------------
-      - name: Upload Edge Extension Package
-        id: edge-upload
-        run: |
-          FILE_PATH="release.zip"
-          UPLOAD_URL="https://api.addons.microsoftedge.microsoft.com/v1/products/${{ secrets.EDGE_PRODUCT_ID }}/submissions/draft/package"
-
-          # Upload the package
-          response=$(curl -s -D - \
-            -H "Authorization: ApiKey ${{ secrets.EDGE_API_KEY }}" \
-            -H "X-ClientID: ${{ secrets.EDGE_CLIENT_ID }}" \
-            -H "Content-Type: application/zip" \
-            -X POST \
-            --data-binary @"$FILE_PATH" \
-            "$UPLOAD_URL")
-
-          echo "$response" > upload_response.txt
-          status_code=$(head -n 1 upload_response.txt | awk '{print $2}')
-          if [ "$status_code" != "202" ]; then
-            echo "Upload failed with status $status_code"
-            cat upload_response.txt
-            exit 1
-          fi
-
-          # Extract operation ID from Location header
-          OPERATION_ID=$(grep -i Location upload_response.txt | awk '{print $2}' | tr -d '\r\n')
-          echo "operation_id=$OPERATION_ID" >> $GITHUB_OUTPUT
-
-      - name: Wait for Edge Upload to Complete
-        run: |
-          RETRIES=10
-          SLEEP=10
-          OP_ID="${{ steps.edge-upload.outputs.operation_id }}"
-
-          for i in $(seq 1 $RETRIES); do
-            STATUS=$(curl -s \
-              -H "Authorization: ApiKey ${{ secrets.EDGE_API_KEY }}" \
-              -H "X-ClientID: ${{ secrets.EDGE_CLIENT_ID }}" \
-              "https://api.addons.microsoftedge.microsoft.com/v1/products/${{ secrets.EDGE_PRODUCT_ID }}/submissions/draft/package/operations/$OP_ID" \
-              | jq -r '.status')
-
-            echo "Upload status: $STATUS"
-            if [ "$STATUS" != "InProgress" ]; then
-              if [ "$STATUS" = "Succeeded" ]; then
-                exit 0
-              else
-                echo "Upload failed: $STATUS"
-                exit 1
-              fi
-            fi
-            sleep $SLEEP
-          done
-          echo "Upload timed out"
-          exit 1
-
-      - name: Publish Edge Extension
-        id: edge-publish
-        run: |
-          PUBLISH_URL="https://api.addons.microsoftedge.microsoft.com/v1/products/${{ secrets.EDGE_PRODUCT_ID }}/submissions"
-          response=$(curl -s -D - \
-            -H "Authorization: ApiKey ${{ secrets.EDGE_API_KEY }}" \
-            -H "X-ClientID: ${{ secrets.EDGE_CLIENT_ID }}" \
-            -H "Content-Type: application/json" \
-            -X POST \
-            -d '{ "notes": "Automated publish from GitHub Actions" }' \
-            "$PUBLISH_URL")
-
-          echo "$response" > publish_response.txt
-          status_code=$(head -n 1 publish_response.txt | awk '{print $2}')
-          if [ "$status_code" != "202" ]; then
-            echo "Publish failed with status $status_code"
-            cat publish_response.txt
-            exit 1
-          fi
-
-          # Extract operation ID from Location header
-          PUB_OPERATION_ID=$(grep -i Location publish_response.txt | awk '{print $2}' | tr -d '\r\n')
-          echo "operation_id=$PUB_OPERATION_ID" >> $GITHUB_OUTPUT
-
-      - name: Wait for Edge Publish to Complete
-        run: |
-          RETRIES=15
-          SLEEP=20
-          PUB_OP_ID="${{ steps.edge-publish.outputs.operation_id }}"
-
-          for i in $(seq 1 $RETRIES); do
-            STATUS=$(curl -s \
-              -H "Authorization: ApiKey ${{ secrets.EDGE_API_KEY }}" \
-              -H "X-ClientID: ${{ secrets.EDGE_CLIENT_ID }}" \
-              "https://api.addons.microsoftedge.microsoft.com/v1/products/${{ secrets.EDGE_PRODUCT_ID }}/submissions/operations/$PUB_OP_ID" \
-              | jq -r '.status')
-
-            echo "Publish status: $STATUS"
-            if [ "$STATUS" != "InProgress" ]; then
-              if [ "$STATUS" = "Succeeded" ]; then
-                exit 0
-              else
-                echo "Publish failed: $STATUS"
-                exit 1
-              fi
-            fi
-            sleep $SLEEP
-          done
-          echo "Publish timed out"
-          exit 1
+        run: zip -r addon.zip ./*
+      - uses: birchill/edge-addon-upload@v1.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          addon_file: addon.zip
+          api_key: ${{ secrets.EDGE_API_KEY }}
+          client_id: ${{ secrets.EDGE_CLIENT_ID }}
+          product_id: ${{ secrets.EDGE_PRODUCT_ID }}
 
   create-release:
     needs: [build]

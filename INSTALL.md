@@ -12,8 +12,9 @@
 
 1. **Go to the [Releases page](https://github.com/BookCatKid/TablissNG/releases)** of the repository
 2. Find the latest release. For the absolute latest development builds, prefer the Nightly release (tag `nightly-auto`). If you need stability, use the latest stable release instead.
-3. Download the appropriate file: (for Nightly builds, the filenames will include `-nightly`)
-   - For Firefox: `tabliss-firefox-signed.xpi` (This file may not exist, if you need it and it is not available, please see [Downloading signed xpi from firefox store](#Downloading-signed-xpi-from-firefox-store))
+3. Download the appropriate file: (for Nightly builds, the filenames will include `-nightly` or `tablissng-X.X.X.X.xpi` for Firefox)
+   - For Firefox (Nightly): `tablissng-1.6.1.3.xpi`
+   - For Firefox (Stable): `tabliss-firefox-signed.xpi` (This file may not exist)
    - For Chrome/Chromium: `tabliss-chromium.zip`
    - For Firefox (unsigned version): `tabliss-firefox.zip` (expert)
    - For Safari (unsigned version): `tabliss-safari.zip` (expert)
@@ -34,7 +35,7 @@
 
 #### Firefox
 
-1. Go to `about\:addons`
+1. Go to `about:addons`
 2. Click the gear icon
 3. Click "Install Add-on from File"
 4. Select the .zip or .xpi file you downloaded
@@ -57,16 +58,6 @@ For now the only way to install the safari extension is to install developer mod
 4. Select the folder you unzipped. (make sure it has manifest.json in the root)
 5. You should be brought to the `Extensions` tab and now click on the checkbox next to extension to enable it.
 6. Click `Use for new windows and tabs` to allow TablissNG to overide your new tab page. (If its not working select TablissNG for the two `New * open with` options)
-
-### Downloading signed xpi from firefox store
-
-- You can use the following command to download the latest signed version from the Firefox store:
-
-```sh
-curl -O $(curl -s "https://addons.mozilla.org/api/v5/addons/addon/tablissng/" | jq -r ".current_version.file.url")
-```
-
-- This will download the latest signed version of the extension. You can then install it in Firefox by following the steps above.
 
 ## Notes
 

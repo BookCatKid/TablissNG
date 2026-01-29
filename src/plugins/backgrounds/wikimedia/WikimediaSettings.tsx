@@ -9,7 +9,7 @@ const WikimediaSettings: React.FC<Props> = ({
   data = defaultData,
   setData,
 }) => (
-  <div className="ApodSettings">
+  <div className="WikimediaSettings">
     <label>
       <FormattedMessage {...backgroundMessages.dateOfPicture} />
       <select

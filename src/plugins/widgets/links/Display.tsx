@@ -56,7 +56,7 @@ type Props = Link & {
   onLinkClick?: () => void;
 };
 
-const Display: FC<Props> = ({
+export const Display: FC<Props> = ({
   icon,
   iconSize,
   IconString,
@@ -151,6 +151,7 @@ const Display: FC<Props> = ({
           <img
             alt={domain}
             src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+            style={{ width: iconSize, height: iconSize }}
           />
         </i>
       ) : (icon === "_favicon_google" && domain) ||
@@ -159,6 +160,7 @@ const Display: FC<Props> = ({
           <img
             alt={domain}
             src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`}
+            style={{ width: iconSize, height: iconSize }}
           />
         </i>
       ) : icon === "_favicon_favicone" && domain ? (
@@ -166,6 +168,7 @@ const Display: FC<Props> = ({
           <img
             alt={domain}
             src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`}
+            style={{ width: iconSize, height: iconSize }}
           />
         </i>
       ) : icon === "_custom_iconify" && IconString ? (
@@ -214,13 +217,13 @@ const Display: FC<Props> = ({
                 ? iconifyIdentifier + iconifyValue
                 : "feather:bookmark"
             }
-            width={customWidth}
-            height={customHeight}
+            width={customWidth || iconSize}
+            height={customHeight || iconSize}
           />
         </i>
       ) : icon ? (
         <i>
-          <Icon icon={"feather:" + icon} />
+          <Icon icon={"feather:" + icon} width={iconSize} height={iconSize} />
         </i>
       ) : null}
       {name}

@@ -14,20 +14,3 @@
   justify-content: center;
   align-items: center;
 }
-
-.beta-badge {
-  position: absolute;
-  top: -5px;
-  right: -3px;
-  background-color: #f1c40f;
-  color: #000;
-  font-size: 6px;
-  font-weight: bold;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-}

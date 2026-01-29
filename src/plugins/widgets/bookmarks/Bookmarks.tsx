@@ -1,19 +1,26 @@
 import React, { FC, ReactNode, useEffect, useState } from "react";
 import { defaultData, Props } from "./types";
 import "./Bookmarks.sass";
+import "../links/Links.sass";
 import Icon from "../../../views/shared/icons/Icon";
 import { BookmarkTreeNode } from "./types";
 import { cleanTitle, truncateText } from "../topSites/TopSites";
+import { Display } from "../links/Display";
 
 type NodeProps = {
   node: BookmarkTreeNode;
   depth: number;
   wrap: boolean;
-  navigationStyle: "drill-down" | "expand-collapse" | "auto-expanded";
+  navigationStyle:
+    | "drill-down"
+    | "expand-collapse"
+    | "auto-expanded"
+    | "quick-links";
   onFolderClick?: (folderId: string) => void;
   iconProvider: string;
   shortNames: boolean;
   maxTextLength: number;
+  iconSize: number;
   isRoot?: boolean;
   expandedFolders?: string[];
   setExpandedFolders?: (ids: string[]) => void;
@@ -29,6 +36,7 @@ const Node: FC<NodeProps> = ({
   iconProvider,
   shortNames,
   maxTextLength,
+  iconSize,
   isRoot = false,
   expandedFolders = [],
   setExpandedFolders,
@@ -70,6 +78,7 @@ const Node: FC<NodeProps> = ({
             iconProvider={iconProvider}
             shortNames={shortNames}
             maxTextLength={maxTextLength}
+            iconSize={iconSize}
             expandedFolders={expandedFolders}
             setExpandedFolders={setExpandedFolders}
             rememberExpanded={rememberExpanded}
@@ -82,7 +91,7 @@ const Node: FC<NodeProps> = ({
   const handleClick = () => {
     if (!isFolder) return;
 
-    if (navigationStyle === "drill-down") {
+    if (navigationStyle === "drill-down" || navigationStyle === "quick-links") {
       onFolderClick?.(node.id);
     } else if (navigationStyle === "expand-collapse") {
       if (rememberExpanded && setExpandedFolders) {
@@ -99,21 +108,47 @@ const Node: FC<NodeProps> = ({
   };
 
   let displayTitle: string;
-  if (isFolder) {
+  if (maxTextLength === -1) {
+    displayTitle = "";
+  } else if (isFolder) {
     displayTitle = node.title?.trim() ? node.title : "(Untitled Folder)";
+    if (maxTextLength > 0) {
+      displayTitle = truncateText(displayTitle, maxTextLength);
+    }
   } else if (shortNames && node.url) {
     displayTitle = truncateText(
       cleanTitle(node.title, node.url),
       maxTextLength,
     );
   } else {
-    displayTitle = node.title;
+    displayTitle = truncateText(node.title, maxTextLength);
   }
 
   const domain = node.url ? new URL(node.url).hostname : "";
 
   // Determine if we should add the 'no-rotate' class for auto-expanded mode
   const folderClass = `${cls} ${isExpanded ? "expanded" : ""} ${navigationStyle === "auto-expanded" ? "no-rotate" : ""}`;
+
+  const iconStyle = {
+    width: `${iconSize}px`,
+    height: `${iconSize}px`,
+  };
+
+  if (navigationStyle === "quick-links") {
+    return (
+      <Display
+        id={node.id}
+        url={node.url || "#"}
+        name={displayTitle}
+        number={10} // Set to ten so that it doesn't display a hover title. Kinda hacky, but whatever
+        linkOpenStyle={false} // Just use default I guess
+        linksNumbered={false}
+        icon={node.url ? iconProvider : "folder"}
+        iconSize={iconSize}
+        onLinkClick={handleClick}
+      />
+    );
+  }
 
   return (
     <>
@@ -131,18 +166,27 @@ const Node: FC<NodeProps> = ({
         onClick={handleClick}
       >
         {isFolder ? (
-          <Icon name={cls} />
+          <Icon name={cls} size={iconSize} />
         ) : iconProvider === "_favicon_duckduckgo" ? (
-          <img alt="" src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} />
+          <img
+            alt=""
+            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+            style={iconStyle}
+          />
         ) : iconProvider === "_favicon_google" ? (
           <img
             alt=""
-            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=32`}
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=256`}
+            style={iconStyle}
           />
         ) : iconProvider === "_favicon_favicone" ? (
-          <img alt="" src={`https://favicone.com/${domain}?s=32`} />
+          <img
+            alt=""
+            src={`https://favicone.com/${domain}?s=256`}
+            style={iconStyle}
+          />
         ) : (
-          <Icon name={cls} />
+          <Icon name={cls} size={iconSize} />
         )}
         {node.url ? <a href={node.url}>{displayTitle}</a> : displayTitle}
       </div>
@@ -163,6 +207,7 @@ const Node: FC<NodeProps> = ({
             iconProvider={iconProvider}
             shortNames={shortNames}
             maxTextLength={maxTextLength}
+            iconSize={iconSize}
             expandedFolders={expandedFolders}
             setExpandedFolders={setExpandedFolders}
             rememberExpanded={rememberExpanded}
@@ -254,7 +299,7 @@ const Bookmarks: FC<Props> = ({ data = defaultData, setData }) => {
 
   return (
     <div
-      className="Bookmarks"
+      className={`Bookmarks ${data.navigationStyle} ${data.showNameUnderIcon ? "show-names-under" : ""}`}
       style={{
         maxWidth: data.maxWidth + "em",
         maxHeight: data.maxHeight + "em",
@@ -269,7 +314,7 @@ const Bookmarks: FC<Props> = ({ data = defaultData, setData }) => {
               style={{ marginLeft: "0em", cursor: "pointer" }}
               onClick={navigateBack}
             >
-              <Icon name="folder" />
+              <Icon name="folder" size={data.iconSize} />
               ..
             </div>
           )}
@@ -285,6 +330,7 @@ const Bookmarks: FC<Props> = ({ data = defaultData, setData }) => {
                 iconProvider={data.iconProvider}
                 shortNames={data.shortNames}
                 maxTextLength={data.maxTextLength}
+                iconSize={data.iconSize}
               />
             ),
           )}
@@ -299,8 +345,50 @@ const Bookmarks: FC<Props> = ({ data = defaultData, setData }) => {
           iconProvider={data.iconProvider}
           shortNames={data.shortNames}
           maxTextLength={data.maxTextLength}
+          iconSize={data.iconSize}
           isRoot={true} // Mark as root node for auto-expanded mode
         />
+      ) : data.navigationStyle === "quick-links" ? (
+        <div className="quick-links-wrapper">
+          {navigationStack.length > 1 && (
+            <div
+              className="folder"
+              style={{
+                marginLeft: "0.25em",
+                cursor: "pointer",
+                marginBottom: "0.5em",
+              }}
+              onClick={navigateBack}
+            >
+              <Icon name="folder" size={data.iconSize} />
+              ..
+            </div>
+          )}
+          <div
+            className="Links"
+            style={{
+              gridTemplateColumns: `repeat(${data.columns || 1}, 1fr)`,
+              textAlign: (data.columns || 1) > 1 ? "left" : "inherit",
+            }}
+          >
+            {navigationStack[navigationStack.length - 1]?.children?.map(
+              (item) => (
+                <Node
+                  key={item.id}
+                  node={item}
+                  depth={0}
+                  wrap={data.wrap}
+                  navigationStyle={data.navigationStyle}
+                  onFolderClick={navigateToFolder}
+                  iconProvider={data.iconProvider}
+                  shortNames={data.shortNames}
+                  maxTextLength={data.maxTextLength}
+                  iconSize={data.iconSize}
+                />
+              ),
+            )}
+          </div>
+        </div>
       ) : (
         <Node
           node={tree}
@@ -311,6 +399,7 @@ const Bookmarks: FC<Props> = ({ data = defaultData, setData }) => {
           iconProvider={data.iconProvider}
           shortNames={data.shortNames}
           maxTextLength={data.maxTextLength}
+          iconSize={data.iconSize}
           expandedFolders={data.expandedFolders}
           setExpandedFolders={
             setData

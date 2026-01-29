@@ -61,7 +61,6 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
                   xPercent: 50,
                   yPercent: 50,
                 });
-                window.location.reload();
               }}
               className="button button--primary"
             >
@@ -76,7 +75,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
             <p className="info">
               <FormattedMessage
                 id="settings.position.drag"
-                defaultMessage="Drag the widget to adjust its position"
+                defaultMessage="Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments."
                 description="Help text shown when editing widget position"
               />
             </p>
@@ -115,13 +114,14 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
           value={display.scale}
           list="scale-markers"
           min="0"
-          max="2"
+          max="3"
           step="0.1"
           onChange={(event) => onChange({ scale: Number(event.target.value) })}
         />
         <datalist id="scale-markers">
           {/* <option value="0.5" label="-0.5" /> */}
           <option value="1" label="Default" />
+          <option value="2" label="Double" />
           {/* <option value="1.5" label="+0.5" /> */}
         </datalist>
       </label>

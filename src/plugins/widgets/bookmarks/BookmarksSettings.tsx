@@ -78,15 +78,32 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
               navigationStyle: evt.target.value as
                 | "drill-down"
                 | "expand-collapse"
-                | "auto-expanded",
+                | "auto-expanded"
+                | "quick-links",
             })
           }
         >
           <option value="drill-down">Drill-down navigation</option>
           <option value="expand-collapse">Expandable folders</option>
           <option value="auto-expanded">Auto-expanded tree</option>
+          <option value="quick-links">Quick links style</option>
         </select>
       </label>
+
+      {data.navigationStyle === "quick-links" && (
+        <label>
+          Columns
+          <input
+            type="number"
+            min="1"
+            max="10"
+            value={data.columns || 1}
+            onChange={(evt) =>
+              setData({ ...data, columns: parseInt(evt.target.value, 10) })
+            }
+          />
+        </label>
+      )}
 
       {data.navigationStyle === "expand-collapse" && (
         <label>
@@ -120,6 +137,18 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
           value={data.maxHeight}
           onChange={(event) =>
             setData({ ...data, maxHeight: Number(event.target.value) })
+          }
+          min={1}
+        />
+      </label>
+
+      <label>
+        Icon Size (px)
+        <input
+          type="number"
+          value={data.iconSize ?? 24}
+          onChange={(event) =>
+            setData({ ...data, iconSize: Number(event.target.value) })
           }
           min={1}
         />
@@ -167,19 +196,30 @@ const BookmarksSettings: FC<Props> = ({ data = defaultData, setData }) => {
         Use short names
       </label>
 
-      {data.shortNames && (
+      {data.navigationStyle === "quick-links" && (
         <label>
-          Maximum Text Length (Use 0 for no limit)
           <input
-            type="number"
-            min="0"
-            value={data.maxTextLength || 0}
+            type="checkbox"
+            checked={data.showNameUnderIcon}
             onChange={(event) =>
-              setData({ ...data, maxTextLength: Number(event.target.value) })
+              setData({ ...data, showNameUnderIcon: event.target.checked })
             }
           />
+          Show name under icon
         </label>
       )}
+
+      <label>
+        Maximum Text Length (Use -1 to hide, 0 for no limit)
+        <input
+          type="number"
+          min="-1"
+          value={data.maxTextLength ?? 0}
+          onChange={(event) =>
+            setData({ ...data, maxTextLength: Number(event.target.value) })
+          }
+        />
+      </label>
     </div>
   );
 };

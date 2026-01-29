@@ -27,8 +27,16 @@ export function reorderLink(index: number, to: number) {
   } as const;
 }
 
+export function importLinks(links: Link[]) {
+  return {
+    type: "IMPORT_LINKS",
+    data: { links },
+  } as const;
+}
+
 export type Action =
   | ReturnType<typeof addLink>
   | ReturnType<typeof updateLink>
   | ReturnType<typeof removeLink>
-  | ReturnType<typeof reorderLink>;
+  | ReturnType<typeof reorderLink>
+  | ReturnType<typeof importLinks>;

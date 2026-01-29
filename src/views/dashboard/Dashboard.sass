@@ -20,7 +20,7 @@
             color: inherit
             opacity: 0.5
 
-    // Offset credits and widgets when the settings icon is in the same corner. TODO: probably refactor the custom settings icon position again
+    // Offset background components and widgets when the settings icon is in the same corner
     &.topLeft
         .Slot.topLeft
             top: 2rem
@@ -32,22 +32,13 @@
     &.bottomLeft
         .Slot.bottomLeft,
         .Slot.bottomCentre
-            bottom: 5rem
-
-        .credit .photo
-            transform: translateY(-2.5em)
-        .wikimedia-credit-title,
-        .credit:has(.giphy-logo)
-            transform: translateY(-2em)
-        .apod-credit
-            transform: translateY(-3em)
+            bottom: 6rem
+        .info-bar .left-info
+            transform: translateY(-3rem)
 
     &.bottomRight
         .Slot.bottomRight,
         .Slot.bottomCentre
-            bottom: 5rem
-
-        .credit .location-wrapper
-            transform: translateY(-2.5em)
-        .wikimedia-credit-copyright
-            transform: translateY(-3em)
+            bottom: 6rem
+        .info-bar .right-info
+            transform: translateY(-3rem)

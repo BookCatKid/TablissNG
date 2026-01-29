@@ -121,4 +121,14 @@ export const backgroundMessages = defineMessages({
     defaultMessage: "Locale",
     description: "Label for locale selection",
   },
+  search: {
+    id: "backgrounds.search",
+    defaultMessage: "Search",
+    description: "Search mode for background sources",
+  },
+  searchTerm: {
+    id: "backgrounds.searchTerm",
+    defaultMessage: "Search Term",
+    description: "Label for background search term input",
+  },
 });

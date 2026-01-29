@@ -28,6 +28,10 @@ export function reducer(state: State, action: Action) {
       links.splice(to, 0, links.splice(index, 1)[0]);
       return links;
     }
+
+    case "IMPORT_LINKS":
+      return state.concat(action.data.links);
+
     default:
       throw new Error("Unknown action");
   }

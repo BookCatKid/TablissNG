@@ -55,7 +55,7 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 - Widgets
   - Time Tracker, Bitcoin Mempool, Top Sites, Binary Clock, Bookmarks, Custom HTML.
   - Enhancements: Daily Routine for Todos, Bible verses in Quotes, Markdown in Notes
-  - "Free Move" mode for dragging widgets (very beta, but functional)
+  - "Free Move" mode for dragging widgets (Now out of beta 🎉)
 
 - Backgrounds & Visuals
   - Wikimedia Image of the Day, NASA APOD
@@ -72,7 +72,12 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 <a href="https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png" alt="Get the Extension on Chrome" height="70" style="border: 1px solid transparent; border-radius:6px;"></a>
 <a href="https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Get_it_from_Microsoft_Badge.svg/320px-Get_it_from_Microsoft_Badge.svg.png" alt="Get the Extension on Edge" height="70" style="border: 1px solid transparent; border-radius:4px;"></a>
 
-The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tabliss-a-beautiful-new/mkaphhbkcccpgkfaifhhdfckagnkcmhm) (edge addon might be outdated, contact me if you are actually using it.). If you want to use safari, see [INSTALL.md](INSTALL.md).
+The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm). If you want to use safari, see [INSTALL.md](INSTALL.md).
+
+**Nightly Builds (Firefox):**
+
+- **Nightly** (v1.6.1.3): [Install Nightly](https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.3.xpi)
+
 If you want to install the extension manually, or want nightly builds, see [INSTALL.md](INSTALL.md).
 
 ## Running Locally

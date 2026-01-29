@@ -1,27 +1,24 @@
 .bg-base
-    .credit
+    .info-bar
         display: grid
         grid-template-columns: 1fr auto 1fr
+        align-items: end
         position: absolute
         bottom: 1rem
         left: 1rem
         right: 1rem
 
-        .photo
+        .left-info
             grid-column: 1
 
         .controls
             grid-column: 2
             justify-self: center
 
-        .location-wrapper
+        .right-info
             grid-column: 3
             text-align: right
             justify-self: end
-
-        .location
-            display: inline-block
-            width: fit-content
 
         .hidden
             visibility: hidden

@@ -59,7 +59,19 @@ export interface BackgroundDisplay {
   scale?: boolean;
   nightStart?: string; // format "HH:mm" e.g. "21:00"
   nightEnd?: string; // format "HH:mm" e.g. "05:00"
+  position?: BackgroundPosition;
 }
+
+export type BackgroundPosition =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "top left"
+  | "top right"
+  | "bottom left"
+  | "bottom right";
 
 export interface WidgetState {
   id: string;
@@ -115,6 +127,7 @@ const initData: State = {
       scale: true,
       nightStart: "21:00", // 9 PM
       nightEnd: "05:00", // 5 AM
+      position: "center",
     },
   },
   "widget/default-time": {

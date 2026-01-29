@@ -153,7 +153,7 @@ export const importStore = (dump: any): void => {
     delete dump.version;
   } else if (dump.version > 3) {
     // Future version
-    throw new TypeError("Settings exported from an newer version of Tabliss");
+    throw new TypeError("Settings exported from a newer version of Tabliss");
   } else {
     // Unknown version
     throw new TypeError("Unknown settings version");

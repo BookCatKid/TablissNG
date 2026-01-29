@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { setBackground } from "../../db/action";
-import { BackgroundDisplay, db } from "../../db/state";
+import { BackgroundDisplay, BackgroundPosition, db } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import { backgroundConfigs, getConfig } from "../../plugins";
 import { sectionMessages } from "../../locales/messages";
@@ -211,6 +211,87 @@ const Background: React.FC = () => {
                     defaultMessage="Scale background to fit"
                     description="Label for scale background checkbox"
                   />
+                </label>
+
+                <label>
+                  <FormattedMessage
+                    id="backgrounds.position"
+                    defaultMessage="Position"
+                    description="Label for background position selection"
+                  />{" "}
+                  <br />
+                  <select
+                    value={data.display.position ?? "center"}
+                    onChange={(e) => {
+                      setBackgroundDisplay({
+                        position: e.target.value as BackgroundPosition,
+                      });
+                    }}
+                  >
+                    <option value="center">
+                      <FormattedMessage
+                        id="backgrounds.position.center"
+                        defaultMessage="Center"
+                        description="Center background position"
+                      />
+                    </option>
+                    <option value="top">
+                      <FormattedMessage
+                        id="backgrounds.position.top"
+                        defaultMessage="Top"
+                        description="Top background position"
+                      />
+                    </option>
+                    <option value="bottom">
+                      <FormattedMessage
+                        id="backgrounds.position.bottom"
+                        defaultMessage="Bottom"
+                        description="Bottom background position"
+                      />
+                    </option>
+                    <option value="left">
+                      <FormattedMessage
+                        id="backgrounds.position.left"
+                        defaultMessage="Left"
+                        description="Left background position"
+                      />
+                    </option>
+                    <option value="right">
+                      <FormattedMessage
+                        id="backgrounds.position.right"
+                        defaultMessage="Right"
+                        description="Right background position"
+                      />
+                    </option>
+                    <option value="top left">
+                      <FormattedMessage
+                        id="backgrounds.position.topLeft"
+                        defaultMessage="Top Left"
+                        description="Top left background position"
+                      />
+                    </option>
+                    <option value="top right">
+                      <FormattedMessage
+                        id="backgrounds.position.topRight"
+                        defaultMessage="Top Right"
+                        description="Top right background position"
+                      />
+                    </option>
+                    <option value="bottom left">
+                      <FormattedMessage
+                        id="backgrounds.position.bottomLeft"
+                        defaultMessage="Bottom Left"
+                        description="Bottom left background position"
+                      />
+                    </option>
+                    <option value="bottom right">
+                      <FormattedMessage
+                        id="backgrounds.position.bottomRight"
+                        defaultMessage="Bottom Right"
+                        description="Bottom right background position"
+                      />
+                    </option>
+                  </select>
                 </label>
 
                 <label>

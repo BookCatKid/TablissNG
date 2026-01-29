@@ -3,6 +3,7 @@ import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { DebounceInput } from "../../shared";
 import topics from "./topics.json";
 import { defaultData, Props } from "./types";
+import { backgroundMessages } from "../../../locales/messages";
 import Select from "react-dropdown-select";
 import BaseSettings from "../base/BaseSettings";
 
@@ -57,11 +58,7 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           checked={data.by === "search"}
           onChange={() => setData({ ...data, by: "search" })}
         />{" "}
-        <FormattedMessage
-          id="backgrounds.unsplash.search"
-          defaultMessage="Search"
-          description="Search title"
-        />
+        <FormattedMessage {...backgroundMessages.search} />
       </label>
 
       <label>
@@ -158,11 +155,7 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       {data.by === "search" && (
         <>
           <label>
-            <FormattedMessage
-              id="backgrounds.unsplash.searchTerm"
-              defaultMessage="Search Term"
-              description="Search Term title"
-            />
+            <FormattedMessage {...backgroundMessages.searchTerm} />
             <DebounceInput
               type="text"
               value={data.search}
@@ -248,6 +241,15 @@ const UnsplashSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
             />
           </option>
         </select>
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={data.showTitle}
+          onChange={() => setData({ ...data, showTitle: !data.showTitle })}
+        />{" "}
+        <FormattedMessage {...backgroundMessages.showTitle} />
       </label>
     </div>
   );

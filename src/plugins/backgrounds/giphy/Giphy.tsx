@@ -1,33 +1,50 @@
 import React from "react";
-import { useObjectUrl } from "../../../hooks";
-import Backdrop from "../../../views/shared/Backdrop";
-import { getGif } from "./api";
-import Credit from "./Credit";
-import "./Giphy.sass";
+import { useBackgroundRotation } from "../../../hooks";
+import BaseBackground from "../base/BaseBackground";
+import { getGifs } from "./api";
+import giphyLogo from "./giphy-logo.png";
 import { defaultData, Props } from "./types";
 
 const Giphy: React.FC<Props> = ({
   cache,
   data = defaultData,
   setCache,
+  setData,
   loader,
 }) => {
-  const [gif, setGif] = React.useState(cache);
-  React.useEffect(() => {
-    const config = { tag: data.tag, nsfw: data.nsfw };
-    getGif(config, loader).then(setCache);
-    setGif(cache);
-  }, [data.tag, data.nsfw]);
+  const { item, go, handlePause } = useBackgroundRotation({
+    fetch: () => getGifs(data, loader),
+    cacheObj: { cache, setCache },
+    data,
+    setData,
+    loader,
+    deps: [data.by, data.tag, data.nsfw],
+  });
 
-  const url = useObjectUrl(gif && gif.data);
+  const url = item?.url || null;
 
-  if (!gif || !url) return null;
+  if (!item || !url) return null;
+
+  const leftInfo = [
+    {
+      label: (
+        <img src={giphyLogo} alt="Powered by GIPHY" width={101} height={36} />
+      ),
+      url: item.link || "https://giphy.com/",
+    },
+  ];
 
   return (
-    <div className="Giphy fullscreen">
-      <Backdrop className="gif fullscreen" url={url}></Backdrop>
-      <Credit link={gif.link} />
-    </div>
+    <BaseBackground
+      containerClassName="Giphy fullscreen"
+      url={url}
+      paused={data.paused ?? false}
+      onPause={handlePause}
+      onPrev={go(-1)}
+      onNext={go(1)}
+      showInfo={true}
+      leftInfo={leftInfo}
+    />
   );
 };
 
