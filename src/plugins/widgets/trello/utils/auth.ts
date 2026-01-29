@@ -77,14 +77,20 @@ const revokeStaleSession = async (stale: TrelloSession) => {
     key: TRELLO_API_KEY,
     token: stale.accessToken,
   });
-  const revokeResult = await fetch(
-    `https://api.trello.com/1/tokens/${stale.accessToken}/?${params.toString()}`,
-    { method: "DELETE" },
-  );
+  try {
+    const revokeResult = await fetch(
+      `https://api.trello.com/1/tokens/${stale.accessToken}/?${params.toString()}`,
+      { method: "DELETE" },
+    );
 
-  if (!revokeResult.ok) {
-    console.error("TRELLO: Failed to revoke previous token");
-  } else {
-    console.log("TRELLO: Successfully revoked previous token");
+    if (!revokeResult.ok) {
+      console.error("TRELLO: Failed to revoke previous token");
+    } else {
+      console.log("TRELLO: Successfully revoked previous token");
+    }
+  } catch {
+    console.error(
+      "TRELLO: Failed to make HTTP delete request for removing token",
+    );
   }
 };
