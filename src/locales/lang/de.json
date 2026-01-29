@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Etwas ist schief gelaufen.",
   "plugins.unknown.errorMessage": "Etwas ist schief gelaufen, vielleicht wurde eine veraltete oder inkompatible Konfiguration importiert? Wenn du Hilfe benötigst, öffne bitte ein Problem bei",
   "plugins.unknown.name": "Unbekanntes Widget",
-  "plugins.unknown.widgetText": "Etwas ist schief gelaufen",
   "plugins.unsplash.photoLink": "Foto",
   "plugins.weather.apparent": "Gefühlte Temperatur",
   "plugins.weather.cannotDetermineLocation": "Dein Standort konnte nicht bestimmt werden: {err}",

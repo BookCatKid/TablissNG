@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Algo deu errado.",
   "plugins.unknown.errorMessage": "Algo deu errado, talvez uma configuração desatualizada ou incompatível foi importada? Se precisar de qualquer ajuda, por favor abra uma issue no",
   "plugins.unknown.name": "Widget Desconhecido",
-  "plugins.unknown.widgetText": "Algo deu errado",
   "plugins.unsplash.photoLink": "Foto",
   "plugins.weather.apparent": "Sensação térmica",
   "plugins.weather.cannotDetermineLocation": "Não foi possível determinar sua localização: {err}",

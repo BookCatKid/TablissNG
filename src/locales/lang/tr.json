@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Bir şeyler ters gitti.",
   "plugins.unknown.errorMessage": "Bir şeyler ters gitti, belki de eski veya uyumsuz bir yapılandırma içe aktarıldı? Herhangi bir yardıma ihtiyacınız olursa, lütfen şu adreste bir konu açın:",
   "plugins.unknown.name": "Bilinmeyen Araç",
-  "plugins.unknown.widgetText": "Bir şeyler yanlış gitti",
   "plugins.unsplash.photoLink": "Fotoğraf",
   "plugins.weather.apparent": "Hissedilen",
   "plugins.weather.cannotDetermineLocation": "Konumunuz belirlenemiyor: {err}",

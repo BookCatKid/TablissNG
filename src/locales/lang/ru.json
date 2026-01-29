@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Что-то пошло не так.",
   "plugins.unknown.errorMessage": "Что-то пошло не так, возможно, был импортирован устаревший или несовместимый конфиг? Если вам нужна какая-либо помощь, пожалуйста, откройте проблему на",
   "plugins.unknown.name": "Неизвестный виджет",
-  "plugins.unknown.widgetText": "Что-то пошло не так.",
   "plugins.unsplash.photoLink": "Фото",
   "plugins.weather.apparent": "Ощущается как",
   "plugins.weather.cannotDetermineLocation": "Невозможно определить ваше местоположение: {err}",

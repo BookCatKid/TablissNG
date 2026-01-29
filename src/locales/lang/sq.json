@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Diçka shkoi keq.",
   "plugins.unknown.errorMessage": "Diçka shkoi keq, ndoshta është importuar një konfigurim i vjetruar ose i papërputhshëm? Nëse të duhet ndihmë, hap një çështje në",
   "plugins.unknown.name": "Widget i panjohur",
-  "plugins.unknown.widgetText": "Diçka nuk funksionoi siç duhet",
   "plugins.unsplash.photoLink": "Foto",
   "plugins.weather.apparent": "Ndjehet si",
   "plugins.weather.cannotDetermineLocation": "Nuk mund të përcaktojë vendndodhjen: {err}",

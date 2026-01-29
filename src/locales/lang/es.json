@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Algo falló.",
   "plugins.unknown.errorMessage": "Algo falló, ¿quizás alguna configuración antigua o incompatible se ha importado? Si necesitas ayuda, popn un asunto al respecto",
   "plugins.unknown.name": "Widget desconocido",
-  "plugins.unknown.widgetText": "Algo ha fallado",
   "plugins.unsplash.photoLink": "Foto",
   "plugins.weather.apparent": "Sensación térmica",
   "plugins.weather.cannotDetermineLocation": "No se puede determinar tu ubicación: {err}",

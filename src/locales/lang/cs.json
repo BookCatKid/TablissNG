@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Něco se pokazilo.",
   "plugins.unknown.errorMessage": "Něco se pokazilo, možná byl importován zastaralý nebo nekompatibilní konfigurační soubor? Pokud potřebujete pomoc, otevřete issue na",
   "plugins.unknown.name": "Neznámý widget",
-  "plugins.unknown.widgetText": "Něco se pokazilo",
   "plugins.unsplash.photoLink": "Fotografie",
   "plugins.weather.apparent": "Pocitová teplota",
   "plugins.weather.cannotDetermineLocation": "Nelze zjistit polohu: {err}",

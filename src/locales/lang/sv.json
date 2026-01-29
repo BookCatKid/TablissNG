@@ -357,7 +357,6 @@
   "plugins.unknown.description": "Something went wrong.",
   "plugins.unknown.errorMessage": "Something went wrong, perhaps an outdated or incompatible config was imported? If you need any help whatsoever, please open an issue on",
   "plugins.unknown.name": "Unknown Widget",
-  "plugins.unknown.widgetText": "Something has gone wrong",
   "plugins.unsplash.photoLink": "Foto",
   "plugins.weather.apparent": "Känns som",
   "plugins.weather.cannotDetermineLocation": "Cannot determine your location: {err}",
