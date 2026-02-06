@@ -23,8 +23,10 @@ const parseSvg = (
     svg.setAttribute("width", `${width}`);
     if (!conserveAspectRatio) {
       svg.setAttribute("height", `${height}`);
+      svg.setAttribute("preserveAspectRatio", "none");
     } else {
       svg.removeAttribute("height");
+      svg.removeAttribute("preserveAspectRatio");
     }
 
     return <span dangerouslySetInnerHTML={{ __html: svg.outerHTML }} />;
