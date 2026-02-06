@@ -1,50 +1,108 @@
-import "./Links.sass";
-
+import React, { FC, useEffect, useMemo } from "react";
 import { Icon } from "@iconify/react";
-import { FC, useEffect, useMemo } from "react";
-import { defineMessages, useIntl } from "react-intl";
-
+import { useIntl } from "react-intl";
 import { useKeyPress, useToggle } from "../../../hooks";
-import { Display } from "./Display";
-import { defaultCache, defaultData, Props } from "./types";
-
-const messages = defineMessages({
-  showQuickLinks: {
-    id: "plugins.links.showQuickLinks",
-    description: "Tooltip to show quick links",
-    defaultMessage: "Show quick links",
-  },
-});
+import Display from "./Display";
+import "./Links.sass";
+import { Props, defaultCache, defaultData, Link } from "./types";
 
 const Links: FC<Props> = ({
   data = defaultData,
   setData,
   cache = defaultCache,
+  setCache,
 }) => {
   const [visible, toggleVisible] = useToggle();
 
   const intl = useIntl();
 
-  // Ensure all links have unique IDs to prevent React key errors
+  // Ensure all links have unique IDs and migrate SVGs to cache
   useEffect(() => {
+    let changed = false;
+    let cacheChanged = false;
+    const newCache = { ...cache };
+
     const linksWithIds = data.links.map((link, index) => {
-      if (!link.id || data.links.filter((l) => l.id === link.id).length > 1) {
-        return {
-          ...link,
-          id:
-            Date.now().toString(36) +
-            Math.random().toString(36).slice(2) +
-            index,
+      const updatedLink = { ...link } as any; // Cast to any to handle legacy fields during migration
+      let linkModified = false;
+
+      // Ensure all links have unique IDs
+      if (
+        !updatedLink.id ||
+        data.links.filter((l) => l.id === updatedLink.id).length > 1
+      ) {
+        updatedLink.id =
+          Date.now().toString(36) + Math.random().toString(36).slice(2) + index;
+        linkModified = true;
+      }
+
+      // Migrate IconString (Custom Iconify) to iconifyValue
+      if (
+        updatedLink.icon === "_custom_iconify" &&
+        updatedLink.IconString &&
+        !updatedLink.iconifyValue
+      ) {
+        updatedLink.iconifyValue = updatedLink.IconString;
+        updatedLink.iconifyIdentifier = ""; // It's usually already in the string
+        delete updatedLink.IconString;
+        linkModified = true;
+      }
+
+      // Migrate SvgString from Data to Cache
+      if (
+        updatedLink.icon === "_custom_svg" &&
+        updatedLink.SvgString &&
+        !updatedLink.iconCacheKey
+      ) {
+        const cacheKey = `migrated_svg_${updatedLink.id}_${Date.now()}`;
+        newCache[cacheKey] = {
+          data: updatedLink.SvgString,
+          type: "svg",
+          size: updatedLink.customWidth || 24,
         };
+
+        updatedLink.iconCacheKey = cacheKey;
+        delete updatedLink.SvgString;
+
+        linkModified = true;
+        cacheChanged = true;
+      }
+
+      // Migrate IconStringIco from Data to Cache
+      if (
+        updatedLink.icon === "_custom_ico" &&
+        updatedLink.IconStringIco &&
+        !updatedLink.iconCacheKey
+      ) {
+        const cacheKey = `migrated_ico_${updatedLink.id}_${Date.now()}`;
+        newCache[cacheKey] = {
+          data: updatedLink.IconStringIco,
+          type: "ico",
+          size: updatedLink.customWidth || 24,
+        };
+
+        updatedLink.iconCacheKey = cacheKey;
+        delete updatedLink.IconStringIco;
+
+        linkModified = true;
+        cacheChanged = true;
+      }
+
+      if (linkModified) {
+        changed = true;
+        return updatedLink as Link;
       }
       return link;
     });
 
-    // Only update if we actually changed something
-    if (JSON.stringify(linksWithIds) !== JSON.stringify(data.links)) {
+    if (changed) {
       setData({ ...data, links: linksWithIds });
     }
-  }, [data.links, setData]);
+
+    if (cacheChanged) {
+      setCache(newCache);
+    }
+  }, [data.links, setData, cache, setCache]);
 
   const handleLinkClick = (id: string) => {
     const updatedLinks = [...data.links];
@@ -105,7 +163,7 @@ const Links: FC<Props> = ({
 
   return (
     <div
-      className="Links"
+      className={`Links ${data.centerLinks ? "center-links" : ""}`.trim()}
       style={{
         gridTemplateColumns:
           data.visible || visible ? "1fr ".repeat(data.columns) : "1fr",
@@ -119,8 +177,6 @@ const Links: FC<Props> = ({
             number={index + 1}
             linkOpenStyle={data.linkOpenStyle}
             linksNumbered={data.linksNumbered}
-            customWidth={data.customWidth}
-            customHeight={data.customHeight}
             cache={cache}
             onLinkClick={() => handleLinkClick(link.id)}
             {...link}
@@ -129,7 +185,11 @@ const Links: FC<Props> = ({
       ) : (
         <a
           onClick={toggleVisible}
-          title={intl.formatMessage(messages.showQuickLinks)}
+          title={intl.formatMessage({
+            id: "plugins.links.showQuickLinks",
+            description: "Tooltip to show quick links",
+            defaultMessage: "Show quick links",
+          })}
         >
           <Icon icon="fe:insert-link" />
         </a>

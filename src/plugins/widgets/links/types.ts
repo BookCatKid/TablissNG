@@ -8,17 +8,13 @@ export type Link = {
   keyboardShortcut?: string;
   lastUsed?: number;
   iconSize?: number;
-  IconString?: string;
-  IconStringIco?: string;
-  SvgString?: string;
+  conserveAspectRatio?: boolean;
   customWidth?: number;
   customHeight?: number;
   iconifyIdentifier?: string;
   iconifyValue?: string;
-  // Reference to cached icon data
-  iconCacheKey?: string;
-  conserveAspectRatio?: boolean;
   useExtensionTabs?: boolean;
+  iconCacheKey?: string; // Reference to cached icon data
 };
 
 export type IconCacheItem = {
@@ -35,12 +31,8 @@ export type Data = {
   visible: boolean;
   linkOpenStyle: boolean;
   linksNumbered: boolean;
-  customWidth: number;
-  customHeight?: number;
   sortBy: "none" | "name" | "icon" | "lastUsed";
-  iconifyIdentifier: string;
-  iconifyValue?: string;
-  conserveAspectRatio?: boolean;
+  centerLinks: boolean;
 };
 
 export type Props = API<Data, Cache>;
@@ -49,8 +41,6 @@ export type DisplayProps = Link & {
   linkOpenStyle: boolean;
   linksNumbered: boolean;
   number: number;
-  customWidth?: number;
-  customHeight?: number;
   cache: Cache;
   onLinkClick?: () => void;
 };
@@ -68,10 +58,7 @@ export const defaultData: Data = {
   linkOpenStyle: false,
   linksNumbered: false,
   sortBy: "none",
-  customWidth: 24,
-  customHeight: 24,
-  iconifyIdentifier: "feather:",
-  conserveAspectRatio: false,
+  centerLinks: false,
 };
 
 export const defaultCache: Cache = {};

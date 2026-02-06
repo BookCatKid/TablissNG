@@ -1,73 +1,17 @@
-import "./Input.sass";
-
-import { Icon } from "@iconify/react";
-import icons from "feather-icons/dist/icons.json";
-import type { ChangeEvent } from "react";
-import { FC, useEffect, useRef, useState } from "react";
-import { defineMessages, FormattedMessage, useIntl } from "react-intl";
-
-import { addIconData, normalizeUrl } from "../../../utils";
+import React, { FC, useState, useRef, useEffect } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
 import {
-  DownIcon,
   IconButton,
   RemoveIcon,
+  DownIcon,
   UpIcon,
 } from "../../../views/shared";
-import { Cache, IconCacheItem, Link } from "./types";
-
-const messages = defineMessages({
-  githubIssue: {
-    id: "plugins.links.input.githubIssue",
-    defaultMessage: "this GitHub issue",
-    description: "Link text pointing to a GitHub issue for help",
-  },
-  optional: {
-    id: "plugins.links.input.optional",
-    defaultMessage: "optional",
-    description: "Label indicating an input field is optional",
-  },
-  removeLink: {
-    id: "plugins.links.input.removeLink",
-    defaultMessage: "Remove link",
-    description: "Button title to remove a link from the list",
-  },
-  moveDown: {
-    id: "plugins.links.input.moveDown",
-    defaultMessage: "Move link down",
-    description: "Button title to move a link down in the list",
-  },
-  moveUp: {
-    id: "plugins.links.input.moveUp",
-    defaultMessage: "Move link up",
-    description: "Button title to move a link up in the list",
-  },
-  custom: {
-    id: "plugins.links.input.custom",
-    defaultMessage: "Custom",
-    description: "Group label for custom icon options",
-  },
-  websiteIcons: {
-    id: "plugins.links.input.websiteIcons",
-    defaultMessage: "Website Icons",
-    description: "Group label for website favicon options",
-  },
-  iconifyIcons: {
-    id: "plugins.links.input.iconifyIcons",
-    defaultMessage: "Iconify Icons",
-    description: "Group label for iconify icon options",
-  },
-  searchIcons: {
-    id: "plugins.links.input.searchIcons",
-    defaultMessage: "Search icons...",
-    description: "Placeholder text for searching icons",
-  },
-  useExtensionTabsHelp: {
-    id: "plugins.links.input.useExtensionTabsHelp",
-    defaultMessage:
-      "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
-    description: "Help tooltip explaining the use extension tabs toggle",
-  },
-});
+import { Link, IconCacheItem, Cache } from "./types";
+import { Icon } from "@iconify/react";
+import { normalizeUrl } from "../../../utils";
+import "./Input.sass";
+import { IconPickerModal } from "./components/IconPickerModal";
+import { SizeInputs } from "./components/SizeInputs";
 
 type Props = Link & {
   number: number;
@@ -79,12 +23,9 @@ type Props = Link & {
   setCache: (cache: Cache) => void;
 };
 
-const iconList = Object.keys(icons);
-
 const Input: FC<Props> = (props) => {
   const [urlValue, setUrlValue] = useState(props.url);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const selectRef = useRef<HTMLSelectElement>(null);
   const intl = useIntl();
 
@@ -92,19 +33,9 @@ const Input: FC<Props> = (props) => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleIconSelect = (icon: string, identifier: string) => {
-    addIconData(identifier + icon);
     props.onChange({ iconifyIdentifier: identifier, iconifyValue: icon });
     setIsModalOpen(false);
   };
-
-  // Filter icons based on search query
-  const filteredIcons = iconList.filter((icon) => {
-    const searchQueryNoSpaces = searchQuery.replace(/\s/g, "-");
-    return (
-      icon.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      icon.toLowerCase().includes(searchQueryNoSpaces)
-    );
-  });
 
   const isGoogleOrFavicone =
     props.icon === "_favicon_google" || props.icon === "_favicon_favicone";
@@ -114,7 +45,7 @@ const Input: FC<Props> = (props) => {
   const isCustomUpload = props.icon === "_custom_upload";
   const isFeather = props.icon === "_feather";
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -179,7 +110,7 @@ const Input: FC<Props> = (props) => {
     return values;
   };
 
-  // Migrate to new method of storing icons, the old one would cause the select to display the wrong value after my changes
+  // Migrate to new method of storing icons
   useEffect(() => {
     if (props.icon === "_favicon") {
       props.onChange({ icon: "_favicon_google" });
@@ -198,14 +129,20 @@ const Input: FC<Props> = (props) => {
         <div className="title--buttons">
           <IconButton
             onClick={props.onRemove}
-            title={intl.formatMessage(messages.removeLink)}
+            title={intl.formatMessage({
+              id: "plugins.links.input.removeLink",
+              defaultMessage: "Remove link",
+            })}
           >
             <RemoveIcon />
           </IconButton>
           {props.onMoveDown && (
             <IconButton
               onClick={props.onMoveDown}
-              title={intl.formatMessage(messages.moveDown)}
+              title={intl.formatMessage({
+                id: "plugins.links.input.moveDown",
+                defaultMessage: "Move link down",
+              })}
             >
               <DownIcon />
             </IconButton>
@@ -213,7 +150,10 @@ const Input: FC<Props> = (props) => {
           {props.onMoveUp && (
             <IconButton
               onClick={props.onMoveUp}
-              title={intl.formatMessage(messages.moveUp)}
+              title={intl.formatMessage({
+                id: "plugins.links.input.moveUp",
+                defaultMessage: "Move link up",
+              })}
             >
               <UpIcon />
             </IconButton>
@@ -225,22 +165,17 @@ const Input: FC<Props> = (props) => {
             id="plugins.links.input.keyboardShortcut"
             defaultMessage="Keyboard shortcut {number}"
             values={{ number: props.number }}
-            description="Keyboard shortcut identifier for this link"
           />
         ) : (
           <FormattedMessage
             id="plugins.links.input.shortcut"
             defaultMessage="Shortcut"
-            description="Heading indicating the keyboard shortcut when number exceeds 9"
           />
         )}
       </h5>
+
       <label>
-        <FormattedMessage
-          id="plugins.links.input.url"
-          defaultMessage="URL"
-          description="Label for the URL input field"
-        />
+        <FormattedMessage id="plugins.links.input.url" defaultMessage="URL" />
         <input
           type="url"
           value={urlValue}
@@ -252,14 +187,16 @@ const Input: FC<Props> = (props) => {
           }}
         />
       </label>
+
       <label>
-        <FormattedMessage
-          id="plugins.links.input.name"
-          defaultMessage="Name"
-          description="Label for the name input field"
-        />{" "}
+        <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />{" "}
         <span className="text--grey">
-          (<FormattedMessage {...messages.optional} />)
+          (
+          <FormattedMessage
+            id="plugins.links.input.optional"
+            defaultMessage="optional"
+          />
+          )
         </span>
         <input
           type="text"
@@ -267,14 +204,16 @@ const Input: FC<Props> = (props) => {
           onChange={(event) => props.onChange({ name: event.target.value })}
         />
       </label>
+
       <label>
-        <FormattedMessage
-          id="plugins.links.input.icon"
-          defaultMessage="Icon"
-          description="Label for the icon dropdown selector"
-        />{" "}
+        <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />{" "}
         <span className="text--grey">
-          (<FormattedMessage {...messages.optional} />)
+          (
+          <FormattedMessage
+            id="plugins.links.input.optional"
+            defaultMessage="optional"
+          />
+          )
         </span>
         <select
           ref={selectRef}
@@ -285,92 +224,100 @@ const Input: FC<Props> = (props) => {
             <FormattedMessage
               id="plugins.links.input.none"
               defaultMessage="None"
-              description="Dropdown option to select no icon"
             />
           </option>
-          <optgroup label={intl.formatMessage(messages.websiteIcons)}>
+          <optgroup
+            label={intl.formatMessage({
+              id: "plugins.links.input.websiteIcons",
+              defaultMessage: "Website Icons",
+            })}
+          >
             <option value="_favicon_google">
               <FormattedMessage
                 id="plugins.links.input.fromGoogle"
                 defaultMessage="From Google"
-                description="Dropdown option to fetch favicon from Google"
               />
             </option>
             <option value="_favicon_duckduckgo">
               <FormattedMessage
                 id="plugins.links.input.fromDuckDuckGo"
                 defaultMessage="From DuckDuckGo"
-                description="Dropdown option to fetch favicon from DuckDuckGo"
               />
             </option>
             <option value="_favicon_favicone">
               <FormattedMessage
                 id="plugins.links.input.fromFavicone"
                 defaultMessage="From Favicone"
-                description="Dropdown option to fetch favicon from Favicone"
               />
             </option>
           </optgroup>
-          <optgroup label={intl.formatMessage(messages.custom)}>
+          <optgroup
+            label={intl.formatMessage({
+              id: "plugins.links.input.custom",
+              defaultMessage: "Custom",
+            })}
+          >
             <option value="_custom_iconify">
               <FormattedMessage
                 id="plugins.links.input.fromIconify"
                 defaultMessage="From Iconify"
-                description="Dropdown option to fetch an icon from Iconify"
               />
             </option>
             <option value="_custom_svg">
               <FormattedMessage
                 id="plugins.links.input.customSvgHtml"
                 defaultMessage="Custom SVG HTML"
-                description="Dropdown option to use custom SVG HTML"
               />
             </option>
             <option value="_custom_ico">
               <FormattedMessage
                 id="plugins.links.input.customImageUrl"
                 defaultMessage="Custom Image URL"
-                description="Dropdown option to use a custom image URL"
               />
             </option>
             <option value="_custom_upload">
               <FormattedMessage
                 id="plugins.links.input.uploadCustomIcon"
                 defaultMessage="Upload Custom Icon"
-                description="Dropdown option to upload a custom icon file"
               />
             </option>
           </optgroup>
-          <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
+          <optgroup
+            label={intl.formatMessage({
+              id: "plugins.links.input.iconifyIcons",
+              defaultMessage: "Iconify Icons",
+            })}
+          >
             <option value="_feather">
               <FormattedMessage
                 id="plugins.links.input.feather"
                 defaultMessage="Feather"
-                description="Dropdown option to select a Feather icon"
               />
             </option>
           </optgroup>
         </select>
       </label>
+
       {isCustomIconify && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customIconifyIdentifier"
             defaultMessage="Custom Iconify Identifier"
-            description="Label for setting a custom Iconify identifier"
           />
           <input
             type="text"
-            value={props.IconString}
+            value={props.iconifyValue || ""}
             onChange={(event) =>
-              props.onChange({ IconString: event.target.value })
+              props.onChange({
+                iconifyIdentifier: "",
+                iconifyValue: event.target.value,
+              })
             }
           />
           <p>
             <FormattedMessage
               id="plugins.links.input.iconifyHelp"
-              defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see"
-              description="Help text for Iconify identifier input"
+              defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see "
             />
             &nbsp;
             <a
@@ -378,31 +325,46 @@ const Input: FC<Props> = (props) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FormattedMessage {...messages.githubIssue} />
+              <FormattedMessage
+                id="plugins.links.input.githubIssue"
+                defaultMessage="this GitHub issue"
+              />
             </a>
             .
           </p>
         </label>
       )}
+
       {isCustomSvg && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customSvgHtmlLabel"
             defaultMessage="Custom SVG HTML"
-            description="Label for the custom SVG HTML input area"
           />
           <textarea
-            value={props.SvgString}
-            style={{ resize: "vertical" }}
-            onChange={(event) =>
-              props.onChange({ SvgString: event.target.value })
+            value={
+              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ||
+              ""
             }
+            style={{ resize: "vertical" }}
+            onChange={(event) => {
+              const value = event.target.value;
+              const cacheKey = props.iconCacheKey || `icon_svg_${props.id}`;
+              props.setCache({
+                ...(props.cache || {}),
+                [cacheKey]: {
+                  data: value,
+                  type: "svg",
+                  size: props.customWidth || 24,
+                },
+              });
+              props.onChange({ iconCacheKey: cacheKey });
+            }}
           />
           <p>
             <FormattedMessage
               id="plugins.links.input.customSvgHelp"
-              defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see"
-              description="Help text for the custom SVG input area"
+              defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see "
             />
             &nbsp;
             <a
@@ -410,42 +372,57 @@ const Input: FC<Props> = (props) => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <FormattedMessage {...messages.githubIssue} />
+              <FormattedMessage
+                id="plugins.links.input.githubIssue"
+                defaultMessage="this GitHub issue"
+              />
             </a>
             .
           </p>
         </label>
       )}
+
       {isCustomICON && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customImageUrlLabel"
             defaultMessage="Custom Image URL"
-            description="Label for custom image URL input"
           />
           <input
             type="text"
-            value={props.IconStringIco}
-            onChange={(event) =>
-              props.onChange({ IconStringIco: event.target.value })
+            value={
+              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ||
+              ""
             }
+            onChange={(event) => {
+              const value = event.target.value;
+              const cacheKey = props.iconCacheKey || `icon_ico_${props.id}`;
+              props.setCache({
+                ...(props.cache || {}),
+                [cacheKey]: {
+                  data: value,
+                  type: "ico",
+                  size: props.customWidth || 24,
+                },
+              });
+              props.onChange({ iconCacheKey: cacheKey });
+            }}
           />
           <p>
             <FormattedMessage
               id="plugins.links.input.customImageUrlHelp"
               defaultMessage="Enter a url on the internet for an image file"
-              description="Help text for the custom image URL input"
             />
           </p>
         </label>
       )}
+
       {isCustomUpload && (
         <div>
           <label>
             <FormattedMessage
               id="plugins.links.input.uploadIcon"
               defaultMessage="Upload Icon"
-              description="Label for the file input to upload an icon"
             />
             <input
               type="file"
@@ -455,6 +432,7 @@ const Input: FC<Props> = (props) => {
           </label>
         </div>
       )}
+
       {isFeather && (
         <div className="icon-picker">
           <button onClick={handleOpenModal} className="custom-select">
@@ -462,13 +440,11 @@ const Input: FC<Props> = (props) => {
               <FormattedMessage
                 id="plugins.links.input.openIconPicker"
                 defaultMessage="Open icon picker"
-                description="Button text to open the icon picker dialog"
               />
             ) : (
               <FormattedMessage
                 id="plugins.links.input.chooseIcon"
                 defaultMessage="Choose an Icon"
-                description="Button text asking user to choose an icon"
               />
             )}
           </button>
@@ -488,186 +464,21 @@ const Input: FC<Props> = (props) => {
           )}
         </div>
       )}
-      {(isCustomICON ||
-        (isCustomUpload &&
-          props.iconCacheKey &&
-          props.cache &&
-          props.cache[props.iconCacheKey]?.type !== "svg")) && (
-        <>
-          <label>
-            <FormattedMessage
-              id="plugins.links.input.conserveAspectRatio"
-              defaultMessage="Conserve Aspect Ratio"
-              description="Checkbox label to maintain icon aspect ratio"
-            />
-            <input
-              className="conserveAspectRatioButton"
-              type="checkbox"
-              checked={props.conserveAspectRatio}
-              onChange={(event) =>
-                props.onChange({ conserveAspectRatio: event.target.checked })
-              }
-            />
-          </label>
-          {props.conserveAspectRatio ? (
-            <label>
-              <FormattedMessage
-                id="plugins.links.input.scale"
-                defaultMessage="Scale"
-                description="Input label for scaling the icon size proportionately"
-              />
-              <input
-                type="number"
-                value={props.customWidth}
-                onChange={(event) => {
-                  props.onChange({
-                    customWidth: Number(event.target.value),
-                    customHeight: Number(event.target.value),
-                  });
-                }}
-              />
-            </label>
-          ) : (
-            <>
-              <label>
-                <FormattedMessage
-                  id="plugins.links.input.iconWidth"
-                  defaultMessage="Icon Width"
-                  description="Input label for icon width"
-                />
-                <input
-                  type="number"
-                  value={props.customWidth ?? 24}
-                  onChange={(event) =>
-                    props.onChange({ customWidth: Number(event.target.value) })
-                  }
-                />
-              </label>
-              <label>
-                <FormattedMessage
-                  id="plugins.links.input.iconHeight"
-                  defaultMessage="Icon Height"
-                  description="Input label for icon height"
-                />
-                <input
-                  type="number"
-                  value={props.customHeight ?? 24}
-                  onChange={(event) =>
-                    props.onChange({ customHeight: Number(event.target.value) })
-                  }
-                />
-              </label>
-            </>
-          )}
-        </>
-      )}
-      {(isCustomSvg ||
-        (isCustomUpload &&
-          props.iconCacheKey &&
-          props.cache &&
-          props.cache[props.iconCacheKey]?.type === "svg")) && (
-        <div>
-          <label>
-            <FormattedMessage
-              id="plugins.links.input.iconSize"
-              defaultMessage="Icon Size"
-              description="Input label for overall icon size"
-            />
-            <input
-              type="number"
-              value={props.customWidth ?? 24}
-              onChange={(event) => {
-                props.onChange({
-                  customWidth: Number(event.target.value),
-                  customHeight: Number(event.target.value),
-                });
-              }}
-            />
-          </label>
-          <p className="no-svg-scaling-warning">
-            <FormattedMessage
-              id="plugins.links.input.svgScalingWarning"
-              defaultMessage="Currently svgs do not support custom dimensions."
-              description="Warning message explaining SVG scaling limitations"
-            />
-          </p>
-        </div>
-      )}
-      {isGoogleOrFavicone && (
-        <label>
-          Icon Size
-          <select
-            value={props.iconSize ?? 256}
-            onChange={(event) =>
-              props.onChange({ iconSize: Number(event.target.value) })
-            }
-          >
-            <option value="16">16x16</option>
-            <option value="32">32x32</option>
-            <option value="64">64x64</option>
-            <option value="128">128x128</option>
-            <option value="256">256x256</option>
-          </select>
-        </label>
-      )}
-      {isModalOpen && (
-        <div className="Modal-container" onClick={handleCloseModal}>
-          <div className="Modal" onClick={(event) => event.stopPropagation()}>
-            <h2>
-              <FormattedMessage
-                id="plugins.links.input.selectIcon"
-                defaultMessage="Select an Icon"
-                description="Dialog title for the icon picker"
-              />
-            </h2>
 
-            <input
-              type="text"
-              placeholder={intl.formatMessage(messages.searchIcons)}
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              className="search-bar"
-            />
+      <SizeInputs
+        customWidth={props.customWidth}
+        customHeight={props.customHeight}
+        conserveAspectRatio={props.conserveAspectRatio}
+        iconSize={props.iconSize}
+        showResolutionInput={isGoogleOrFavicone}
+        onChange={props.onChange}
+      />
 
-            <div className="icon-grid">
-              {filteredIcons.length > 0 ? (
-                filteredIcons.map((icon) => (
-                  <button
-                    key={icon}
-                    className="icon-box"
-                    onClick={() => handleIconSelect(icon, "feather:")}
-                  >
-                    <Icon icon={"feather:" + icon} />
-                    <span>{icon.replace(/-/g, " ")}</span>
-                  </button>
-                ))
-              ) : (
-                <p className="no-results">
-                  <FormattedMessage
-                    id="plugins.links.input.noIconsFound"
-                    defaultMessage="No icons found"
-                    description="Message shown when icon search yields no results"
-                  />
-                </p>
-              )}
-            </div>
-
-            <button className="close-button" onClick={handleCloseModal}>
-              <FormattedMessage
-                id="plugins.links.input.cancel"
-                defaultMessage="Cancel"
-                description="Button text to cancel icon selection"
-              />
-            </button>
-          </div>
-        </div>
-      )}
       <label>
         <FormattedMessage
           id="plugins.links.input.keyboardShortcut"
           defaultMessage="Keyboard shortcut {number}"
           values={{ number: props.number }}
-          description="Keyboard shortcut identifier for this link"
         />
         <input
           type="text"
@@ -679,8 +490,15 @@ const Input: FC<Props> = (props) => {
           maxLength={1}
         />
       </label>
+
       {BUILD_TARGET !== "web" && (
-        <label title={intl.formatMessage(messages.useExtensionTabsHelp)}>
+        <label
+          title={intl.formatMessage({
+            id: "plugins.links.input.useExtensionTabsHelp",
+            defaultMessage:
+              "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
+          })}
+        >
           <input
             type="checkbox"
             checked={props.useExtensionTabs || false}
@@ -691,11 +509,17 @@ const Input: FC<Props> = (props) => {
           <FormattedMessage
             id="plugins.links.input.useExtensionTabs"
             defaultMessage="Use browser extension API to open link"
-            description="Toggle label to open links via extension tabs API"
           />
         </label>
       )}
+
       <hr />
+
+      <IconPickerModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onSelect={handleIconSelect}
+      />
     </div>
   );
 };

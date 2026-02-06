@@ -1,45 +1,19 @@
-import { Icon } from "@iconify/react";
-import { type FC, type MouseEvent, useMemo } from "react";
-import { defineMessages, useIntl } from "react-intl";
-
+import React, { FC, useMemo } from "react";
+import { useIntl } from "react-intl";
+import { Link, Cache } from "./types";
 import { isSpecialUrl, normalizeUrl } from "../../../utils";
-import { Cache, Link } from "./types";
+import { Favicon } from "./components/Favicon";
+import { CustomSvg } from "./components/CustomSvg";
+import { CustomImage } from "./components/CustomImage";
+import { IconifyIcon } from "./components/IconifyIcon";
 
 const getDomain = (url: string): string | null => {
   try {
     return new URL(url).hostname;
-  } catch (e) {
-    return null;
-  }
-};
-
-const parseSvg = (svgString: string, width?: number, height?: number) => {
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, "image/svg+xml");
-    const svg = doc.querySelector("svg");
-    if (!svg) return null;
-
-    svg.setAttribute("width", `${width ?? 24}`);
-    svg.setAttribute("height", `${height ?? 24}`);
-    return <span dangerouslySetInnerHTML={{ __html: svg.outerHTML }} />;
   } catch {
     return null;
   }
 };
-
-const messages = defineMessages({
-  shortcutHint: {
-    id: "plugins.links.shortcutHint",
-    description: "Hover hint text for links with a keyboard shortcut",
-    defaultMessage: "Press {key} or click to visit",
-  },
-  standardHint: {
-    id: "plugins.links.standardHint",
-    description: "Hover hint text for links without a keyboard shortcut",
-    defaultMessage: "Click to visit",
-  },
-});
 
 type Props = Link & {
   number: number;
@@ -52,9 +26,6 @@ type Props = Link & {
 export const Display: FC<Props> = ({
   icon,
   iconSize,
-  IconString,
-  IconStringIco,
-  SvgString,
   name,
   number,
   url,
@@ -81,16 +52,27 @@ export const Display: FC<Props> = ({
         ? keyboardShortcut
         : fallback;
     if (label && label.length > 0)
-      return intl.formatMessage(messages.shortcutHint, { key: label });
-    return intl.formatMessage(messages.standardHint);
+      return intl.formatMessage(
+        {
+          id: "plugins.links.shortcutHint",
+          description: "Hover hint text for links with a keyboard shortcut",
+          defaultMessage: "Press {key} or click to visit",
+        },
+        { key: label },
+      );
+    return intl.formatMessage({
+      id: "plugins.links.standardHint",
+      description: "Hover hint text for links without a keyboard shortcut",
+      defaultMessage: "Click to visit",
+    });
   }, [intl, number, keyboardShortcut]);
-  const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
-  const parsedSvg = useMemo(
-    () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
-    [SvgString, customWidth, customHeight],
-  );
 
-  const handleClick = async (e: MouseEvent) => {
+  const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
+
+  const displayWidth = customWidth || 24;
+  const displayHeight = customHeight || 24;
+
+  const handleClick = async (e: React.MouseEvent) => {
     if (
       BUILD_TARGET !== "web" &&
       (useExtensionTabs || isSpecialUrl(normalizedUrl))
@@ -123,6 +105,108 @@ export const Display: FC<Props> = ({
     onLinkClick?.();
   };
 
+  const renderIcon = () => {
+    if (
+      icon === "_favicon_duckduckgo" ||
+      icon === "_favicon_google" ||
+      icon === "_favicon" ||
+      icon === "_favicon_favicone"
+    ) {
+      return (
+        <Favicon
+          icon={icon}
+          domain={domain}
+          width={displayWidth}
+          height={displayHeight}
+          conserveAspectRatio={conserveAspectRatio}
+          resolution={iconSize}
+        />
+      );
+    }
+
+    if (icon === "_custom_iconify" && iconifyValue) {
+      return (
+        <IconifyIcon
+          iconString={
+            iconifyIdentifier ? iconifyIdentifier + iconifyValue : iconifyValue
+          }
+          width={displayWidth}
+          height={displayHeight}
+          conserveAspectRatio={conserveAspectRatio}
+        />
+      );
+    }
+
+    if (
+      (icon === "_custom_svg" || icon === "_custom_upload") &&
+      iconCacheKey &&
+      cache?.[iconCacheKey]
+    ) {
+      const cachedItem = cache[iconCacheKey];
+      if (cachedItem.type === "svg") {
+        return (
+          <CustomSvg
+            svgString={cachedItem.data}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      } else {
+        return (
+          <CustomImage
+            src={cachedItem.data}
+            alt={name}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      }
+    }
+
+    if (icon === "_custom_ico" && iconCacheKey && cache?.[iconCacheKey]) {
+      return (
+        <CustomImage
+          src={cache[iconCacheKey].data}
+          alt={name}
+          width={displayWidth}
+          height={displayHeight}
+          conserveAspectRatio={conserveAspectRatio}
+        />
+      );
+    }
+
+    if (icon === "_feather") {
+      return (
+        <IconifyIcon
+          iconString={
+            iconifyValue
+              ? (iconifyIdentifier || "feather:") + iconifyValue
+              : "feather:bookmark"
+          }
+          width={displayWidth}
+          height={displayHeight}
+          conserveAspectRatio={conserveAspectRatio}
+        />
+      );
+    }
+
+    if (icon) {
+      // Legacy fallback for simple icon names (feather)
+      return (
+        <IconifyIcon
+          iconString={"feather:" + icon}
+          width={displayWidth}
+          height={displayHeight}
+          conserveAspectRatio={conserveAspectRatio}
+        />
+      );
+    }
+
+    return null;
+  };
+
   return (
     <a
       className={`Link ${linkOpenStyle ? "Link--open" : ""}`}
@@ -133,87 +217,10 @@ export const Display: FC<Props> = ({
       title={title}
     >
       {linksNumbered ? <span className="LinkNumber">{number} </span> : null}
-      {icon === "_favicon_duckduckgo" && domain ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : (icon === "_favicon_google" && domain) ||
-        (icon === "_favicon" && domain) ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : icon === "_favicon_favicone" && domain ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : icon === "_custom_iconify" && IconString ? (
-        <i>
-          <Icon icon={IconString} width={customWidth} height={customWidth} />
-        </i>
-      ) : icon === "_custom_svg" && parsedSvg ? (
-        <span className="custom-icon">{parsedSvg}</span>
-      ) : icon === "_custom_ico" && IconStringIco ? (
-        <i>
-          <img
-            src={IconStringIco}
-            alt={name}
-            style={{
-              width: conserveAspectRatio
-                ? `${customWidth}px`
-                : `${customWidth}px`,
-              height: conserveAspectRatio ? "auto" : `${customHeight}px`,
-              display: "inline-block",
-            }}
-          />
-        </i>
-      ) : icon === "_custom_upload" && iconCacheKey && cache?.[iconCacheKey] ? (
-        <i className="custom-icon">
-          {cache[iconCacheKey].type === "svg" ? (
-            parseSvg(cache[iconCacheKey].data, customWidth, customHeight)
-          ) : (
-            <img
-              alt={name}
-              src={cache[iconCacheKey].data}
-              style={{
-                width: conserveAspectRatio
-                  ? `${customWidth}px`
-                  : `${customWidth}px`,
-                height: conserveAspectRatio ? "auto" : `${customHeight}px`,
-                display: "inline-block",
-              }}
-            />
-          )}
-        </i>
-      ) : icon === "_feather" ? (
-        <i>
-          <Icon
-            icon={
-              iconifyValue
-                ? iconifyIdentifier + iconifyValue
-                : "feather:bookmark"
-            }
-            width={customWidth || iconSize}
-            height={customHeight || iconSize}
-          />
-        </i>
-      ) : icon ? (
-        <i>
-          <Icon icon={"feather:" + icon} width={iconSize} height={iconSize} />
-        </i>
-      ) : null}
-      {name}
+      {renderIcon()}
+      <span className="Link-name">{name}</span>
     </a>
   );
 };
+
+export default Display;
