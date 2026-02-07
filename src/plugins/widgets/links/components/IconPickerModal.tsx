@@ -3,6 +3,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
 import icons from "feather-icons/dist/icons.json";
 import { addIconData } from "../../../../utils";
+import Modal from "../../../../views/shared/modal/Modal";
 
 interface IconPickerModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ interface IconPickerModalProps {
 }
 
 const iconList = Object.keys(icons);
+const iconifyIdentifier = "feather:";
 
 export const IconPickerModal: FC<IconPickerModalProps> = ({
   isOpen,
@@ -22,9 +24,9 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleIconSelect = (icon: string, identifier: string) => {
-    addIconData(identifier + icon);
-    onSelect(icon, identifier);
+  const handleIconSelect = (icon: string) => {
+    addIconData(iconifyIdentifier + icon);
+    onSelect(icon, iconifyIdentifier);
   };
 
   // Filter icons based on search query
@@ -37,55 +39,63 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
   });
 
   return (
-    <div className="Modal-container" onClick={onClose}>
-      <div className="Modal" onClick={(event) => event.stopPropagation()}>
-        <h2>
-          <FormattedMessage
-            id="plugins.links.input.selectIcon"
-            defaultMessage="Select an Icon"
-          />
-        </h2>
-
-        <input
-          type="text"
-          placeholder={intl.formatMessage({
-            id: "plugins.links.input.searchIcons",
-            defaultMessage: "Search icons...",
-          })}
-          value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
-          className="search-bar"
-        />
-
-        <div className="icon-grid">
-          {filteredIcons.length > 0 ? (
-            filteredIcons.map((icon) => (
-              <button
-                key={icon}
-                className="icon-box"
-                onClick={() => handleIconSelect(icon, "feather:")}
-              >
-                <Icon icon={"feather:" + icon} />
-                <span>{icon.replace(/-/g, " ")}</span>
-              </button>
-            ))
-          ) : (
-            <p className="no-results">
-              <FormattedMessage
-                id="plugins.links.input.noIconsFound"
-                defaultMessage="No icons found"
-              />
-            </p>
-          )}
-        </div>
-
-        <button className="close-button" onClick={onClose}>
+    <Modal
+      onClose={onClose}
+      className="IconPickerModal"
+      center
+      footer={
+        <button
+          type="button"
+          className="button button--primary"
+          onClick={onClose}
+        >
           <FormattedMessage
             id="plugins.links.input.cancel"
             defaultMessage="Cancel"
           />
         </button>
+      }
+    >
+      <h2>
+        <FormattedMessage
+          id="plugins.links.input.selectIcon"
+          defaultMessage="Select an Icon"
+        />
+      </h2>
+
+      <input
+        type="text"
+        placeholder={intl.formatMessage({
+          id: "plugins.links.input.searchIcons",
+          defaultMessage: "Search icons...",
+        })}
+        value={searchQuery}
+        onChange={(event) => setSearchQuery(event.target.value)}
+        autoFocus
+      />
+
+      <div className="icon-grid">
+        {filteredIcons.length > 0 ? (
+          filteredIcons.map((icon) => (
+            <button
+              key={icon}
+              className="icon-box"
+              onClick={() => handleIconSelect(icon)}
+              type="button"
+            >
+              <Icon icon={iconifyIdentifier + icon} />
+              <span>{icon.replace(/-/g, " ")}</span>
+            </button>
+          ))
+        ) : (
+          <p className="no-results">
+            <FormattedMessage
+              id="plugins.links.input.noIconsFound"
+              defaultMessage="No icons found"
+            />
+          </p>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 };

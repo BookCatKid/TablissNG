@@ -408,7 +408,11 @@ const Input: FC<Props> = (props) => {
 
       {isFeather && (
         <div className="icon-picker">
-          <button onClick={handleOpenModal} className="custom-select">
+          <button
+            onClick={handleOpenModal}
+            className="button button--primary"
+            style={{ width: "100%" }}
+          >
             {props.iconifyValue ? (
               <FormattedMessage
                 id="plugins.links.input.openIconPicker"
@@ -422,19 +426,16 @@ const Input: FC<Props> = (props) => {
             )}
           </button>
 
-          {/* Show currently selected Feather icon with preview */}
           {props.iconifyValue && (
-            <div className="selected-icon-display">
-              <div className="icon-preview">
+            <div className="selected-icon">
+              <div className="selected-icon-preview">
                 <Icon icon={props.iconifyValue} />
               </div>
-              <div className="icon-info">
-                <span className="icon-name">
-                  {(props.iconifyValue.includes(":")
-                    ? props.iconifyValue.split(":")[1]
-                    : props.iconifyValue
-                  ).replace(/-/g, " ")}
-                </span>
+              <div className="selected-icon-name">
+                {(props.iconifyValue.includes(":")
+                  ? props.iconifyValue.split(":")[1]
+                  : props.iconifyValue
+                ).replace(/-/g, " ")}
               </div>
             </div>
           )}

@@ -1,144 +1,67 @@
-// TODO: Make styles/colors match the rest of the app better
 .LinkInput
-  .Modal-container
-    position: fixed
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background: rgba(0, 0, 0, 0.6)
+  .selected-icon
     display: flex
     align-items: center
-    justify-content: center
-    z-index: 1000
+    gap: 0.5em
+    margin-top: 0.5em
+    padding: 0.5em
+    border: 1px solid #bdc3c7
+    border-radius: 0.2em
 
-  .Modal
-    background: white
-    width: 95%
-    max-width: 95% !important
-    height: 95%
-    border-radius: 12px
-    display: flex
-    flex-direction: column
-    align-items: center
-    padding: 20px
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3)
-    padding-top: 13px !important
-    padding-bottom: 13px !important
+    .dark &
+      border-color: #444
 
-    h2
-      margin-top: 0
+    &-preview
+      display: flex
+      font-size: 1.5em
 
-  .search-bar
-    width: 90%
-    padding: 10px
-    margin-bottom: 10px
-    border: 1px solid #ddd
-    border-radius: 6px
-    font-size: 16px
+    &-name
+      font-size: 0.9em
+      text-transform: capitalize
+
+.IconPickerModal
+  max-width: none !important
+  width: 90vw
+  height: 90vh
+
+  h2
+    text-align: center
+
+  .no-results
+    text-align: center
+    grid-column: 1 / -1
 
   .icon-grid
     display: grid
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr))
-    gap: 10px
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr))
+    gap: 0.5em
+    margin-top: 1em
     width: 100%
-    flex-grow: 1
-    overflow-y: auto
-    padding: 10px
 
   .icon-box
     display: flex
     flex-direction: column
     align-items: center
-    justify-content: center
-    padding: 10px
-    border: 1px solid #ddd
-    border-radius: 8px
-    background: #f9f9f9
-    cursor: pointer
-    transition: background 0.2s ease-in-out
-    max-height: 150px
-    text-transform: capitalize
-
-  .icon-box:hover
-    background: #e0e0e0
-
-  .icon-image
-    width: 32px
-    height: 32px
-    margin-bottom: 5px
-
-  .no-results
-    font-size: 16px
-    color: #888
-    text-align: center
-    margin-top: 20px
-
-  .close-button
-    margin-top: 15px
-    padding: 10px 16px
-    border: none
-    background: #007bff
-    color: white
-    border-radius: 6px
-    cursor: pointer
-    font-size: 16px
-    align-self: end
-
-  .close-button:hover
-    background: #0056b3
-
-  .custom-select
+    padding: 1em
     border: 1px solid #bdc3c7
+    background-color: #ecf0f1
     border-radius: 0.2em
-    color: inherit
-    display: block
-    margin: 0.5em 0
-    padding: 0.5em
-    width: 100%
-    overflow: hidden
-    background-color: transparent
     cursor: pointer
+    color: inherit
 
     &:hover
-      background-color: rgba(233, 233, 237, 0.1)
+      background: rgba(0, 0, 0, 0.05)
 
     .dark &
       border-color: #444
-      color: #ffffff
+      background: #2d2d2d
 
       &:hover
-        background-color: rgba(255, 255, 255, 0.1)
+        background: #3a3a3a
 
-  .selected-icon-display
-    display: flex
-    align-items: center
-    gap: 8px
-    margin-top: 8px
-    padding: 8px
-    border: 1px solid #bdc3c7
-    border-radius: 0.2em
-    background-color: rgba(233, 233, 237, 0.1)
+    svg
+      margin-bottom: 1em
 
-    .icon-preview
-      display: flex
-      align-items: center
-      justify-content: center
-
-    .icon-info
-      .icon-name
-        font-size: 0.9em
-        color: inherit
-        text-transform: capitalize
-
-    .dark &
-      border-color: #444
-      background-color: rgba(255, 255, 255, 0.1)
-
-  .conserveAspectRatioButton
-    margin-left: 0.5em
-
-  .no-svg-scaling-warning
-    color: #6c757d
-    font-size: 0.8rem
-    margin-top: 0.5rem
+    span
+      font-size: 0.9em
+      text-transform: capitalize

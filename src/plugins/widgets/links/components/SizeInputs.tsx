@@ -43,17 +43,16 @@ export const SizeInputs: FC<SizeInputsProps> = ({
       )}
 
       <label>
-        <FormattedMessage
-          id="plugins.links.input.conserveAspectRatio"
-          defaultMessage="Conserve Aspect Ratio"
-        />
         <input
-          className="conserveAspectRatioButton"
           type="checkbox"
           checked={!!conserveAspectRatio}
           onChange={(event) =>
             onChange({ conserveAspectRatio: event.target.checked })
           }
+        />
+        <FormattedMessage
+          id="plugins.links.input.conserveAspectRatio"
+          defaultMessage="Conserve Aspect Ratio"
         />
       </label>
 
