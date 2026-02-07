@@ -36,6 +36,24 @@ const Links: FC<Props> = ({
         linkModified = true;
       }
 
+      // Migrate legacy _favicon to _favicon_google
+      if (updatedLink.icon === "_favicon") {
+        updatedLink.icon = "_favicon_google";
+        linkModified = true;
+      }
+
+      // Migrate legacy Feather icon strings (stored in 'icon' property) to iconifyValue
+      if (
+        updatedLink.icon &&
+        !updatedLink.icon.includes(":") &&
+        !updatedLink.icon.startsWith("_") &&
+        !updatedLink.iconifyValue
+      ) {
+        updatedLink.iconifyValue = `feather:${updatedLink.icon}`;
+        updatedLink.icon = "_feather";
+        linkModified = true;
+      }
+
       // Migrate IconString (Custom Iconify) to iconifyValue
       if (
         updatedLink.icon === "_custom_iconify" &&

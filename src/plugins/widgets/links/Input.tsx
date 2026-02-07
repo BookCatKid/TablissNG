@@ -1,4 +1,4 @@
-import React, { FC, useState, useRef, useEffect } from "react";
+import React, { FC, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import {
   IconButton,
@@ -26,7 +26,6 @@ type Props = Link & {
 const Input: FC<Props> = (props) => {
   const [urlValue, setUrlValue] = useState(props.url);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const selectRef = useRef<HTMLSelectElement>(null);
   const intl = useIntl();
 
   const handleOpenModal = () => setIsModalOpen(true);
@@ -98,29 +97,6 @@ const Input: FC<Props> = (props) => {
       reader.readAsDataURL(file);
     }
   };
-
-  const getSelectValues = () => {
-    const values: string[] = [];
-    if (selectRef.current) {
-      const options = selectRef.current.options;
-      for (let i = 0; i < options.length; i++) {
-        values.push(options[i].value);
-      }
-    }
-    return values;
-  };
-
-  // Migrate to new method of storing icons
-  useEffect(() => {
-    if (props.icon === "_favicon") {
-      props.onChange({ icon: "_favicon_google" });
-    } else if (props.icon && !getSelectValues().includes(props.icon)) {
-      props.onChange({
-        iconifyValue: "feather:" + props.icon,
-        icon: "_feather",
-      });
-    }
-  }, [props.icon]);
 
   return (
     <div className="LinkInput">
@@ -215,7 +191,6 @@ const Input: FC<Props> = (props) => {
           )
         </span>
         <select
-          ref={selectRef}
           value={props.icon}
           onChange={(event) => props.onChange({ icon: event.target.value })}
         >
