@@ -33,7 +33,7 @@ const Input: FC<Props> = (props) => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleIconSelect = (icon: string, identifier: string) => {
-    props.onChange({ iconifyIdentifier: identifier, iconifyValue: icon });
+    props.onChange({ iconifyValue: identifier + icon });
     setIsModalOpen(false);
   };
 
@@ -116,8 +116,7 @@ const Input: FC<Props> = (props) => {
       props.onChange({ icon: "_favicon_google" });
     } else if (props.icon && !getSelectValues().includes(props.icon)) {
       props.onChange({
-        iconifyValue: props.icon,
-        iconifyIdentifier: "feather:",
+        iconifyValue: "feather:" + props.icon,
         icon: "_feather",
       });
     }
@@ -309,7 +308,6 @@ const Input: FC<Props> = (props) => {
             value={props.iconifyValue || ""}
             onChange={(event) =>
               props.onChange({
-                iconifyIdentifier: "",
                 iconifyValue: event.target.value,
               })
             }
@@ -453,11 +451,14 @@ const Input: FC<Props> = (props) => {
           {props.iconifyValue && (
             <div className="selected-icon-display">
               <div className="icon-preview">
-                <Icon icon={`feather:${props.iconifyValue}`} />
+                <Icon icon={props.iconifyValue} />
               </div>
               <div className="icon-info">
                 <span className="icon-name">
-                  {props.iconifyValue.replace(/-/g, " ")}
+                  {(props.iconifyValue.includes(":")
+                    ? props.iconifyValue.split(":")[1]
+                    : props.iconifyValue
+                  ).replace(/-/g, " ")}
                 </span>
               </div>
             </div>

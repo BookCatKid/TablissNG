@@ -43,8 +43,16 @@ const Links: FC<Props> = ({
         !updatedLink.iconifyValue
       ) {
         updatedLink.iconifyValue = updatedLink.IconString;
-        updatedLink.iconifyIdentifier = ""; // It's usually already in the string
         delete updatedLink.IconString;
+        linkModified = true;
+      }
+
+      // Consolidate iconifyIdentifier and iconifyValue
+      if (updatedLink.iconifyValue && !updatedLink.iconifyValue.includes(":")) {
+        updatedLink.iconifyValue =
+          (updatedLink.iconifyIdentifier || "feather:") +
+          updatedLink.iconifyValue;
+        delete updatedLink.iconifyIdentifier;
         linkModified = true;
       }
 
@@ -63,7 +71,6 @@ const Links: FC<Props> = ({
 
         updatedLink.iconCacheKey = cacheKey;
         delete updatedLink.SvgString;
-
         linkModified = true;
         cacheChanged = true;
       }
@@ -83,7 +90,6 @@ const Links: FC<Props> = ({
 
         updatedLink.iconCacheKey = cacheKey;
         delete updatedLink.IconStringIco;
-
         linkModified = true;
         cacheChanged = true;
       }

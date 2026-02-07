@@ -31,7 +31,6 @@ export const Display: FC<Props> = ({
   url,
   linkOpenStyle,
   linksNumbered,
-  iconifyIdentifier,
   iconifyValue,
   iconCacheKey,
   cache,
@@ -127,9 +126,7 @@ export const Display: FC<Props> = ({
     if (icon === "_custom_iconify" && iconifyValue) {
       return (
         <IconifyIcon
-          iconString={
-            iconifyIdentifier ? iconifyIdentifier + iconifyValue : iconifyValue
-          }
+          iconString={iconifyValue}
           width={displayWidth}
           height={displayHeight}
           conserveAspectRatio={conserveAspectRatio}
@@ -180,11 +177,7 @@ export const Display: FC<Props> = ({
     if (icon === "_feather") {
       return (
         <IconifyIcon
-          iconString={
-            iconifyValue
-              ? (iconifyIdentifier || "feather:") + iconifyValue
-              : "feather:bookmark"
-          }
+          iconString={iconifyValue || "feather:bookmark"}
           width={displayWidth}
           height={displayHeight}
           conserveAspectRatio={conserveAspectRatio}

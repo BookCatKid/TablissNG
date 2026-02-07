@@ -11,7 +11,6 @@ export type Link = {
   conserveAspectRatio?: boolean;
   customWidth?: number;
   customHeight?: number;
-  iconifyIdentifier?: string;
   iconifyValue?: string;
   useExtensionTabs?: boolean;
   iconCacheKey?: string; // Reference to cached icon data
