@@ -122,7 +122,7 @@ Example SVG code:
 </svg>
 ```
 
-SVGS must include a `viewBox` attribute to ensure they scale properly.
+SVGs must include a `viewBox` attribute to ensure they scale properly.
 
 ## Reordering Links
 

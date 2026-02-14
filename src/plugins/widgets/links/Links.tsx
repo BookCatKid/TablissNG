@@ -65,8 +65,13 @@ const Links: FC<Props> = ({
         linkModified = true;
       }
 
-      // Consolidate iconifyIdentifier and iconifyValue
-      if (updatedLink.iconifyValue && !updatedLink.iconifyValue.includes(":")) {
+      // Consolidate iconifyIdentifier and iconifyValue (legacy migration only)
+      if (
+        updatedLink.iconifyValue &&
+        !updatedLink.iconifyValue.includes(":") &&
+        (updatedLink.icon !== "_custom_iconify" ||
+          updatedLink.iconifyIdentifier)
+      ) {
         updatedLink.iconifyValue =
           (updatedLink.iconifyIdentifier || "feather:") +
           updatedLink.iconifyValue;
@@ -80,11 +85,10 @@ const Links: FC<Props> = ({
         updatedLink.SvgString &&
         !updatedLink.iconCacheKey
       ) {
-        const cacheKey = `migrated_svg_${updatedLink.id}_${Date.now()}`;
+        const cacheKey = `links_svg_${updatedLink.id}`;
         newCache[cacheKey] = {
           data: updatedLink.SvgString,
           type: "svg",
-          size: updatedLink.customWidth || 24,
         };
 
         updatedLink.iconCacheKey = cacheKey;
@@ -99,11 +103,10 @@ const Links: FC<Props> = ({
         updatedLink.IconStringIco &&
         !updatedLink.iconCacheKey
       ) {
-        const cacheKey = `migrated_ico_${updatedLink.id}_${Date.now()}`;
+        const cacheKey = `links_ico_${updatedLink.id}`;
         newCache[cacheKey] = {
           data: updatedLink.IconStringIco,
           type: "ico",
-          size: updatedLink.customWidth || 24,
         };
 
         updatedLink.iconCacheKey = cacheKey;

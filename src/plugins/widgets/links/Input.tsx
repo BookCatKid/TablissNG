@@ -52,7 +52,6 @@ const Input: FC<Props> = (props) => {
     reader.onload = (e) => {
       const result = e.target?.result;
       if (typeof result === "string") {
-        const iconSize = props.customWidth || 24;
         const cacheKey = `icon_${Date.now()}`;
 
         let iconData: IconCacheItem;
@@ -60,19 +59,16 @@ const Input: FC<Props> = (props) => {
           iconData = {
             data: result,
             type: "svg",
-            size: iconSize,
           };
         } else if (file.type === "image/x-icon") {
           iconData = {
             data: result,
             type: "ico",
-            size: iconSize,
           };
         } else {
           iconData = {
             data: result,
             type: "image",
-            size: iconSize,
           };
         }
 
@@ -86,7 +82,6 @@ const Input: FC<Props> = (props) => {
         props.onChange({
           icon: "_custom_upload",
           iconCacheKey: cacheKey,
-          customWidth: iconSize,
         });
       }
     };
@@ -327,7 +322,6 @@ const Input: FC<Props> = (props) => {
                 [cacheKey]: {
                   data: value,
                   type: "svg",
-                  size: props.customWidth || 24,
                 },
               });
               props.onChange({ iconCacheKey: cacheKey });
@@ -373,7 +367,6 @@ const Input: FC<Props> = (props) => {
                 [cacheKey]: {
                   data: value,
                   type: "ico",
-                  size: props.customWidth || 24,
                 },
               });
               props.onChange({ iconCacheKey: cacheKey });

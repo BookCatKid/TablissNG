@@ -19,7 +19,6 @@ export type Link = {
 export type IconCacheItem = {
   data: string;
   type: "image" | "svg" | "ico";
-  size: number;
 };
 
 export type Cache = Record<string, IconCacheItem>;

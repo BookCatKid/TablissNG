@@ -129,7 +129,6 @@ export const Display: FC<Props> = ({
           iconString={iconifyValue}
           width={displayWidth}
           height={displayHeight}
-          conserveAspectRatio={conserveAspectRatio}
         />
       );
     }
@@ -180,7 +179,6 @@ export const Display: FC<Props> = ({
           iconString={iconifyValue || "feather:bookmark"}
           width={displayWidth}
           height={displayHeight}
-          conserveAspectRatio={conserveAspectRatio}
         />
       );
     }
@@ -192,7 +190,6 @@ export const Display: FC<Props> = ({
           iconString={"feather:" + icon}
           width={displayWidth}
           height={displayHeight}
-          conserveAspectRatio={conserveAspectRatio}
         />
       );
     }
