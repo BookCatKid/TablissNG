@@ -292,15 +292,14 @@ const Input: FC<Props> = (props) => {
               id="plugins.links.input.iconifyHelp"
               defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see "
             />
-            &nbsp;
             <a
-              href="https://github.com/BookCatKid/TablissNG/issues/3#issuecomment-2676456153"
+              href="https://bookcatkid.github.io/TablissNG/docs/widgets/quick-links"
               target="_blank"
               rel="noopener noreferrer"
             >
               <FormattedMessage
-                id="plugins.links.input.githubIssue"
-                defaultMessage="this GitHub issue"
+                id="plugins.links.input.docsPage"
+                defaultMessage="the documentation"
               />
             </a>
             .
@@ -339,15 +338,14 @@ const Input: FC<Props> = (props) => {
               id="plugins.links.input.customSvgHelp"
               defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see "
             />
-            &nbsp;
             <a
-              href="https://github.com/BookCatKid/TablissNG/issues/3#issuecomment-2676456153"
+              href="https://bookcatkid.github.io/TablissNG/docs/widgets/quick-links"
               target="_blank"
               rel="noopener noreferrer"
             >
               <FormattedMessage
-                id="plugins.links.input.githubIssue"
-                defaultMessage="this GitHub issue"
+                id="plugins.links.input.docsPage"
+                defaultMessage="the documentation"
               />
             </a>
             .
