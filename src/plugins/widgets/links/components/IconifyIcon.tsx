@@ -12,7 +12,7 @@ export const IconifyIcon: FC<IconifyIconProps> = ({
   iconString,
   width,
   height,
-  conserveAspectRatio,
+  // conserveAspectRatio,
 }) => {
   if (!iconString) return null;
   return (
@@ -20,7 +20,7 @@ export const IconifyIcon: FC<IconifyIconProps> = ({
       <Icon
         icon={iconString}
         width={width}
-        height={conserveAspectRatio ? "auto" : height}
+        height={height} // Both width and height need to be set in convserveAspectRatio is false, otherwise icons won't scale.
       />
     </span>
   );
