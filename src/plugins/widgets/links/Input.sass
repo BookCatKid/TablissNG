@@ -5,11 +5,8 @@
     gap: 0.5em
     margin-top: 0.5em
     padding: 0.5em
-    border: 1px solid #bdc3c7
+    border: 1px solid var(--border-main)
     border-radius: 0.2em
-
-    .dark &
-      border-color: #444
 
     &-preview
       display: flex
@@ -43,21 +40,15 @@
     flex-direction: column
     align-items: center
     padding: 1em
-    border: 1px solid #bdc3c7
-    background-color: #ecf0f1
+    border: 1px solid var(--border-main)
+    background-color: var(--bg-button)
     border-radius: 0.2em
     cursor: pointer
-    color: inherit
+    color: var(--text-heading)
+    transition: background-color 0.2s ease
 
     &:hover
-      background: rgba(0, 0, 0, 0.05)
-
-    .dark &
-      border-color: #444
-      background: #2d2d2d
-
-      &:hover
-        background: #3a3a3a
+      background-color: var(--bg-secondary)
 
     svg
       margin-bottom: 1em
