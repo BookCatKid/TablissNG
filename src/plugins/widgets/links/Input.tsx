@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import {
   IconButton,
   RemoveIcon,
@@ -12,6 +12,38 @@ import { normalizeUrl } from "../../../utils";
 import "./Input.sass";
 import { IconPickerModal } from "./components/IconPickerModal";
 import { SizeInputs } from "./components/SizeInputs";
+
+const messages = defineMessages({
+  removeLink: {
+    id: "plugins.links.input.removeLink",
+    defaultMessage: "Remove link",
+  },
+  moveDown: {
+    id: "plugins.links.input.moveDown",
+    defaultMessage: "Move link down",
+  },
+  moveUp: {
+    id: "plugins.links.input.moveUp",
+    defaultMessage: "Move link up",
+  },
+  websiteIcons: {
+    id: "plugins.links.input.websiteIcons",
+    defaultMessage: "Website Icons",
+  },
+  custom: {
+    id: "plugins.links.input.custom",
+    defaultMessage: "Custom",
+  },
+  iconifyIcons: {
+    id: "plugins.links.input.iconifyIcons",
+    defaultMessage: "Iconify Icons",
+  },
+  useExtensionTabsHelp: {
+    id: "plugins.links.input.useExtensionTabsHelp",
+    defaultMessage:
+      "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
+  },
+});
 
 type Props = Link & {
   number: number;
@@ -99,20 +131,14 @@ const Input: FC<Props> = (props) => {
         <div className="title--buttons">
           <IconButton
             onClick={props.onRemove}
-            title={intl.formatMessage({
-              id: "plugins.links.input.removeLink",
-              defaultMessage: "Remove link",
-            })}
+            title={intl.formatMessage(messages.removeLink)}
           >
             <RemoveIcon />
           </IconButton>
           {props.onMoveDown && (
             <IconButton
               onClick={props.onMoveDown}
-              title={intl.formatMessage({
-                id: "plugins.links.input.moveDown",
-                defaultMessage: "Move link down",
-              })}
+              title={intl.formatMessage(messages.moveDown)}
             >
               <DownIcon />
             </IconButton>
@@ -120,10 +146,7 @@ const Input: FC<Props> = (props) => {
           {props.onMoveUp && (
             <IconButton
               onClick={props.onMoveUp}
-              title={intl.formatMessage({
-                id: "plugins.links.input.moveUp",
-                defaultMessage: "Move link up",
-              })}
+              title={intl.formatMessage(messages.moveUp)}
             >
               <UpIcon />
             </IconButton>
@@ -195,12 +218,7 @@ const Input: FC<Props> = (props) => {
               defaultMessage="None"
             />
           </option>
-          <optgroup
-            label={intl.formatMessage({
-              id: "plugins.links.input.websiteIcons",
-              defaultMessage: "Website Icons",
-            })}
-          >
+          <optgroup label={intl.formatMessage(messages.websiteIcons)}>
             <option value="_favicon_google">
               <FormattedMessage
                 id="plugins.links.input.fromGoogle"
@@ -220,12 +238,7 @@ const Input: FC<Props> = (props) => {
               />
             </option>
           </optgroup>
-          <optgroup
-            label={intl.formatMessage({
-              id: "plugins.links.input.custom",
-              defaultMessage: "Custom",
-            })}
-          >
+          <optgroup label={intl.formatMessage(messages.custom)}>
             <option value="_custom_iconify">
               <FormattedMessage
                 id="plugins.links.input.fromIconify"
@@ -251,12 +264,7 @@ const Input: FC<Props> = (props) => {
               />
             </option>
           </optgroup>
-          <optgroup
-            label={intl.formatMessage({
-              id: "plugins.links.input.iconifyIcons",
-              defaultMessage: "Iconify Icons",
-            })}
-          >
+          <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
             <option value="_feather">
               <FormattedMessage
                 id="plugins.links.input.feather"
@@ -460,13 +468,7 @@ const Input: FC<Props> = (props) => {
       </label>
 
       {BUILD_TARGET !== "web" && (
-        <label
-          title={intl.formatMessage({
-            id: "plugins.links.input.useExtensionTabsHelp",
-            defaultMessage:
-              "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
-          })}
-        >
+        <label title={intl.formatMessage(messages.useExtensionTabsHelp)}>
           <input
             type="checkbox"
             checked={props.useExtensionTabs || false}

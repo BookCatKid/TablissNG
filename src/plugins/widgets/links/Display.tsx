@@ -1,11 +1,24 @@
 import React, { FC, useMemo } from "react";
-import { useIntl } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import { Link, Cache } from "./types";
 import { isSpecialUrl, normalizeUrl } from "../../../utils";
 import { Favicon } from "./components/Favicon";
 import { CustomSvg } from "./components/CustomSvg";
 import { CustomImage } from "./components/CustomImage";
 import { IconifyIcon } from "./components/IconifyIcon";
+
+const messages = defineMessages({
+  shortcutHint: {
+    id: "plugins.links.shortcutHint",
+    description: "Hover hint text for links with a keyboard shortcut",
+    defaultMessage: "Press {key} or click to visit",
+  },
+  standardHint: {
+    id: "plugins.links.standardHint",
+    description: "Hover hint text for links without a keyboard shortcut",
+    defaultMessage: "Click to visit",
+  },
+});
 
 const getDomain = (url: string): string | null => {
   try {
@@ -51,19 +64,8 @@ export const Display: FC<Props> = ({
         ? keyboardShortcut
         : fallback;
     if (label && label.length > 0)
-      return intl.formatMessage(
-        {
-          id: "plugins.links.shortcutHint",
-          description: "Hover hint text for links with a keyboard shortcut",
-          defaultMessage: "Press {key} or click to visit",
-        },
-        { key: label },
-      );
-    return intl.formatMessage({
-      id: "plugins.links.standardHint",
-      description: "Hover hint text for links without a keyboard shortcut",
-      defaultMessage: "Click to visit",
-    });
+      return intl.formatMessage(messages.shortcutHint, { key: label });
+    return intl.formatMessage(messages.standardHint);
   }, [intl, number, keyboardShortcut]);
 
   const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);

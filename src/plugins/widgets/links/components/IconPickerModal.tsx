@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
 import icons from "feather-icons/dist/icons.json";
 import { addIconData } from "../../../../utils";
@@ -13,6 +13,13 @@ interface IconPickerModalProps {
 
 const iconList = Object.keys(icons);
 const iconifyIdentifier = "feather:";
+
+const messages = defineMessages({
+  searchIcons: {
+    id: "plugins.links.input.searchIcons",
+    defaultMessage: "Search icons...",
+  },
+});
 
 export const IconPickerModal: FC<IconPickerModalProps> = ({
   isOpen,
@@ -65,10 +72,7 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
 
       <input
         type="text"
-        placeholder={intl.formatMessage({
-          id: "plugins.links.input.searchIcons",
-          defaultMessage: "Search icons...",
-        })}
+        placeholder={intl.formatMessage(messages.searchIcons)}
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
         autoFocus

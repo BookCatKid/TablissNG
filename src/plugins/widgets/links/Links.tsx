@@ -1,10 +1,18 @@
 import React, { FC, useEffect, useMemo } from "react";
 import { Icon } from "@iconify/react";
-import { useIntl } from "react-intl";
+import { defineMessages, useIntl } from "react-intl";
 import { useKeyPress, useToggle } from "../../../hooks";
 import Display from "./Display";
 import "./Links.sass";
 import { Props, defaultCache, defaultData, Link } from "./types";
+
+const messages = defineMessages({
+  showQuickLinks: {
+    id: "plugins.links.showQuickLinks",
+    description: "Tooltip to show quick links",
+    defaultMessage: "Show quick links",
+  },
+});
 
 const Links: FC<Props> = ({
   data = defaultData,
@@ -212,11 +220,7 @@ const Links: FC<Props> = ({
       ) : (
         <a
           onClick={toggleVisible}
-          title={intl.formatMessage({
-            id: "plugins.links.showQuickLinks",
-            description: "Tooltip to show quick links",
-            defaultMessage: "Show quick links",
-          })}
+          title={intl.formatMessage(messages.showQuickLinks)}
         >
           <Icon icon="fe:insert-link" />
         </a>
