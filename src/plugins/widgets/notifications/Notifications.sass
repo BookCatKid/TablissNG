@@ -1,0 +1,86 @@
+$dot-size: 18px
+$dot-offset: calc(-1 * $dot-size / 2)
+$mask-radius: $dot-size - 6px
+
+.notification-wrapper
+  display: flex
+  gap: 14px
+  align-items: center
+
+.badge-container
+  position: relative
+  cursor: pointer
+  transition: transform 0.2s ease
+
+  &:hover
+    transform: scale(1.12)
+
+.is-disabled
+  filter: grayscale(80%)
+
+.circle-topright
+  mask-image: radial-gradient(circle $mask-radius at top right, transparent 100%, black 100%)
+
+.badge-button
+  border-radius: 5px
+  border: none
+  background: transparent
+  padding: 0
+  cursor: pointer
+  display: flex
+  align-items: center
+  justify-content: center
+
+.badge-icon
+  width: 32px
+  height: 32px
+  border-radius: 8px
+  object-fit: contain
+
+.badge-dot
+  position: absolute
+  top: $dot-offset
+  right: $dot-offset
+  width: $dot-size
+  height: $dot-size
+  border-radius: 50%
+  background: #e53935
+  box-shadow: 0 0 4px 2px rgba(229, 57, 53, 0.5)
+  pointer-events: none
+  display: flex
+  align-items: center
+  justify-content: center
+  color: white
+  font-size: 10px
+  font-weight: bold
+  line-height: 1
+
+.notification-list
+  display: flex
+  flex-direction: column
+  width: 150px
+  max-height: 200px
+  overflow-y: auto
+  scrollbar-width: none
+  color: dimgray
+  background: white
+  border-radius: 12px
+  padding: 5px 16px
+
+  & > * + *
+    border-top: 1px solid whitesmoke
+
+.notification-item
+  display: flex
+  flex-direction: column
+  padding: 10px 0
+  gap: 4px
+
+.notification-link
+  font-size: 10px
+  white-space: normal
+
+.notification-time
+  font-size: 8px
+  color: grey
+  margin-top: 3px

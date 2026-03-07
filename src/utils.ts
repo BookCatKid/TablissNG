@@ -1,4 +1,5 @@
 import { addIcon, loadIcon } from "@iconify/react";
+import pkceChallenge from "pkce-challenge";
 import tlds from "tlds";
 
 export const SECONDS = 1000;
@@ -257,4 +258,102 @@ export function isSpecialUrl(url: string): boolean {
     "view-source:",
   ];
   return prefixes.some((p) => s.startsWith(p));
+}
+
+export function formattedTime(
+  unixTime: number,
+  format: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  },
+) {
+  const date = new Date(unixTime * 1000);
+  return date.toLocaleString(undefined, format);
+}
+
+// helper function for OAuth
+export async function pkceLogin({
+  authUrl,
+  tokenEndpoint,
+  scope,
+  clientId: client_id,
+  grant_type = null,
+}: {
+  authUrl: string;
+  tokenEndpoint: string;
+  scope?: string | null;
+  clientId: string;
+  grant_type?: string | null;
+}) {
+  const { code_verifier, code_challenge } = await pkceChallenge();
+
+  const redirect_uri = browser.identity.getRedirectURL().replace(/\/$/, "");
+  // console.log(redirect_uri);
+  // This will be the OAuth callback URL
+
+  const params = new URLSearchParams({
+    client_id,
+    redirect_uri,
+    code_challenge,
+    response_type: "code",
+    code_challenge_method: "S256",
+    ...(scope && { scope }),
+  });
+
+  const redirectUrl = await browser.identity.launchWebAuthFlow({
+    url: `${authUrl}?${params}`,
+    interactive: true,
+  });
+
+  const code = new URL(redirectUrl).searchParams.get("code");
+
+  if (!code) return {};
+
+  const res = await fetch(tokenEndpoint, {
+    method: "POST",
+    body: new URLSearchParams({
+      client_id,
+      redirect_uri,
+      code,
+      code_verifier,
+      ...(grant_type && { grant_type }),
+    }),
+  });
+
+  const json = await res.json();
+
+  if (!res.ok) {
+    console.error(json);
+    return {};
+  }
+
+  return json;
+  /*
+    How Client OAuth works:
+      - User clicks on Login
+      - Redirect user to the Authorization Endpoint (authUrl)
+      - After login, user is redirected to callback URL (redirectUri)
+        Eg: https://asdf.chromiumapp.org
+      - Extract the authorization code from the URL
+        (If redirectUrl looks like https://asdf.chromiumapp.org?code=AUTH_CODE, we wanna extract AUTH_CODE)
+      - Send POST request to tokenEndpoint with the authorization code
+      - Receive and store tokens (in browser.storage)
+    
+    Why PKCE?
+      The code_verifier ensures that the client initiating the auth request is the same client exchanging the code for tokens.
+      code_verifier = random_string()
+      code_challenge = hash(code_verifier)
+      Server checks: hash(code_verifier) == code_challenge
+      If code_challenge is stolen, one cannot compute the original code_verifier.
+  
+    Summary: App → Authorization Endpoint → App → POST Token Endpoint → Get tokens 🥳
+  */
+}
+
+export async function getStoredVal(key: string): Promise<any> {
+  const result = await browser.storage.local.get(key);
+  return result[key];
 }

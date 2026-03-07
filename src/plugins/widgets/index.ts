@@ -16,18 +16,19 @@ import links from "./links";
 import literatureClock from "./literatureClock";
 import message from "./message";
 import notes from "./notes";
+import notifications from "./notifications";
 import palette from "./palette";
 import quote from "./quote";
 import search from "./search";
 import since from "./since";
+import tallyCounter from "./tallyCounter";
 import time from "./time";
+import timeTracker from "./timeTracker";
 import todo from "./todo";
 import topSites from "./topSites";
+import trello from "./trello";
 import weather from "./weather";
 import workHours from "./workHours";
-import timeTracker from "./timeTracker";
-import trello from "./trello";
-import tallyCounter from "./tallyCounter";
 
 export const widgetConfigs = [
   // nba,
@@ -64,4 +65,5 @@ if (BUILD_TARGET != "web" && BUILD_TARGET != "safari") {
   widgetConfigs.push(topSites);
   widgetConfigs.push(bookmarks);
   widgetConfigs.push(trello);
+  widgetConfigs.push(notifications);
 }
