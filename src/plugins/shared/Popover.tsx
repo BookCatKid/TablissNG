@@ -50,7 +50,7 @@ const Popover = ({ children }: PropsWithChildren) => {
 
 const PopoverTrigger = ({ children }: PropsWithChildren) => {
   const { toggle } = usePopover();
-  return <div onClick={toggle}>{children}</div>;
+  return <button onClick={toggle}>{children}</button>;
 };
 
 const PopoverContent = ({ children }: PropsWithChildren) => {

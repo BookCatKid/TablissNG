@@ -9,13 +9,9 @@ import {
 } from "./api";
 import PopoverIcon from "./PopoverIcon";
 import "./Notifications.sass";
-import { defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
-const Notifications: React.FC<any> = ({
-  cache,
-  data = defaultData,
-  setCache,
-}) => {
+const Notifications = ({ cache, data = defaultData, setCache }: Props) => {
   return (
     <div className="notification-wrapper">
       {data.showSE && (

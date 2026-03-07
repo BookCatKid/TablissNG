@@ -54,6 +54,7 @@
     "nanoid": "^5.1.6",
     "normalize.css": "^8.0.1",
     "pkce-challenge": "^6.0.0",
+    "prop-types": "^15.8.1",
     "react": "^19.2.4",
     "react-crossfade-simple": "^1.0.7",
     "react-dom": "^19.2.4",
