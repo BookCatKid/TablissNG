@@ -5,7 +5,6 @@ import { TrelloSession } from "../types";
  */
 export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
   const SESSION_NAME = "trello";
-  const SESSION_NAME = "trello";
   const AUTH_URL_BASE = "https://trello.com/1/authorize";
   const params = new URLSearchParams({
     expiration: "30days",
@@ -59,42 +58,6 @@ export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
     accessToken: token,
     expires: expiry,
   } as TrelloSession;
-};
-
-/**
- * Clears current trello session token from user's account to
- * prevent cases where account dashboard is polluted with stale tokens
- */
-export const onTrelloSignOut = async (session: TrelloSession) => {
-  await revokeStaleSession(session);
-};
-
-/**
- * Clears a stale trello session from the user's account to prevent
- * cases where account dashboard is polluted with stale tokens
- * @param stale
- * @param accessToken
- * @returns
- */
-const revokeStaleSession = async (stale: TrelloSession) => {
-  const params = new URLSearchParams({
-    key: TRELLO_API_KEY,
-    token: stale.accessToken,
-  });
-  try {
-    const revokeResult = await fetch(
-      `https://api.trello.com/1/tokens/${stale.accessToken}/?${params.toString()}`,
-      { method: "DELETE" },
-    );
-
-    if (!revokeResult.ok) {
-      console.warn("TRELLO: Failed to revoke previous token");
-    } else {
-      console.log("TRELLO: Successfully revoked previous token");
-    }
-  } catch (error) {
-    console.warn(`TRELLO: Failed to delete stale token ${error}`);
-  }
 };
 
 /**
