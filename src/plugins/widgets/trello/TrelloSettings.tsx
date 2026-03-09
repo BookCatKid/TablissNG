@@ -132,7 +132,7 @@ const TrelloSettings: FC<Props> = ({
         </label>
         <Button
           disabled={authState === "pending"}
-          primary
+          primary={authState !== "pending"}
           onClick={onAuthenticateClick}
         >
           {authState === "unauthenticated"

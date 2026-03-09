@@ -28,7 +28,18 @@
 .display-list-item-content
     overflow-wrap: anywhere
     word-break: break-word
-    padding: 0.25rem 0
+    padding: 0.25rem
+
+    span 
+        user-select: none
+
+    &:hover 
+        background: rgba(255, 255, 255, 0.09)
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
+        border-radius: 0.25rem
+        backdrop-filter: blur(5px)
+        -webkit-backdrop-filter: blur(5px)
+        cursor: pointer
 
 .labels-container
     display: flex
