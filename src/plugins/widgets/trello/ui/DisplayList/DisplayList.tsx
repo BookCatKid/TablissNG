@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import { DisplayList, Item, colourPalette } from "../../types";
 import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
+import Moveable from "react-moveable";
+
+type ListItems = Record<string, HTMLDivElement>;
 
 interface DisplayListComponentProps {
   header: string;
@@ -14,6 +17,7 @@ export default function DisplayList({
   items,
   loading,
 }: DisplayListComponentProps) {
+  const listItemRefs = useRef<ListItems>({});
   const view =
     loading || !items ? (
       <div className="loader-container">
@@ -21,9 +25,15 @@ export default function DisplayList({
       </div>
     ) : (
       <div className="display-list-items">
-        {items.map((item, i) => {
+        {items.map((item) => {
           return (
-            <div key={i} className="display-list-item-content">
+            <div
+              key={item.name}
+              className="display-list-item-content"
+              ref={(element) => {
+                listItemRefs.current[item.name] = element!;
+              }}
+            >
               <div className="labels-container">
                 {item.labels.map((label) => {
                   return (

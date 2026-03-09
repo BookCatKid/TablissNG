@@ -18,12 +18,14 @@
 .display-list-items
     width: 30vh
     height: 31vh
-    overflow-y: overlay
-    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track) !important
-    scrollbar-width: thin
+    overflow-y: auto
+    scrollbar-color: rgba(255, 255, 255, 0.09) transparent
+    scrollbar-width: thin !important
     scrollbar-gutter: stable
     padding-right: 16px
 
+    &::-webkit-scrollbar-button
+      display: none
 
 .display-list-item-content
     overflow-wrap: anywhere
