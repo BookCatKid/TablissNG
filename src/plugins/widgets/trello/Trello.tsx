@@ -95,6 +95,9 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         />
       ) : (
         <div className="display-list-container">
+          {/* This container is referenced by DraggableItem in order to allow dragging between display lists.
+              If you remove display list container point DraggableItem to a different DOM location
+            */}
           {cache.order.map((list: List) => {
             const response = cache.responses.get(list.id);
             return (
