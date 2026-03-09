@@ -10,8 +10,8 @@ const StoreError: React.FC<Props> = ({ onClose }) => {
   return (
     <Modal onClose={onClose}>
       <div className="Settings">
-        <h2 style={{ margin: 0 }}>Storage Error</h2>
-        <p style={{ fontSize: "1.25em" }}>
+        <h2 className="no-margin">Storage Error</h2>
+        <p className="large">
           <FormattedMessage
             id="plugins.storageError"
             defaultMessage="TablissNG is unable to load or save settings. This is most commonly caused by running in private browsing mode; but low disk space or a corrupt browser profile can also be the problem."
@@ -31,7 +31,7 @@ const StoreError: React.FC<Props> = ({ onClose }) => {
             defaultMessage="If they do not return, the {supportGuideLink} covers the common causes and how to resolve them. Otherwise, create an issue at {githubLink} if you are still unable to solve the issue."
             values={{
               supportGuideLink: (
-                <a href="https://tabliss.io/support.html">
+                <a href="https://bookcatkid.github.io/TablissNG/docs/support/storage-errors">
                   <FormattedMessage
                     id="plugins.storageError.guide"
                     defaultMessage="support guide"

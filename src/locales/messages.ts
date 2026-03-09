@@ -54,6 +54,12 @@ export const pluginMessages = defineMessages({
     defaultMessage: "Save Position",
     description: "Save Position button title",
   },
+  deprecationWarning: {
+    id: "plugins.deprecationWarning",
+    defaultMessage:
+      "This widget is outdated. Please use the {widget} widget instead.",
+    description: "General warning that a widget is outdated",
+  },
 });
 
 export const timingMessages = defineMessages({

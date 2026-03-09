@@ -3,14 +3,13 @@ import { defineMessages, useIntl } from "react-intl";
 import { usePushError } from "../api";
 import { UiContext } from "../contexts/ui";
 import { migrate } from "../db/migrate";
-import { cacheStorage, dbStorage } from "../db/state";
+import { cacheStorage, dbStorage, db } from "../db/state";
 import { Stream } from "../lib";
 import { useValue } from "../lib/db/react";
 import Dashboard from "./dashboard";
 import { Settings } from "./settings";
 import Errors from "./shared/Errors";
 import StoreError from "./shared/StoreError";
-import { db } from "../db/state";
 import { useSystemTheme, useFavicon } from "../hooks";
 
 function setHighlighting() {
@@ -45,12 +44,20 @@ const Root: React.FC = () => {
   const [error, setError] = React.useState(false);
   const themePreference = useValue(db, "themePreference");
   const systemIsDark = useSystemTheme();
+  const accent = useValue(db, "accent");
 
   React.useEffect(() => {
     const isDark =
       themePreference === "system" ? systemIsDark : themePreference === "dark";
     document.body.className = isDark ? "dark" : "";
   }, [themePreference, systemIsDark]);
+
+  // Update CSS variable when accent color changes
+  React.useEffect(() => {
+    if (accent) {
+      document.documentElement.style.setProperty("--accent-color", accent);
+    }
+  }, [accent]);
 
   useFavicon();
 
@@ -119,7 +126,7 @@ const Root: React.FC = () => {
     };
   }, []);
 
-  const { errors, settings, toggleErrors } = React.use(UiContext);
+  const { errors, settings, toggleErrors } = React.useContext(UiContext);
 
   return (
     <>

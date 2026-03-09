@@ -6,6 +6,116 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I also attempt to follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
+## [1.6.5] - 2/20/2026 | Error logging, new widgets, and quality-of-life improvements
+
+A solid release featuring a comprehensive error logging system, a new random color palette widget, drag-and-drop todo reordering, weather auto-update, and several UI improvements and fixes.
+
+### Added
+
+- feat: improve error logging and user feedback with comprehensive error log management, global error capture, and sharing functionality. [41d25f9a](https://github.com/BookCatKid/TablissNG/commit/41d25f9a)
+
+- feat(palette): add random color palette widget. [82fb9df6](https://github.com/BookCatKid/TablissNG/commit/82fb9df6)
+
+- feat(todo): add drag-and-drop reordering for todo items. [f19e15e1](https://github.com/BookCatKid/TablissNG/commit/f19e15e1)
+
+- feat(weather): add auto-update location feature. [52476cfa](https://github.com/BookCatKid/TablissNG/commit/52476cfa)
+
+- feat(search): add special URL handling. [5e14bcda](https://github.com/BookCatKid/TablissNG/commit/5e14bcda)
+
+- feat: add scroll-to-top button in Settings panel. [3fd010e3](https://github.com/BookCatKid/TablissNG/commit/3fd010e3)
+
+- feat(github): add tooltips to calendar widget. [f70eeb1b](https://github.com/BookCatKid/TablissNG/commit/f70eeb1b)
+
+### Changed
+
+- feat(ip-info): more robust fallbacking and parsing. [70d071da](https://github.com/BookCatKid/TablissNG/commit/70d071da)
+
+- Updated ES & IT files (#114). [762e4f48](https://github.com/BookCatKid/TablissNG/commit/762e4f48)
+
+- Update Vietnamese (vi) translation (#110). [9d6cb68e](https://github.com/BookCatKid/TablissNG/commit/9d6cb68e)
+
+### Fixed
+
+- fix: less gimmicky scroll to top button. [decec927](https://github.com/BookCatKid/TablissNG/commit/decec927)
+
+- fix(search): missing/broken translation. [f54a423a](https://github.com/BookCatKid/TablissNG/commit/f54a423a)
+
+- fix: remove whole background on chromium dev. [fb9dbb52](https://github.com/BookCatKid/TablissNG/commit/fb9dbb52)
+
+### Chore / Cleanup
+
+- chore: run translations. [bed18d2e](https://github.com/BookCatKid/TablissNG/commit/bed18d2e)
+
+- ci: update actions to latest versions in workflows. [3add9da4](https://github.com/BookCatKid/TablissNG/commit/3add9da4)
+
+## [1.6.4] - 2/13/2026 | Theming, search customization, tally counter, and online documentation
+
+A feature-packed release with centralized theming via CSS variables, search widget customization, a new tally counter widget, and full online documentation! Additionally, the since and countdown widgets are now deprecated in favor of TimeTracker, and a lot of development work has been done under the hood to prepare for future updates and make contributions easier.
+
+### Added
+
+- feat(ui): add customizable global accent color. [b8ffd6fb](https://github.com/BookCatKid/TablissNG/commit/b8ffd6fb)
+
+- feat(time): indent settings and add showHours. [e08dcb35](https://github.com/BookCatKid/TablissNG/commit/e08dcb35)
+
+- feat: add tally counter widget. [5a79bf13](https://github.com/BookCatKid/TablissNG/commit/5a79bf13)
+
+- feat(search): add custom width settings. [cb8aa009](https://github.com/BookCatKid/TablissNG/commit/cb8aa009)
+
+- feat(search): add style customization to search widget. [48b0706e](https://github.com/BookCatKid/TablissNG/commit/48b0706e)
+
+- feat(docs): add full online documentation! (#98). [b4570ef7](https://github.com/BookCatKid/TablissNG/commit/b4570ef7)
+
+### Changed
+
+- refactor: implement centralized CSS variables for theming (#109). [d170e10f](https://github.com/BookCatKid/TablissNG/commit/d170e10f)
+
+- change: expand the default rows for custom css/js/html widgets. [e289d4ea](https://github.com/BookCatKid/TablissNG/commit/e289d4ea)
+
+- feat: add deprecation warning to since and countdown widgets. [a52d6e65](https://github.com/BookCatKid/TablissNG/commit/a52d6e65)
+
+- Updated ES & IT files (#108). [c2c80b6b](https://github.com/BookCatKid/TablissNG/commit/c2c80b6b)
+
+### Fixed
+
+- fix: visible instead of auto (oops...). [62e87b4d](https://github.com/BookCatKid/TablissNG/commit/62e87b4d)
+
+### Chore / Cleanup
+
+- chore: improve lint-staged configuration. [1743f601](https://github.com/BookCatKid/TablissNG/commit/1743f601)
+
+- ci: refactor workflows to use reusable templates. [8f81b721](https://github.com/BookCatKid/TablissNG/commit/8f81b721)
+
+- build: remove service worker from manifest in dev. [41e6e6e2](https://github.com/BookCatKid/TablissNG/commit/41e6e6e2)
+
+- chore: migrate some project styles from CSS to SASS. [4fa02de2](https://github.com/BookCatKid/TablissNG/commit/4fa02de2)
+
+- chore: deps. [e3269c8f](https://github.com/BookCatKid/TablissNG/commit/e3269c8f)
+
+## [1.6.3] - 2/5/2026 | Bugfixes and minor improvements
+
+Very small release with a few fixes and minor improvements.
+
+### Added
+
+- feat(release): add closed issues summary to release body. [d9c56024](https://github.com/BookCatKid/TablissNG/commit/d9c56024)
+
+- feat(links): add URL normalization and extension tab option. [bd53b7ab](https://github.com/BookCatKid/TablissNG/commit/bd53b7ab)
+
+- feat(media): hide controls with 1 or less images. [8d92f1aa](https://github.com/BookCatKid/TablissNG/commit/8d92f1aa)
+
+### Fixed
+
+- fix: translations. [3434f6c0](https://github.com/BookCatKid/TablissNG/commit/3434f6c0)
+
+- fix(dates): date parsing causing incorrect days. [40d6c942](https://github.com/BookCatKid/TablissNG/commit/40d6c942)
+
+- fix(bookmarks): properly set iconSize to 24 by default. [378fdc72](https://github.com/BookCatKid/TablissNG/commit/378fdc72)
+
+- fix: don't include unused service-worker on firefox. [505525ac](https://github.com/BookCatKid/TablissNG/commit/505525ac)
+
+- fix(trello): minor fixes (#97). [4ccd112d](https://github.com/BookCatKid/TablissNG/commit/4ccd112d)
+
 ## [1.6.2] - 1/28/2026 | Better positioning, unified (and improved) backgrounds, Giphy modernization, and signed firefox nightly builds
 
 A major update to the positioning system and internal background structure, along with modernization of the Giphy plugin, signed Firefox nightly/beta builds, and several important bug fixes.
@@ -138,7 +248,7 @@ Finally changed the logo to something different from Tabliss's logo! This releas
 
 - fix(QuickLinks): text underline not appearing. [b2f8883](https://github.com/BookCatKid/TablissNG/commit/b2f8883)
 
-- fix: replace {{}} with [] for github-calendar translations. [0bf9d9e](https://github.com/BookCatKid/TablissNG/commit/0bf9d9e)
+- fix: replace `{{}}` with `[]` for github-calendar translations. [0bf9d9e](https://github.com/BookCatKid/TablissNG/commit/0bf9d9e)
 
 - fix: remove drop-shadow from github-calendar. [aa6fd7e](https://github.com/BookCatKid/TablissNG/commit/aa6fd7e)
 

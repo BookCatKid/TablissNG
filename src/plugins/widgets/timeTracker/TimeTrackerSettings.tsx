@@ -72,10 +72,7 @@ const TimeTrackerSettings: FC<Props> = ({ data = defaultData, setData }) => {
           type="text"
           value={data.title || ""}
           onChange={(event) => setData({ ...data, title: event.target.value })}
-          placeholder={intl.formatMessage({
-            id: "plugins.timeTracker.eventNamePlaceholder",
-            defaultMessage: "Event name",
-          })}
+          placeholder={intl.formatMessage(messages.eventNamePlaceholder)}
         />
       </label>
 

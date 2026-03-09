@@ -2,6 +2,7 @@ import React, { FC, useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
 import { Link, Cache } from "./types";
+import { isSpecialUrl, normalizeUrl } from "../../../utils";
 
 const displayUrl = (url: string): string => {
   try {
@@ -75,9 +76,11 @@ export const Display: FC<Props> = ({
   customHeight,
   conserveAspectRatio,
   keyboardShortcut,
+  useExtensionTabs,
   onLinkClick,
 }) => {
   const intl = useIntl();
+  const normalizedUrl = useMemo(() => normalizeUrl(url), [url]);
   const title = useMemo(() => {
     const fallback =
       typeof number !== "undefined" && number < 10 ? String(number) : undefined;
@@ -89,47 +92,39 @@ export const Display: FC<Props> = ({
       return intl.formatMessage(messages.shortcutHint, { key: label });
     return intl.formatMessage(messages.standardHint);
   }, [intl, number, keyboardShortcut]);
-  const domain = useMemo(() => getDomain(url), [url]);
+  const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
   const parsedSvg = useMemo(
     () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
     [SvgString, customWidth, customHeight],
   );
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Prevent default behavior for special URLs
+  const handleClick = async (e: React.MouseEvent) => {
     if (
-      url.startsWith("about:") || // Browser internal pages (about:blank, about:config)
-      url.startsWith("chrome:") || // Chrome browser internal pages (chrome:settings)
-      url.startsWith("edge:") || // Edge browser internal pages (edge:settings)
-      url.startsWith("file:") || // Local file system URLs (file:///path)
-      url.startsWith("chrome-extension:") || // Chrome extension pages (chrome-extension://id)
-      url.startsWith("moz-extension:") || // Firefox extension pages (moz-extension://id)
-      url.startsWith("ms-settings:") || // Windows system settings (ms-settings:display)
-      url.startsWith("view-source:")
+      BUILD_TARGET !== "web" &&
+      (useExtensionTabs || isSpecialUrl(normalizedUrl))
     ) {
-      // View page source (view-source:https://example.com)
       e.preventDefault();
 
-      if (BUILD_TARGET === "firefox") {
+      if (BUILD_TARGET === "firefox" && isSpecialUrl(normalizedUrl)) {
         alert(
-          "Sorry, Firefox restricts access to this type of URL. This is completely out of my control. Please copy and paste the URL into your address bar manually.",
+          "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
         );
         return;
       }
 
-      if (linkOpenStyle) {
-        browser.tabs
-          .create({
-            url: url,
+      try {
+        if (linkOpenStyle) {
+          await browser.tabs.create({
+            url: normalizedUrl,
             active: true,
-          })
-          .catch(console.error);
-      } else {
-        browser.tabs
-          .update({
-            url: url,
-          })
-          .catch(console.error);
+          });
+        } else {
+          await browser.tabs.update({
+            url: normalizedUrl,
+          });
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
 
@@ -139,7 +134,7 @@ export const Display: FC<Props> = ({
   return (
     <a
       className={`Link ${linkOpenStyle ? "Link--open" : ""}`}
-      href={url}
+      href={normalizedUrl}
       onClick={handleClick}
       rel="noopener noreferrer"
       target={linkOpenStyle ? "_blank" : "_self"}

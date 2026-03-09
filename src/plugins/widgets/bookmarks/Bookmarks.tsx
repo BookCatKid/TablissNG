@@ -36,7 +36,7 @@ const Node: FC<NodeProps> = ({
   iconProvider,
   shortNames,
   maxTextLength,
-  iconSize,
+  iconSize = 24,
   isRoot = false,
   expandedFolders = [],
   setExpandedFolders,

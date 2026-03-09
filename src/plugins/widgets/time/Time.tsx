@@ -15,6 +15,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
     colorCircles,
     showDate,
     hideTime,
+    showHours = true,
     showMinutes,
     showSeconds,
     timeZone,
@@ -37,6 +38,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
           {mode === "analogue" ? (
             <Analogue
               time={time}
+              showHours={showHours}
               showMinutes={showMinutes}
               showSeconds={showSeconds}
               color={color}
@@ -46,6 +48,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
             <Digital
               time={time}
               hour12={hour12}
+              showHours={showHours}
               showMinutes={showMinutes}
               showSeconds={showSeconds}
               showDayPeriod={showDayPeriod}

@@ -16,7 +16,7 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
           description="Label for HTML input field"
         />
         <textarea
-          rows={3}
+          rows={20}
           style={{ resize: "vertical", fontFamily: "monospace" }}
           value={input}
           onChange={(event) => setInput(event.target.value)}

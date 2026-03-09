@@ -1,4 +1,4 @@
-import React, { FC, useLayoutEffect, useRef } from "react";
+import React, { FC, useLayoutEffect, useRef, useState } from "react";
 
 import { useKeyPress } from "../../../hooks";
 import { Icon, RemoveIcon } from "../../../views/shared";
@@ -10,10 +10,26 @@ interface Props {
   onToggle(): void;
   onUpdate(contents: string): void;
   onDelete(): void;
+  onDragStart(): void;
+  onDragOver(e: React.DragEvent): void;
+  onDrop(e: React.DragEvent): void;
+  onDragEnd(): void;
+  dropIndicator: "above" | "below" | null;
 }
 
-const TodoItem: FC<Props> = ({ item, onDelete, onUpdate, onToggle }) => {
+const TodoItem: FC<Props> = ({
+  item,
+  onDelete,
+  onUpdate,
+  onToggle,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+  dropIndicator,
+}) => {
   const ref = useRef<HTMLSpanElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useLayoutEffect(() => {
     if (ref.current) {
@@ -55,8 +71,38 @@ const TodoItem: FC<Props> = ({ item, onDelete, onUpdate, onToggle }) => {
     false,
   );
 
+  const className = [
+    "TodoItem",
+    isDragging ? "dragging" : "",
+    dropIndicator === "above" ? "drop-above" : "",
+    dropIndicator === "below" ? "drop-below" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className="TodoItem">
+    <div
+      className={className}
+      draggable
+      onDragStart={(e) => {
+        e.dataTransfer.effectAllowed = "move";
+        setIsDragging(true);
+        onDragStart();
+      }}
+      onDragOver={onDragOver}
+      onDrop={(e) => {
+        setIsDragging(false);
+        onDrop(e);
+      }}
+      onDragEnd={() => {
+        setIsDragging(false);
+        onDragEnd();
+      }}
+    >
+      <a className="drag-handle">
+        <Icon name="more-vertical" />
+      </a>
+
       <span
         ref={ref}
         contentEditable={true}

@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { engines } from "./engines";
-import { Props, defaultData, SEARCH_ENGINE_CUSTOM } from "./types";
+import { Props, defaultData, SEARCH_ENGINE_CUSTOM, SearchStyle } from "./types";
 import { messages } from "./Search";
 
 const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
@@ -77,7 +77,7 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
       <label>
         <FormattedMessage
-          id="plugins.search.placeholder"
+          id="plugins.search.placeholderLabel"
           defaultMessage="Placeholder Text"
           description="Search placeholder text input label"
         />
@@ -96,6 +96,42 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
       <label>
         <FormattedMessage
+          id="plugins.search.style"
+          defaultMessage="Search Style"
+          description="Search Style title"
+        />
+        <select
+          onChange={(event) =>
+            setData({ ...data, style: event.target.value as SearchStyle })
+          }
+          value={data.style ?? "default"}
+        >
+          <option value="default">
+            <FormattedMessage
+              id="plugins.search.style.default"
+              defaultMessage="Default"
+              description="Label for the default search style"
+            />
+          </option>
+          <option value="transparent-rounded">
+            <FormattedMessage
+              id="plugins.search.style.transparentRounded"
+              defaultMessage="Transparent Rounded"
+              description="Label for the transparent rounded search style"
+            />
+          </option>
+          <option value="minimal-outlined">
+            <FormattedMessage
+              id="plugins.search.style.minimalOutlined"
+              defaultMessage="Minimal Outlined"
+              description="Label for the minimal outlined search style"
+            />
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <FormattedMessage
           id="plugins.search.keybind"
           defaultMessage="Search keybind"
           description="Search keybind title"
@@ -109,6 +145,41 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
           value={data.keyBind}
         />
       </label>
+
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={data.overrideWidth}
+          onChange={(event) =>
+            setData({ ...data, overrideWidth: event.target.checked })
+          }
+        />
+        <FormattedMessage
+          id="plugins.search.overrideWidth"
+          defaultMessage="Override search bar width"
+          description="Checkbox label to override search bar width"
+        />
+      </label>
+
+      {data.overrideWidth && (
+        <label>
+          <FormattedMessage
+            id="plugins.search.customWidth"
+            defaultMessage="Custom Width (px)"
+            description="Input label for custom search bar width"
+          />
+          <input
+            type="number"
+            value={data.customWidth ?? 400}
+            onChange={(event) =>
+              setData({
+                ...data,
+                customWidth: Number(event.target.value),
+              })
+            }
+          />
+        </label>
+      )}
 
       <label>
         <FormattedMessage
@@ -154,8 +225,8 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
           />
           <input
             type="number"
-            min="1"
-            max="10"
+            min={1}
+            max={10}
             value={data.suggestionsQuantity}
             onChange={(event) =>
               setData({

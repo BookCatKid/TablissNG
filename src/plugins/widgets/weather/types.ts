@@ -10,6 +10,7 @@ export type Data = Coordinates & {
   name?: string;
   showDetails: boolean;
   showCity: boolean;
+  autoUpdate?: boolean;
   units: "auto" | "si" | "us"; // `auto` has been removed, but may still be present in settings
 };
 

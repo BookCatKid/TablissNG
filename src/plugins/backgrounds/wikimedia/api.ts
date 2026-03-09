@@ -1,7 +1,8 @@
 import { format } from "date-fns";
+import { parseLocalDate } from "../../../utils";
 
 export const formatDateForApi = (date: string): string => {
-  return format(new Date(date), "yyyy/MM/dd");
+  return format(parseLocalDate(date), "yyyy/MM/dd");
 };
 
 export const fetchFeaturedContent = async ({

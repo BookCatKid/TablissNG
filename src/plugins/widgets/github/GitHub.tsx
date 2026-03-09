@@ -1,6 +1,7 @@
 import React, { FC } from "react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useIntl } from "react-intl";
+import "./GitHub.sass";
 import { useFormatMessages } from "../../../hooks/useFormatMessages";
 import { useTheme } from "../../../hooks/useTheme";
 import {
@@ -8,6 +9,7 @@ import {
   weekdayMessages,
   legendMessages,
   messages,
+  tooltipMessages,
 } from "./messages";
 import { Props, defaultData } from "./types";
 
@@ -81,6 +83,26 @@ const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
           light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
           dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
         }}
+        tooltips={
+          data.showTooltips
+            ? {
+                activity: {
+                  text: (activity) => {
+                    if (activity.count === 0) {
+                      return intl.formatMessage(tooltipMessages.noActivity, {
+                        date: activity.date,
+                      });
+                    }
+
+                    return intl.formatMessage(tooltipMessages.activity, {
+                      count: activity.count,
+                      date: activity.date,
+                    });
+                  },
+                },
+              }
+            : undefined
+        }
       />
     </a>
   );

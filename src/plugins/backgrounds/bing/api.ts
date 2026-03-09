@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import { parseLocalDate } from "../../../utils";
 import { Data, Image } from "./types";
 
 const API_URL = "https://bing.npanuhin.me";
@@ -33,8 +34,9 @@ export async function getImage(data: Data, loader: any): Promise<Image> {
       return toImageFromNp(entry);
     } else {
       if (!data.customDate) throw new Error("No date provided");
-      const target = format(new Date(data.customDate), "yyyy-MM-dd");
-      const year = format(new Date(data.customDate), "yyyy");
+      const localDate = parseLocalDate(data.customDate);
+      const target = format(localDate, "yyyy-MM-dd");
+      const year = format(localDate, "yyyy");
 
       const yearUrl = `${API_URL}/${locale}.${year}.json`;
       const json = await fetchJson(yearUrl);

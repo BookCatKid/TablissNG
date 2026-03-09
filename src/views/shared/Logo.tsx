@@ -1,5 +1,5 @@
 import React from "react";
-import "./Logo.css";
+import "./Logo.sass";
 import tablissLogo from "./tabliss.svg";
 
 const Logo: React.FC = () => (

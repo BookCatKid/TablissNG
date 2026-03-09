@@ -30,33 +30,10 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.build_target }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build_target:
-          - chromium
-          - firefox
-          - web
-          - safari
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.ref }}
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - run: npm ci
-      - run: npm run build:${{ matrix.build_target }}
-        env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
-          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: tabliss-${{ matrix.build_target }}
-          path: dist/${{ matrix.build_target }}
+    uses: ./.github/workflows/_build.yml
+    with:
+      ref: ${{ inputs.ref }}
+    secrets: inherit
 
   upload-firefox-store:
     needs: [build]
@@ -67,22 +44,32 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/download-artifact@v4
+
+      - uses: actions/download-artifact@v7
         with:
           name: tabliss-firefox
           path: dist/firefox
+
       - name: Install web-ext
         run: npm install --global web-ext
+
       - name: Submit to Firefox Add-ons
         run: |
           web-ext sign \
             --source-dir=dist/firefox \
             --api-key=${{ secrets.AMO_ISSUER }} \
             --api-secret=${{ secrets.AMO_SECRET }} \
-            --channel=listed
+            --channel=listed \
+            --artifacts-dir=dist/signed-firefox
         env:
           WEB_EXT_API_KEY: ${{ secrets.AMO_ISSUER }}
           WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
+
+      - name: Upload Signed XPI Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: tabliss-firefox-signed
+          path: dist/signed-firefox/*.xpi
 
   upload-chrome-store:
     needs: [build]
@@ -90,13 +77,16 @@ jobs:
     name: Upload extension to Chrome Web Store
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: tabliss-chromium
-      - run: zip -r release.zip ./*
+          path: dist/chromium
+
+      - name: Create Release ZIP
+        run: |
+          cd dist/chromium
+          zip -r ../../release.zip .
+
       - uses: mnao305/chrome-extension-upload@v5.0.0
         with:
           file-path: release.zip
@@ -112,15 +102,22 @@ jobs:
     name: Upload extension to Edge Store
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: tabliss-chromium
+          path: dist/chromium
+
       - name: Remove key field from manifest
         run: |
+          cd dist/chromium
           jq 'del(.key)' manifest.json > manifest.tmp.json
           mv manifest.tmp.json manifest.json
+
       - name: Create Release ZIP
-        run: zip -r addon.zip ./*
+        run: |
+          cd dist/chromium
+          zip -r ../../addon.zip .
+
       - uses: birchill/edge-addon-upload@v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -131,7 +128,7 @@ jobs:
           product_id: ${{ secrets.EDGE_PRODUCT_ID }}
 
   create-release:
-    needs: [build]
+    needs: [build, upload-firefox-store]
     if: ${{ !inputs.skip_github_release }}
     name: Create GitHub Release
     runs-on: ubuntu-latest
@@ -141,9 +138,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
-      - uses: actions/download-artifact@v4
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v7
         with:
           path: artifacts
+
       - name: Create ZIP files
         run: |
           cd artifacts/tabliss-firefox
@@ -155,22 +155,75 @@ jobs:
           cd ../tabliss-safari
           zip -r ../../tabliss-safari.zip ./*
           cd ../..
+
+      - name: Prepare Signed Firefox XPI
+        run: |
+          XPI_FILE=$(find artifacts/tabliss-firefox-signed -name "*.xpi" | head -n 1)
+          cp "$XPI_FILE" tabliss-firefox.xpi
+
       - name: Get version without v prefix
         id: version
         run: |
-          REF=${{ inputs.ref || github.ref_name }}
+          REF="${{ inputs.ref }}"
+          if [ -z "$REF" ]; then
+            REF="${{ github.ref_name }}"
+          fi
           VERSION=${REF#v}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "ref=$REF" >> $GITHUB_OUTPUT
+
+      - name: Get previous release date and closed issues
+        id: closed_issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the date of the previous release
+          PREV_RELEASE_DATE=$(gh release list --limit 2 --order desc --json createdAt,tagName -q '.[1].createdAt // empty')
+
+          if [ -n "$PREV_RELEASE_DATE" ]; then
+            echo "Previous release date: $PREV_RELEASE_DATE"
+
+            # Get all issues closed since the previous release
+            CLOSED_ISSUES=$(gh issue list \
+              --state closed \
+              --limit 1000 \
+              --search "closed:>$PREV_RELEASE_DATE" \
+              --json number,title,closedAt \
+              --jq '.[] | "- #\(.number) \(.title)"')
+
+            if [ -n "$CLOSED_ISSUES" ]; then
+              echo "Found closed issues:"
+              echo "$CLOSED_ISSUES"
+
+              # Write to output using heredoc for multiline
+              {
+                echo 'body<<EOF'
+                echo '## Closed Issues'
+                echo ''
+                echo "$CLOSED_ISSUES"
+                echo ''
+                echo 'EOF'
+              } >> "$GITHUB_OUTPUT"
+            else
+              echo "No closed issues found since previous release"
+              echo "body=" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "No previous release found"
+            echo "body=" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         with:
           name: Version ${{ steps.version.outputs.version }}
           tag_name: ${{ steps.version.outputs.ref }}
+          body: ${{ steps.closed_issues.outputs.body }}
           files: |
             tabliss-firefox.zip
+            tabliss-firefox.xpi
             tabliss-chromium.zip
             tabliss-web.zip
             tabliss-safari.zip

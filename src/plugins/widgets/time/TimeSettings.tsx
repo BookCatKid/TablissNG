@@ -41,7 +41,7 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       {!data.hideTime && (
-        <>
+        <div style={{ marginLeft: "1em" }}>
           <label>
             <input
               type="radio"
@@ -105,30 +105,45 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
           <label>
             <input
               type="checkbox"
-              checked={data.showSeconds}
+              checked={data.showHours ?? true}
               onChange={() =>
-                setData({ ...data, showSeconds: !data.showSeconds })
+                setData({ ...data, showHours: !(data.showHours ?? true) })
               }
             />{" "}
             <FormattedMessage
-              id="plugins.time.displaySeconds"
-              defaultMessage="Display seconds"
-              description="Display seconds title"
+              id="plugins.time.displayHours"
+              defaultMessage="Display hours"
+              description="Display hours title"
             />
           </label>
 
           <label>
             <input
               type="checkbox"
-              checked={data.showMinutes}
+              checked={data.showMinutes ?? true}
               onChange={() =>
-                setData({ ...data, showMinutes: !data.showMinutes })
+                setData({ ...data, showMinutes: !(data.showMinutes ?? true) })
               }
             />{" "}
             <FormattedMessage
               id="plugins.time.displayMinutes"
               defaultMessage="Display minutes"
               description="Display minutes title"
+            />
+          </label>
+
+          <label>
+            <input
+              type="checkbox"
+              checked={data.showSeconds ?? false}
+              onChange={() =>
+                setData({ ...data, showSeconds: !(data.showSeconds ?? false) })
+              }
+            />{" "}
+            <FormattedMessage
+              id="plugins.time.displaySeconds"
+              defaultMessage="Display seconds"
+              description="Display seconds title"
             />
           </label>
 
@@ -148,7 +163,7 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
               />
             </label>
           )}
-        </>
+        </div>
       )}
 
       <label>

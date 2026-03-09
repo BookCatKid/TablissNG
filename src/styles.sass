@@ -1,14 +1,79 @@
+:root
+    --accent-color: #3498db
+    --accent-color-hover: color-mix(in srgb, var(--accent-color), black 10%)
+    --accent-color-active: color-mix(in srgb, var(--accent-color), black 20%)
+
+    --bg-main: #ffffff
+    --bg-secondary: #f5f7f8
+    --bg-input: #f5f7f8
+    --bg-button: #ecf0f1
+
+    --text-main: #5a636a
+    --text-heading: #000000
+    --text-secondary: #7f8c8d
+    --text-muted: #bdc3c7
+    --text-on-primary: #ffffff
+
+    --border-main: #bdc3c7
+    --border-light: #ecf0f1
+
+    --shadow-main: rgba(0, 0, 0, 0.25)
+    --bg-overlay: rgba(255, 255, 255, 0.65)
+
+    --scrollbar-track: #F2F2F2
+    --scrollbar-thumb: #BDBDBD
+    --scrollbar-thumb-hover: #6E6E6E
+
+.dark
+    --bg-main: #1a1a1a
+    --bg-secondary: #2d2d2d
+    --bg-input: #2d2d2d
+    --bg-button: #242424
+
+    --text-main: #d4d4d4
+    --text-heading: #ffffff
+    --text-secondary: #dddddd
+    --text-muted: #888888
+
+    --border-main: #444444
+    --border-light: #333333
+
+    --shadow-main: rgba(0, 0, 0, 0.5)
+    --bg-overlay: rgba(0, 0, 0, 0.65)
+
+    --scrollbar-track: #2d2d2d
+    --scrollbar-thumb: #444444
+    --scrollbar-thumb-hover: #555555
+
 *
     box-sizing: border-box
+    scrollbar-width: thin
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track)
+
+::-webkit-scrollbar
+    width: 10px
+
+::-webkit-scrollbar-track
+    background: var(--scrollbar-track)
+
+::-webkit-scrollbar-thumb
+    background: var(--scrollbar-thumb)
+    border-radius: 5px
+
+::-webkit-scrollbar-thumb:hover
+    background: var(--scrollbar-thumb-hover)
+
+::-webkit-resizer
+    background-color: var(--border-main)
 
 html, body
     font-family: sans-serif
     font-size: 14px
     line-height: 1.25
-    color: #5a636a
+    color: var(--text-main)
 
 a
-    color: #3498db
+    color: var(--accent-color)
     cursor: pointer
     text-decoration: none
 
@@ -44,7 +109,7 @@ i:not(custom-icon) > svg
 
 .text
     &--grey
-        color: #bdc3c7
+        color: var(--text-muted)
 
 .fullscreen
     position: absolute
@@ -60,3 +125,56 @@ textarea
     object-fit: cover
     width: 100%
     height: 100%
+
+.button--icon
+    background-color: var(--bg-button)
+    border: none
+    border-radius: 1em
+    display: inline-block
+    padding: 0.5em
+    line-height: 1
+    height: 2em
+    width: 2em
+    color: var(--text-heading)
+    cursor: pointer
+    transition: background-color 0.25s ease-out
+
+    &:hover
+        background-color: var(--border-main) !important
+
+    &.button--primary
+        background-color: var(--accent-color) !important
+        color: var(--text-on-primary)
+
+        &:hover
+            background-color: var(--accent-color-hover, var(--accent-color)) !important
+
+.button
+    border: 0
+    border-radius: 2em
+    color: var(--text-on-primary) !important
+    cursor: pointer
+    display: inline-block
+    padding: 0.5em 1em
+    text-decoration: none
+    transition: background 0.25s ease-out
+    text-align: center
+    font-weight: 500
+
+    &:disabled
+        background-color: var(--text-muted)
+        cursor: default
+
+    &--primary
+        background-color: var(--accent-color)
+        &:hover
+            background: var(--accent-color-hover, var(--accent-color))
+        &:active
+            background: var(--accent-color-active, var(--accent-color))
+
+    &--secondary
+        background: var(--text-muted)
+        &:hover
+            background: var(--border-main)
+        &:active
+            background: var(--text-secondary)

@@ -1,40 +1,24 @@
-@use "sass:color"
-
-// Dark mode variables
-$dark-bg: #2d2d2d
-$dark-button-bg: #3a3a3a
-$dark-border: #444
-$dark-text: #ffffff
-
 .Settings .Widget
     border: none
     border-radius: 0.5rem
-    background: #ecf0f1
+    background: var(--bg-secondary)
     margin: 1em 0
     padding: 1em
-
-    .dark &
-        background: $dark-bg
-        color: $dark-text
+    color: var(--text-main)
 
     h4
         margin: 0
-        
-        .dark &
-            color: $dark-text
 
     .title--buttons
         button
             float: right
             margin: -0.25em 0 0 0.5em
+            background: var(--bg-button)
+            color: var(--text-heading)
+            border-color: var(--border-main)
 
-            .dark &
-                background: $dark-button-bg
-                color: $dark-text
-                border-color: $dark-border
-
-                &:hover
-                    background: color.adjust($dark-button-bg, $lightness: 10%)
+            &:hover
+                background: var(--border-main)
 
         h4
             cursor: pointer
@@ -42,15 +26,5 @@ $dark-text: #ffffff
     .settings
         margin: 1.5rem 0
 
-    p:last-child 
+    p:last-child
         margin-bottom: 0
-
-    .button--icon
-        background-color: white
-
-        .dark &
-            background-color: $dark-button-bg
-            color: $dark-text
-
-            &:hover
-                background-color: color.adjust($dark-button-bg, $lightness: 10%)

@@ -259,13 +259,44 @@ const Widget: React.FC<Props> = ({
                   description="Colour title"
                 />{" "}
                 <br />
-                <input
-                  type="color"
-                  value={plugin.display.colour ?? "#ffffff"}
-                  onChange={(event) =>
-                    setDisplay({ colour: event.target.value })
-                  }
-                />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="color"
+                    value={plugin.display.colour ?? "#ffffff"}
+                    onChange={(event) =>
+                      setDisplay({ colour: event.target.value })
+                    }
+                    disabled={plugin.display.useAccentColor}
+                    style={{ opacity: plugin.display.useAccentColor ? 0.5 : 1 }}
+                  />
+                  <label
+                    style={{
+                      margin: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={plugin.display.useAccentColor ?? false}
+                      onChange={(event) =>
+                        setDisplay({ useAccentColor: event.target.checked })
+                      }
+                    />
+                    <FormattedMessage
+                      id="settings.useAccentColor"
+                      defaultMessage="Use Accent Color"
+                      description="Use global accent color for widget text"
+                    />
+                  </label>
+                </div>
               </label>
 
               <label>

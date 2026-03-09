@@ -31,13 +31,13 @@
 
     &:hover
         opacity: 1
-        background-color: rgba(0, 0, 0, 0.65)
+        background-color: var(--bg-overlay)
 
         .on-hover
             opacity: 1
 
         svg
-            color: #3498db
+            color: var(--accent-color)
             filter: none
 
     a, span
@@ -45,6 +45,3 @@
 
     svg, i
         transition: stroke 0.25s ease-out
-
-.light .Overlay:hover
-    background-color: rgba(255, 255, 255, 0.65)

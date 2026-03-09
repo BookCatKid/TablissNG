@@ -1,0 +1,55 @@
+/**
+ * CSS files with the .module.sass suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner
+  padding: 2rem 0
+  text-align: center
+  background: var(--ifm-background-color)
+  border-bottom: 1px solid var(--ifm-color-emphasis-200)
+
+.heroLogo
+  width: 600px
+  max-width: 100%
+  margin-bottom: 1.5rem
+
+.heroSubtitle
+  font-size: 1.25rem
+  margin-bottom: 2rem
+  color: var(--ifm-color-content-secondary)
+
+.buttons
+  display: flex
+  justify-content: center
+
+.showcaseSection
+  padding: 2rem 0
+
+.showcase
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 3rem
+
+.showcaseGrid
+  display: grid
+  grid-template-columns: repeat(2, 1fr)
+  gap: 2rem
+  width: 100%
+  max-width: 1200px
+
+@media screen and (max-width: 768px)
+  .showcaseGrid
+    grid-template-columns: 1fr
+
+.showcaseImage
+  width: 100%
+  height: auto
+  border-radius: 6px
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08)
+  border: 1px solid var(--ifm-color-emphasis-200)
+  transition: transform 0.2s ease
+
+.showcaseImage:hover
+  transform: scale(1.02)

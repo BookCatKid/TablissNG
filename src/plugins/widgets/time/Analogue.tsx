@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import "./Analogue.sass";
 
 type Props = {
+  showHours: boolean;
   showMinutes: boolean;
   showSeconds: boolean;
   time: Date;
@@ -11,6 +12,7 @@ type Props = {
 
 const Analogue: FC<Props> = ({
   time,
+  showHours,
   showMinutes,
   showSeconds,
   colorCircles,
@@ -32,14 +34,16 @@ const Analogue: FC<Props> = ({
           style={{ stroke: colorCircles ? color : "white" }}
         />
 
-        <line
-          x1="50"
-          y1="50"
-          x2="50"
-          y2="30"
-          className="hours theme-stroke"
-          style={{ transform: `rotate(${hoursAngle}deg)`, stroke: color }}
-        />
+        {showHours && (
+          <line
+            x1="50"
+            y1="50"
+            x2="50"
+            y2="30"
+            className="hours theme-stroke"
+            style={{ transform: `rotate(${hoursAngle}deg)`, stroke: color }}
+          />
+        )}
 
         {showMinutes && (
           <line

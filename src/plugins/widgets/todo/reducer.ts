@@ -39,6 +39,16 @@ export function reducer(state: State, action: Action) {
           : todo,
       );
 
+    case "REORDER_TODO": {
+      const { index, to } = action.data;
+      if (index < 0 || index >= state.length || to < 0 || to >= state.length) {
+        return state;
+      }
+      const todos = [...state];
+      todos.splice(to, 0, todos.splice(index, 1)[0]);
+      return todos;
+    }
+
     default:
       throw new Error("Unknown action");
   }

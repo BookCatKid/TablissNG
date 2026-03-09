@@ -1,106 +1,97 @@
 # Building TablissNG
 
-This document provides detailed instructions for building TablissNG from its source code.
+This guide provides step-by-step instructions for setting up your development environment and building TablissNG from source for various platforms.
 
-## System Requirements
+## Prerequisites
 
-### Required Software
+Before you begin, ensure you have the following installed on your system:
 
-- Node.js Version: 22.x or higher
+- **Node.js**: Version 22.x or higher is recommended.
+- **npm**: Usually comes bundled with Node.js.
+- **Git**: To clone the repository.
 
-## Build Script
+## Setup
 
-A convenience build script is provided to automate the build process for Firefox. Save this as `build.sh` (Linux/macOS) or `build.bat` (Windows) in the project root:
+1. **Clone the repository**:
 
-### Windows (build.bat)
+   ```bash
+   git clone https://github.com/BookCatKid/TablissNG.git
+   cd TablissNG
+   ```
 
-```batch
-@echo off
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-echo Building Tabliss Extension...
+## Development
 
-:: Check Node.js installation
-node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: Node.js is not installed
-    exit /b 1
-)
+To run TablissNG in development mode with hot reloading:
 
-:: Install dependencies
-echo Installing dependencies...
-call npm install || (
-    echo Error: Failed to install dependencies
-    exit /b 1
-)
+### Web Version (Browser Preview)
 
-:: Build Firefox extension
-echo Building Firefox extension...
-call npm run build:firefox || (
-    echo Error: Build failed
-    exit /b 1
-)
-
-:: Zip the build output
-echo Zipping build output...
-powershell Compress-Archive -Path dist/firefox/* -DestinationPath dist/firefox.zip || (
-    echo Error: Failed to zip build output
-    exit /b 1
-)
-
-echo Build completed successfully!
-echo Firefox extension is available in dist/firefox/
-echo Zipped archive available at dist/firefox.zip
-```
-
-### Linux/macOS (build.sh)
+This will start a local development server and open the web version in your browser.
 
 ```bash
-#!/bin/bash
+npm run dev
+```
 
-set -e
+### Browser Extensions
 
-echo "Building Tabliss Extension..."
+To develop for specific browsers with auto-rebuild on file changes:
 
-# Check Node.js installation
-if ! command -v node &> /dev/null; then
-    echo "Error: Node.js is not installed"
-    exit 1
-fi
+```bash
+# Chromium (Chrome, Edge, Brave, etc.)
+npm run dev:chromium
 
-# Install dependencies
-echo "Installing dependencies..."
-npm install
+# Firefox
+npm run dev:firefox
 
-# Build Firefox extension
-echo "Building Firefox extension..."
+# Safari
+npm run dev:safari
+```
+
+The output will be in the `dist/` directory. You can then load this as an "unpacked extension" in your browser.
+
+**Warning: Data Persistence Notice**
+
+Installing manual or nightly builds alongside the store version can cause configuration conflicts. Switching back from a manual build to a store version often requires a full re-installation, which **will erase your settings and data** unless you have exported them. Always [export your settings](https://bookcatkid.github.io/TablissNG/docs/guides/backup-and-export) before switching versions.
+
+## Building for Production
+
+To create a production-ready build for a specific platform:
+
+### Extension Builds
+
+```bash
+# Chromium (Chrome, Edge, Brave, etc.)
+npm run build:chromium
+
+# Firefox
 npm run build:firefox
 
-# Ensure the output directory exists
-if [ ! -d "dist/firefox" ]; then
-    echo "Error: Build output directory does not exist!"
-    exit 1
-fi
-
-# Zip the build output while preserving directory structure
-echo "Zipping build output..."
-cd dist/firefox
-zip -r ../firefox.zip ./*
-cd ../..
-
-echo "Build completed successfully!"
-echo "Firefox extension is available in dist/firefox/"
-echo "Zipped archive available at dist/firefox.zip"
+# Safari
+npm run build:safari
 ```
 
-Make the script executable on Linux/macOS:
+### Web Build
 
 ```bash
-chmod +x build.sh
+npm run build
 ```
 
-## Support
+All production builds are located in the `dist/` directory, organized by platform (e.g., `dist/firefox/`, `dist/chromium/`).
 
-If you encounter any issues during the build process, please:
+## Other Scripts
 
-1. Check the [GitHub Issues](https://github.com/BookCatKid/TablissNG/issues) page
-2. Create a new issue if your problem hasn't been reported
+- `npm test`: Run the test suite.
+- `npm run lint`: Check for code style and potential errors.
+- `npm run lint:fix`: Automatically fix linting errors.
+- `npm run prettier`: Format the codebase using Prettier.
+- `npm run prettier:check`: Check if the codebase follows Prettier formatting rules.
+- `npm run typecheck`: Run TypeScript type checking.
+- `npm run translations`: Manage and update translation files.
+- `npm run sign:firefox`: Manually sign the Firefox extension (requires credentials, mostly for gh workflows).
+- `npm run deps:check`: Check for outdated dependencies using `npm-check`.
+- `npm run deps:update`: Interactively update dependencies.
+- `npm run prepare`: Set up Husky git hooks.

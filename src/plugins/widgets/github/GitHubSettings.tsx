@@ -66,13 +66,27 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <label>
+        <input
+          type="checkbox"
+          checked={data.showTooltips}
+          onChange={(event) =>
+            setData({ ...data, showTooltips: !data.showTooltips })
+          }
+        />{" "}
+        <FormattedMessage
+          id="plugins.github.showTooltips"
+          defaultMessage="Show tooltips"
+          description="Option to show tooltips on hover"
+        />
+      </label>
+
+      <label>
         <FormattedMessage
           id="plugins.github.clickAction"
           defaultMessage="Click Action"
           description="Label for click action dropdown"
         />
         <select
-          title={intl.formatMessage({ id: "plugins.github.clickAction" })}
           value={data.clickAction}
           onChange={(event) =>
             setData({

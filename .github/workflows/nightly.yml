@@ -8,44 +8,10 @@ on:
 
 jobs:
   build:
-    name: Build ${{ matrix.build_target }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build_target:
-          - chromium
-          - firefox
-          - web
-          - safari
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build ${{ matrix.build_target }}
-        run: npm run build:${{ matrix.build_target }}
-        env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
-          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
-
-      - name: Create archive
-        run: |
-          cd dist/${{ matrix.build_target }}
-          zip -r ../../tabliss-${{ matrix.build_target }}-nightly.zip .
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tabliss-${{ matrix.build_target }}-nightly
-          path: tabliss-${{ matrix.build_target }}-nightly.zip
+    uses: ./.github/workflows/_build.yml
+    with:
+      artifact_suffix: "-nightly"
+    secrets: inherit
 
   release:
     name: Create Nightly Release
@@ -54,12 +20,33 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
+
+      - name: Create ZIP files for release
+        run: |
+          mkdir -p nightly-zips
+          count=0
+          for dir in artifacts/tabliss-*-nightly; do
+            if [ -d "$dir" ]; then
+              target=$(basename "$dir")
+              echo "Zipping $target..."
+              (cd "$dir" && zip -r "../../nightly-zips/$target.zip" .)
+              count=$((count + 1))
+            fi
+          done
+
+          if [ $count -eq 0 ]; then
+            echo "Error: No nightly artifact directories found in artifacts/ matching 'tabliss-*-nightly'"
+            ls -R artifacts/
+            exit 1
+          fi
+
+          echo "Successfully created $count ZIP files in nightly-zips/."
 
       - name: Get current date
         id: date
@@ -81,7 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update or create nightly release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
         with:
           tag_name: nightly-auto
           name: "TablissNG Nightly Build"
@@ -98,7 +85,7 @@ jobs:
             ### Download Instructions:
 
             1. Download the version that corresponds to your browser
-            2. Follow the installation instructions (while skipping download steps) in [the installation guide](https://github.com/BookCatKid/TablissNG/blob/main/INSTALL.md#step-2-install-the-extension-in-your-browser)
+            2. Follow the installation instructions (while skipping download steps) in our [Documentation](https://bookcatkid.github.io/TablissNG/docs/category/installation/)
             3. Dive into the newest features and improvements!
 
             ### Please Note:
@@ -118,9 +105,7 @@ jobs:
             **Thank you for supporting TablissNG!**
 
             Your active participation and feedback are key to continuous improvement. Enjoy exploring the latest features!
-          files: |
-            artifacts/*/tabliss-*-nightly.zip
-          draft: false
+          files: nightly-zips/tabliss-*-nightly.zip
           prerelease: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

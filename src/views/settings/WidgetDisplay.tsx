@@ -2,7 +2,6 @@ import React from "react";
 import { FormattedMessage, defineMessages, useIntl } from "react-intl";
 import { WidgetDisplay as WidgetDisplayType } from "../../db/state";
 import PositionInput from "./PositionInput";
-import "./WidgetDisplay.css";
 import { pluginMessages } from "../../locales/messages";
 
 type Props = {

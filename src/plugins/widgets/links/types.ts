@@ -18,6 +18,7 @@ export type Link = {
   // Reference to cached icon data
   iconCacheKey?: string;
   conserveAspectRatio?: boolean;
+  useExtensionTabs?: boolean;
 };
 
 export type IconCacheItem = {

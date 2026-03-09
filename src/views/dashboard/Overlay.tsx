@@ -41,8 +41,8 @@ const messages = defineMessages({
 const Overlay: React.FC = () => {
   const intl = useIntl();
   const focus = useValue(db, "focus");
-  const { errors } = React.use(ErrorContext);
-  const { pending, toggleErrors, toggleSettings } = React.use(UiContext);
+  const { errors } = React.useContext(ErrorContext);
+  const { pending, toggleErrors, toggleSettings } = React.useContext(UiContext);
   const [hideSettingsIcon] = useKey(db, "hideSettingsIcon");
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
 

@@ -4,60 +4,15 @@ on: push
 
 jobs:
   test:
-    name: Run tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run prettier:check
-      - run: npm run lint
+    uses: ./.github/workflows/_test.yml
 
   build:
-    name: Build ${{ matrix.build_target }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        build_target:
-          - chromium
-          - firefox
-          - web
-          - safari
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build:${{ matrix.build_target }}
-        env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
-          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
-
-      # Use upload-pages-artifact only for web
-      - uses: actions/upload-pages-artifact@v3
-        if: matrix.build_target == 'web'
-        with:
-          name: tabliss-web
-          path: dist/web
-
-      # Use upload-artifact for other build targets
-      - uses: actions/upload-artifact@v4
-        if: matrix.build_target != 'web'
-        with:
-          name: tabliss-${{ matrix.build_target }}
-          path: dist/${{ matrix.build_target }}
+    uses: ./.github/workflows/_build.yml
+    secrets: inherit
 
   deploy:
     name: Deploy to GitHub Pages
-    needs: build
+    needs: [build]
     if: github.ref == 'refs/heads/main' # Only deploy on main branch
     runs-on: ubuntu-latest
     permissions:
@@ -67,9 +22,23 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Download web artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: tabliss-web
+          path: combined-dist
+
+      - name: Download docs artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: tabliss-docs
+          path: combined-dist/docs
+
+      - name: Upload combined artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: combined-dist
+
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          artifact_name: tabliss-web
+        uses: actions/deploy-pages@v4.0.5

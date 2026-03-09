@@ -16,7 +16,7 @@ const JsSettings: FC<Props> = ({ data = defaultData, setData }) => {
           description="JavaScript Snippet title"
         />
         <textarea
-          rows={3}
+          rows={20}
           style={{ resize: "vertical", fontFamily: "monospace" }}
           value={input}
           onChange={(event) => setInput(event.target.value)}

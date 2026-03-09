@@ -10,7 +10,7 @@ import {
 } from "../../../views/shared";
 import { Link, IconCacheItem, Cache } from "./types";
 import { Icon } from "@iconify/react";
-import { addIconData } from "../../../utils";
+import { addIconData, normalizeUrl } from "../../../utils";
 import "./Input.sass";
 
 const messages = defineMessages({
@@ -49,6 +49,11 @@ const messages = defineMessages({
   searchIcons: {
     id: "plugins.links.input.searchIcons",
     defaultMessage: "Search icons...",
+  },
+  useExtensionTabsHelp: {
+    id: "plugins.links.input.useExtensionTabsHelp",
+    defaultMessage:
+      "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
   },
 });
 
@@ -223,7 +228,11 @@ const Input: FC<Props> = (props) => {
           type="url"
           value={urlValue}
           onChange={(e) => setUrlValue(e.target.value)}
-          onBlur={() => props.onChange({ url: urlValue })}
+          onBlur={() => {
+            const normalized = normalizeUrl(urlValue);
+            setUrlValue(normalized);
+            props.onChange({ url: normalized });
+          }}
         />
       </label>
 
@@ -629,6 +638,22 @@ const Input: FC<Props> = (props) => {
           maxLength={1}
         />
       </label>
+
+      {BUILD_TARGET !== "web" && (
+        <label title={intl.formatMessage(messages.useExtensionTabsHelp)}>
+          <input
+            type="checkbox"
+            checked={props.useExtensionTabs || false}
+            onChange={(event) =>
+              props.onChange({ useExtensionTabs: event.target.checked })
+            }
+          />
+          <FormattedMessage
+            id="plugins.links.input.useExtensionTabs"
+            defaultMessage="Use browser extension API to open link"
+          />
+        </label>
+      )}
 
       <hr />
     </div>

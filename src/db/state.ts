@@ -29,6 +29,8 @@ export interface State {
   autoHideSettings: boolean;
   /** Favicon settings */
   favicon: FaviconState;
+  /** Global accent color in hex format */
+  accent: string;
 }
 
 export type FaviconMode =
@@ -101,6 +103,8 @@ export interface WidgetDisplay {
   textDecoration?: "none" | "underline";
   position: WidgetPosition;
   customClass?: string;
+  /** Whether to use the global accent color instead of a specific color */
+  useAccentColor?: boolean;
 }
 
 export type WidgetPosition =
@@ -159,6 +163,7 @@ const initData: State = {
     url: "",
     data: null,
   },
+  accent: "#3498db",
 };
 
 // Database storage

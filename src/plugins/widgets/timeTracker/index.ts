@@ -3,7 +3,7 @@ import { defineMessages } from "react-intl";
 import TimeTracker from "./TimeTracker";
 import TimeTrackerSettings from "./TimeTrackerSettings";
 
-const messages = defineMessages({
+export const messages = defineMessages({
   name: {
     id: "plugins.timeTracker.name",
     defaultMessage: "Time Tracker",

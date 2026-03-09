@@ -14,7 +14,20 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
         onChange={(location) => setData({ ...data, ...location })}
       />
 
-      {data.latitude && data.latitude ? (
+      <label>
+        <input
+          type="checkbox"
+          checked={data.autoUpdate || false}
+          onChange={() => setData({ ...data, autoUpdate: !data.autoUpdate })}
+        />{" "}
+        <FormattedMessage
+          id="plugins.weather.autoUpdate"
+          defaultMessage="Follow location"
+          description="Follow location automatically title"
+        />
+      </label>
+
+      {data.latitude && data.longitude ? (
         <>
           <label>
             <FormattedMessage

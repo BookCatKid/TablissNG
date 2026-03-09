@@ -4,6 +4,7 @@ import { useValue } from "../../../lib/db/react";
 
 type Props = {
   hour12: boolean;
+  showHours: boolean;
   showMinutes: boolean;
   showSeconds: boolean;
   showDayPeriod?: boolean;
@@ -22,6 +23,7 @@ type Props = {
  */
 const IntlTime: React.FC<Props> = ({
   hour12,
+  showHours,
   showMinutes,
   showSeconds,
   showDayPeriod = true,
@@ -33,12 +35,12 @@ const IntlTime: React.FC<Props> = ({
   const formater = React.useMemo(
     () =>
       Intl.DateTimeFormat(locale, {
-        hour: "numeric",
+        hour: showHours ? "numeric" : undefined,
         hourCycle: hour12 ? "h12" : "h23",
         minute: showMinutes ? "numeric" : undefined,
         second: showSeconds ? "numeric" : undefined,
       }),
-    [locale, hour12, showMinutes, showSeconds],
+    [locale, hour12, showHours, showMinutes, showSeconds],
   );
 
   if (showDayPeriod) {

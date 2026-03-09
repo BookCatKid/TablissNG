@@ -3,3 +3,5 @@ target/
 package-lock.json
 screenshots/
 updates.json
+docs/.docusaurus/
+docs/build/

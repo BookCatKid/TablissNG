@@ -1,4 +1,5 @@
 import React from "react";
+import { format } from "date-fns";
 import BaseBackground from "../base/BaseBackground";
 import { fetchFeaturedContent, formatDateForApi } from "./api";
 import { defaultData, Props } from "./types";
@@ -15,7 +16,7 @@ const Wikimedia: React.FC<Props> = ({
     const formattedDate =
       data.date === "custom" && data.customDate
         ? formatDateForApi(data.customDate)
-        : formatDateForApi(new Date().toISOString());
+        : formatDateForApi(format(new Date(), "yyyy-MM-dd"));
     const language = "en";
     const params = { language, formattedDate };
     fetchFeaturedContent(params).then((result) => {

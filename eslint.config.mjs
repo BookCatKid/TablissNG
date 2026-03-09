@@ -14,6 +14,8 @@ export default defineConfig(
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/ban-ts-comment": "warn",
+      "@eslint-react/no-use-context": "off",
+      "@eslint-react/no-context-provider": "off",
     },
   },
   {
@@ -22,6 +24,7 @@ export default defineConfig(
       "jest.config.json",
       "scripts/**/*.js",
       "eslint.config.mjs",
+      "docs/sync-assets.js",
     ],
     languageOptions: {
       globals: {

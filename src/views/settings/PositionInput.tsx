@@ -2,7 +2,7 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { WidgetPosition } from "../../db/state";
 import { Icon, IconButton } from "../shared";
-import "./PositionInput.css";
+import "./PositionInput.sass";
 
 const positions = [
   {
@@ -64,7 +64,7 @@ const PositionInput: React.FC<Props> = ({ value, onChange }) => (
 
     <div className="grid">
       {positions.map((position) => (
-        <div key={position.value} className="position-button-container">
+        <div key={position.value} className="PositionInput-buttonContainer">
           <IconButton
             onClick={() => onChange(position.value)}
             primary={value === position.value}

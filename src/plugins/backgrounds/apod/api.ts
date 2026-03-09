@@ -1,11 +1,12 @@
 import { API } from "../../types";
 import { Image, Data } from "./types";
 import { format } from "date-fns";
+import { parseLocalDate } from "../../../utils";
 
 type Config = Data;
 
 const formatDateForApi = (date: string): string => {
-  return format(new Date(date), "yyyy-MM-dd");
+  return format(parseLocalDate(date), "yyyy-MM-dd");
 };
 
 export async function getPicture(

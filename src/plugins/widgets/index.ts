@@ -16,6 +16,7 @@ import links from "./links";
 import literatureClock from "./literatureClock";
 import message from "./message";
 import notes from "./notes";
+import palette from "./palette";
 import quote from "./quote";
 import search from "./search";
 import since from "./since";
@@ -26,6 +27,7 @@ import weather from "./weather";
 import workHours from "./workHours";
 import timeTracker from "./timeTracker";
 import trello from "./trello";
+import tallyCounter from "./tallyCounter";
 
 export const widgetConfigs = [
   // nba,
@@ -43,6 +45,7 @@ export const widgetConfigs = [
   literatureClock,
   message,
   notes,
+  palette,
   quote,
   search,
   since,
@@ -51,6 +54,7 @@ export const widgetConfigs = [
   weather,
   workHours,
   timeTracker,
+  tallyCounter,
 ];
 
 if (BUILD_TARGET === "web") {

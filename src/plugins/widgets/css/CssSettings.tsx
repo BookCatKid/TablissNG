@@ -11,7 +11,7 @@ const CssSettings: FC<Props> = ({ data = defaultData, setData }) => (
         description="CSS Snippet title"
       />
       <textarea
-        rows={3}
+        rows={20}
         style={{ resize: "vertical", fontFamily: "monospace" }}
         value={data.input}
         onChange={(event) => setData({ input: event.target.value })}

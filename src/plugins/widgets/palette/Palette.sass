@@ -1,0 +1,66 @@
+.Palette
+  display: flex
+  width: 500px
+  height: 200px
+  overflow: hidden
+  border-radius: 12px
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2)
+
+  &.is-loading
+    .Color
+      background: rgba(255, 255, 255, 0.1)
+      cursor: default
+      pointer-events: none
+      position: relative
+      overflow: hidden
+
+      &::after
+        content: ""
+        position: absolute
+        top: 0
+        right: 0
+        bottom: 0
+        left: 0
+        transform: translateX(-100%)
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent)
+        animation: shimmer 1.5s infinite
+
+  .Color
+    flex: 1
+    display: flex
+    align-items: center
+    justify-content: center
+    cursor: pointer
+    transition: flex 0.3s ease
+    position: relative
+
+    &:not(.is-loading):hover
+      flex: 1.5
+      z-index: 1
+
+    .label
+      position: absolute
+      font-size: 0.8rem
+      font-weight: 600
+      opacity: 0
+      pointer-events: none
+      font-family: monospace
+      text-transform: uppercase
+      transform: rotate(-90deg)
+      white-space: nowrap
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2)
+      top: 50%
+      left: 50%
+      margin-top: -0.5em
+      display: block
+      text-align: center
+      width: 150px
+      transition: opacity 0.3s ease
+      margin-left: -75px
+
+      &.visible
+        opacity: 0.9
+
+@keyframes shimmer
+  100%
+    transform: translateX(100%)

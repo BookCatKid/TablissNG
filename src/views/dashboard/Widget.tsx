@@ -1,6 +1,7 @@
 import React from "react";
-import { WidgetDisplay } from "../../db/state";
+import { WidgetDisplay, db } from "../../db/state";
 import { setWidgetDisplay } from "../../db/action";
+import { useKey } from "../../lib/db/react";
 import { Icon } from "@iconify/react";
 import { FormattedMessage } from "react-intl";
 import { pluginMessages } from "../../locales/messages";
@@ -35,8 +36,10 @@ const Widget: React.FC<WidgetProps> = ({
   yPercent = 50,
   isEditingPosition = false,
   customClass,
+  useAccentColor,
 }) => {
   const widgetRef = React.useRef<HTMLDivElement>(null);
+  const [accent] = useKey(db, "accent") || ["#3498db"];
 
   // Calculate pixel position from percentage
   // Uses "travel space" (viewport size - widget size) for better responsiveness
@@ -147,7 +150,7 @@ const Widget: React.FC<WidgetProps> = ({
 
   const styles: React.CSSProperties = {
     position: position === "free" ? "absolute" : "relative",
-    color: colour,
+    color: useAccentColor ? accent : colour,
     fontFamily: parsedFont.family || fontFamily,
     fontSize: `${fontSize}px`,
     fontWeight,
