@@ -8,6 +8,9 @@ import {
   TrelloSession,
 } from "../types";
 
+// TODO add pagination for boards and list fetches
+// Potentially infinite scroll
+
 /**
  * Make authenticated call to Trello's API
  * and transform the response into a TData array
@@ -32,6 +35,11 @@ const trelloFetch = async <TResponse, TData>(
   return transform(data);
 };
 
+/**
+ * Fetch boards all boards owned by the current authenticated user
+ * @param session
+ * @returns
+ */
 export const getBoards = async (session: TrelloSession) => {
   return trelloFetch<TrelloBoardResponse[], Board[]>(
     `members/${session.userId}/boards`,
@@ -40,6 +48,12 @@ export const getBoards = async (session: TrelloSession) => {
   );
 };
 
+/**
+ * Fetch lists under a specific board owned by the authenticated user
+ * @param boardId
+ * @param session
+ * @returns
+ */
 export const getLists = async (boardId: string, session: TrelloSession) => {
   return trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
@@ -51,6 +65,12 @@ export const getLists = async (boardId: string, session: TrelloSession) => {
   );
 };
 
+/**
+ * Fetch items under a specific list owned by the authenticated user
+ * @param listId
+ * @param session
+ * @returns
+ */
 export const getItems = async (listId: string, session: TrelloSession) => {
   return trelloFetch<TrelloItemsResponse[], Item[]>(
     `lists/${listId}/cards`,
@@ -61,4 +81,21 @@ export const getItems = async (listId: string, session: TrelloSession) => {
           ({ id: item.id, name: item.name, labels: item.labels }) as Item,
       ),
   );
+};
+
+/**
+ * Move a card to a different list
+ * @param cardId The ID of the card to move
+ * @param targetListId The ID of the destination list
+ * @param session The Trello session for authentication
+ * @returns true if successful, false otherwise
+ */
+export const moveCardToList = async (
+  cardId: string,
+  targetListId: string,
+  session: TrelloSession,
+): Promise<boolean> => {
+  const url = `https://api.trello.com/1/cards/${cardId}?key=${TRELLO_API_KEY}&token=${session.accessToken}&idList=${targetListId}`;
+  const response = await fetch(url, { method: "PUT" });
+  return response.ok;
 };

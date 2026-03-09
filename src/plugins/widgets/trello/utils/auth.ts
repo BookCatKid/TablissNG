@@ -9,7 +9,7 @@ export const trelloAuthFlow = async (): Promise<TrelloSession | null> => {
   const params = new URLSearchParams({
     expiration: "30days",
     callback_method: "fragment",
-    scope: "read",
+    scope: "read,write",
     response_type: "token",
     key: TRELLO_API_KEY,
     return_url: browser.identity.getRedirectURL(),

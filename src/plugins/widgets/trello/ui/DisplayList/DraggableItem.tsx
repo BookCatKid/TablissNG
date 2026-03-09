@@ -1,69 +1,52 @@
-import React, { useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import { colourPalette, Item } from "../../types";
-import { useRef } from "react";
-import Moveable from "react-moveable";
-
-interface DraggableItemProps {
-  item: Item;
-  initialPosition: { x: number; y: number };
-}
+import { colourPalette } from "../../types";
+import { useDragContext } from "../../contexts/DragContext";
 
 /**
- * Floating, draggable list item. Rendered outside of DisplayList's container so it can be dragged anywherekjA
+ * Floating drag preview - rendered via portal to document.body
+ * Receives position from DragContext
  */
-export default function DraggableItem({
-  item,
-  initialPosition,
-}: DraggableItemProps) {
-  const [target, setTarget] = useState<HTMLDivElement | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
+export default function DraggableItem() {
+  const { dragState } = useDragContext();
+
+  if (!dragState.item || !dragState.position || !dragState.elementStyle) {
+    return null;
+  }
+
+  const { item, position, elementStyle } = dragState;
 
   return ReactDOM.createPortal(
-    <>
-      <div
-        ref={setTarget}
-        className="display-list-item-content"
-        style={{
-          position: "fixed",
-          left: initialPosition.x,
-          top: initialPosition.y,
-          zIndex: 9999,
-          width: "200px",
-          pointerEvents: "all",
-        }}
-      >
-        {/* Trello card tags */}
-        <div className="labels-container">
-          {item.labels.map((label) => (
-            <div
-              key={label.color}
-              style={{
-                width: "2.5rem",
-                height: "0.26rem",
-                borderRadius: "0.5rem",
-                marginBottom: "0.5rem",
-                background: colourPalette[label.color],
-              }}
-            />
-          ))}
-        </div>
-        <span>{item.name}</span>
+    <div
+      className="display-list-item-content dragged-item"
+      style={{
+        position: "fixed",
+        left: position.x,
+        top: position.y,
+        zIndex: 9999,
+        width: `${elementStyle.size.width}px`,
+        height: `${elementStyle.size.height}px`,
+        fontSize: `${elementStyle.fontSize}px`,
+        pointerEvents: "none",
+        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
+      }}
+    >
+      <div className="labels-container">
+        {item.labels.map((label) => (
+          <div
+            key={label.color}
+            style={{
+              width: "2.5rem",
+              height: "0.26rem",
+              borderRadius: "0.5rem",
+              marginBottom: "0.5rem",
+              background: colourPalette[label.color],
+            }}
+          />
+        ))}
       </div>
-
-      {target && (
-        <Moveable
-          target={target}
-          draggable={true}
-          onDrag={({ target, left, top }) => {
-            console.log(left, top);
-            target.style.left = `${left}px`;
-            target.style.top = `${top}px`;
-          }}
-        />
-      )}
-    </>,
-    document.querySelector(".display-list-container")!, // Assumes the display list container will always be present
-    // document.body
+      <span>{item.name}</span>
+    </div>,
+    document.body,
   );
 }
