@@ -1,5 +1,15 @@
 import React, { FC, useEffect, useCallback } from "react";
-import { Props, List, defaultCache, TrelloSession } from "./types";
+import {
+  Props,
+  List,
+  defaultCache,
+  TrelloSession,
+  isSkeleton,
+  isItem,
+  RealOrSkeletonItem,
+  SkeletonItem,
+  FetchJob,
+} from "./types";
 import "./Trello.sass";
 
 import DisplayList from "./ui/DisplayList/DisplayList";
@@ -10,13 +20,65 @@ import useAuth from "../../../hooks/useAuth";
 import { FormattedMessage } from "react-intl";
 import { DragContextProvider, useDragContext } from "./contexts/DragContext";
 
-// Inner component that uses the drag context
+const Trello: FC<Props> = (props) => {
+  return (
+    <DragContextProvider>
+      <TrelloContent {...props} />
+    </DragContextProvider>
+  );
+};
+
 const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
   );
-  const { endDrag, isDragging } = useDragContext();
+
+  const { dragState, endDrag, isDragging } = useDragContext();
+
+  // Insert skeleton item at drag source
+  useEffect(() => {
+    // Remove drag source item and replace with a skeleton
+    if (!dragState) {
+      return;
+    }
+
+    console.log("Inserting skeleton for drag source");
+    const skeletonWidth = dragState.elementStyle!.size.width;
+    const skeletonHeight = dragState.elementStyle!.size.height;
+
+    const fetchJob = cache.responses.get(dragState.sourceListId);
+    if (!fetchJob) {
+      return;
+    }
+
+    const notSourceItem = (item: RealOrSkeletonItem) =>
+      isItem(item) && item.id !== dragState.item.id;
+    const updatedItems = fetchJob.items.filter(notSourceItem);
+
+    // Replace removed source item with skeleton
+    updatedItems.splice(dragState.sourceItemIndex, 0, {
+      width: skeletonWidth,
+      height: skeletonHeight,
+    } as SkeletonItem);
+
+    const updated: FetchJob = {
+      ...fetchJob,
+      items: updatedItems,
+    };
+
+    const updatedResponses = new Map(cache.responses);
+    updatedResponses.set(dragState.sourceListId, updated);
+
+    setCache({
+      ...cache,
+      responses: updatedResponses,
+    });
+
+    return () => {
+      // Clear skeletons
+    };
+  }, [dragState]);
 
   // fetch data on page load
   useEffect(() => {
@@ -84,14 +146,21 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   }, [cache.order]);
 
   // Handle moving an item from one list to another
-  const handleItemMoved = useCallback(
-    async (itemId: string, fromListId: string, toListId: string) => {
+  const handleDrop = useCallback(
+    async (
+      itemId: string,
+      insertIndex: number,
+      fromListId: string,
+      toListId: string,
+    ) => {
+      console.log(insertIndex);
       const updatedResponses = new Map(cache.responses);
       const source = updatedResponses.get(fromListId);
       const destination = updatedResponses.get(toListId);
 
       if (source && destination) {
-        const itemIndex = source.items.findIndex((i) => i.id === itemId);
+        const nonSkeletons = source.items.filter((item) => isSkeleton(item));
+        const itemIndex = nonSkeletons.findIndex((i) => i.id === itemId);
         if (itemIndex !== -1) {
           const [item] = source.items.splice(itemIndex, 1);
           destination.items.unshift(item);
@@ -113,17 +182,60 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache, getSession],
   );
 
+  // Restore the currently dragging item back to where it came from
+  const handleCancel = useCallback(
+    async (sourceItemIndex: number, sourceListId: string) => {
+      const fetchJob = cache.responses.get(sourceListId);
+      if (!fetchJob) {
+        return;
+      }
+
+      if (!dragState) {
+        return;
+      }
+
+      // Find the skeleton item at the sourceItemIndex
+      const items = fetchJob.items;
+      const itemAtSourceIndex = items[sourceItemIndex];
+
+      // Check if there's actually a skeleton at the source index
+      if (isSkeleton(itemAtSourceIndex)) {
+        // Find the original item by ID
+        const originalItem = dragState.item;
+        if (originalItem) {
+          console.log("TRELLO: Found original item");
+          const updatedItems = [...fetchJob.items];
+          updatedItems[sourceItemIndex] = originalItem;
+
+          const updatedResponses = new Map(cache.responses);
+          updatedResponses.set(sourceListId, {
+            ...fetchJob,
+            items: updatedItems,
+          });
+
+          // Update UI
+          setCache({
+            ...cache,
+            responses: updatedResponses,
+          });
+        }
+      }
+    },
+    [cache, setCache],
+  );
+
   // Handle pointer up to end drag
   useEffect(() => {
     if (!isDragging) return;
 
     const handlePointerUp = () => {
-      endDrag(handleItemMoved);
+      console.log("POINTER UP");
+      endDrag(handleDrop, handleCancel);
     };
 
     window.addEventListener("pointerup", handlePointerUp);
     return () => window.removeEventListener("pointerup", handlePointerUp);
-  }, [isDragging, endDrag, handleItemMoved]);
+  }, [isDragging, endDrag, handleDrop, handleCancel]);
 
   return (
     <>
@@ -158,14 +270,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         </div>
       )}
     </>
-  );
-};
-
-const Trello: FC<Props> = (props) => {
-  return (
-    <DragContextProvider>
-      <TrelloContent {...props} />
-    </DragContextProvider>
   );
 };
 

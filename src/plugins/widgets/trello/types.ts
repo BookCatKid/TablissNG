@@ -10,16 +10,6 @@ export type BoardPreference = {
   lists: List[];
 };
 
-/**
- * Type to represent UI lists on the browser page
- */
-export type DisplayList = {
-  id: string; // same list id
-  name: string;
-  items: DisplayListItem[];
-  loading: boolean;
-};
-
 export type TrelloBoardResponse = {
   id: string;
   name: string;
@@ -122,12 +112,20 @@ export interface TrelloSession extends Session {
   userId: string;
 }
 
+export type RealOrSkeletonItem = Item | SkeletonItem;
+
 /**
  * Represents a pending job to fetch items from a trello board
+ * Skeleton = true: Job is there but has not yet started fetching.
+ * Used for optimistic UI updates with debounced selection.
+ * When debounce timer runs out all skeletons are converted to real networks fetches to fetch all information simultaneously
+ * to prevent race conditions when setting the cache
+ *
+ * Loading = true: Network fetch is pending
  */
 export type FetchJob = {
   listId: string;
-  items: Item[];
+  items: RealOrSkeletonItem[];
   loading: boolean;
   skeleton: boolean;
 };
@@ -139,10 +137,6 @@ export const createFetchJob = (listId: string) => {
     loading: true,
     skeleton: true,
   } as FetchJob;
-};
-
-export type DisplayListItem = {
-  content: string;
 };
 
 export type Board = {
@@ -162,9 +156,23 @@ export type Item = {
   labels: TrelloListItemLabel[];
 };
 
+// A blank space / placeholder item that is used for drag previews
+export type SkeletonItem = {
+  width: number;
+  height: number;
+};
+
+export const isSkeleton = (item: RealOrSkeletonItem): item is Item => {
+  return !("id" in item);
+};
+
+export const isItem = (item: RealOrSkeletonItem): item is Item => {
+  return "id" in item;
+};
+
 export type Cache = {
   order: List[]; // order of responses for rendering
-  responses: Map<string, FetchJob>; // map list ids to the corresponding API response
+  responses: Map<string, FetchJob>; // map list ids to their corresponding job
 };
 
 export type Data = {

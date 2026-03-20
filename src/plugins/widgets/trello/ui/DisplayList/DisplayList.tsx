@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Item } from "../../types";
+import { isItem, RealOrSkeletonItem } from "../../types";
 import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
 import DisplayItem from "./DisplayItem";
@@ -8,7 +8,7 @@ import { useDragContext } from "../../contexts/DragContext";
 interface DisplayListComponentProps {
   header: string;
   listId: string;
-  items: Item[] | undefined;
+  items: RealOrSkeletonItem[] | undefined;
   loading: boolean | undefined;
 }
 
@@ -30,29 +30,31 @@ export default function DisplayList({
   };
 
   // Check if this list is the current drop target
-  const isDropTarget =
-    dragState.overListId === listId && dragState.sourceListId !== listId;
-
-  const view =
-    loading || !items ? (
-      <div className="loader-container">
-        <Spinner size={24} />
-      </div>
-    ) : (
-      <div
-        className={`display-list-items${isDropTarget ? " is-drop-target" : ""}`}
-        ref={setRef}
-      >
-        {items.map((item, i) => (
-          <DisplayItem key={item.id + i} item={item} listId={listId} />
-        ))}
-      </div>
-    );
+  const isDropTarget = !dragState
+    ? false
+    : dragState.overListId === listId && dragState.sourceListId !== listId;
 
   return (
     <div className="display-list">
       <h3 className="display-list-header">{header}</h3>
-      {view}
+      {loading || !items ? (
+        <div className="loader-container">
+          <Spinner size={24} />
+        </div>
+      ) : (
+        <div
+          className={`display-list-items ${isDropTarget ?? " is-drop-target"}`}
+          ref={setRef}
+        >
+          {items.map((item, i) => (
+            <DisplayItem
+              key={isItem(item) ? item.id : `skeleton-${i}`}
+              item={item}
+              listId={listId}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

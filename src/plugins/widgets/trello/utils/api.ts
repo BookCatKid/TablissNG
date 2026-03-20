@@ -41,7 +41,7 @@ const trelloFetch = async <TResponse, TData>(
  * @returns
  */
 export const getBoards = async (session: TrelloSession) => {
-  return trelloFetch<TrelloBoardResponse[], Board[]>(
+  return await trelloFetch<TrelloBoardResponse[], Board[]>(
     `members/${session.userId}/boards`,
     session,
     (data) => data.map((item) => ({ id: item.id, name: item.name }) as Board),
@@ -55,7 +55,7 @@ export const getBoards = async (session: TrelloSession) => {
  * @returns
  */
 export const getLists = async (boardId: string, session: TrelloSession) => {
-  return trelloFetch<TrelloListResponse[], List[]>(
+  return await trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
     session,
     (data) =>
@@ -72,7 +72,7 @@ export const getLists = async (boardId: string, session: TrelloSession) => {
  * @returns
  */
 export const getItems = async (listId: string, session: TrelloSession) => {
-  return trelloFetch<TrelloItemsResponse[], Item[]>(
+  return await trelloFetch<TrelloItemsResponse[], Item[]>(
     `lists/${listId}/cards`,
     session,
     (data) =>

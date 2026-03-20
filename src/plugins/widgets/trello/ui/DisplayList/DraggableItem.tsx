@@ -23,10 +23,11 @@ export default function DraggableItem() {
         position: "fixed",
         left: position.x,
         top: position.y,
-        zIndex: 9999,
+        zIndex: 676767,
         width: `${elementStyle.size.width}px`,
         height: `${elementStyle.size.height}px`,
         fontSize: `${elementStyle.fontSize}px`,
+        rotate: "3deg",
         pointerEvents: "none",
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
       }}

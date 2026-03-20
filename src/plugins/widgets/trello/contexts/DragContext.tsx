@@ -8,30 +8,52 @@ import React, {
 } from "react";
 import { Item } from "../types";
 
+type ListIdToDisplayList = Map<string, HTMLDivElement>;
+type ListIdToItemElements = Map<
+  string,
+  { element: HTMLDivElement; item: Item }[]
+>;
+
 // Information encoded in the currently dragged item
-interface DragState {
-  item: Item | null;
-  sourceListId: string | null;
+// null when no item is being dragged
+type DragState = null | {
+  item: Item;
+  sourceListId: string;
   overListId: string | null; // id of the display list the dragged object is hovering over
-  position: { x: number; y: number } | null;
-  elementStyle: null | {
+  overItemId: string | null; // id of any cards the dragged item is over
+  position: { x: number; y: number };
+  sourceItemIndex: number;
+  destinationItemIndex: number | null;
+  elementStyle: {
     size: { width: number; height: number };
     fontSize: number; // Measured in pixels
   };
-  pointerOffset: { x: number; y: number } | null;
-}
+  cursorPosition: { x: number; y: number };
+};
 
 // Context provider information
 interface DragContextValue {
   dragState: DragState;
-  displayListRefs: Map<string, HTMLDivElement>;
+  itemsRef: ListIdToItemElements;
+  displayListsRef: ListIdToDisplayList;
   registerDisplayListRef: (
     listId: string,
     element: HTMLDivElement | null,
   ) => void;
+  registerItemRef: (
+    listId: string,
+    element: HTMLDivElement | null,
+    item: Item,
+  ) => void;
   startDrag: (item: Item, listId: string, element: HTMLElement) => void;
   endDrag: (
-    onMove: (itemId: string, fromListId: string, toListId: string) => void,
+    onDrop: (
+      itemId: string,
+      insertIndex: number,
+      fromListId: string,
+      toListId: string,
+    ) => void,
+    onCancel: (sourceItemIndex: number, sourceListId: string) => void,
   ) => void;
   isDragging: boolean;
 }
@@ -51,23 +73,40 @@ interface DragContextProviderProps {
 }
 
 export function DragContextProvider({ children }: DragContextProviderProps) {
-  const [dragState, setDragState] = useState<DragState>({
-    item: null,
-    sourceListId: null,
-    overListId: null,
-    position: null,
-    elementStyle: null,
-    pointerOffset: null,
-  });
+  const [dragState, setDragState] = useState<DragState | null>(null);
 
-  const displayListRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  // Keep track of current display lists on screen
+  const displayListsRef = useRef<ListIdToDisplayList>(new Map());
+
+  // Keep track of items under each display list
+  const itemsRef = useRef<ListIdToItemElements>(new Map());
 
   const registerDisplayListRef = useCallback(
     (listId: string, element: HTMLDivElement | null) => {
       if (element) {
-        displayListRefs.current.set(listId, element);
+        displayListsRef.current.set(listId, element);
       } else {
-        displayListRefs.current.delete(listId);
+        displayListsRef.current.delete(listId);
+      }
+    },
+    [],
+  );
+
+  const registerItemRef = useCallback(
+    (listId: string, element: HTMLDivElement | null, item: Item) => {
+      if (element) {
+        if (!itemsRef.current.has(listId)) {
+          itemsRef.current.set(listId, []);
+        }
+
+        const obj = itemsRef.current.get(listId)!;
+        const existingIndex = obj.findIndex((o) => o.item.id === item.id);
+        const pair = { element: element, item: item };
+        if (existingIndex !== -1) {
+          obj[existingIndex] = pair;
+        } else {
+          obj.push(pair);
+        }
       }
     },
     [],
@@ -84,15 +123,28 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       ).value;
 
       // Store where in the element the pointer grabbed (center it for now)
-      const pointerOffset = { x: width / 2, y: height / 2 };
+      const cursorPosition = { x: width / 2, y: height / 2 };
+
+      // Set position for source skeleton
+      const elementItemPairs = itemsRef.current.get(listId)!;
+      const sourceIndex = elementItemPairs.findIndex(
+        (pair) => pair.item.id === item.id,
+      );
+      if (sourceIndex === -1) {
+        console.error("TRELLO: error starting drag");
+        return;
+      }
 
       setDragState({
         item,
         sourceListId: listId,
         overListId: listId, // Start over the source list
+        overItemId: item.id, // Start over the source item
+        sourceItemIndex: sourceIndex,
+        destinationItemIndex: null,
         position: { x: rect.left, y: rect.top },
         elementStyle: { size: { width, height }, fontSize: fontSize },
-        pointerOffset,
+        cursorPosition,
       });
     },
     [],
@@ -100,46 +152,61 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
   const endDrag = useCallback(
     (
-      onMove: (itemId: string, fromListId: string, toListId: string) => void,
+      onDrop: (
+        itemId: string,
+        insertIndex: number,
+        fromListId: string,
+        toListId: string,
+      ) => void,
+      onCancel: (sourceItemIndex: number, sourceListId: string) => void,
     ) => {
-      if (dragState.item && dragState.sourceListId && dragState.overListId) {
-        // Only move if dropped on a different list
-        if (dragState.sourceListId !== dragState.overListId) {
-          onMove(
-            dragState.item.id,
-            dragState.sourceListId,
-            dragState.overListId,
-          );
-        }
+      if (!dragState) {
+        return;
       }
 
-      setDragState({
-        item: null,
-        sourceListId: null,
-        overListId: null,
-        position: null,
-        elementStyle: null,
-        pointerOffset: null,
-      });
+      console.log("Drag over list id", dragState.overListId);
+      console.log("Destination item index ", dragState.destinationItemIndex);
+      console.log("Destination source item index ", dragState.sourceItemIndex);
+      console.log("Destination over item id ", dragState.overItemId);
+
+      if (!dragState.overListId || !dragState.destinationItemIndex) {
+        // Drag was cancelled due to being dropped on itself or dropped outside a list
+        // Currently on cancel will restore moved item back to its original location
+        onCancel(dragState.sourceItemIndex, dragState.sourceListId);
+      } else {
+        onDrop(
+          dragState.item.id,
+          dragState.destinationItemIndex,
+          dragState.sourceListId,
+          dragState.overListId,
+        );
+      }
+
+      // Clear drag state
+      setDragState(null);
     },
-    [dragState.item, dragState.sourceListId, dragState.overListId],
+    [dragState],
   );
 
-  // Update position and check drop zones on pointer move
+  // Check position of item being dragged and update drag state
   useEffect(() => {
-    if (!dragState.item) return;
+    if (!dragState) return;
 
     const handlePointerMove = (e: PointerEvent) => {
       setDragState((prev) => {
-        if (!prev.item || !prev.elementStyle || !prev.pointerOffset)
-          return prev;
+        if (!prev) {
+          return null;
+        }
 
-        const newX = e.clientX - prev.pointerOffset.x;
-        const newY = e.clientY - prev.pointerOffset.y;
+        const newX = e.clientX - prev.cursorPosition.x;
+        const newY = e.clientY - prev.cursorPosition.y;
 
         // Check which list we're over
         let overListId: string | null = null;
-        displayListRefs.current.forEach((element, listId) => {
+        let overItemId: string | null = null;
+        let overItemName: string | null = null;
+
+        displayListsRef.current.forEach((element, listId) => {
           const rect = element.getBoundingClientRect();
           if (
             e.clientX >= rect.left &&
@@ -151,26 +218,65 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           }
         });
 
+        let destinationIndex = prev.destinationItemIndex;
+        if (overListId) {
+          // Check which item we're over
+          const elementItemPairs = itemsRef.current.get(overListId)!;
+
+          for (const pair of elementItemPairs) {
+            const rect = pair.element.getBoundingClientRect();
+            if (
+              e.clientX >= rect.left &&
+              e.clientX <= rect.right &&
+              e.clientY >= rect.top &&
+              e.clientY <= rect.bottom
+            ) {
+              overItemId = pair.item.id;
+              overItemName = pair.item.name;
+              break;
+            }
+          }
+
+          if (overItemId && overItemName) {
+            // Locate position of item
+            destinationIndex = elementItemPairs.findIndex(
+              (pair) => pair.item.id === overItemId,
+            );
+            if (destinationIndex === -1) {
+              console.error("TRELLO: error while moving item");
+            }
+          }
+        }
+
+        // Update
+        // cursor position
+        // list we are currently over
+        // item we are currently over
+        // the position of the item we are currently over
         return {
           ...prev,
           position: { x: newX, y: newY },
-          overListId: overListId ?? prev.overListId,
+          overListId: overListId,
+          overItemId: overItemId,
+          destinationItemIndex: destinationIndex,
         };
       });
     };
 
     window.addEventListener("pointermove", handlePointerMove);
     return () => window.removeEventListener("pointermove", handlePointerMove);
-  }, [dragState.item]);
+  }, [dragState]);
 
-  const isDragging = dragState.item !== null;
+  const isDragging = dragState !== null;
 
   return (
     <DragContext.Provider
       value={{
         dragState,
-        displayListRefs: displayListRefs.current,
+        itemsRef: itemsRef.current,
+        displayListsRef: displayListsRef.current,
         registerDisplayListRef,
+        registerItemRef,
         startDrag,
         endDrag,
         isDragging,

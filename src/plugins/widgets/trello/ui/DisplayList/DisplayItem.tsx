@@ -1,33 +1,47 @@
 import React, { useRef } from "react";
-import { colourPalette, Item } from "../../types";
+import { colourPalette, RealOrSkeletonItem, isItem } from "../../types";
 import { useDragContext } from "../../contexts/DragContext";
+import SkeletonItem from "./SkeletonItem";
 
 interface DisplayItemProps {
-  item: Item;
+  item: RealOrSkeletonItem;
   listId: string;
 }
 
 export default function DisplayItem({ item, listId }: DisplayItemProps) {
-  const itemRef = useRef<HTMLDivElement>(null);
-  const { startDrag, isDragging, dragState } = useDragContext();
+  const typeIsItem = isItem(item);
 
-  const isThisItemDragging = isDragging && dragState.item?.id === item.id;
+  const itemRef = useRef<HTMLDivElement | null>(null);
+  const { registerItemRef, startDrag, isDragging, dragState } =
+    useDragContext();
+
+  const itemDragging =
+    dragState && isDragging && typeIsItem && dragState.item.id === item.id;
+
+  const setRef = (element: HTMLDivElement) => {
+    if (element && typeIsItem) {
+      registerItemRef(listId, element, item);
+    }
+    itemRef.current = element;
+  };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (itemRef.current) {
+    if (itemRef.current && typeIsItem) {
       // Capture pointer for smooth dragging
       itemRef.current.setPointerCapture(e.pointerId);
       startDrag(item, listId, itemRef.current);
     }
   };
 
-  return (
+  return !typeIsItem ? (
+    <SkeletonItem width={100} height={60} />
+  ) : (
     <div
-      ref={itemRef}
+      ref={setRef}
       className="display-list-item-content"
       style={{
-        opacity: isThisItemDragging ? 0.3 : 1,
-        cursor: isThisItemDragging ? "grabbing" : "grab",
+        opacity: itemDragging ? 0.3 : 1,
+        cursor: itemDragging ? "grabbing" : "grab",
       }}
       onPointerDown={handlePointerDown}
     >
