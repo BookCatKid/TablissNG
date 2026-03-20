@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { colourPalette } from "../../types";
+import { colourPalette, TrelloColour, TrelloListItemLabel } from "../../types";
 import { useDragContext } from "../../contexts/DragContext";
 
 /**
@@ -10,7 +10,7 @@ import { useDragContext } from "../../contexts/DragContext";
 export default function DraggableItem() {
   const { dragState } = useDragContext();
 
-  if (!dragState.item || !dragState.position || !dragState.elementStyle) {
+  if (!dragState) {
     return null;
   }
 
@@ -33,7 +33,7 @@ export default function DraggableItem() {
       }}
     >
       <div className="labels-container">
-        {item.labels.map((label) => (
+        {item.labels.map((label: TrelloListItemLabel) => (
           <div
             key={label.color}
             style={{
@@ -41,7 +41,7 @@ export default function DraggableItem() {
               height: "0.26rem",
               borderRadius: "0.5rem",
               marginBottom: "0.5rem",
-              background: colourPalette[label.color],
+              background: colourPalette[label.color as TrelloColour],
             }}
           />
         ))}
