@@ -42,6 +42,13 @@ interface DragContextValue {
     element: HTMLDivElement | null,
     item: Item,
   ) => void;
+  registerOverlapCallback: (
+    onDragItemOverlap: (
+      index: number | null,
+      listId: string | null,
+      style: DraggedItemStyle,
+    ) => void | null,
+  ) => void;
   startDrag: (
     item: Item,
     listId: string,
@@ -88,6 +95,16 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   // Keep track of items under each display list
   const itemsRef = useRef<ListIdToItemElements>(new Map());
 
+  // Callback for handling drag overlap (skeleton placement)
+  const overlapCallbackRef =
+    useRef<
+      (
+        index: number | null,
+        listId: string | null,
+        style: DraggedItemStyle,
+      ) => void | null
+    >(null);
+
   const registerDisplayListRef = useCallback(
     (listId: string, element: HTMLDivElement | null) => {
       if (element) {
@@ -115,6 +132,19 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           obj.push(pair);
         }
       }
+    },
+    [],
+  );
+
+  const registerOverlapCallback = useCallback(
+    (
+      onDragItemOverlap: (
+        index: number | null,
+        listId: string | null,
+        style: DraggedItemStyle,
+      ) => void | null,
+    ) => {
+      overlapCallbackRef.current = onDragItemOverlap;
     },
     [],
   );
@@ -220,6 +250,9 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   useEffect(() => {
     if (!dragState) return;
 
+    let style: DraggedItemStyle | null = null;
+    let destinationIndex: number | null = null;
+    let overListId: string | null = null;
     const handlePointerMove = (e: PointerEvent) => {
       setDragState((prev) => {
         if (!prev) {
@@ -230,7 +263,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         const newY = e.clientY - prev.cursorPosition.y;
 
         // Check which list we're over
-        let overListId: string | null = null;
         let overItemId: string | null = null;
         let overItemName: string | null = null;
 
@@ -246,7 +278,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           }
         });
 
-        let destinationIndex = prev.destinationItemIndex;
+        destinationIndex = prev.destinationItemIndex;
         if (overListId) {
           // Check which item we're over
           const elementItemPairs = itemsRef.current.get(overListId)!;
@@ -265,16 +297,20 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
             }
           }
 
-          if (overItemId && overItemName) {
+          if (overItemId) {
             // Locate position of item
             destinationIndex = elementItemPairs.findIndex(
               (pair) => pair.item.id === overItemId,
             );
+
             if (destinationIndex === -1) {
               console.error("TRELLO: error while moving item");
+              destinationIndex = null;
             }
           }
         }
+
+        style = dragState.style;
 
         // Update
         // cursor position
@@ -289,6 +325,19 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           destinationItemIndex: destinationIndex,
         };
       });
+
+      // Call the overlap callback to handle skeleton placement
+      if (
+        overlapCallbackRef.current &&
+        style &&
+        destinationIndex &&
+        overListId
+      ) {
+        console.log("Calling overlap");
+        console.log("Destination index ", destinationIndex);
+        console.log("Destination list id ", overListId);
+        overlapCallbackRef.current(destinationIndex, overListId, style);
+      }
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -305,6 +354,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         displayListsRef: displayListsRef.current,
         registerDisplayListRef,
         registerItemRef,
+        registerOverlapCallback,
         startDrag,
         endDrag,
         isDragging,

@@ -36,7 +36,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     trelloAuthStore,
   );
 
-  const { dragState, endDrag, isDragging } = useDragContext();
+  const { dragState, endDrag, registerOverlapCallback, isDragging } =
+    useDragContext();
 
   // fetch data on page load
   useEffect(() => {
@@ -156,7 +157,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   // Restore the currently dragging item back to where it came from
   const handleDragCancel = useCallback(
-    async (sourceItemIndex: number, sourceListId: string) => {
+    (sourceItemIndex: number, sourceListId: string) => {
       console.log("Handling cancel");
       const fetchJob = cache.responses.get(sourceListId);
       if (!fetchJob) {
@@ -198,7 +199,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   );
 
   const handleDragStart = useCallback(
-    async (
+    (
       item: Item,
       sourceItemIndex: number,
       sourceListId: string,
@@ -239,18 +240,75 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache],
   );
 
+  const handleDragItemOverlap = useCallback(
+    (
+      hoveredItemIndex: number | null,
+      hoveredListId: string | null,
+      style: DraggedItemStyle,
+    ) => {
+      console.log("Handling overlap");
+
+      if (!hoveredItemIndex || !hoveredListId) {
+        // item is not overlapping with anything
+        // clear skeletons in all lists except the source
+        if (dragState) {
+          console.log("OUTSIDE CLEAR ALL");
+          const sourceListId = dragState.sourceListId;
+          const updatedResponses = new Map(cache.responses);
+        }
+        return;
+      }
+
+      const updatedResponses = new Map(cache.responses);
+      const destination = updatedResponses.get(hoveredListId);
+      if (!destination) {
+        return;
+      }
+
+      let items = [...destination.items];
+
+      // Clear existing placeholders
+      items = items.filter((i) => isItem(i));
+      const { width: skeletonWidth, height: skeletonHeight } = style.size;
+
+      // Insert new placeholder
+      items.splice(hoveredItemIndex, 0, {
+        width: skeletonWidth,
+        height: skeletonHeight,
+      } as SkeletonItem);
+
+      const updated: FetchJob = {
+        ...destination,
+        items: items,
+      };
+
+      updatedResponses.set(hoveredListId, updated);
+
+      setCache({
+        ...cache,
+        responses: updatedResponses,
+      });
+    },
+    [cache, setCache],
+  );
+
   // Handle pointer up to end drag
   useEffect(() => {
     if (!isDragging) return;
 
     const handlePointerUp = () => {
-      console.log("POINTER UP");
       endDrag(handleDrop, handleDragCancel);
     };
 
     window.addEventListener("pointerup", handlePointerUp);
     return () => window.removeEventListener("pointerup", handlePointerUp);
   }, [isDragging, endDrag, handleDrop, handleDragCancel]);
+
+  // Register callback in context
+  useEffect(() => {
+    console.log("Registering callbacks");
+    registerOverlapCallback(handleDragItemOverlap);
+  }, []);
 
   return (
     <>
