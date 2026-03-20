@@ -6,7 +6,7 @@ import React, {
   useRef,
   useEffect,
 } from "react";
-import { Item } from "../types";
+import { DraggedItemStyle, Item } from "../types";
 
 type ListIdToDisplayList = Map<string, HTMLDivElement>;
 type ListIdToItemElements = Map<
@@ -24,10 +24,7 @@ type DragState = null | {
   position: { x: number; y: number };
   sourceItemIndex: number;
   destinationItemIndex: number | null;
-  elementStyle: {
-    size: { width: number; height: number };
-    fontSize: number; // Measured in pixels
-  };
+  style: DraggedItemStyle;
   cursorPosition: { x: number; y: number };
 };
 
@@ -45,10 +42,20 @@ interface DragContextValue {
     element: HTMLDivElement | null,
     item: Item,
   ) => void;
-  startDrag: (item: Item, listId: string, element: HTMLElement) => void;
+  startDrag: (
+    item: Item,
+    listId: string,
+    element: HTMLElement,
+    onStart: (
+      item: Item,
+      sourceItemIndex: number,
+      sourceListId: string,
+      style: DraggedItemStyle,
+    ) => void,
+  ) => void;
   endDrag: (
     onDrop: (
-      itemId: string,
+      item: Item,
       insertIndex: number,
       fromListId: string,
       toListId: string,
@@ -113,7 +120,17 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   );
 
   const startDrag = useCallback(
-    (item: Item, listId: string, element: HTMLElement) => {
+    (
+      item: Item,
+      listId: string,
+      element: HTMLElement,
+      onStart: (
+        item: Item,
+        sourceItemIndex: number,
+        sourceListId: string,
+        style: DraggedItemStyle,
+      ) => void,
+    ) => {
       const rect = element.getBoundingClientRect();
       const width = rect.width;
       const height = rect.height;
@@ -135,6 +152,15 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         return;
       }
 
+      // UI style of the dragged item
+      const style: DraggedItemStyle = {
+        size: { width, height },
+        fontSize: fontSize,
+      };
+
+      // Trigger side effects such as placing skeletons
+      onStart(item, sourceIndex, listId, style);
+
       setDragState({
         item,
         sourceListId: listId,
@@ -143,7 +169,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         sourceItemIndex: sourceIndex,
         destinationItemIndex: null,
         position: { x: rect.left, y: rect.top },
-        elementStyle: { size: { width, height }, fontSize: fontSize },
+        style: style,
         cursorPosition,
       });
     },
@@ -153,7 +179,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   const endDrag = useCallback(
     (
       onDrop: (
-        itemId: string,
+        item: Item,
         insertIndex: number,
         fromListId: string,
         toListId: string,
@@ -169,14 +195,16 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       console.log("Destination source item index ", dragState.sourceItemIndex);
       console.log("Destination over item id ", dragState.overItemId);
 
-      if (!dragState.overListId || !dragState.destinationItemIndex) {
+      if (dragState.overListId === null) {
         // Drag was cancelled due to being dropped on itself or dropped outside a list
         // Currently on cancel will restore moved item back to its original location
+        console.log("Calling on cancel");
         onCancel(dragState.sourceItemIndex, dragState.sourceListId);
       } else {
+        console.log("Calling on drop");
         onDrop(
-          dragState.item.id,
-          dragState.destinationItemIndex,
+          dragState.item,
+          dragState.destinationItemIndex!,
           dragState.sourceListId,
           dragState.overListId,
         );

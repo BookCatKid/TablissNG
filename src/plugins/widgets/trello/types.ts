@@ -23,6 +23,7 @@ export type TrelloListResponse = {
 export type TrelloItemsResponse = {
   id: string;
   name: string;
+  pos: number;
   labels: TrelloListItemLabel[];
 };
 
@@ -153,6 +154,7 @@ export type List = {
 export type Item = {
   id: string;
   name: string;
+  position: number;
   labels: TrelloListItemLabel[];
 };
 
@@ -160,6 +162,12 @@ export type Item = {
 export type SkeletonItem = {
   width: number;
   height: number;
+};
+
+// Store style info on the currently dragged item
+export type DraggedItemStyle = {
+  size: { width: number; height: number };
+  fontSize: number; // measured in pixels
 };
 
 export const isSkeleton = (item: RealOrSkeletonItem): item is Item => {

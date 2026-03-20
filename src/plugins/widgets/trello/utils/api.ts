@@ -78,7 +78,12 @@ export const getItems = async (listId: string, session: TrelloSession) => {
     (data) =>
       data.map(
         (item) =>
-          ({ id: item.id, name: item.name, labels: item.labels }) as Item,
+          ({
+            id: item.id,
+            name: item.name,
+            position: item.pos,
+            labels: item.labels,
+          }) as Item,
       ),
   );
 };

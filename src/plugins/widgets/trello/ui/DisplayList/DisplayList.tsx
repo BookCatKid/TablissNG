@@ -1,5 +1,10 @@
 import React, { useRef } from "react";
-import { isItem, RealOrSkeletonItem } from "../../types";
+import {
+  DraggedItemStyle,
+  isItem,
+  Item,
+  RealOrSkeletonItem,
+} from "../../types";
 import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
 import DisplayItem from "./DisplayItem";
@@ -10,6 +15,12 @@ interface DisplayListComponentProps {
   listId: string;
   items: RealOrSkeletonItem[] | undefined;
   loading: boolean | undefined;
+  onDragStart: (
+    item: Item,
+    sourceItemIndex: number,
+    sourceListId: string,
+    style: DraggedItemStyle,
+  ) => void;
 }
 
 export default function DisplayList({
@@ -17,6 +28,7 @@ export default function DisplayList({
   listId,
   items,
   loading,
+  onDragStart,
 }: DisplayListComponentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const { registerDisplayListRef, dragState } = useDragContext();
@@ -51,6 +63,7 @@ export default function DisplayList({
               key={isItem(item) ? item.id : `skeleton-${i}`}
               item={item}
               listId={listId}
+              onDragStart={onDragStart}
             />
           ))}
         </div>

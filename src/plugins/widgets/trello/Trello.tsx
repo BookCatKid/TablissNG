@@ -9,6 +9,8 @@ import {
   RealOrSkeletonItem,
   SkeletonItem,
   FetchJob,
+  Item,
+  DraggedItemStyle,
 } from "./types";
 import "./Trello.sass";
 
@@ -35,50 +37,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   );
 
   const { dragState, endDrag, isDragging } = useDragContext();
-
-  // Insert skeleton item at drag source
-  useEffect(() => {
-    // Remove drag source item and replace with a skeleton
-    if (!dragState) {
-      return;
-    }
-
-    console.log("Inserting skeleton for drag source");
-    const skeletonWidth = dragState.elementStyle!.size.width;
-    const skeletonHeight = dragState.elementStyle!.size.height;
-
-    const fetchJob = cache.responses.get(dragState.sourceListId);
-    if (!fetchJob) {
-      return;
-    }
-
-    const notSourceItem = (item: RealOrSkeletonItem) =>
-      isItem(item) && item.id !== dragState.item.id;
-    const updatedItems = fetchJob.items.filter(notSourceItem);
-
-    // Replace removed source item with skeleton
-    updatedItems.splice(dragState.sourceItemIndex, 0, {
-      width: skeletonWidth,
-      height: skeletonHeight,
-    } as SkeletonItem);
-
-    const updated: FetchJob = {
-      ...fetchJob,
-      items: updatedItems,
-    };
-
-    const updatedResponses = new Map(cache.responses);
-    updatedResponses.set(dragState.sourceListId, updated);
-
-    setCache({
-      ...cache,
-      responses: updatedResponses,
-    });
-
-    return () => {
-      // Clear skeletons
-    };
-  }, [dragState]);
 
   // fetch data on page load
   useEffect(() => {
@@ -148,22 +106,36 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   // Handle moving an item from one list to another
   const handleDrop = useCallback(
     async (
-      itemId: string,
+      item: Item,
       insertIndex: number,
       fromListId: string,
       toListId: string,
     ) => {
+      console.log("Handling drop");
       console.log(insertIndex);
       const updatedResponses = new Map(cache.responses);
       const source = updatedResponses.get(fromListId);
       const destination = updatedResponses.get(toListId);
 
       if (source && destination) {
-        const nonSkeletons = source.items.filter((item) => isSkeleton(item));
-        const itemIndex = nonSkeletons.findIndex((i) => i.id === itemId);
-        if (itemIndex !== -1) {
-          const [item] = source.items.splice(itemIndex, 1);
-          destination.items.unshift(item);
+        console.log("SOURCE ITEMS ", source.items);
+        // Find position of skeleton
+        const skeletonIndex = source.items.findIndex((i) => isSkeleton(i));
+
+        if (skeletonIndex !== -1) {
+          let sourceItems = [...source.items];
+          let destItems = [...destination.items];
+          console.log("Adding item");
+          console.log(item);
+
+          destItems.push(item);
+
+          // Clear placeholders
+          sourceItems = sourceItems.filter((i) => isItem(i));
+          destItems = destItems.filter((i) => isItem(i));
+
+          updatedResponses.set(fromListId, { ...source, items: sourceItems });
+          updatedResponses.set(toListId, { ...destination, items: destItems });
 
           // Update UI
           setCache({
@@ -172,10 +144,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
           });
 
           // Persist on Trello's side
-          const session = await getSession();
-          if (session) {
-            await moveCardToList(itemId, toListId, session);
-          }
+          // const session = await getSession();
+          // if (session) {
+          //   await moveCardToList(item.id, toListId, session);
+          // }
         }
       }
     },
@@ -183,8 +155,9 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   );
 
   // Restore the currently dragging item back to where it came from
-  const handleCancel = useCallback(
+  const handleDragCancel = useCallback(
     async (sourceItemIndex: number, sourceListId: string) => {
+      console.log("Handling cancel");
       const fetchJob = cache.responses.get(sourceListId);
       if (!fetchJob) {
         return;
@@ -224,18 +197,60 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache],
   );
 
+  const handleDragStart = useCallback(
+    async (
+      item: Item,
+      sourceItemIndex: number,
+      sourceListId: string,
+      style: DraggedItemStyle,
+    ) => {
+      // Place skeletons in item's original position
+      console.log("Inserting skeleton for drag source");
+      const { width: skeletonWidth, height: skeletonHeight } = style.size;
+
+      const fetchJob = cache.responses.get(sourceListId);
+      if (!fetchJob) {
+        return;
+      }
+
+      const notSourceItem = (i: RealOrSkeletonItem) =>
+        isItem(i) && i.id !== item.id;
+      const updatedItems = fetchJob.items.filter(notSourceItem);
+
+      // Replace removed source item with placeholder
+      updatedItems.splice(sourceItemIndex, 0, {
+        width: skeletonWidth,
+        height: skeletonHeight,
+      } as SkeletonItem);
+
+      const updated: FetchJob = {
+        ...fetchJob,
+        items: updatedItems,
+      };
+
+      const updatedResponses = new Map(cache.responses);
+      updatedResponses.set(sourceListId, updated);
+
+      setCache({
+        ...cache,
+        responses: updatedResponses,
+      });
+    },
+    [cache, setCache],
+  );
+
   // Handle pointer up to end drag
   useEffect(() => {
     if (!isDragging) return;
 
     const handlePointerUp = () => {
       console.log("POINTER UP");
-      endDrag(handleDrop, handleCancel);
+      endDrag(handleDrop, handleDragCancel);
     };
 
     window.addEventListener("pointerup", handlePointerUp);
     return () => window.removeEventListener("pointerup", handlePointerUp);
-  }, [isDragging, endDrag, handleDrop, handleCancel]);
+  }, [isDragging, endDrag, handleDrop, handleDragCancel]);
 
   return (
     <>
@@ -262,6 +277,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
                 listId={list.id}
                 items={response?.items}
                 loading={response?.loading}
+                onDragStart={handleDragStart}
               />
             );
           })}

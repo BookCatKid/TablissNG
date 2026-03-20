@@ -14,7 +14,7 @@ export default function DraggableItem() {
     return null;
   }
 
-  const { item, position, elementStyle } = dragState;
+  const { item, position, style } = dragState;
 
   return ReactDOM.createPortal(
     <div
@@ -24,9 +24,9 @@ export default function DraggableItem() {
         left: position.x,
         top: position.y,
         zIndex: 676767,
-        width: `${elementStyle.size.width}px`,
-        height: `${elementStyle.size.height}px`,
-        fontSize: `${elementStyle.fontSize}px`,
+        width: `${style.size.width}px`,
+        height: `${style.size.height}px`,
+        fontSize: `${style.fontSize}px`,
         rotate: "3deg",
         pointerEvents: "none",
         boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
