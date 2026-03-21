@@ -14,6 +14,29 @@ type ListIdToItemElements = Map<
   { element: HTMLDivElement; item: Item }[]
 >;
 
+// Callback types
+type OnDragStart = (
+  item: Item,
+  sourceItemIndex: number,
+  sourceListId: string,
+  style: DraggedItemStyle,
+) => void;
+
+type OnDragItemDrop = (
+  item: Item,
+  insertIndex: number,
+  fromListId: string,
+  toListId: string,
+) => void;
+
+type OnDragItemOverlap = (
+  index: number | null,
+  listId: string | null,
+  style: DraggedItemStyle,
+) => void;
+
+type OnDragCancel = (sourceItemIndex: number, sourceListId: string) => void;
+
 // Information encoded in the currently dragged item
 // null when no item is being dragged
 type DragState = null | {
@@ -42,33 +65,14 @@ interface DragContextValue {
     element: HTMLDivElement | null,
     item: Item,
   ) => void;
-  registerOverlapCallback: (
-    onDragItemOverlap: (
-      index: number | null,
-      listId: string | null,
-      style: DraggedItemStyle,
-    ) => void | null,
+  registerCallbacks: (
+    onDragStart: OnDragStart,
+    onDragItemDrop: OnDragItemDrop,
+    onDragItemOverlap: OnDragItemOverlap,
+    onDragCancel: OnDragCancel,
   ) => void;
-  startDrag: (
-    item: Item,
-    listId: string,
-    element: HTMLElement,
-    onStart: (
-      item: Item,
-      sourceItemIndex: number,
-      sourceListId: string,
-      style: DraggedItemStyle,
-    ) => void,
-  ) => void;
-  endDrag: (
-    onDrop: (
-      item: Item,
-      insertIndex: number,
-      fromListId: string,
-      toListId: string,
-    ) => void,
-    onCancel: (sourceItemIndex: number, sourceListId: string) => void,
-  ) => void;
+  startDrag: (item: Item, listId: string, element: HTMLElement) => void;
+  endDrag: () => void;
   isDragging: boolean;
 }
 
@@ -87,7 +91,7 @@ interface DragContextProviderProps {
 }
 
 export function DragContextProvider({ children }: DragContextProviderProps) {
-  const [dragState, setDragState] = useState<DragState | null>(null);
+  const [dragState, setDragState] = useState<DragState>(null);
 
   // Keep track of current display lists on screen
   const displayListsRef = useRef<ListIdToDisplayList>(new Map());
@@ -95,15 +99,10 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   // Keep track of items under each display list
   const itemsRef = useRef<ListIdToItemElements>(new Map());
 
-  // Callback for handling drag overlap (skeleton placement)
-  const overlapCallbackRef =
-    useRef<
-      (
-        index: number | null,
-        listId: string | null,
-        style: DraggedItemStyle,
-      ) => void | null
-    >(null);
+  const overlapCallbackRef = useRef<OnDragItemOverlap | null>(null);
+  const dragStartCallbackRef = useRef<OnDragStart | null>(null);
+  const dragDropCallbackRef = useRef<OnDragItemDrop | null>(null);
+  const dragCancelCallbackRef = useRef<OnDragCancel | null>(null);
 
   const registerDisplayListRef = useCallback(
     (listId: string, element: HTMLDivElement | null) => {
@@ -136,115 +135,92 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     [],
   );
 
-  const registerOverlapCallback = useCallback(
-    (
-      onDragItemOverlap: (
-        index: number | null,
-        listId: string | null,
-        style: DraggedItemStyle,
-      ) => void | null,
-    ) => {
-      overlapCallbackRef.current = onDragItemOverlap;
-    },
-    [],
-  );
+  const startDrag = (item: Item, listId: string, element: HTMLElement) => {
+    const rect = element.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
 
-  const startDrag = useCallback(
-    (
-      item: Item,
-      listId: string,
-      element: HTMLElement,
-      onStart: (
-        item: Item,
-        sourceItemIndex: number,
-        sourceListId: string,
-        style: DraggedItemStyle,
-      ) => void,
-    ) => {
-      const rect = element.getBoundingClientRect();
-      const width = rect.width;
-      const height = rect.height;
+    const fontSize = (
+      element.computedStyleMap().get("font-size") as CSSUnitValue
+    ).value;
 
-      const fontSize = (
-        element.computedStyleMap().get("font-size") as CSSUnitValue
-      ).value;
+    // Store where in the element the pointer grabbed (center it for now)
+    const cursorPosition = { x: width / 2, y: height / 2 };
 
-      // Store where in the element the pointer grabbed (center it for now)
-      const cursorPosition = { x: width / 2, y: height / 2 };
+    // Set position for source skeleton
+    const elementItemPairs = itemsRef.current.get(listId)!;
+    const sourceIndex = elementItemPairs.findIndex(
+      (pair) => pair.item.id === item.id,
+    );
+    if (sourceIndex === -1) {
+      console.error("TRELLO: error starting drag");
+      return;
+    }
 
-      // Set position for source skeleton
-      const elementItemPairs = itemsRef.current.get(listId)!;
-      const sourceIndex = elementItemPairs.findIndex(
-        (pair) => pair.item.id === item.id,
-      );
-      if (sourceIndex === -1) {
-        console.error("TRELLO: error starting drag");
-        return;
+    // UI style of the dragged item
+    const style: DraggedItemStyle = {
+      size: { width, height },
+      fontSize: fontSize,
+    };
+
+    // Trigger side effects such as placing skeletons
+    if (dragStartCallbackRef.current) {
+      dragStartCallbackRef.current(item, sourceIndex, listId, style);
+    }
+
+    setDragState({
+      item,
+      sourceListId: listId,
+      overListId: listId, // Start over the source list
+      overItemId: item.id, // Start over the source item
+      sourceItemIndex: sourceIndex,
+      destinationItemIndex: null,
+      position: { x: rect.left, y: rect.top },
+      style: style,
+      cursorPosition,
+    });
+  };
+
+  const endDrag = () => {
+    if (!dragState) {
+      return;
+    }
+
+    if (dragState.overListId === null) {
+      // Drag was cancelled due to being dropped on itself or dropped outside a list
+      // Currently on cancel will restore moved item back to its original location
+      if (dragCancelCallbackRef.current) {
+        dragCancelCallbackRef.current(
+          dragState.sourceItemIndex,
+          dragState.sourceListId,
+        );
       }
-
-      // UI style of the dragged item
-      const style: DraggedItemStyle = {
-        size: { width, height },
-        fontSize: fontSize,
-      };
-
-      // Trigger side effects such as placing skeletons
-      onStart(item, sourceIndex, listId, style);
-
-      setDragState({
-        item,
-        sourceListId: listId,
-        overListId: listId, // Start over the source list
-        overItemId: item.id, // Start over the source item
-        sourceItemIndex: sourceIndex,
-        destinationItemIndex: null,
-        position: { x: rect.left, y: rect.top },
-        style: style,
-        cursorPosition,
-      });
-    },
-    [],
-  );
-
-  const endDrag = useCallback(
-    (
-      onDrop: (
-        item: Item,
-        insertIndex: number,
-        fromListId: string,
-        toListId: string,
-      ) => void,
-      onCancel: (sourceItemIndex: number, sourceListId: string) => void,
-    ) => {
-      if (!dragState) {
-        return;
-      }
-
-      console.log("Drag over list id", dragState.overListId);
-      console.log("Destination item index ", dragState.destinationItemIndex);
-      console.log("Destination source item index ", dragState.sourceItemIndex);
-      console.log("Destination over item id ", dragState.overItemId);
-
-      if (dragState.overListId === null) {
-        // Drag was cancelled due to being dropped on itself or dropped outside a list
-        // Currently on cancel will restore moved item back to its original location
-        console.log("Calling on cancel");
-        onCancel(dragState.sourceItemIndex, dragState.sourceListId);
-      } else {
-        console.log("Calling on drop");
-        onDrop(
+    } else {
+      if (dragDropCallbackRef.current) {
+        dragDropCallbackRef.current(
           dragState.item,
           dragState.destinationItemIndex!,
           dragState.sourceListId,
           dragState.overListId,
         );
       }
+    }
 
-      // Clear drag state
-      setDragState(null);
-    },
-    [dragState],
-  );
+    // Clear drag state
+    setDragState(null);
+  };
+
+  const registerCallbacks = (
+    onDragStart: OnDragStart,
+    onDragItemDrop: OnDragItemDrop,
+    onDragItemOverlap: OnDragItemOverlap,
+    onDragCancel: OnDragCancel,
+  ) => {
+    dragStartCallbackRef.current = onDragStart;
+    dragDropCallbackRef.current = onDragItemDrop;
+    overlapCallbackRef.current = onDragItemOverlap;
+    dragCancelCallbackRef.current = onDragCancel;
+  };
 
   // Check position of item being dragged and update drag state
   useEffect(() => {
@@ -346,6 +322,19 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
   const isDragging = dragState !== null;
 
+  // Handle pointer up to end drag
+  useEffect(() => {
+    if (!isDragging) return;
+
+    const handlePointerUp = () => {
+      console.log("END dragging");
+      endDrag();
+    };
+
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => window.removeEventListener("pointerup", handlePointerUp);
+  }, [isDragging, endDrag]);
+
   return (
     <DragContext.Provider
       value={{
@@ -354,7 +343,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         displayListsRef: displayListsRef.current,
         registerDisplayListRef,
         registerItemRef,
-        registerOverlapCallback,
+        registerCallbacks,
         startDrag,
         endDrag,
         isDragging,

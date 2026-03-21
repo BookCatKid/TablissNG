@@ -36,8 +36,9 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     trelloAuthStore,
   );
 
-  const { dragState, endDrag, registerOverlapCallback, isDragging } =
-    useDragContext();
+  const { dragState, registerCallbacks, isDragging } = useDragContext();
+
+  // =================== Data fetching ==================
 
   // fetch data on page load
   useEffect(() => {
@@ -103,6 +104,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     };
     effect();
   }, [cache.order]);
+
+  // =======================================
+
+  // ================= Callbacks to trigger UI changes on various stages of dragging ==================
 
   // Handle moving an item from one list to another
   const handleDrop = useCallback(
@@ -180,6 +185,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
           console.log("TRELLO: Found original item");
           const updatedItems = [...fetchJob.items];
           updatedItems[sourceItemIndex] = originalItem;
+
+          // Clear placeholders
 
           const updatedResponses = new Map(cache.responses);
           updatedResponses.set(sourceListId, {
@@ -270,7 +277,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       // Clear existing placeholders
       items = items.filter((i) => isItem(i));
       const { width: skeletonWidth, height: skeletonHeight } = style.size;
-
+      console.log("Hovered item index ", hoveredItemIndex);
       // Insert new placeholder
       items.splice(hoveredItemIndex, 0, {
         width: skeletonWidth,
@@ -292,23 +299,21 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache],
   );
 
-  // Handle pointer up to end drag
+  // Register callbacks for DragContext to use
   useEffect(() => {
-    if (!isDragging) return;
-
-    const handlePointerUp = () => {
-      endDrag(handleDrop, handleDragCancel);
-    };
-
-    window.addEventListener("pointerup", handlePointerUp);
-    return () => window.removeEventListener("pointerup", handlePointerUp);
-  }, [isDragging, endDrag, handleDrop, handleDragCancel]);
-
-  // Register callback in context
-  useEffect(() => {
-    console.log("Registering callbacks");
-    registerOverlapCallback(handleDragItemOverlap);
-  }, []);
+    registerCallbacks(
+      handleDragStart,
+      handleDrop,
+      handleDragItemOverlap,
+      handleDragCancel,
+    );
+  }, [
+    registerCallbacks,
+    handleDragStart,
+    handleDrop,
+    handleDragItemOverlap,
+    handleDragCancel,
+  ]);
 
   return (
     <>
@@ -335,7 +340,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
                 listId={list.id}
                 items={response?.items}
                 loading={response?.loading}
-                onDragStart={handleDragStart}
               />
             );
           })}

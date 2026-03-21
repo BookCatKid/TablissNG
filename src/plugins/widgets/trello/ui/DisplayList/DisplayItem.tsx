@@ -12,19 +12,9 @@ import SkeletonItem from "./SkeletonItem";
 interface DisplayItemProps {
   item: RealOrSkeletonItem;
   listId: string;
-  onDragStart: (
-    item: Item,
-    sourceItemIndex: number,
-    sourceListId: string,
-    style: DraggedItemStyle,
-  ) => void;
 }
 
-export default function DisplayItem({
-  item,
-  listId,
-  onDragStart,
-}: DisplayItemProps) {
+export default function DisplayItem({ item, listId }: DisplayItemProps) {
   const typeIsItem = isItem(item);
 
   const itemRef = useRef<HTMLDivElement | null>(null);
@@ -45,7 +35,7 @@ export default function DisplayItem({
     if (itemRef.current && typeIsItem) {
       // Capture pointer for smooth dragging
       itemRef.current.setPointerCapture(e.pointerId);
-      startDrag(item, listId, itemRef.current, onDragStart);
+      startDrag(item, listId, itemRef.current);
     }
   };
 
