@@ -113,7 +113,7 @@ export interface TrelloSession extends Session {
   userId: string;
 }
 
-export type RealOrSkeletonItem = Item | SkeletonItem;
+export type RealOrPlaceholderItem = Item | PlaceholderItem;
 
 /**
  * Represents a pending job to fetch items from a trello board
@@ -126,7 +126,7 @@ export type RealOrSkeletonItem = Item | SkeletonItem;
  */
 export type FetchJob = {
   listId: string;
-  items: RealOrSkeletonItem[];
+  items: RealOrPlaceholderItem[];
   loading: boolean;
   skeleton: boolean;
 };
@@ -159,7 +159,7 @@ export type Item = {
 };
 
 // A blank space / placeholder item that is used for drag previews
-export type SkeletonItem = {
+export type PlaceholderItem = {
   width: number;
   height: number;
 };
@@ -170,11 +170,11 @@ export type DraggedItemStyle = {
   fontSize: number; // measured in pixels
 };
 
-export const isSkeleton = (item: RealOrSkeletonItem): item is Item => {
+export const isPlaceholder = (item: RealOrPlaceholderItem): item is Item => {
   return !("id" in item);
 };
 
-export const isItem = (item: RealOrSkeletonItem): item is Item => {
+export const isItem = (item: RealOrPlaceholderItem): item is Item => {
   return "id" in item;
 };
 

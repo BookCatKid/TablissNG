@@ -1,10 +1,5 @@
 import React, { useRef } from "react";
-import {
-  DraggedItemStyle,
-  isItem,
-  Item,
-  RealOrSkeletonItem,
-} from "../../types";
+import { isItem, RealOrPlaceholderItem } from "../../types";
 import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
 import DisplayItem from "./DisplayItem";
@@ -13,7 +8,7 @@ import { useDragContext } from "../../contexts/DragContext";
 interface DisplayListComponentProps {
   header: string;
   listId: string;
-  items: RealOrSkeletonItem[] | undefined;
+  items: RealOrPlaceholderItem[] | undefined;
   loading: boolean | undefined;
 }
 

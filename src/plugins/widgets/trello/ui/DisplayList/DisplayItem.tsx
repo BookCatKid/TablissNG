@@ -1,10 +1,10 @@
 import React, { useRef } from "react";
-import { colourPalette, RealOrSkeletonItem, isItem } from "../../types";
+import { colourPalette, RealOrPlaceholderItem, isItem } from "../../types";
 import { useDragContext } from "../../contexts/DragContext";
-import SkeletonItem from "./SkeletonItem";
+import PlaceholderItem from "./PlaceholderItem";
 
 interface DisplayItemProps {
-  item: RealOrSkeletonItem;
+  item: RealOrPlaceholderItem;
   listId: string;
 }
 
@@ -35,7 +35,7 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
   };
 
   return !typeIsItem ? (
-    <SkeletonItem
+    <PlaceholderItem
       listId={listId}
       width={style ? style.width : 100}
       height={style ? style.height : 60}

@@ -1,17 +1,17 @@
 import React, { useEffect, useRef } from "react";
 import { useDragContext } from "../../contexts/DragContext";
 
-interface SkeletonItemProps {
+interface PlaceholderItemProps {
   listId: string;
   width: number;
   height: number;
 }
 
-export default function SkeletonItem({
+export default function PlaceholderItem({
   listId,
   width,
   height,
-}: SkeletonItemProps) {
+}: PlaceholderItemProps) {
   const { registerPlaceholderRef } = useDragContext();
   const ref = useRef<HTMLDivElement | null>(null);
   useEffect(() => {

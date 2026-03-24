@@ -4,10 +4,10 @@ import {
   List,
   defaultCache,
   TrelloSession,
-  isSkeleton,
+  isPlaceholder,
   isItem,
-  RealOrSkeletonItem,
-  SkeletonItem,
+  RealOrPlaceholderItem,
+  PlaceholderItem,
   FetchJob,
   Item,
   DraggedItemStyle,
@@ -119,7 +119,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       if (source && destination) {
         console.log("SOURCE ITEMS ", source.items);
-        const skeletonIndex = source.items.findIndex((i) => isSkeleton(i));
+        const skeletonIndex = source.items.findIndex((i) => isPlaceholder(i));
 
         if (skeletonIndex !== -1) {
           let sourceItems = [...source.items];
@@ -194,14 +194,14 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         return;
       }
 
-      const notSourceItem = (i: RealOrSkeletonItem) =>
+      const notSourceItem = (i: RealOrPlaceholderItem) =>
         isItem(i) && i.id !== item.id;
       const updatedItems = fetchJob.items.filter(notSourceItem);
 
       updatedItems.splice(sourceItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,
-      } as SkeletonItem);
+      } as PlaceholderItem);
 
       const updated: FetchJob = {
         ...fetchJob,
@@ -261,7 +261,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       items.splice(hoveredItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,
-      } as SkeletonItem);
+      } as PlaceholderItem);
 
       const updated: FetchJob = {
         ...destination,
