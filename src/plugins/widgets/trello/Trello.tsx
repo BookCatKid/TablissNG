@@ -36,11 +36,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     trelloAuthStore,
   );
 
-  const { dragState, registerCallbacks, isDragging } = useDragContext();
+  const { registerCallbacks, isDragging } = useDragContext();
 
   // =================== Data fetching ==================
 
-  // fetch data on page load
   useEffect(() => {
     const effect = async () => {
       console.log("TRELLO: fetching items for all selected lists");
@@ -57,7 +56,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       const updatedResponses = new Map(cache.responses);
       results.forEach((result) => {
-        // resolve jobs
         if (result) {
           updatedResponses.set(result.listId, {
             ...result.response,
@@ -78,7 +76,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     }
   }, [authStatus]);
 
-  // fetch data when selected lists are changed
   useEffect(() => {
     const effect = async () => {
       console.log("TRELLO: fetching items for new jobs");
@@ -105,11 +102,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     effect();
   }, [cache.order]);
 
-  // =======================================
+  // ================= Drag callbacks ==================
 
-  // ================= Callbacks to trigger UI changes on various stages of dragging ==================
-
-  // Handle moving an item from one list to another
   const handleDrop = useCallback(
     async (
       item: Item,
@@ -125,7 +119,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       if (source && destination) {
         console.log("SOURCE ITEMS ", source.items);
-        // Find position of skeleton
         const skeletonIndex = source.items.findIndex((i) => isSkeleton(i));
 
         if (skeletonIndex !== -1) {
@@ -136,20 +129,17 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
           destItems.push(item);
 
-          // Clear placeholders
           sourceItems = sourceItems.filter((i) => isItem(i));
           destItems = destItems.filter((i) => isItem(i));
 
           updatedResponses.set(fromListId, { ...source, items: sourceItems });
           updatedResponses.set(toListId, { ...destination, items: destItems });
 
-          // Update UI
           setCache({
             ...cache,
             responses: updatedResponses,
           });
 
-          // Persist on Trello's side
           // const session = await getSession();
           // if (session) {
           //   await moveCardToList(item.id, toListId, session);
@@ -160,47 +150,31 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache, getSession],
   );
 
-  // Restore the currently dragging item back to where it came from
   const handleDragCancel = useCallback(
-    (sourceItemIndex: number, sourceListId: string) => {
+    (sourceItem: Item, sourceItemIndex: number, sourceListId: string) => {
       console.log("Handling cancel");
-      const fetchJob = cache.responses.get(sourceListId);
-      if (!fetchJob) {
+      const listIds = Array.from(cache.responses.keys());
+      let updatedResponses = new Map(cache.responses);
+      updatedResponses = clearPlaceholdersFromList(updatedResponses, listIds);
+
+      const response = updatedResponses.get(sourceListId);
+      if (!response) {
+        console.error("TRELLO: failed to cancel");
         return;
       }
 
-      if (!dragState) {
-        return;
-      }
+      const updatedItems = [...response.items];
+      updatedItems.splice(sourceItemIndex, 0, sourceItem);
 
-      // Find the skeleton item at the sourceItemIndex
-      const items = fetchJob.items;
-      const itemAtSourceIndex = items[sourceItemIndex];
+      updatedResponses.set(sourceListId, {
+        ...response,
+        items: updatedItems,
+      });
 
-      // Check if there's actually a skeleton at the source index
-      if (isSkeleton(itemAtSourceIndex)) {
-        // Find the original item by ID
-        const originalItem = dragState.item;
-        if (originalItem) {
-          console.log("TRELLO: Found original item");
-          const updatedItems = [...fetchJob.items];
-          updatedItems[sourceItemIndex] = originalItem;
-
-          // Clear placeholders
-
-          const updatedResponses = new Map(cache.responses);
-          updatedResponses.set(sourceListId, {
-            ...fetchJob,
-            items: updatedItems,
-          });
-
-          // Update UI
-          setCache({
-            ...cache,
-            responses: updatedResponses,
-          });
-        }
-      }
+      setCache({
+        ...cache,
+        responses: updatedResponses,
+      });
     },
     [cache, setCache],
   );
@@ -212,7 +186,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       sourceListId: string,
       style: DraggedItemStyle,
     ) => {
-      // Place skeletons in item's original position
       console.log("Inserting skeleton for drag source");
       const { width: skeletonWidth, height: skeletonHeight } = style.size;
 
@@ -225,7 +198,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         isItem(i) && i.id !== item.id;
       const updatedItems = fetchJob.items.filter(notSourceItem);
 
-      // Replace removed source item with placeholder
       updatedItems.splice(sourceItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,
@@ -249,20 +221,27 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   const handleDragItemOverlap = useCallback(
     (
+      sourceListId: string,
       hoveredItemIndex: number | null,
       hoveredListId: string | null,
-      style: DraggedItemStyle,
+      style: DraggedItemStyle | null,
     ) => {
-      console.log("Handling overlap");
+      if (!hoveredListId) {
+        const listIds = Array.from(cache.responses.keys()).filter(
+          (i) => i !== sourceListId,
+        );
+        const updated = clearPlaceholdersFromList(
+          new Map(cache.responses),
+          listIds,
+        );
+        setCache({
+          ...cache,
+          responses: updated,
+        });
+        return;
+      }
 
-      if (!hoveredItemIndex || !hoveredListId) {
-        // item is not overlapping with anything
-        // clear skeletons in all lists except the source
-        if (dragState) {
-          console.log("OUTSIDE CLEAR ALL");
-          const sourceListId = dragState.sourceListId;
-          const updatedResponses = new Map(cache.responses);
-        }
+      if (hoveredItemIndex === null) {
         return;
       }
 
@@ -273,12 +252,12 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       }
 
       let items = [...destination.items];
-
-      // Clear existing placeholders
       items = items.filter((i) => isItem(i));
-      const { width: skeletonWidth, height: skeletonHeight } = style.size;
-      console.log("Hovered item index ", hoveredItemIndex);
-      // Insert new placeholder
+      const { width: skeletonWidth, height: skeletonHeight } = style!.size;
+
+      // hoveredItemIndex now correctly accounts for any existing placeholder
+      // in the list because DragContext builds its index from a merged
+      // (real items + placeholder element) sorted list
       items.splice(hoveredItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,
@@ -299,7 +278,29 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [cache, setCache],
   );
 
-  // Register callbacks for DragContext to use
+  /**
+   * Clear all skeletons/placeholders from specified lists.
+   * Returns an updated responses map — does not call setCache itself.
+   */
+  const clearPlaceholdersFromList = (
+    responses: Map<string, FetchJob>,
+    listIds: string[],
+  ) => {
+    const updatedResponses = new Map(responses);
+
+    for (const listId of listIds) {
+      const fetchJob = updatedResponses.get(listId);
+      if (fetchJob) {
+        updatedResponses.set(listId, {
+          ...fetchJob,
+          items: fetchJob.items.filter((i) => isItem(i)),
+        });
+      }
+    }
+
+    return updatedResponses;
+  };
+
   useEffect(() => {
     registerCallbacks(
       handleDragStart,
@@ -343,7 +344,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
               />
             );
           })}
-          {/* Render the floating drag preview when dragging */}
           {isDragging && <DraggableItem />}
         </div>
       )}

@@ -1,13 +1,37 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { useDragContext } from "../../contexts/DragContext";
 
 interface SkeletonItemProps {
+  listId: string;
   width: number;
   height: number;
 }
 
-export default function SkeletonItem({ width, height }: SkeletonItemProps) {
+export default function SkeletonItem({
+  listId,
+  width,
+  height,
+}: SkeletonItemProps) {
+  const { registerPlaceholderRef } = useDragContext();
+  const ref = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    // Register on mount, deregister on unmount
+    return () => {
+      registerPlaceholderRef(listId, null);
+    };
+  }, [listId, registerPlaceholderRef]);
+
+  const setRef = (element: HTMLDivElement | null) => {
+    ref.current = element;
+    // Registers (element present) or deregisters (null on unmount) the
+    // placeholder element with DragContext so pointer-move hit testing
+    // includes this slot when calculating destinationIndex
+    registerPlaceholderRef(listId, element);
+  };
+
   return (
     <div
+      ref={setRef}
       className="display-list-item-content"
       style={{
         visibility: "hidden",

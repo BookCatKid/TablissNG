@@ -24,7 +24,7 @@ export default function DisplayList({
   loading,
 }: DisplayListComponentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { registerDisplayListRef, dragState } = useDragContext();
+  const { registerDisplayListRef } = useDragContext();
 
   // Register this list as a drop zone
   const setRef = (element: HTMLDivElement | null) => {
@@ -34,11 +34,6 @@ export default function DisplayList({
     containerRef.current = element;
   };
 
-  // Check if this list is the current drop target
-  const isDropTarget = !dragState
-    ? false
-    : dragState.overListId === listId && dragState.sourceListId !== listId;
-
   return (
     <div className="display-list">
       <h3 className="display-list-header">{header}</h3>
@@ -47,10 +42,7 @@ export default function DisplayList({
           <Spinner size={24} />
         </div>
       ) : (
-        <div
-          className={`display-list-items ${isDropTarget ?? " is-drop-target"}`}
-          ref={setRef}
-        >
+        <div className={`display-list-items`} ref={setRef}>
           {items.map((item, i) => (
             <DisplayItem
               key={isItem(item) ? item.id : `skeleton-${i}`}

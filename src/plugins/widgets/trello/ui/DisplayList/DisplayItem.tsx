@@ -1,11 +1,5 @@
 import React, { useRef } from "react";
-import {
-  colourPalette,
-  RealOrSkeletonItem,
-  isItem,
-  Item,
-  DraggedItemStyle,
-} from "../../types";
+import { colourPalette, RealOrSkeletonItem, isItem } from "../../types";
 import { useDragContext } from "../../contexts/DragContext";
 import SkeletonItem from "./SkeletonItem";
 
@@ -23,6 +17,7 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
 
   const itemDragging =
     dragState && isDragging && typeIsItem && dragState.item.id === item.id;
+  const style = dragState?.style.size;
 
   const setRef = (element: HTMLDivElement) => {
     if (element && typeIsItem) {
@@ -40,7 +35,11 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
   };
 
   return !typeIsItem ? (
-    <SkeletonItem width={100} height={60} />
+    <SkeletonItem
+      listId={listId}
+      width={style ? style.width : 100}
+      height={style ? style.height : 60}
+    />
   ) : (
     <div
       ref={setRef}

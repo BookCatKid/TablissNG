@@ -14,6 +14,9 @@ type ListIdToItemElements = Map<
   { element: HTMLDivElement; item: Item }[]
 >;
 
+type PlaceholderEntry = { element: HTMLDivElement };
+type ListIdToPlaceholder = Map<string, PlaceholderEntry>;
+
 // Callback types
 type OnDragStart = (
   item: Item,
@@ -30,20 +33,25 @@ type OnDragItemDrop = (
 ) => void;
 
 type OnDragItemOverlap = (
+  fromListId: string,
   index: number | null,
   listId: string | null,
-  style: DraggedItemStyle,
+  style: DraggedItemStyle | null,
 ) => void;
 
-type OnDragCancel = (sourceItemIndex: number, sourceListId: string) => void;
+type OnDragCancel = (
+  sourceItem: Item,
+  sourceItemIndex: number,
+  sourceListId: string,
+) => void;
 
 // Information encoded in the currently dragged item
 // null when no item is being dragged
 type DragState = null | {
   item: Item;
   sourceListId: string;
-  overListId: string | null; // id of the display list the dragged object is hovering over
-  overItemId: string | null; // id of any cards the dragged item is over
+  overListId: string | null;
+  overItemId: string | null;
   position: { x: number; y: number };
   sourceItemIndex: number;
   destinationItemIndex: number | null;
@@ -64,6 +72,12 @@ interface DragContextValue {
     listId: string,
     element: HTMLDivElement | null,
     item: Item,
+  ) => void;
+  // let skeleton/placeholder elements register themselves so the context
+  // knows about them when computing destination indices
+  registerPlaceholderRef: (
+    listId: string,
+    element: HTMLDivElement | null,
   ) => void;
   registerCallbacks: (
     onDragStart: OnDragStart,
@@ -93,11 +107,11 @@ interface DragContextProviderProps {
 export function DragContextProvider({ children }: DragContextProviderProps) {
   const [dragState, setDragState] = useState<DragState>(null);
 
-  // Keep track of current display lists on screen
   const displayListsRef = useRef<ListIdToDisplayList>(new Map());
-
-  // Keep track of items under each display list
   const itemsRef = useRef<ListIdToItemElements>(new Map());
+
+  // NEW: tracks the single placeholder element per list (at most one at a time)
+  const placeholdersRef = useRef<ListIdToPlaceholder>(new Map());
 
   const overlapCallbackRef = useRef<OnDragItemOverlap | null>(null);
   const dragStartCallbackRef = useRef<OnDragStart | null>(null);
@@ -124,12 +138,24 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
         const obj = itemsRef.current.get(listId)!;
         const existingIndex = obj.findIndex((o) => o.item.id === item.id);
-        const pair = { element: element, item: item };
+        const pair = { element: element, item: item, placeholder: false };
         if (existingIndex !== -1) {
           obj[existingIndex] = pair;
         } else {
           obj.push(pair);
         }
+      }
+    },
+    [],
+  );
+
+  // Stores at most one placeholder per list — clears the entry when element is null.
+  const registerPlaceholderRef = useCallback(
+    (listId: string, element: HTMLDivElement | null) => {
+      if (element) {
+        placeholdersRef.current.set(listId, { element });
+      } else {
+        placeholdersRef.current.delete(listId);
       }
     },
     [],
@@ -144,10 +170,8 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       element.computedStyleMap().get("font-size") as CSSUnitValue
     ).value;
 
-    // Store where in the element the pointer grabbed (center it for now)
     const cursorPosition = { x: width / 2, y: height / 2 };
 
-    // Set position for source skeleton
     const elementItemPairs = itemsRef.current.get(listId)!;
     const sourceIndex = elementItemPairs.findIndex(
       (pair) => pair.item.id === item.id,
@@ -157,13 +181,11 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       return;
     }
 
-    // UI style of the dragged item
     const style: DraggedItemStyle = {
       size: { width, height },
       fontSize: fontSize,
     };
 
-    // Trigger side effects such as placing skeletons
     if (dragStartCallbackRef.current) {
       dragStartCallbackRef.current(item, sourceIndex, listId, style);
     }
@@ -171,8 +193,8 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     setDragState({
       item,
       sourceListId: listId,
-      overListId: listId, // Start over the source list
-      overItemId: item.id, // Start over the source item
+      overListId: listId,
+      overItemId: item.id,
       sourceItemIndex: sourceIndex,
       destinationItemIndex: null,
       position: { x: rect.left, y: rect.top },
@@ -187,10 +209,9 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     }
 
     if (dragState.overListId === null) {
-      // Drag was cancelled due to being dropped on itself or dropped outside a list
-      // Currently on cancel will restore moved item back to its original location
       if (dragCancelCallbackRef.current) {
         dragCancelCallbackRef.current(
+          dragState.item,
           dragState.sourceItemIndex,
           dragState.sourceListId,
         );
@@ -206,7 +227,10 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       }
     }
 
-    // Clear drag state
+    // NEW: clear all placeholder refs when drag ends so stale entries don't
+    // affect the next drag session
+    placeholdersRef.current.clear();
+
     setDragState(null);
   };
 
@@ -222,97 +246,108 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     dragCancelCallbackRef.current = onDragCancel;
   };
 
-  // Check position of item being dragged and update drag state
   useEffect(() => {
     if (!dragState) return;
 
-    let style: DraggedItemStyle | null = null;
-    let destinationIndex: number | null = null;
-    let overListId: string | null = null;
+    const sourceListId = dragState.sourceListId;
+
     const handlePointerMove = (e: PointerEvent) => {
-      setDragState((prev) => {
-        if (!prev) {
-          return null;
+      let overListId: string | null = null;
+      let overItemId: string | null = null;
+      let destinationIndex: number | null = null;
+
+      // Find which list the cursor is over
+      displayListsRef.current.forEach((element, listId) => {
+        const rect = element.getBoundingClientRect();
+        if (
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom
+        ) {
+          overListId = listId;
         }
+      });
 
-        const newX = e.clientX - prev.cursorPosition.x;
-        const newY = e.clientY - prev.cursorPosition.y;
+      if (overListId) {
+        const realItems = itemsRef.current.get(overListId) ?? [];
+        const placeholder = placeholdersRef.current.get(overListId);
 
-        // Check which list we're over
-        let overItemId: string | null = null;
-        let overItemName: string | null = null;
+        console.log(`THERE ARE ${realItems.length} in the start`);
 
-        displayListsRef.current.forEach((element, listId) => {
-          const rect = element.getBoundingClientRect();
+        // Build a unified sorted list of real item elements + the placeholder
+        // element (if one exists in this list), ordered top-to-bottom by their
+        // current DOM position. This ensures destinationIndex accounts for the
+        // placeholder slot that has been rendered into the list.
+        type SlotEntry =
+          | { kind: "item"; element: HTMLDivElement; itemId: string }
+          | { kind: "placeholder"; element: HTMLDivElement };
+
+        const slots: SlotEntry[] = [
+          ...realItems.map((p) => ({
+            kind: "item" as const,
+            element: p.element,
+            itemId: p.item.id,
+          })),
+          ...(placeholder
+            ? [{ kind: "placeholder" as const, element: placeholder.element }]
+            : []),
+        ].sort(
+          (a, b) =>
+            a.element.getBoundingClientRect().top -
+            b.element.getBoundingClientRect().top,
+        );
+
+        console.log(
+          `THERE ARE ${slots.length} in the processed including placeholder`,
+        );
+
+        // Find which slot the cursor is inside
+        for (const slot of slots) {
+          const rect = slot.element.getBoundingClientRect();
           if (
             e.clientX >= rect.left &&
             e.clientX <= rect.right &&
             e.clientY >= rect.top &&
             e.clientY <= rect.bottom
           ) {
-            overListId = listId;
-          }
-        });
-
-        destinationIndex = prev.destinationItemIndex;
-        if (overListId) {
-          // Check which item we're over
-          const elementItemPairs = itemsRef.current.get(overListId)!;
-
-          for (const pair of elementItemPairs) {
-            const rect = pair.element.getBoundingClientRect();
-            if (
-              e.clientX >= rect.left &&
-              e.clientX <= rect.right &&
-              e.clientY >= rect.top &&
-              e.clientY <= rect.bottom
-            ) {
-              overItemId = pair.item.id;
-              overItemName = pair.item.name;
-              break;
+            if (slot.kind === "item") {
+              overItemId = slot.itemId;
             }
-          }
-
-          if (overItemId) {
-            // Locate position of item
-            destinationIndex = elementItemPairs.findIndex(
-              (pair) => pair.item.id === overItemId,
-            );
-
-            if (destinationIndex === -1) {
-              console.error("TRELLO: error while moving item");
-              destinationIndex = null;
-            }
+            // Whether it's an item or the placeholder itself, record the
+            // sorted index as the destination so callers get the correct
+            // position in the fully-rendered list
+            destinationIndex = slots.indexOf(slot);
+            break;
           }
         }
+      }
 
-        style = dragState.style;
+      console.log("OVER LIST ID ", overListId);
+      console.log("OVER ITEM ID ", overItemId);
+      console.log("DEST INDEX ", destinationIndex);
 
-        // Update
-        // cursor position
-        // list we are currently over
-        // item we are currently over
-        // the position of the item we are currently over
+      setDragState((prev) => {
+        if (!prev) return null;
         return {
           ...prev,
-          position: { x: newX, y: newY },
-          overListId: overListId,
-          overItemId: overItemId,
+          position: {
+            x: e.clientX - prev.cursorPosition.x,
+            y: e.clientY - prev.cursorPosition.y,
+          },
+          overListId,
+          overItemId,
           destinationItemIndex: destinationIndex,
         };
       });
 
-      // Call the overlap callback to handle skeleton placement
-      if (
-        overlapCallbackRef.current &&
-        style &&
-        destinationIndex &&
-        overListId
-      ) {
-        console.log("Calling overlap");
-        console.log("Destination index ", destinationIndex);
-        console.log("Destination list id ", overListId);
-        overlapCallbackRef.current(destinationIndex, overListId, style);
+      if (overlapCallbackRef.current) {
+        overlapCallbackRef.current(
+          sourceListId,
+          destinationIndex,
+          overListId,
+          dragState.style,
+        );
       }
     };
 
@@ -322,7 +357,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
   const isDragging = dragState !== null;
 
-  // Handle pointer up to end drag
   useEffect(() => {
     if (!isDragging) return;
 
@@ -343,6 +377,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         displayListsRef: displayListsRef.current,
         registerDisplayListRef,
         registerItemRef,
+        registerPlaceholderRef,
         registerCallbacks,
         startDrag,
         endDrag,
