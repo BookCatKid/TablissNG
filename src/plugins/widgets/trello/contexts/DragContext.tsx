@@ -114,6 +114,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   const placeholdersRef = useRef<ListIdToPlaceholder>(new Map());
 
   const overlapCallbackRef = useRef<OnDragItemOverlap | null>(null);
+
   const dragStartCallbackRef = useRef<OnDragStart | null>(null);
   const dragDropCallbackRef = useRef<OnDragItemDrop | null>(null);
   const dragCancelCallbackRef = useRef<OnDragCancel | null>(null);
@@ -250,6 +251,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     if (!dragState) return;
 
     const sourceListId = dragState.sourceListId;
+    const dragStyle = dragState.style;
 
     const handlePointerMove = (e: PointerEvent) => {
       let overListId: string | null = null;
@@ -346,7 +348,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           sourceListId,
           destinationIndex,
           overListId,
-          dragState.style,
+          dragStyle,
         );
       }
     };

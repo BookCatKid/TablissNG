@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useCallback } from "react";
+import React, { FC, useEffect, useCallback, useRef } from "react";
 import {
   Props,
   List,
@@ -37,6 +37,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   );
 
   const { registerCallbacks, isDragging } = useDragContext();
+
+  // Used for throttling updates with overlap callback to prevent flickering
+  const lastOverlapUpdateRef = useRef<number>(0);
+  const THROTTLE_MS = 75;
 
   // =================== Data fetching ==================
 
@@ -111,21 +115,16 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       fromListId: string,
       toListId: string,
     ) => {
-      console.log("Handling drop");
-      console.log(insertIndex);
       const updatedResponses = new Map(cache.responses);
       const source = updatedResponses.get(fromListId);
       const destination = updatedResponses.get(toListId);
 
       if (source && destination) {
-        console.log("SOURCE ITEMS ", source.items);
         const skeletonIndex = source.items.findIndex((i) => isPlaceholder(i));
 
         if (skeletonIndex !== -1) {
           let sourceItems = [...source.items];
           let destItems = [...destination.items];
-          console.log("Adding item");
-          console.log(item);
 
           destItems.push(item);
 
@@ -152,7 +151,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   const handleDragCancel = useCallback(
     (sourceItem: Item, sourceItemIndex: number, sourceListId: string) => {
-      console.log("Handling cancel");
+      console.log("TRELLO: Handling drop cancel");
       const listIds = Array.from(cache.responses.keys());
       let updatedResponses = new Map(cache.responses);
       updatedResponses = clearPlaceholdersFromList(updatedResponses, listIds);
@@ -186,7 +185,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       sourceListId: string,
       style: DraggedItemStyle,
     ) => {
-      console.log("Inserting skeleton for drag source");
       const { width: skeletonWidth, height: skeletonHeight } = style.size;
 
       const fetchJob = cache.responses.get(sourceListId);
@@ -244,6 +242,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       if (hoveredItemIndex === null) {
         return;
       }
+
+      const now = Date.now();
+      if (now - lastOverlapUpdateRef.current < THROTTLE_MS) return;
+      lastOverlapUpdateRef.current = now;
 
       const updatedResponses = new Map(cache.responses);
       const destination = updatedResponses.get(hoveredListId);
