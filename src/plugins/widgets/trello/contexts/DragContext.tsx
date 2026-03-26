@@ -110,7 +110,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   const displayListsRef = useRef<ListIdToDisplayList>(new Map());
   const itemsRef = useRef<ListIdToItemElements>(new Map());
 
-  // NEW: tracks the single placeholder element per list (at most one at a time)
+  // Tracks the single placeholder element per list (at most one at a time)
   const placeholdersRef = useRef<ListIdToPlaceholder>(new Map());
 
   const overlapCallbackRef = useRef<OnDragItemOverlap | null>(null);
@@ -132,7 +132,16 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
   const registerItemRef = useCallback(
     (listId: string, element: HTMLDivElement | null, item: Item) => {
-      if (element) {
+      if (!element) {
+        // Clean up when the element unmounts
+        const obj = itemsRef.current.get(listId);
+        if (obj) {
+          itemsRef.current.set(
+            listId,
+            obj.filter((o) => o.item.id !== item.id),
+          );
+        }
+      } else {
         if (!itemsRef.current.has(listId)) {
           itemsRef.current.set(listId, []);
         }
@@ -275,8 +284,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         const realItems = itemsRef.current.get(overListId) ?? [];
         const placeholder = placeholdersRef.current.get(overListId);
 
-        console.log(`THERE ARE ${realItems.length} in the start`);
-
         // Build a unified sorted list of real item elements + the placeholder
         // element (if one exists in this list), ordered top-to-bottom by their
         // current DOM position. This ensures destinationIndex accounts for the
@@ -300,10 +307,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
             b.element.getBoundingClientRect().top,
         );
 
-        console.log(
-          `THERE ARE ${slots.length} in the processed including placeholder`,
-        );
-
         // Find which slot the cursor is inside
         for (const slot of slots) {
           const rect = slot.element.getBoundingClientRect();
@@ -324,10 +327,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
           }
         }
       }
-
-      console.log("OVER LIST ID ", overListId);
-      console.log("OVER ITEM ID ", overItemId);
-      console.log("DEST INDEX ", destinationIndex);
 
       setDragState((prev) => {
         if (!prev) return null;
@@ -363,7 +362,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     if (!isDragging) return;
 
     const handlePointerUp = () => {
-      console.log("END dragging");
       endDrag();
     };
 

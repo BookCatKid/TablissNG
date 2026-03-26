@@ -39,8 +39,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { registerCallbacks, isDragging } = useDragContext();
 
   // Used for throttling updates with overlap callback to prevent flickering
-  const lastOverlapUpdateRef = useRef<number>(0);
-  const THROTTLE_MS = 75;
+  const lastOverlapUpdateRef = useRef<DOMHighResTimeStamp>(0);
+  const THROTTLE_MS = 30;
 
   // =================== Data fetching ==================
 
@@ -151,7 +151,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   const handleDragCancel = useCallback(
     (sourceItem: Item, sourceItemIndex: number, sourceListId: string) => {
-      console.log("TRELLO: Handling drop cancel");
       const listIds = Array.from(cache.responses.keys());
       let updatedResponses = new Map(cache.responses);
       updatedResponses = clearPlaceholdersFromList(updatedResponses, listIds);
@@ -243,7 +242,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         return;
       }
 
-      const now = Date.now();
+      const now = performance.now();
       if (now - lastOverlapUpdateRef.current < THROTTLE_MS) return;
       lastOverlapUpdateRef.current = now;
 

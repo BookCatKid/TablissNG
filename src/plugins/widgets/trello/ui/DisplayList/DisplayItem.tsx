@@ -12,11 +12,7 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
   const typeIsItem = isItem(item);
 
   const itemRef = useRef<HTMLDivElement | null>(null);
-  const { registerItemRef, startDrag, isDragging, dragState } =
-    useDragContext();
-
-  const itemDragging =
-    dragState && isDragging && typeIsItem && dragState.item.id === item.id;
+  const { registerItemRef, startDrag, dragState } = useDragContext();
   const style = dragState?.style.size;
 
   const setRef = (element: HTMLDivElement) => {
@@ -44,10 +40,6 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
     <div
       ref={setRef}
       className="display-list-item-content"
-      style={{
-        opacity: itemDragging ? 0.3 : 1,
-        cursor: itemDragging ? "grabbing" : "grab",
-      }}
       onPointerDown={handlePointerDown}
     >
       <div className="labels-container">
