@@ -36,7 +36,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     trelloAuthStore,
   );
 
-  const { registerCallbacks, isDragging } = useDragContext();
+  const { registerCallbacks, unregisterItemRef, isDragging } = useDragContext();
 
   // Used for throttling updates with overlap callback to prevent flickering
   const lastOverlapUpdateRef = useRef<DOMHighResTimeStamp>(0);
@@ -200,6 +200,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       if (!fetchJob) {
         return;
       }
+      unregisterItemRef(sourceListId, item);
 
       const notSourceItem = (i: RealOrPlaceholderItem) =>
         isItem(i) && i.id !== item.id;
@@ -267,9 +268,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       items = items.filter((i) => isItem(i));
       const { width: skeletonWidth, height: skeletonHeight } = style!.size;
 
-      // hoveredItemIndex now correctly accounts for any existing placeholder
-      // in the list because DragContext builds its index from a merged
-      // (real items + placeholder element) sorted list
+      // Insert placeholder
       items.splice(hoveredItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,

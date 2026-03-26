@@ -24,8 +24,6 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (itemRef.current && typeIsItem) {
-      // Capture pointer for smooth dragging
-      itemRef.current.setPointerCapture(e.pointerId);
       startDrag(item, listId, itemRef.current);
     }
   };

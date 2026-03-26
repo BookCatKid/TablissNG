@@ -73,6 +73,7 @@ interface DragContextValue {
     element: HTMLDivElement | null,
     item: Item,
   ) => void;
+  unregisterItemRef: (listId: string, item: Item) => void;
   // let skeleton/placeholder elements register themselves so the context
   // knows about them when computing destination indices
   registerPlaceholderRef: (
@@ -159,6 +160,13 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     [],
   );
 
+  const unregisterItemRef = useCallback(
+    (listId: string, item: Item) => {
+      registerItemRef(listId, null, item);
+    },
+    [registerItemRef],
+  );
+
   // Stores at most one placeholder per list — clears the entry when element is null.
   const registerPlaceholderRef = useCallback(
     (listId: string, element: HTMLDivElement | null) => {
@@ -237,10 +245,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       }
     }
 
-    // NEW: clear all placeholder refs when drag ends so stale entries don't
-    // affect the next drag session
     placeholdersRef.current.clear();
-
     setDragState(null);
   };
 
@@ -281,8 +286,10 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       });
 
       if (overListId) {
+        console.log("Checking list ");
         const realItems = itemsRef.current.get(overListId) ?? [];
         const placeholder = placeholdersRef.current.get(overListId);
+        console.log("PLACE HOLDER", placeholder);
 
         // Build a unified sorted list of real item elements + the placeholder
         // element (if one exists in this list), ordered top-to-bottom by their
@@ -377,6 +384,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
         displayListsRef: displayListsRef.current,
         registerDisplayListRef,
         registerItemRef,
+        unregisterItemRef,
         registerPlaceholderRef,
         registerCallbacks,
         startDrag,
