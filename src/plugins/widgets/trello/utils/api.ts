@@ -97,10 +97,47 @@ export const getItems = async (listId: string, session: TrelloSession) => {
  */
 export const moveCardToList = async (
   cardId: string,
+  insertIndex: number,
   targetListId: string,
+  listItems: Item[],
   session: TrelloSession,
 ): Promise<boolean> => {
-  const url = `https://api.trello.com/1/cards/${cardId}?key=${TRELLO_API_KEY}&token=${session.accessToken}&idList=${targetListId}`;
-  const response = await fetch(url, { method: "PUT" });
+  // listItems should already have the card excluded so indices are clean
+  const getOrNull = <T>(arr: T[], index: number): T | null =>
+    index >= 0 && index < arr.length ? arr[index] : null;
+
+  const prevItem = getOrNull(listItems, insertIndex - 1);
+  const nextItem = getOrNull(listItems, insertIndex + 1);
+
+  console.log("PREVIOUS ITEM ", prevItem?.name);
+  console.log("NEXT ITEM ", nextItem?.name);
+
+  let newPos: number;
+
+  if (!prevItem && !nextItem) {
+    // Only card in the list
+    newPos = 65536;
+  } else if (!prevItem) {
+    // Inserting at the top
+    newPos = nextItem!.position / 2;
+  } else if (!nextItem) {
+    // Inserting at the bottom
+    newPos = prevItem.position + 65536;
+  } else {
+    // Inserting between two cards
+    newPos = (prevItem.position + nextItem.position) / 2;
+  }
+
+  const response = await fetch(`https://api.trello.com/1/cards/${cardId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idList: targetListId,
+      pos: newPos,
+      key: TRELLO_API_KEY,
+      token: session.accessToken,
+    }),
+  });
+
   return response.ok;
 };

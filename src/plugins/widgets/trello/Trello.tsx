@@ -40,7 +40,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   // Used for throttling updates with overlap callback to prevent flickering
   const lastOverlapUpdateRef = useRef<DOMHighResTimeStamp>(0);
-  const THROTTLE_MS = 30;
+  const THROTTLE_MS = 100;
 
   // =================== Data fetching ==================
 
@@ -124,25 +124,35 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
         if (skeletonIndex !== -1) {
           let sourceItems = [...source.items];
-          let destItems = [...destination.items];
+          const destItems = [...destination.items];
 
-          destItems.push(item);
+          destItems.splice(insertIndex, 0, item);
 
           sourceItems = sourceItems.filter((i) => isItem(i));
-          destItems = destItems.filter((i) => isItem(i));
+          const updatedDestItems = destItems.filter((i) => isItem(i));
 
           updatedResponses.set(fromListId, { ...source, items: sourceItems });
-          updatedResponses.set(toListId, { ...destination, items: destItems });
+          updatedResponses.set(toListId, {
+            ...destination,
+            items: updatedDestItems,
+          });
 
           setCache({
             ...cache,
             responses: updatedResponses,
           });
 
-          // const session = await getSession();
-          // if (session) {
-          //   await moveCardToList(item.id, toListId, session);
-          // }
+          const session = await getSession();
+          console.log("SESSION ", session);
+          if (session) {
+            await moveCardToList(
+              item.id,
+              insertIndex,
+              toListId,
+              updatedDestItems,
+              session,
+            );
+          }
         }
       }
     },
@@ -242,6 +252,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         return;
       }
 
+      // Throttle updates
       const now = performance.now();
       if (now - lastOverlapUpdateRef.current < THROTTLE_MS) return;
       lastOverlapUpdateRef.current = now;
