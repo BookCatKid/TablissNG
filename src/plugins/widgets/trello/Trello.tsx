@@ -144,7 +144,9 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
           const session = await getSession();
           console.log("SESSION ", session);
+
           if (session) {
+            // Update positions on trello
             await moveCardToList(
               item.id,
               insertIndex,
@@ -152,6 +154,32 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
               updatedDestItems,
               session,
             );
+
+            // Revalidate both lists to update positions using Trello as the source of truth
+            const [updatedSourceItems, updatedDestinationItems] =
+              await Promise.all([
+                getItems(fromListId, session),
+                await getItems(toListId, session),
+              ]);
+
+            const revalidated = new Map(cache.responses);
+            if (updatedSourceItems) {
+              revalidated.set(fromListId, {
+                ...source,
+                loading: false,
+                items: updatedSourceItems,
+              });
+            }
+
+            if (updatedDestinationItems) {
+              revalidated.set(toListId, {
+                ...destination,
+                loading: false,
+                items: updatedDestinationItems,
+              });
+            }
+
+            setCache({ ...cache, responses: revalidated });
           }
         }
       }
