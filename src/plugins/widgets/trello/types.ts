@@ -116,28 +116,21 @@ export interface TrelloSession extends Session {
 export type RealOrPlaceholderItem = Item | PlaceholderItem;
 
 /**
- * Represents a pending job to fetch items from a trello board
- * Skeleton = true: Job is there but has not yet started fetching.
- * Used for optimistic UI updates with debounced selection.
- * When debounce timer runs out all skeletons are converted to real networks fetches to fetch all information simultaneously
- * to prevent race conditions when setting the cache
- *
- * Loading = true: Network fetch is pending
+ * Represents a Trello list in the plugin's UI
+ * Each list fetches their items independently and indicate fetching using status = LOADING
  */
-export type FetchJob = {
+export type UIList = {
   listId: string;
   items: RealOrPlaceholderItem[];
-  loading: boolean;
-  skeleton: boolean;
+  status: "COMPLETED" | "LOADING" | "FAILED";
 };
 
-export const createFetchJob = (listId: string) => {
+export const createUIList = (listId: string) => {
   return {
     listId: listId,
     items: [],
-    loading: true,
-    skeleton: true,
-  } as FetchJob;
+    status: "LOADING",
+  } as UIList;
 };
 
 export type Board = {
@@ -180,7 +173,7 @@ export const isItem = (item: RealOrPlaceholderItem): item is Item => {
 
 export type Cache = {
   order: List[]; // order of responses for rendering
-  responses: Map<string, FetchJob>; // map list ids to their corresponding job
+  lists: Map<string, UIList>; // map list ids to their corresponding job
 };
 
 export type Data = {
@@ -197,5 +190,5 @@ export const defaultData: Data = {
 
 export const defaultCache: Cache = {
   order: [],
-  responses: new Map<string, FetchJob>(),
+  lists: new Map<string, UIList>(),
 };

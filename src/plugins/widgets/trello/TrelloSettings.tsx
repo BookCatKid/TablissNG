@@ -1,11 +1,10 @@
-import React, { ChangeEvent, FC, useRef } from "react";
+import React, { ChangeEvent, FC } from "react";
 import {
   BoardPreference,
-  createFetchJob,
+  createUIList,
   defaultCache,
   defaultData,
   Props,
-  FetchJob,
   TrelloSession,
 } from "./types";
 import Button from "../../../views/shared/Button";
@@ -34,17 +33,7 @@ const TrelloSettings: FC<Props> = ({
 
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
 
-  const {
-    lists,
-    setLists,
-    isLoading: listsLoading,
-    updateUI,
-    updateUIWithSkeletons,
-  } = useLists(data, cache, setCache);
-
-  const pendingJobsRef = useRef<Set<FetchJob>>(new Set<FetchJob>());
-  const debounceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const DEBOUNCE_INTERVAL = 525;
+  const { lists, setLists, isLoading: listsLoading } = useLists(data, setCache);
 
   const onAuthenticateClick = async () => {
     await signIn(trelloAuthFlow);
@@ -67,20 +56,24 @@ const TrelloSettings: FC<Props> = ({
     }
 
     const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
-    if (action === "REMOVE") {
-      pendingJobsRef.current.forEach(
-        (job) => job.listId === listID && pendingJobsRef.current.delete(job),
-      );
+
+    const updatedUILists = new Map(cache.lists);
+    const newUIList = createUIList(listID);
+
+    if (action === "ADD") {
+      updatedUILists.set(listID, newUIList);
     } else {
-      pendingJobsRef.current.add(createFetchJob(listID));
+      updatedUILists.delete(listID);
     }
 
     // update the settings UI
+    // to change the watch status for the checked list
     const updatedOptions = lists.map((list: List) => {
       return list.id === listID ? { ...list, watch: !list.watch } : list;
     });
-
     setLists(updatedOptions);
+
+    // Will be made redundant after refactor to reducer
     const selectedLists = updatedOptions.filter((list: List) => list.watch);
     const newPreference: BoardPreference = {
       boardId: data.selectedID!,
@@ -91,25 +84,15 @@ const TrelloSettings: FC<Props> = ({
       ...data.preferences,
       [data.selectedID!]: newPreference,
     };
+
     setData({ ...data, preferences: updated });
 
-    // optimistically update UI with skeletons
-    console.log("TRELLO: Updating skeletons");
-    updateUIWithSkeletons(
-      updatedOptions.filter((list: List) => list.watch),
-      pendingJobsRef.current,
-    );
-
-    // debouncing logic for rapid selection
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    debounceTimeoutRef.current = setTimeout(() => {
-      // update the UI and set the skeleton jobs to actual jobs and newest selections
-      updateUI(listID, selectedLists, pendingJobsRef.current, action);
-      pendingJobsRef.current.clear();
-    }, DEBOUNCE_INTERVAL);
+    // Update UI
+    setCache({
+      ...cache,
+      order: selectedLists,
+      lists: updatedUILists,
+    });
   };
 
   if (authState !== "authenticated") {

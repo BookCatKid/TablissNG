@@ -8,7 +8,7 @@ import {
   isItem,
   RealOrPlaceholderItem,
   PlaceholderItem,
-  FetchJob,
+  UIList,
   Item,
   DraggedItemStyle,
 } from "./types";
@@ -42,68 +42,128 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const lastOverlapUpdateRef = useRef<DOMHighResTimeStamp>(0);
   const THROTTLE_MS = 100;
 
+  // Hacky fix to use for testing before moving to reducer
+  const cacheRef = useRef(cache);
+
+  useEffect(() => {
+    cacheRef.current = cache;
+  }, [cache]);
+
   // =================== Data fetching ==================
 
   useEffect(() => {
-    const effect = async () => {
+    const controller = new AbortController();
+
+    const fetchData = async () => {
       console.log("TRELLO: fetching items for all selected lists");
-      const results = await Promise.all(
-        Array.from(cache.responses.values()).map(async (response) => {
-          if (!response.skeleton) {
+
+      try {
+        if (controller.signal.aborted) {
+          console.log("Aborting before fetching");
+          return;
+        }
+
+        const listsWithData = await Promise.all(
+          Array.from(cache.lists.values()).map(async (list) => {
             const session = await getSession();
             if (!session) return null;
-            const items = await getItems(response.listId, session);
-            return items ? { listId: response.listId, response, items } : null;
-          }
-        }),
-      );
+            const items = await getItems(list.listId, session);
+            console.log("FETCHING");
+            return items ? { listId: list.listId, items } : null;
+          }),
+        );
 
-      const updatedResponses = new Map(cache.responses);
-      results.forEach((result) => {
-        if (result) {
-          updatedResponses.set(result.listId, {
-            ...result.response,
-            loading: false,
-            items: result.items,
-          });
+        if (controller.signal.aborted) {
+          console.log("Aborting after fetching");
+          return;
         }
-      });
 
-      setCache({
-        ...cache,
-        responses: updatedResponses,
-      });
+        const updatedLists = new Map(cache.lists);
+
+        listsWithData.forEach((list) => {
+          if (list) {
+            console.log(list.items);
+            updatedLists.set(list.listId, {
+              listId: list.listId,
+              items: list.items,
+              status: "COMPLETED",
+            });
+          }
+        });
+
+        setCache({
+          ...cacheRef.current,
+          lists: updatedLists,
+        });
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          console.log("Request aborted");
+        }
+      }
     };
 
     if (authStatus === "authenticated") {
-      effect();
+      fetchData();
     }
+
+    return () => controller.abort();
   }, [authStatus]);
 
+  /**
+   * Refetch data when order of items are changed
+   */
   useEffect(() => {
-    const effect = async () => {
-      console.log("TRELLO: fetching items for new jobs");
-      await Promise.all(
-        cache.responses.values().map(async (response) => {
-          if (response.loading && !response.skeleton) {
-            const session = await getSession();
-            if (!session) return null;
-            const items = await getItems(response.listId, session);
-            if (items) {
-              setCache({
-                ...cache,
-                responses: cache.responses.set(response.listId, {
-                  ...response,
-                  loading: false,
-                  items: items,
-                }),
-              });
+    const controller = new AbortController();
+
+    const fetchData = async () => {
+      try {
+        if (controller.signal.aborted) {
+          console.log("Aborted before fetch");
+          return;
+        }
+
+        console.log("TRELLO: fetching items for new jobs");
+        const listsWithData = await Promise.all(
+          cache.lists.values().map(async (list) => {
+            console.log("CHECKING ", list.status);
+            if (list.status === "LOADING") {
+              const session = await getSession();
+              if (!session) return null;
+              const items = await getItems(list.listId, session);
+              return items ? { listId: list.listId, items } : null;
             }
+          }),
+        );
+
+        if (controller.signal.aborted) {
+          console.log("Aborting after fetching");
+          return;
+        }
+
+        const updatedLists = new Map(cache.lists);
+        listsWithData.forEach((list) => {
+          if (list) {
+            updatedLists.set(list.listId, {
+              listId: list.listId,
+              items: list.items,
+              status: "COMPLETED",
+            });
           }
-        }),
-      );
+        });
+
+        setCache({
+          ...cacheRef.current,
+          lists: updatedLists,
+        });
+      } catch (error: any) {
+        if (error.name === "AbortError") {
+          console.log("Request Aborted");
+        }
+      }
     };
-    effect();
+
+    fetchData();
+    return () => controller.abort();
   }, [cache.order]);
 
   // ================= Drag callbacks ==================
@@ -115,7 +175,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       fromListId: string,
       toListId: string,
     ) => {
-      const updatedResponses = new Map(cache.responses);
+      const updatedResponses = new Map(cache.lists);
       const source = updatedResponses.get(fromListId);
       const destination = updatedResponses.get(toListId);
 
@@ -139,7 +199,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
           setCache({
             ...cache,
-            responses: updatedResponses,
+            lists: updatedResponses,
           });
 
           const session = await getSession();
@@ -162,11 +222,11 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
                 await getItems(toListId, session),
               ]);
 
-            const revalidated = new Map(cache.responses);
+            const revalidated = new Map(cache.lists);
             if (updatedSourceItems) {
               revalidated.set(fromListId, {
                 ...source,
-                loading: false,
+                status: "COMPLETED",
                 items: updatedSourceItems,
               });
             }
@@ -174,12 +234,12 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
             if (updatedDestinationItems) {
               revalidated.set(toListId, {
                 ...destination,
-                loading: false,
+                status: "COMPLETED",
                 items: updatedDestinationItems,
               });
             }
 
-            setCache({ ...cache, responses: revalidated });
+            setCache({ ...cache, lists: revalidated });
           }
         }
       }
@@ -189,8 +249,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   const handleDragCancel = useCallback(
     (sourceItem: Item, sourceItemIndex: number, sourceListId: string) => {
-      const listIds = Array.from(cache.responses.keys());
-      let updatedResponses = new Map(cache.responses);
+      const listIds = Array.from(cache.lists.keys());
+      let updatedResponses = new Map(cache.lists);
       updatedResponses = clearPlaceholdersFromList(updatedResponses, listIds);
 
       const response = updatedResponses.get(sourceListId);
@@ -209,7 +269,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       setCache({
         ...cache,
-        responses: updatedResponses,
+        lists: updatedResponses,
       });
     },
     [cache, setCache],
@@ -224,7 +284,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     ) => {
       const { width: skeletonWidth, height: skeletonHeight } = style.size;
 
-      const fetchJob = cache.responses.get(sourceListId);
+      const fetchJob = cache.lists.get(sourceListId);
       if (!fetchJob) {
         return;
       }
@@ -239,17 +299,17 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         height: skeletonHeight,
       } as PlaceholderItem);
 
-      const updated: FetchJob = {
+      const updated: UIList = {
         ...fetchJob,
         items: updatedItems,
       };
 
-      const updatedResponses = new Map(cache.responses);
+      const updatedResponses = new Map(cache.lists);
       updatedResponses.set(sourceListId, updated);
 
       setCache({
         ...cache,
-        responses: updatedResponses,
+        lists: updatedResponses,
       });
     },
     [cache, setCache],
@@ -263,16 +323,16 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       style: DraggedItemStyle | null,
     ) => {
       if (!hoveredListId) {
-        const listIds = Array.from(cache.responses.keys()).filter(
+        const listIds = Array.from(cache.lists.keys()).filter(
           (i) => i !== sourceListId,
         );
         const updated = clearPlaceholdersFromList(
-          new Map(cache.responses),
+          new Map(cache.lists),
           listIds,
         );
         setCache({
           ...cache,
-          responses: updated,
+          lists: updated,
         });
         return;
       }
@@ -286,7 +346,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       if (now - lastOverlapUpdateRef.current < THROTTLE_MS) return;
       lastOverlapUpdateRef.current = now;
 
-      const updatedResponses = new Map(cache.responses);
+      const updatedResponses = new Map(cache.lists);
       const destination = updatedResponses.get(hoveredListId);
       if (!destination) {
         return;
@@ -302,7 +362,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         height: skeletonHeight,
       } as PlaceholderItem);
 
-      const updated: FetchJob = {
+      const updated: UIList = {
         ...destination,
         items: items,
       };
@@ -311,7 +371,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       setCache({
         ...cache,
-        responses: updatedResponses,
+        lists: updatedResponses,
       });
     },
     [cache, setCache],
@@ -322,7 +382,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
    * Returns an updated responses map — does not call setCache itself.
    */
   const clearPlaceholdersFromList = (
-    responses: Map<string, FetchJob>,
+    responses: Map<string, UIList>,
     listIds: string[],
   ) => {
     const updatedResponses = new Map(responses);
@@ -355,6 +415,8 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     handleDragCancel,
   ]);
 
+  console.log(cache.lists);
+
   return (
     <>
       {authStatus !== "authenticated" ? (
@@ -372,14 +434,14 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       ) : (
         <div className="display-list-container">
           {cache.order.map((list: List) => {
-            const response = cache.responses.get(list.id);
+            const response = cache.lists.get(list.id);
             return (
               <DisplayList
                 key={list.id}
                 header={list.name}
                 listId={list.id}
                 items={response?.items}
-                loading={response?.loading}
+                loading={response?.status === "LOADING"}
               />
             );
           })}
