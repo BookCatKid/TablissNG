@@ -1,11 +1,12 @@
-import React, { FC, useMemo } from "react";
+import { type FC, type MouseEvent, useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
-import { Link, Cache } from "./types";
+
 import { isSpecialUrl, normalizeUrl } from "../../../utils";
-import { Favicon } from "./components/Favicon";
-import { CustomSvg } from "./components/CustomSvg";
 import { CustomImage } from "./components/CustomImage";
+import { CustomSvg } from "./components/CustomSvg";
+import { Favicon } from "./components/Favicon";
 import { IconifyIcon } from "./components/IconifyIcon";
+import { Cache, Link } from "./types";
 
 const messages = defineMessages({
   shortcutHint: {
@@ -73,7 +74,7 @@ export const Display: FC<Props> = ({
   const displayWidth = customWidth || 24;
   const displayHeight = customHeight || 24;
 
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = async (e: MouseEvent) => {
     if (
       BUILD_TARGET !== "web" &&
       (useExtensionTabs || isSpecialUrl(normalizedUrl))
@@ -214,5 +215,3 @@ export const Display: FC<Props> = ({
     </a>
   );
 };
-
-export default Display;

@@ -1,5 +1,6 @@
-import React, { FC } from "react";
+import type { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { Link } from "../types";
 
 interface SizeInputsProps {

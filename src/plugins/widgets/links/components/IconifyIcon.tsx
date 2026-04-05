@@ -1,5 +1,5 @@
-import React, { FC } from "react";
 import { Icon } from "@iconify/react";
+import type { FC } from "react";
 
 interface IconifyIconProps {
   iconString: string;

@@ -1,7 +1,9 @@
-import React, { FC, useState } from "react";
-import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
 import icons from "feather-icons/dist/icons.json";
+import type { FC } from "react";
+import { useState } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { addIconData } from "../../../../utils";
 import Modal from "../../../../views/shared/modal/Modal";
 

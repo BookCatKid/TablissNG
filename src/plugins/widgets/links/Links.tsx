@@ -1,10 +1,12 @@
-import React, { FC, useEffect, useMemo } from "react";
-import { Icon } from "@iconify/react";
-import { defineMessages, useIntl } from "react-intl";
-import { useKeyPress, useToggle } from "../../../hooks";
-import Display from "./Display";
 import "./Links.sass";
-import { Props, defaultCache, defaultData, Link } from "./types";
+
+import { Icon } from "@iconify/react";
+import { FC, useEffect, useMemo } from "react";
+import { defineMessages, useIntl } from "react-intl";
+
+import { useKeyPress, useToggle } from "../../../hooks";
+import { Display } from "./Display";
+import { defaultCache, defaultData, Link, Props } from "./types";
 
 const messages = defineMessages({
   showQuickLinks: {
