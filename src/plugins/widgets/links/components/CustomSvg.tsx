@@ -14,7 +14,7 @@ const parseSvg = (
   width: number,
   height: number,
   conserveAspectRatio?: boolean,
-) => {
+): string | null => {
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgString, "image/svg+xml");
@@ -32,7 +32,7 @@ const parseSvg = (
       svg.removeAttribute("preserveAspectRatio");
     }
 
-    return <span dangerouslySetInnerHTML={{ __html: svg.outerHTML }} />;
+    return svg.outerHTML;
   } catch {
     return null;
   }
@@ -53,6 +53,9 @@ export const CustomSvg: FC<CustomSvgProps> = ({
   if (!parsedSvg) return null;
 
   return (
-    <span className={`Link-icon ${className ?? ""}`.trim()}>{parsedSvg}</span>
+    <span
+      className={`Link-icon ${className ?? ""}`.trim()}
+      dangerouslySetInnerHTML={{ __html: parsedSvg }}
+    />
   );
 };

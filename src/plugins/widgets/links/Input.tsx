@@ -66,8 +66,8 @@ const Input: FC<Props> = (props) => {
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
-  const handleIconSelect = (icon: string, identifier: string) => {
-    props.onChange({ iconifyValue: identifier + icon });
+  const handleIconSelect = (iconString: string) => {
+    props.onChange({ iconifyValue: iconString });
     setIsModalOpen(false);
   };
 
@@ -282,7 +282,7 @@ const Input: FC<Props> = (props) => {
         <label>
           <FormattedMessage
             id="plugins.links.input.customIconifyIdentifier"
-            defaultMessage="Custom Iconify Identifier"
+            defaultMessage="Custom Iconify Icon"
           />
           <input
             type="text"

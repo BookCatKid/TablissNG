@@ -6,6 +6,7 @@ import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress, useToggle } from "../../../hooks";
 import { Display } from "./Display";
+import { sortLinks } from "./sortLinks";
 import { defaultCache, defaultData, Link, Props } from "./types";
 
 const messages = defineMessages({
@@ -154,25 +155,10 @@ const Links: FC<Props> = ({
     }
   };
 
-  const sortedLinks = useMemo(() => {
-    if (data.sortBy === "none") return data.links;
-
-    return [...data.links].sort((a, b) => {
-      switch (data.sortBy) {
-        case "name":
-          return (a.name || "").localeCompare(b.name || "");
-        case "icon":
-          return (a.icon || "").localeCompare(b.icon || "");
-        case "lastUsed": {
-          const bTime = b.lastUsed || 0;
-          const aTime = a.lastUsed || 0;
-          return bTime - aTime; // Most recent first
-        }
-        default:
-          return 0;
-      }
-    });
-  }, [data.links, data.sortBy]);
+  const sortedLinks = useMemo(
+    () => sortLinks(data.links, data.sortBy),
+    [data.links, data.sortBy],
+  );
 
   const keyToIndex = useMemo(() => {
     const map = new Map<string, number>();

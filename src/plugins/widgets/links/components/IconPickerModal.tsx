@@ -10,7 +10,7 @@ import Modal from "../../../../views/shared/modal/Modal";
 interface IconPickerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (icon: string, identifier: string) => void;
+  onSelect: (iconString: string) => void;
 }
 
 const iconList = Object.keys(icons);
@@ -34,8 +34,9 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
   if (!isOpen) return null;
 
   const handleIconSelect = (icon: string) => {
-    addIconData(iconifyIdentifier + icon);
-    onSelect(icon, iconifyIdentifier);
+    const iconString = iconifyIdentifier + icon;
+    addIconData(iconString);
+    onSelect(iconString);
   };
 
   // Filter icons based on search query

@@ -1,4 +1,4 @@
-import { type FC, type JSX, useEffect, useState } from "react";
+import { type FC, type JSX, useEffect, useMemo, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { BookmarkTreeNode } from "../bookmarks/types";
@@ -77,23 +77,26 @@ const ImportBookmarks: FC<Props> = ({ onImport }) => {
     }
   };
 
-  const folderOptions: JSX.Element[] = [];
-  const descendTree = (tree: BookmarkTreeNode | undefined, pad: string) => {
-    if (!tree || tree.url) return;
+  const folderOptions = useMemo(() => {
+    const options: JSX.Element[] = [];
+    const descendTree = (tree: BookmarkTreeNode | undefined, pad: string) => {
+      if (!tree || tree.url) return;
 
-    folderOptions.push(
-      <option key={tree.id} value={tree.id}>
-        {pad + (tree.title || "Root")}
-      </option>,
-    );
+      options.push(
+        <option key={tree.id} value={tree.id}>
+          {pad + (tree.title || "Root")}
+        </option>,
+      );
 
-    if (tree.children) {
-      for (const item of tree.children) {
-        descendTree(item, pad + "\u00A0\u00A0\u00A0");
+      if (tree.children) {
+        for (const item of tree.children) {
+          descendTree(item, pad + "\u00A0\u00A0\u00A0");
+        }
       }
-    }
-  };
-  descendTree(bookmarkTree, "");
+    };
+    descendTree(bookmarkTree, "");
+    return options;
+  }, [bookmarkTree]);
 
   return (
     <>

@@ -12,6 +12,7 @@ import {
 import ImportBookmarks from "./ImportBookmarks";
 import Input from "./Input";
 import { reducer } from "./reducer";
+import { sortLinks } from "./sortLinks";
 import { Data, defaultData, Link, Props } from "./types";
 
 const LinksSettings: FC<Props> = ({
@@ -23,25 +24,10 @@ const LinksSettings: FC<Props> = ({
   const saveLinks = (links: Link[]) => setData({ ...data, links });
   const dispatch = useSavedReducer(reducer, data.links, saveLinks);
 
-  const sortedLinks = useMemo(() => {
-    if (data.sortBy === "none") return data.links;
-
-    return [...data.links].sort((a, b) => {
-      switch (data.sortBy) {
-        case "name":
-          return (a.name || "").localeCompare(b.name || "");
-        case "icon":
-          return (a.icon || "").localeCompare(b.icon || "");
-        case "lastUsed": {
-          const bTime = b.lastUsed || 0;
-          const aTime = a.lastUsed || 0;
-          return bTime - aTime; // Most recent first
-        }
-        default:
-          return 0;
-      }
-    });
-  }, [data.links, data.sortBy]);
+  const sortedLinks = useMemo(
+    () => sortLinks(data.links, data.sortBy),
+    [data.links, data.sortBy],
+  );
 
   return (
     <div className="LinksSettings">

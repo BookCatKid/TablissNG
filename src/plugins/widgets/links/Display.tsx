@@ -186,17 +186,6 @@ export const Display: FC<Props> = ({
       );
     }
 
-    if (icon) {
-      // Legacy fallback for simple icon names (feather)
-      return (
-        <IconifyIcon
-          iconString={"feather:" + icon}
-          width={displayWidth}
-          height={displayHeight}
-        />
-      );
-    }
-
     return null;
   };
 
