@@ -18,6 +18,8 @@ const parseSvg = (
   try {
     const parser = new DOMParser();
     const doc = parser.parseFromString(svgString, "image/svg+xml");
+    const parseError = doc.querySelector("parsererror");
+    if (parseError) return null;
     const svg = doc.querySelector("svg");
     if (!svg) return null;
 

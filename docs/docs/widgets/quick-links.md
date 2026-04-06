@@ -68,8 +68,7 @@ For custom icons, you can set custom width and height dimensions. You can also c
 
 ### Keyboard Shortcut
 
-Each link can have a custom keyboard shortcut. By default, links are assigned shortcuts based on their position (1-9). You can customize this by entering a single character in the keyboard shortcut field.
-
+Each link can have a custom keyboard shortcut. By default, the first 9 links are assigned shortcuts based on their position (1-9). Links beyond the 9th position do not receive a default shortcut unless manually assigned. You can customize this by entering a single character in the keyboard shortcut field.
 To use a keyboard shortcut, press the assigned key while viewing your new tab page.
 
 ### Use browser extension API to open link

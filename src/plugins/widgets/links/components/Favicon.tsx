@@ -23,7 +23,6 @@ export const Favicon: FC<FaviconProps> = ({
     width: `${width}px`,
     height: conserveAspectRatio ? "auto" : `${height}px`,
   };
-  const res = resolution ?? 256;
 
   if (icon === "_favicon_duckduckgo") {
     return (
@@ -42,7 +41,7 @@ export const Favicon: FC<FaviconProps> = ({
       <span className="Link-icon">
         <img
           alt={domain}
-          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${res}`}
+          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${resolution}`}
           style={style}
         />
       </span>
@@ -54,7 +53,7 @@ export const Favicon: FC<FaviconProps> = ({
       <span className="Link-icon">
         <img
           alt={domain}
-          src={`https://favicone.com/${domain}?s=${res}`}
+          src={`https://favicone.com/${domain}?s=${resolution}`}
           style={style}
         />
       </span>
