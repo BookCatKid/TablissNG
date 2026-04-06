@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 import { useDragContext } from "../../contexts/DragContext";
-import { colourPalette, isItem,RealOrPlaceholderItem } from "../../types";
+import { colourPalette, isItem, RealOrPlaceholderItem } from "../../types";
 import PlaceholderItem from "./PlaceholderItem";
 
 interface DisplayItemProps {

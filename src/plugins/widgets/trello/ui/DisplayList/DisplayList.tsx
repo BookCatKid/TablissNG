@@ -1,9 +1,11 @@
-import React, { useRef } from "react";
-import { isItem, RealOrPlaceholderItem } from "../../types";
-import { Spinner } from "../../../../shared";
 import "./DisplayList.sass";
-import DisplayItem from "./DisplayItem";
+
+import { useRef } from "react";
+
+import { Spinner } from "../../../../shared";
 import { useDragContext } from "../../contexts/DragContext";
+import { isItem, RealOrPlaceholderItem } from "../../types";
+import DisplayItem from "./DisplayItem";
 
 interface DisplayListComponentProps {
   header: string;
