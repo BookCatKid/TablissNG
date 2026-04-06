@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
+
 import { useDragContext } from "../../contexts/DragContext";
 
 interface PlaceholderItemProps {

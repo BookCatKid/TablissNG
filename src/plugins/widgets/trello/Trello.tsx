@@ -1,28 +1,29 @@
-import React, { FC, useEffect, useCallback, useRef, useMemo } from "react";
-import {
-  Props,
-  List,
-  defaultCache,
-  TrelloSession,
-  isPlaceholder,
-  isItem,
-  RealOrPlaceholderItem,
-  PlaceholderItem,
-  UIList,
-  Item,
-  DraggedItemStyle,
-} from "./types";
 import "./Trello.sass";
 
+import { FC, useCallback, useEffect, useMemo,useRef } from "react";
+import { FormattedMessage } from "react-intl";
+
+import useAuth from "../../../hooks/useAuth";
+import { useFreshReducer } from "../../../hooks/useFreshReducer";
+import { cacheReducer } from "./cacheReducer";
+import { DragContextProvider, useDragContext } from "./contexts/DragContext";
+import { trelloAuthStore } from "./stores/trelloAuthStore";
+import {
+  defaultCache,
+  DraggedItemStyle,
+  isItem,
+  isPlaceholder,
+  Item,
+  List,
+  PlaceholderItem,
+  Props,
+  RealOrPlaceholderItem,
+  TrelloSession,
+  UIList,
+} from "./types";
 import DisplayList from "./ui/DisplayList/DisplayList";
 import DraggableItem from "./ui/DisplayList/DraggableItem";
 import { getItems, moveCardToList } from "./utils/api";
-import { trelloAuthStore } from "./stores/trelloAuthStore";
-import useAuth from "../../../hooks/useAuth";
-import { FormattedMessage } from "react-intl";
-import { DragContextProvider, useDragContext } from "./contexts/DragContext";
-import { useFreshReducer } from "../../../hooks/useFreshReducer";
-import { cacheReducer } from "./cacheReducer";
 
 const Trello: FC<Props> = (props) => {
   return (

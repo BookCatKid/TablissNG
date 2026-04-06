@@ -1,7 +1,7 @@
-import React from "react";
 import ReactDOM from "react-dom";
-import { colourPalette, TrelloColour, TrelloListItemLabel } from "../../types";
+
 import { useDragContext } from "../../contexts/DragContext";
+import { colourPalette, TrelloColour, TrelloListItemLabel } from "../../types";
 
 /**
  * Floating drag preview - rendered via portal to document.body

@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
-import { colourPalette, RealOrPlaceholderItem, isItem } from "../../types";
+
 import { useDragContext } from "../../contexts/DragContext";
+import { colourPalette, isItem,RealOrPlaceholderItem } from "../../types";
 import PlaceholderItem from "./PlaceholderItem";
 
 interface DisplayItemProps {
@@ -22,7 +23,7 @@ export default function DisplayItem({ item, listId }: DisplayItemProps) {
     itemRef.current = element;
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
+  const handlePointerDown = () => {
     if (itemRef.current && typeIsItem) {
       startDrag(item, listId, itemRef.current);
     }
