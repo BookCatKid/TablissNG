@@ -141,7 +141,7 @@ export type Board = {
 export type List = {
   id: string;
   name: string;
-  watch: boolean;
+  selected: boolean;
 };
 
 export type Item = {
@@ -173,7 +173,7 @@ export const isItem = (item: RealOrPlaceholderItem): item is Item => {
 
 export type Cache = {
   order: List[]; // order of responses for rendering
-  lists: Map<string, UIList>; // map list ids to their corresponding job
+  lists: Record<string, UIList>; // map list ids to their corresponding job
 };
 
 export type Data = {
@@ -190,5 +190,5 @@ export const defaultData: Data = {
 
 export const defaultCache: Cache = {
   order: [],
-  lists: new Map<string, UIList>(),
+  lists: {},
 };

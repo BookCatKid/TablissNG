@@ -1,18 +1,15 @@
-import { useEffect, useState } from "react";
-import {
-  Data,
-  Cache,
-  List,
-  UIList,
-  createUIList,
-  TrelloSession,
-} from "../types";
+import React, { useEffect, useState } from "react";
+import { Data, List, TrelloSession, createUIList } from "../types";
+import { CacheReducerAction } from "../cacheReducer";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
 import useAuth from "../../../../hooks/useAuth";
 
-export default function useLists(data: Data, setCache: (cache: Cache) => void) {
+export default function useLists(
+  data: Data,
+  dispatchUI: React.Dispatch<CacheReducerAction>,
+) {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
@@ -21,10 +18,11 @@ export default function useLists(data: Data, setCache: (cache: Cache) => void) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // when a board is selected fetch the lists under it
+  // and load them into the UI
   useEffect(() => {
-    setIsLoading(true);
     const effect = async () => {
       if (!data.selectedID) return;
+      setIsLoading(true);
       console.log("TRELLO: Fetching lists");
       const session = await getSession();
       if (!session) return;
@@ -42,18 +40,9 @@ export default function useLists(data: Data, setCache: (cache: Cache) => void) {
       setLists(lists);
       setIsLoading(false);
 
-      // load new fetching jobs into cache
-      // and update ui
-      const filtered = lists.filter((list) => list.watch);
-      const _lists = new Map<string, UIList>();
-      filtered.map((list) => {
-        _lists.set(list.id, { ...createUIList(list.id) });
-      });
-
-      setCache({
-        order: filtered,
-        lists: _lists,
-      });
+      const selectedLists = lists.filter((l) => l.selected);
+      const uiLists = selectedLists.map((l) => createUIList(l.id));
+      dispatchUI({ type: "UPDATE", order: selectedLists, lists: uiLists });
     };
 
     if (authStatus === "authenticated") {

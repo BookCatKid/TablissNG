@@ -11,6 +11,6 @@ export const applyPreferences = async (
 ) => {
   return lists.map((list) => {
     const match = preference.lists.find((item) => item.id === list.id);
-    return match ? { ...list, watch: match.watch } : list;
+    return match ? { ...list, selected: match.selected } : list;
   });
 };

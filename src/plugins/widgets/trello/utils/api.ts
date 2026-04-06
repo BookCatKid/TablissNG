@@ -60,7 +60,7 @@ export const getLists = async (boardId: string, session: TrelloSession) => {
     session,
     (data) =>
       data.map(
-        (item) => ({ id: item.id, name: item.name, watch: false }) as List,
+        (item) => ({ id: item.id, name: item.name, selected: false }) as List,
       ),
   );
 };

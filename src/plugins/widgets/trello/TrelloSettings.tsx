@@ -1,12 +1,13 @@
 import React, { ChangeEvent, FC } from "react";
 import {
   BoardPreference,
-  createUIList,
   defaultCache,
   defaultData,
   Props,
   TrelloSession,
 } from "./types";
+import { cacheReducer } from "./cacheReducer";
+import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import Button from "../../../views/shared/Button";
 import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
@@ -32,8 +33,12 @@ const TrelloSettings: FC<Props> = ({
   } = useAuth<TrelloSession>("trello", trelloAuthStore);
 
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
-
-  const { lists, setLists, isLoading: listsLoading } = useLists(data, setCache);
+  const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
+  const {
+    lists,
+    setLists,
+    isLoading: listsLoading,
+  } = useLists(data, dispatchUI);
 
   const onAuthenticateClick = async () => {
     await signIn(trelloAuthFlow);
@@ -41,40 +46,32 @@ const TrelloSettings: FC<Props> = ({
 
   const onSignout = async () => {
     await signOut(onTrelloSignOut);
-    setCache(defaultCache);
+    dispatchUI({ type: "CLEAR" });
   };
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
     setData({ ...data, selectedID: event.target.value });
-    setCache(defaultCache);
+    dispatchUI({ type: "CLEAR" });
   };
 
   const onListCheckboxSelect = (listID: string) => {
-    const found = lists.find((list: List) => list.id === listID);
-    if (!found) {
+    const targetList = lists.find((list: List) => list.id === listID);
+    if (!targetList) {
       return;
     }
 
-    const action: "ADD" | "REMOVE" = found.watch ? "REMOVE" : "ADD";
-
-    const updatedUILists = new Map(cache.lists);
-    const newUIList = createUIList(listID);
-
-    if (action === "ADD") {
-      updatedUILists.set(listID, newUIList);
-    } else {
-      updatedUILists.delete(listID);
-    }
-
-    // update the settings UI
-    // to change the watch status for the checked list
-    const updatedOptions = lists.map((list: List) => {
-      return list.id === listID ? { ...list, watch: !list.watch } : list;
+    // Toggle the selected status for the checked list
+    const updatedSettingsOptions = lists.map((list: List) => {
+      return list.id === listID ? { ...list, selected: !list.selected } : list;
     });
-    setLists(updatedOptions);
+    setLists(updatedSettingsOptions);
 
-    // Will be made redundant after refactor to reducer
-    const selectedLists = updatedOptions.filter((list: List) => list.watch);
+    // Call to data reducer
+
+    // Update preferences
+    const selectedLists = updatedSettingsOptions.filter(
+      (list: List) => list.selected,
+    );
     const newPreference: BoardPreference = {
       boardId: data.selectedID!,
       lists: selectedLists,
@@ -85,14 +82,8 @@ const TrelloSettings: FC<Props> = ({
       [data.selectedID!]: newPreference,
     };
 
+    dispatchUI({ type: "TOGGLE", order: selectedLists, target: targetList });
     setData({ ...data, preferences: updated });
-
-    // Update UI
-    setCache({
-      ...cache,
-      order: selectedLists,
-      lists: updatedUILists,
-    });
   };
 
   if (authState !== "authenticated") {
@@ -174,7 +165,7 @@ const TrelloSettings: FC<Props> = ({
                 return (
                   <ListCheckbox
                     key={list.id}
-                    checked={list.watch}
+                    checked={list.selected}
                     index={index}
                     listID={list.id}
                     label={list.name}
