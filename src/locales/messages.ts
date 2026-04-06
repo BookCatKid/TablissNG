@@ -112,6 +112,11 @@ export const backgroundMessages = defineMessages({
     defaultMessage: "Show title",
     description: "Toggle for showing/hiding image titles",
   },
+  showControls: {
+    id: "backgrounds.showControls",
+    defaultMessage: "Show controls",
+    description: "Toggle for always showing background controls",
+  },
   today: {
     id: "backgrounds.today",
     defaultMessage: "Today",
@@ -136,5 +141,120 @@ export const backgroundMessages = defineMessages({
     id: "backgrounds.searchTerm",
     defaultMessage: "Search Term",
     description: "Label for background search term input",
+  },
+});
+
+export const monthMessages = defineMessages({
+  jan: {
+    id: "date.month.jan",
+    defaultMessage: "Jan",
+    description: "January short name",
+  },
+  feb: {
+    id: "date.month.feb",
+    defaultMessage: "Feb",
+    description: "February short name",
+  },
+  mar: {
+    id: "date.month.mar",
+    defaultMessage: "Mar",
+    description: "March short name",
+  },
+  apr: {
+    id: "date.month.apr",
+    defaultMessage: "Apr",
+    description: "April short name",
+  },
+  may: {
+    id: "date.month.may",
+    defaultMessage: "May",
+    description: "May short name",
+  },
+  jun: {
+    id: "date.month.jun",
+    defaultMessage: "Jun",
+    description: "June short name",
+  },
+  jul: {
+    id: "date.month.jul",
+    defaultMessage: "Jul",
+    description: "July short name",
+  },
+  aug: {
+    id: "date.month.aug",
+    defaultMessage: "Aug",
+    description: "August short name",
+  },
+  sep: {
+    id: "date.month.sep",
+    defaultMessage: "Sep",
+    description: "September short name",
+  },
+  oct: {
+    id: "date.month.oct",
+    defaultMessage: "Oct",
+    description: "October short name",
+  },
+  nov: {
+    id: "date.month.nov",
+    defaultMessage: "Nov",
+    description: "November short name",
+  },
+  dec: {
+    id: "date.month.dec",
+    defaultMessage: "Dec",
+    description: "December short name",
+  },
+});
+
+export const weekdayMessages = defineMessages({
+  sun: {
+    id: "date.weekday.sun",
+    defaultMessage: "Sun",
+    description: "Sunday short name",
+  },
+  mon: {
+    id: "date.weekday.mon",
+    defaultMessage: "Mon",
+    description: "Monday short name",
+  },
+  tue: {
+    id: "date.weekday.tue",
+    defaultMessage: "Tue",
+    description: "Tuesday short name",
+  },
+  wed: {
+    id: "date.weekday.wed",
+    defaultMessage: "Wed",
+    description: "Wednesday short name",
+  },
+  thu: {
+    id: "date.weekday.thu",
+    defaultMessage: "Thu",
+    description: "Thursday short name",
+  },
+  fri: {
+    id: "date.weekday.fri",
+    defaultMessage: "Fri",
+    description: "Friday short name",
+  },
+  sat: {
+    id: "date.weekday.sat",
+    defaultMessage: "Sat",
+    description: "Saturday short name",
+  },
+});
+
+// Legend messages for activity heatmap in GitHub and Leetcode calendar
+export const calendarLegendMessages = defineMessages({
+  less: {
+    id: "date.legend.less",
+    defaultMessage: "Less",
+    description: "Less text for calendar legend",
+  },
+  more: {
+    id: "date.legend.more",
+    defaultMessage: "More",
+    description: "More text for calendar legend",
   },
 });

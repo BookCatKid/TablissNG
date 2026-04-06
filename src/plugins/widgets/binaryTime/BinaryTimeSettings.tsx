@@ -1,8 +1,9 @@
-import React, { FC } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
-import { Props, defaultData } from "./types";
-import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+import { FC } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { pluginMessages } from "../../../locales/messages";
+import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+import { defaultData, Props } from "./types";
 
 const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
@@ -31,7 +32,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showSeconds}
-          onChange={() => setData({ ...data, showSeconds: !data.showSeconds })}
+          onChange={(event) =>
+            setData({ ...data, showSeconds: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showSeconds"
@@ -44,7 +47,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showMinutes}
-          onChange={() => setData({ ...data, showMinutes: !data.showMinutes })}
+          onChange={(event) =>
+            setData({ ...data, showMinutes: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showMinutes"
@@ -57,7 +62,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showHours}
-          onChange={() => setData({ ...data, showHours: !data.showHours })}
+          onChange={(event) =>
+            setData({ ...data, showHours: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showHours"

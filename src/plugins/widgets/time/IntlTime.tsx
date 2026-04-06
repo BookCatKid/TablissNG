@@ -1,4 +1,5 @@
-import React from "react";
+import { type FC, useMemo } from "react";
+
 import { db } from "../../../db/state";
 import { useValue } from "../../../lib/db/react";
 
@@ -21,7 +22,7 @@ type Props = {
  * Code based on: https://github.com/mattermost/mattermost-webapp/pull/5138
  * Tabliss issue: https://github.com/joelshepherd/tabliss/issues/231
  */
-const IntlTime: React.FC<Props> = ({
+const IntlTime: FC<Props> = ({
   hour12,
   showHours,
   showMinutes,
@@ -32,7 +33,7 @@ const IntlTime: React.FC<Props> = ({
   const locale = useValue(db, "locale");
 
   // Time formatter config
-  const formater = React.useMemo(
+  const formater = useMemo(
     () =>
       Intl.DateTimeFormat(locale, {
         hour: showHours ? "numeric" : undefined,

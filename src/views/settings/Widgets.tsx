@@ -1,13 +1,14 @@
-import React, { useMemo } from "react";
+import { type FC, useMemo } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+
 import { addWidget, removeWidget, reorderWidget } from "../../db/action";
 import { selectWidgets } from "../../db/select";
 import { db } from "../../db/state";
 import { useSelector } from "../../lib/db/react";
-import Widget from "./Widget";
 import { widgetConfigs } from "../../plugins/plugins";
+import Widget from "./Widget";
 
-const Widgets: React.FC = () => {
+const Widgets: FC = () => {
   const widgets = useSelector(db, selectWidgets);
   const intl = useIntl();
 
@@ -18,15 +19,6 @@ const Widgets: React.FC = () => {
       return nameA.localeCompare(nameB);
     });
   }, [intl]);
-
-  const getWidgetName = (key: string) => {
-    const config = widgetConfigs.find((w) => w.key === key);
-    if (!config) return key;
-
-    return typeof config.name === "string"
-      ? config.name
-      : intl.formatMessage(config.name);
-  };
 
   return (
     <div>

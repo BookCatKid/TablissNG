@@ -6,7 +6,9 @@
       "webpack-dev-server",
       "webextension-polyfill",
       "eslint-plugin-react-hooks",
-      "eslint-plugin-react-refresh"
+      "eslint-plugin-react-refresh",
+      "style-loader",
+      "@emotion/react"
     ]
   }
 }

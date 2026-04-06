@@ -15,6 +15,13 @@
             grid-column: 2
             justify-self: center
 
+            &.is-on-hover
+                opacity: 0
+                transition: opacity 0.25s ease-out
+
+        &:hover
+            .controls.is-on-hover
+                opacity: 1
         .right-info
             grid-column: 3
             text-align: right

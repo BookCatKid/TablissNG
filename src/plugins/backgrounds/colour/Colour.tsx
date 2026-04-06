@@ -1,6 +1,6 @@
-import React, { FC } from "react";
+import { FC } from "react";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const Colour: FC<Props> = ({ data = defaultData }) => (
   <div className="Colour fullscreen" style={{ backgroundColor: data.colour }} />

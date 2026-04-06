@@ -1,7 +1,8 @@
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Props, defaultData } from "./types";
+
 import { pluginMessages } from "../../../locales/messages";
+import { defaultData, Props } from "./types";
 
 const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const [input, setInput] = useState(data.input);

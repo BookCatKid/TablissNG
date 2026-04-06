@@ -31,8 +31,13 @@ jobs:
           ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
+      - name: Cache webpack
+        uses: actions/cache@v5
+        with:
+          path: .cache
+          key: webpack-${{ matrix.build_target }}-${{ hashFiles('package-lock.json', 'webpack.config.js') }}
       - name: Install dependencies
         run: npm ci
 
@@ -59,9 +64,14 @@ jobs:
           ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: npm
           cache-dependency-path: docs/package-lock.json
+      - name: Cache webpack
+        uses: actions/cache@v5
+        with:
+          path: .cache
+          key: webpack-docs-${{ hashFiles('docs/package-lock.json', 'docs/webpack.config.js') }}
       - name: Install dependencies
         run: npm ci
         working-directory: docs

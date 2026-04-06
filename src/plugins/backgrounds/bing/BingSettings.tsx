@@ -1,10 +1,12 @@
-import React from "react";
+import "./Bing.sass";
+
+import { format } from "date-fns";
+import { type FC } from "react";
 import { FormattedMessage } from "react-intl";
+
+import { backgroundMessages } from "../../../locales/messages";
 import { DebounceInput } from "../../shared";
 import { Data, defaultData, Props } from "./types";
-import { format } from "date-fns";
-import { backgroundMessages } from "../../../locales/messages";
-import "./Bing.sass";
 
 const getMaxDate = () => format(new Date(), "yyyy-MM-dd");
 
@@ -24,7 +26,7 @@ const locales = [
   "ROW/en",
 ];
 
-const BingSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
+const BingSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="BingSettings">
     <label>
       <FormattedMessage {...backgroundMessages.dateOfPicture} />
@@ -76,7 +78,9 @@ const BingSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
       <input
         type="checkbox"
         checked={data.showTitle}
-        onChange={(event) => setData({ ...data, showTitle: !data.showTitle })}
+        onChange={(event) =>
+          setData({ ...data, showTitle: event.target.checked })
+        }
       />
       <FormattedMessage {...backgroundMessages.showTitle} />
     </label>

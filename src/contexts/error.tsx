@@ -1,4 +1,13 @@
-import React from "react";
+import {
+  createContext,
+  type FC,
+  type PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
 import { capture, onError } from "../errorHandler";
 
 type ErrorAPI = {
@@ -15,16 +24,16 @@ type ErrorState = {
   errors: ErrorItem[];
 };
 
-export const ErrorContext = React.createContext<ErrorAPI>(null as any);
+export const ErrorContext = createContext<ErrorAPI>(null as any);
 
-const ErrorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [state, setState] = React.useState<ErrorState>({ errors: [] });
-  const push = React.useCallback((error: Omit<ErrorItem, "timestamp">) => {
+const ErrorProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [state, setState] = useState<ErrorState>({ errors: [] });
+  const push = useCallback((error: Omit<ErrorItem, "timestamp">) => {
     capture(new Error(error.message));
   }, []);
 
   // Subscribe to all captured errors (from push, error boundaries, global handlers)
-  React.useEffect(() => {
+  useEffect(() => {
     return onError((entry) => {
       setState((prev) => ({
         ...prev,
@@ -45,6 +54,6 @@ const ErrorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
 /** Push error to the error log */
 export const usePushError = (): ErrorAPI["push"] =>
-  React.useContext(ErrorContext).push;
+  useContext(ErrorContext).push;
 
 export default ErrorProvider;

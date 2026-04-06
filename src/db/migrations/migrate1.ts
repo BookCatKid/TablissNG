@@ -1,4 +1,5 @@
 import { nanoid as generateId } from "nanoid";
+
 import { defaultData as defaultGiphyData } from "../../plugins/backgrounds/giphy/types";
 import { defaultData as defaultGradientData } from "../../plugins/backgrounds/gradient/types";
 import { defaultData as defaultUnsplashData } from "../../plugins/backgrounds/unsplash/types";

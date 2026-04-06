@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Greeting from "./Greeting";
 import GreetingSettings from "./GreetingSettings";
 

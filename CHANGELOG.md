@@ -6,6 +6,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 I also attempt to follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
 
+## [Unreleased]
+
+## [1.6.6] - 4/4/2026 | LeetCode widget, APOD improvements, and important bugfixes
+
+Adds a new LeetCode calendar widget, APOD video support and cache improvements, a backgrounds controls visibility toggle, configurable quote refresh timeout, and a critical quick link upload bugfix. Also includes translation updates and A LOT OF INTERNAL REFACTORS.
+
+### Added
+
+- feat(leetcode): add Leetcode calendar widget (#121). [a9e6eed3](https://github.com/BookCatKid/TablissNG/commit/a9e6eed3)
+
+- feat(apod): add video support and background handling. [62d202f5](https://github.com/BookCatKid/TablissNG/commit/62d202f5)
+
+- feat(apod): add cache freshness check for data retrieval. [dbf0f0ef](https://github.com/BookCatKid/TablissNG/commit/dbf0f0ef)
+
+- feat(backgrounds): add controls visibility toggle setting. [1d00b432](https://github.com/BookCatKid/TablissNG/commit/1d00b432)
+
+- feat(quote): add configurable timeout for quote refresh. [cfebaf2e](https://github.com/BookCatKid/TablissNG/commit/cfebaf2e)
+
+### Changed
+
+- feat(cache): change image caching strategy to NetworkFirst. [cfacda40](https://github.com/BookCatKid/TablissNG/commit/cfacda40)
+
+- style: add inline-flex display to summary and link elements to correctly center them vertically. [21fcf026](https://github.com/BookCatKid/TablissNG/commit/21fcf026)
+
+### Fixed
+
+- fix: critical issue with quick link upload bug. [fdefc435](https://github.com/BookCatKid/TablissNG/commit/fdefc435)
+
+### Translations
+
+- Update Spanish and Catalan translations (#120). [ce357784](https://github.com/BookCatKid/TablissNG/commit/ce357784)
+
+- Update fr.json (#131). [9ec671e1](https://github.com/BookCatKid/TablissNG/commit/9ec671e1)
+
+### Internal
+
+- refactor(tsconfig): modernization updates and cool stuff. [f5a7e3f2](https://github.com/BookCatKid/TablissNG/commit/f5a7e3f2)
+
+- refactor(plugins): consolidate unknown widget configuration and remove unused exports. [62cf0a07](https://github.com/BookCatKid/TablissNG/commit/62cf0a07)
+
+- chore: react-codemod auto fix react imports. [cf362ef2](https://github.com/BookCatKid/TablissNG/commit/cf362ef2)
+
+- fix(hooks): fix lint by handling nullish callback in useKeyPress hook. [d26742f3](https://github.com/BookCatKid/TablissNG/commit/d26742f3)
+
+- fix(ts): clean up unused variables and improve checkbox handlers. [fb776682](https://github.com/BookCatKid/TablissNG/commit/fb776682)
+
+- fix: eslint trello auth lint error. [56150650](https://github.com/BookCatKid/TablissNG/commit/56150650)
+
+- deps go brrrrrrrr. [ef9824aa](https://github.com/BookCatKid/TablissNG/commit/ef9824aa)
+
+- chore(deps): yay more dep updates. [638fb288](https://github.com/BookCatKid/TablissNG/commit/638fb288)
+
+- chore: pin serialize-javascript to ^7.0.4. [175a5fcc](https://github.com/BookCatKid/TablissNG/commit/175a5fcc)
+
+- feat(docs): add google site verification metadata. [57cf7578](https://github.com/BookCatKid/TablissNG/commit/57cf7578)
+
+- refactor: convert React namespace imports to named imports across codebase. [a9921099](https://github.com/BookCatKid/TablissNG/commit/a9921099)
+
+- style: sort imports across codebase. [4835fd8b](https://github.com/BookCatKid/TablissNG/commit/4835fd8b)
+
+- chore: docs deps override again. [e0a1162d](https://github.com/BookCatKid/TablissNG/commit/e0a1162d)
+
 ## [1.6.5] - 2/20/2026 | Error logging, new widgets, and quality-of-life improvements
 
 A solid release featuring a comprehensive error logging system, a new random color palette widget, drag-and-drop todo reordering, weather auto-update, and several UI improvements and fixes.

@@ -1,12 +1,13 @@
-import React from "react";
 import "./Modal.sass";
 
+import type { FC, ReactNode } from "react";
+
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
   onClose: () => void;
 };
 
-const Modal: React.FC<Props> = ({ children, onClose }) => {
+const Modal: FC<Props> = ({ children, onClose }) => {
   return (
     <div className="Modal-container" onClick={onClose}>
       <div className="Modal" onClick={(event) => event.stopPropagation()}>

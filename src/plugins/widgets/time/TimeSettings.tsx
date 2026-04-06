@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { Props, defaultData } from "./types";
-import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+
 import { pluginMessages } from "../../../locales/messages";
+import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+import { defaultData, Props } from "./types";
 
 const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
@@ -31,7 +32,9 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={!data.hideTime}
-          onChange={() => setData({ ...data, hideTime: !data.hideTime })}
+          onChange={(event) =>
+            setData({ ...data, hideTime: !event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.time.displayTime"
@@ -60,8 +63,8 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
               <input
                 type="checkbox"
                 checked={data.colorCircles}
-                onChange={() =>
-                  setData({ ...data, colorCircles: !data.colorCircles })
+                onChange={(event) =>
+                  setData({ ...data, colorCircles: event.target.checked })
                 }
               />{" "}
               <FormattedMessage
@@ -106,8 +109,8 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
             <input
               type="checkbox"
               checked={data.showHours ?? true}
-              onChange={() =>
-                setData({ ...data, showHours: !(data.showHours ?? true) })
+              onChange={(event) =>
+                setData({ ...data, showHours: event.target.checked })
               }
             />{" "}
             <FormattedMessage
@@ -121,8 +124,8 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
             <input
               type="checkbox"
               checked={data.showMinutes ?? true}
-              onChange={() =>
-                setData({ ...data, showMinutes: !(data.showMinutes ?? true) })
+              onChange={(event) =>
+                setData({ ...data, showMinutes: event.target.checked })
               }
             />{" "}
             <FormattedMessage
@@ -136,8 +139,8 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
             <input
               type="checkbox"
               checked={data.showSeconds ?? false}
-              onChange={() =>
-                setData({ ...data, showSeconds: !(data.showSeconds ?? false) })
+              onChange={(event) =>
+                setData({ ...data, showSeconds: event.target.checked })
               }
             />{" "}
             <FormattedMessage
@@ -152,8 +155,8 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
               <input
                 type="checkbox"
                 checked={data.showDayPeriod}
-                onChange={() =>
-                  setData({ ...data, showDayPeriod: !data.showDayPeriod })
+                onChange={(event) =>
+                  setData({ ...data, showDayPeriod: event.target.checked })
                 }
               />{" "}
               <FormattedMessage
@@ -170,7 +173,9 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showDate}
-          onChange={() => setData({ ...data, showDate: !data.showDate })}
+          onChange={(event) =>
+            setData({ ...data, showDate: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.time.displayDate"

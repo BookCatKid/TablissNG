@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Js from "./Js";
 import JsSettings from "./JsSettings";
 

@@ -1,6 +1,6 @@
-import { useTime } from "./useTime";
-import { useValue } from "../lib/db/react";
 import { db } from "../db/state";
+import { useValue } from "../lib/db/react";
+import { useTime } from "./useTime";
 
 export function useIsNight() {
   const time = useTime();

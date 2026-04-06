@@ -1,8 +1,9 @@
 import { format } from "date-fns";
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
-import { parseLocalDate } from "../../../utils";
+
 import { pluginMessages } from "../../../locales/messages";
+import { parseLocalDate } from "../../../utils";
 import { messages as timeTrackerMessages } from "../timeTracker/index";
 import { defaultData, Props } from "./types";
 

@@ -1,17 +1,19 @@
-import icons from "feather-icons/dist/icons.json";
-import React, { FC, useState, useRef, useEffect } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import "./Input.sass";
 
+import { Icon } from "@iconify/react";
+import icons from "feather-icons/dist/icons.json";
+import type { ChangeEvent } from "react";
+import { FC, useEffect, useRef, useState } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
+import { addIconData, normalizeUrl } from "../../../utils";
 import {
+  DownIcon,
   IconButton,
   RemoveIcon,
-  DownIcon,
   UpIcon,
 } from "../../../views/shared";
-import { Link, IconCacheItem, Cache } from "./types";
-import { Icon } from "@iconify/react";
-import { addIconData, normalizeUrl } from "../../../utils";
-import "./Input.sass";
+import { Cache, IconCacheItem, Link } from "./types";
 
 const messages = defineMessages({
   githubIssue: {
@@ -102,7 +104,7 @@ const Input: FC<Props> = (props) => {
   const isCustomUpload = props.icon === "_custom_upload";
   const isFeather = props.icon === "_feather";
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -221,7 +223,6 @@ const Input: FC<Props> = (props) => {
           />
         )}
       </h5>
-
       <label>
         <FormattedMessage id="plugins.links.input.url" defaultMessage="URL" />
         <input
@@ -235,7 +236,6 @@ const Input: FC<Props> = (props) => {
           }}
         />
       </label>
-
       <label>
         <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />{" "}
         <span className="text--grey">
@@ -247,7 +247,6 @@ const Input: FC<Props> = (props) => {
           onChange={(event) => props.onChange({ name: event.target.value })}
         />
       </label>
-
       <label>
         <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />{" "}
         <span className="text--grey">
@@ -320,7 +319,6 @@ const Input: FC<Props> = (props) => {
           </optgroup>
         </select>
       </label>
-
       {isCustomIconify && (
         <label>
           <FormattedMessage
@@ -351,7 +349,6 @@ const Input: FC<Props> = (props) => {
           </p>
         </label>
       )}
-
       {isCustomSvg && (
         <label>
           <FormattedMessage
@@ -382,7 +379,6 @@ const Input: FC<Props> = (props) => {
           </p>
         </label>
       )}
-
       {isCustomICON && (
         <label>
           <FormattedMessage
@@ -404,7 +400,6 @@ const Input: FC<Props> = (props) => {
           </p>
         </label>
       )}
-
       {isCustomUpload && (
         <div>
           <label>
@@ -420,7 +415,6 @@ const Input: FC<Props> = (props) => {
           </label>
         </div>
       )}
-
       {isFeather && (
         <div className="icon-picker">
           <button onClick={handleOpenModal} className="custom-select">
@@ -452,7 +446,6 @@ const Input: FC<Props> = (props) => {
           )}
         </div>
       )}
-
       {(isCustomICON ||
         (isCustomUpload &&
           props.iconCacheKey &&
@@ -522,7 +515,6 @@ const Input: FC<Props> = (props) => {
           )}
         </>
       )}
-
       {(isCustomSvg ||
         (isCustomUpload &&
           props.iconCacheKey &&
@@ -553,7 +545,6 @@ const Input: FC<Props> = (props) => {
           </p>
         </div>
       )}
-
       {isGoogleOrFavicone && (
         <label>
           Icon Size
@@ -571,7 +562,6 @@ const Input: FC<Props> = (props) => {
           </select>
         </label>
       )}
-
       {isModalOpen && (
         <div className="Modal-container" onClick={handleCloseModal}>
           <div className="Modal" onClick={(event) => event.stopPropagation()}>
@@ -621,7 +611,6 @@ const Input: FC<Props> = (props) => {
           </div>
         </div>
       )}
-
       <label>
         <FormattedMessage
           id="plugins.links.input.keyboardShortcut"
@@ -638,7 +627,6 @@ const Input: FC<Props> = (props) => {
           maxLength={1}
         />
       </label>
-
       {BUILD_TARGET !== "web" && (
         <label title={intl.formatMessage(messages.useExtensionTabsHelp)}>
           <input
@@ -654,7 +642,6 @@ const Input: FC<Props> = (props) => {
           />
         </label>
       )}
-
       <hr />
     </div>
   );

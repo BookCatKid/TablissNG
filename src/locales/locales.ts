@@ -1,4 +1,5 @@
 import { pick } from "in-browser-language";
+
 import ar from "./lang/ar.json";
 import be from "./lang/be.json";
 import caES from "./lang/ca-ES.json";
@@ -23,27 +24,27 @@ import it from "./lang/it.json";
 import ja from "./lang/ja.json";
 import ko from "./lang/ko.json";
 import kp from "./lang/kp.json";
-import lt from "./lang/lt.json";
 import lb from "./lang/lb.json";
+import lt from "./lang/lt.json";
 import ne from "./lang/ne.json";
 import nl from "./lang/nl.json";
 import no from "./lang/no.json";
+import pl from "./lang/pl.json";
+import pt from "./lang/pt.json";
+import ptBR from "./lang/pt-BR.json";
 import ro from "./lang/ro.json";
 import ru from "./lang/ru.json";
 import sk from "./lang/sk.json";
 import sq from "./lang/sq.json";
 import sr from "./lang/sr.json";
 import sv from "./lang/sv.json";
-import pl from "./lang/pl.json";
-import pt from "./lang/pt.json";
-import ptBR from "./lang/pt-BR.json";
 import ta from "./lang/ta.json";
 import th from "./lang/th.json";
 import tr from "./lang/tr.json";
+import uk from "./lang/uk.json";
 import vi from "./lang/vi.json";
 import zhCN from "./lang/zh-CN.json";
 import zhTW from "./lang/zh-TW.json";
-import uk from "./lang/uk.json";
 
 export const messages: Record<string, Record<string, string>> = {
   ar: ar,

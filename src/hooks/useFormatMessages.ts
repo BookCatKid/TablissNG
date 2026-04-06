@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useIntl, MessageDescriptor } from "react-intl";
+import { MessageDescriptor, useIntl } from "react-intl";
 
 export function useFormatMessages<K extends string>(
   messsages: Record<K, MessageDescriptor>,

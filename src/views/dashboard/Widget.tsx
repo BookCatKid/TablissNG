@@ -1,20 +1,29 @@
-import React from "react";
-import { WidgetDisplay, db } from "../../db/state";
-import { setWidgetDisplay } from "../../db/action";
-import { useKey } from "../../lib/db/react";
 import { Icon } from "@iconify/react";
+import {
+  type CSSProperties,
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { FormattedMessage } from "react-intl";
+
+import { setWidgetDisplay } from "../../db/action";
+import { db, WidgetDisplay } from "../../db/state";
+import { useKey } from "../../lib/db/react";
 import { pluginMessages } from "../../locales/messages";
+import { parseFontFamilyAndFeatures } from "../../utils";
 import FloatingButton from "../shared/FloatingButton";
 import MoveableWrapper from "./MoveableWrapper";
-import { parseFontFamilyAndFeatures } from "../../utils";
 
 interface WidgetProps extends WidgetDisplay {
   id: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const Widget: React.FC<WidgetProps> = ({
+const Widget: FC<WidgetProps> = ({
   id,
   children,
   colour,
@@ -38,12 +47,12 @@ const Widget: React.FC<WidgetProps> = ({
   customClass,
   useAccentColor,
 }) => {
-  const widgetRef = React.useRef<HTMLDivElement>(null);
+  const widgetRef = useRef<HTMLDivElement>(null);
   const [accent] = useKey(db, "accent") || ["#3498db"];
 
   // Calculate pixel position from percentage
   // Uses "travel space" (viewport size - widget size) for better responsiveness
-  const getPixelPosition = React.useCallback(() => {
+  const getPixelPosition = useCallback(() => {
     if (xPercent !== undefined && yPercent !== undefined && widgetRef.current) {
       const travelX = window.innerWidth - widgetRef.current.offsetWidth;
       const travelY = window.innerHeight - widgetRef.current.offsetHeight;
@@ -54,10 +63,10 @@ const Widget: React.FC<WidgetProps> = ({
     return { x: x || 0, y: y || 0 };
   }, [x, y, xPercent, yPercent]);
 
-  const [offset, setOffset] = React.useState(() => ({ x: x || 0, y: y || 0 }));
+  const [offset, setOffset] = useState(() => ({ x: x || 0, y: y || 0 }));
 
   // Migration: Convert existing pixel coordinates to percentages if needed
-  React.useEffect(() => {
+  useEffect(() => {
     if (
       position === "free" &&
       (xPercent === undefined || yPercent === undefined) &&
@@ -75,7 +84,7 @@ const Widget: React.FC<WidgetProps> = ({
   }, [position, x, y, xPercent, yPercent, id]);
 
   // Update offset when percentage changes or window resizes
-  React.useEffect(() => {
+  useEffect(() => {
     if (position === "free") {
       const pos = getPixelPosition();
       setOffset(pos);
@@ -83,7 +92,7 @@ const Widget: React.FC<WidgetProps> = ({
   }, [position, getPixelPosition]);
 
   // Handle window resize or widget size changes to maintain relative positioning
-  React.useEffect(() => {
+  useEffect(() => {
     if (position !== "free" || !widgetRef.current) return;
 
     const handleResize = () => {
@@ -106,7 +115,7 @@ const Widget: React.FC<WidgetProps> = ({
   const parsedFont = parseFontFamilyAndFeatures(fontFamily || "");
 
   // Handle transform updates from MoveableWrapper
-  const handleTransformEnd = React.useCallback(
+  const handleTransformEnd = useCallback(
     (transform: {
       x?: number;
       y?: number;
@@ -148,7 +157,7 @@ const Widget: React.FC<WidgetProps> = ({
     }
   };
 
-  const styles: React.CSSProperties = {
+  const styles: CSSProperties = {
     position: position === "free" ? "absolute" : "relative",
     color: useAccentColor ? accent : colour,
     fontFamily: parsedFont.family || fontFamily,

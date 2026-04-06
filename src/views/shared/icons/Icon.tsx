@@ -1,5 +1,5 @@
 import icons from "feather-icons/dist/icons.json";
-import React, { FC } from "react";
+import { FC } from "react";
 
 type Props = {
   colour?: string;

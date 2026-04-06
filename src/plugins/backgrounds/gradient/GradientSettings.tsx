@@ -1,7 +1,7 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const GradientSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="GradientSettings">

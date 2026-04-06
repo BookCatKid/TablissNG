@@ -1,6 +1,6 @@
+import { MINUTES } from "../../../utils";
 import { API } from "../../types";
 import categories from "./categories";
-import { MINUTES } from "../../../utils";
 
 type JokeAPIType = "single" | "twopart";
 

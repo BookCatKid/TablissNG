@@ -1,4 +1,4 @@
-import React, { FC, JSX } from "react";
+import { FC, JSX } from "react";
 
 type Props = JSX.IntrinsicElements["button"] & {
   primary?: boolean;

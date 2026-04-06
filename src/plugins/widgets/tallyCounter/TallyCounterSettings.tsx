@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import type { FC } from "react";
+import { useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { API } from "../../types";
-import { Data, defaultData } from "./types";
-import { messages } from "./messages";
-import { pluginMessages } from "../../../locales/messages";
 
-const TallyCounterSettings: React.FC<API<Data>> = ({
+import { pluginMessages } from "../../../locales/messages";
+import { API } from "../../types";
+import { messages } from "./messages";
+import { Data, defaultData } from "./types";
+
+const TallyCounterSettings: FC<API<Data>> = ({
   data = defaultData,
   setData,
 }) => {

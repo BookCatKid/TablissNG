@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useCachedEffect, useKeyPress } from "../../../hooks";
+import "./Joke.sass";
+
+import { type FC, useEffect, useState } from "react";
+
 import { db } from "../../../db/state";
+import { useCachedEffect, useKeyPress } from "../../../hooks";
 import { useValue } from "../../../lib/db/react";
 import { getJoke } from "./api";
-import "./Joke.sass";
 import {
   defaultData,
-  Props,
+  isJokeError,
   isSingleJoke,
   isTwoPartJoke,
+  Props,
   TwoPartJokeAPIResponse,
-  isJokeError,
 } from "./types";
 
-const Joke: React.FC<Props> = ({
-  cache,
-  data = defaultData,
-  setCache,
-  loader,
-}) => {
+const Joke: FC<Props> = ({ cache, data = defaultData, setCache, loader }) => {
   // Grab the user's locale
   const locale = useValue(db, "locale");
 
@@ -88,7 +85,7 @@ const Joke: React.FC<Props> = ({
   );
 };
 
-const TwoPartJoke: React.FC<{
+const TwoPartJoke: FC<{
   joke: TwoPartJokeAPIResponse;
   keyBind?: string;
 }> = ({ joke, keyBind = "J" }) => {

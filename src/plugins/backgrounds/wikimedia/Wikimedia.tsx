@@ -1,18 +1,15 @@
-import React from "react";
 import { format } from "date-fns";
+import { type FC, useEffect, useRef, useState } from "react";
+
 import BaseBackground from "../base/BaseBackground";
 import { fetchFeaturedContent, formatDateForApi } from "./api";
 import { defaultData, Props } from "./types";
 
-const Wikimedia: React.FC<Props> = ({
-  cache,
-  data = defaultData,
-  setCache,
-}) => {
-  const [picture, setPicture] = React.useState(cache);
-  const mounted = React.useRef(false);
+const Wikimedia: FC<Props> = ({ cache, data = defaultData, setCache }) => {
+  const [picture, setPicture] = useState(cache);
+  const mounted = useRef(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const formattedDate =
       data.date === "custom" && data.customDate
         ? formatDateForApi(data.customDate)

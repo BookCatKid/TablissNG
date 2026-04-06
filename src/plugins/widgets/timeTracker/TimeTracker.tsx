@@ -1,11 +1,13 @@
-import React, { FC, useState, useEffect } from "react";
-import { FormattedRelativeTime, FormattedMessage } from "react-intl";
+import "./TimeTracker.sass";
+
+import { toZonedTime } from "date-fns-tz";
+import { FC, useEffect, useState } from "react";
+import { FormattedMessage, FormattedRelativeTime } from "react-intl";
+
 import { useTime } from "../../../hooks";
 import { selectUnit } from "../../../utils";
-import { Props, defaultData } from "./types";
 import { messages } from "./messages";
-import { toZonedTime } from "date-fns-tz";
-import "./TimeTracker.sass";
+import { defaultData, Props } from "./types";
 
 const TimeTracker: FC<Props> = ({ data = defaultData }) => {
   let time = useTime(data.timeZone ? "absolute" : "zoned");

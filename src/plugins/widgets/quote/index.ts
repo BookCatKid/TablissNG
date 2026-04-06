@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Quote from "./Quote";
 import QuoteSettings from "./QuoteSettings";
 

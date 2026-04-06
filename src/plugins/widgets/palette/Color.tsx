@@ -1,7 +1,8 @@
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { ColorProps } from "./types";
-import { rgbToHex, getContrastColor } from "./utils";
+import { getContrastColor, rgbToHex } from "./utils";
 
 type Props = ColorProps & {
   format: "hex" | "rgb";

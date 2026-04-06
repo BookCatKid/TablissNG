@@ -1,5 +1,5 @@
-import { API } from "../../types";
 import { Session } from "../../shared/types/Session";
+import { API } from "../../types";
 
 /**
  * Locally saved preferences

@@ -1,12 +1,15 @@
-import React, { useEffect } from "react";
+import "./Weather.sass";
+
+import { Icon } from "@iconify/react";
+import type { FC } from "react";
+import { useEffect } from "react";
 import { defineMessages, useIntl } from "react-intl";
+
 import { useCachedEffect, useTime } from "../../../hooks";
 import { HOURS } from "../../../utils";
-import { Icon } from "@iconify/react";
 import { getForecast, requestLocation } from "./api";
 import { findCurrent, weatherCodes } from "./conditions";
 import { defaultData, Props } from "./types";
-import "./Weather.sass";
 
 const messages = defineMessages({
   high: {
@@ -36,7 +39,7 @@ const messages = defineMessages({
   },
 });
 
-const Weather: React.FC<Props> = ({
+const Weather: FC<Props> = ({
   cache,
   data = defaultData,
   loader,

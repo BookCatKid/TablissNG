@@ -1,19 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FormattedMessage, useIntl, defineMessages } from "react-intl";
+import "./Settings.sass";
+
+import { Icon } from "@iconify/react";
+import { useEffect, useRef, useState } from "react";
+import { type FC, memo, useContext, useMemo } from "react";
+import GitHubButton from "react-github-btn";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { UiContext } from "../../contexts/ui";
 import { exportStore, importStore, resetStore } from "../../db/action";
+import { db } from "../../db/state";
 import { useKeyPress } from "../../hooks";
-import { Icon } from "@iconify/react";
+import { useTheme } from "../../hooks";
+import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
 import Background from "./Background";
 import Persist from "./Persist";
-import "./Settings.sass";
 import System from "./System";
 import Widgets from "./Widgets";
-import GitHubButton from "react-github-btn";
-import { db } from "../../db/state";
-import { useKey } from "../../lib/db/react";
-import { useTheme } from "../../hooks";
 
 const messages = defineMessages({
   scrollToTop: {
@@ -29,8 +32,8 @@ const messages = defineMessages({
   },
 });
 
-const Settings: React.FC = () => {
-  const { toggleSettings } = React.useContext(UiContext);
+const Settings: FC = () => {
+  const { toggleSettings } = useContext(UiContext);
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
   const [autoHideSettings] = useKey(db, "autoHideSettings");
   const { isDark } = useTheme();
@@ -228,7 +231,7 @@ const Settings: React.FC = () => {
             />
           </h4>
 
-          {React.useMemo(
+          {useMemo(
             () => (
               <div
                 style={{
@@ -335,4 +338,4 @@ const Settings: React.FC = () => {
   );
 };
 
-export default React.memo(Settings);
+export default memo(Settings);

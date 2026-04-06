@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Notes from "./Notes";
 import NotesSettings from "./NotesSettings";
 

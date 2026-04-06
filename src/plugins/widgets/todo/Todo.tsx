@@ -1,12 +1,12 @@
-import React, { FC, useEffect } from "react";
+import { FC, useEffect } from "react";
 
 import {
   useKeyPress,
   useSavedReducer,
-  useToggle,
   useTime,
+  useToggle,
 } from "../../../hooks";
-import { DownIcon, Icon, UpIcon, ExpandIcon } from "../../../views/shared";
+import { DownIcon, ExpandIcon, Icon, UpIcon } from "../../../views/shared";
 import {
   addTodo,
   removeTodo,

@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Search from "./Search";
 import SearchSettings from "./SearchSettings";
 

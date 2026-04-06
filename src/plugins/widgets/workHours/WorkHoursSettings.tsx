@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { useFormatMessages } from "../../../hooks/useFormatMessages";
 import { days } from "./messages";
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const dayNames = useFormatMessages(days);

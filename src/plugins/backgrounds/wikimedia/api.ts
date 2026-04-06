@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+
 import { parseLocalDate } from "../../../utils";
 
 export const formatDateForApi = (date: string): string => {
@@ -13,10 +14,6 @@ export const fetchFeaturedContent = async ({
   formattedDate: string;
 }): Promise<any> => {
   const url = `https://api.wikimedia.org/feed/v1/wikipedia/${language}/featured/${formattedDate}`;
-  const headers = {
-    origin: "*", // <-- this is the magic ingredient!
-  };
-
   const res = await fetch(url);
   const body = await res.json();
 

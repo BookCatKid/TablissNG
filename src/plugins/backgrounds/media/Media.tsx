@@ -1,17 +1,18 @@
-import React from "react";
-import { useObjectUrl, useBackgroundRotation } from "../../../hooks";
+import { type FC, useEffect, useMemo } from "react";
+
 import { db } from "../../../db/state";
+import { useBackgroundRotation, useObjectUrl } from "../../../hooks";
 import { useValue } from "../../../lib/db/react";
 import BaseBackground from "../base/BaseBackground";
 import { defaultCache, defaultData, Props } from "./types";
 
-const Media: React.FC<Props> = ({
+const Media: FC<Props> = ({
   cache = defaultCache,
   setCache,
   data = defaultData,
   setData,
 }) => {
-  const normalizedCache = React.useMemo(() => {
+  const normalizedCache = useMemo(() => {
     if (Array.isArray(cache)) {
       return {
         items: cache as File[],
@@ -24,7 +25,7 @@ const Media: React.FC<Props> = ({
   }, [cache]);
 
   // If legacy cache is an old File[] array, convert it to the new cache format
-  React.useEffect(() => {
+  useEffect(() => {
     if (Array.isArray(cache)) {
       setCache?.(normalizedCache);
     }
@@ -48,7 +49,7 @@ const Media: React.FC<Props> = ({
   const isVideo = file.type.match(/^video\/(mp4|webm|ogg)$/);
 
   // Only show controls if there's more than one item to navigate through
-  const showControls = normalizedCache.items?.length > 1;
+  const hasControls = normalizedCache.items?.length > 1;
 
   return (
     <BaseBackground
@@ -58,7 +59,8 @@ const Media: React.FC<Props> = ({
       onPause={handlePause}
       onPrev={go(-1)}
       onNext={go(1)}
-      showControls={showControls}
+      showControls={hasControls}
+      controlsOnHover={hasControls && !data.showControls}
     >
       {isVideo && (
         <video

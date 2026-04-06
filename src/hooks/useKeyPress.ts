@@ -10,23 +10,24 @@ function isInputEvent(event: KeyboardEvent) {
 }
 
 export function useKeyPress(
-  callback: (event: KeyboardEvent) => void,
+  callback: ((event: KeyboardEvent) => void) | null | undefined,
   detectKeys: string[],
   ignoreInputEvents = true,
 ) {
-  const handler = (event: KeyboardEvent) => {
-    if (
-      detectKeys.includes(event.key) &&
-      !(ignoreInputEvents && isInputEvent(event)) &&
-      !(event.ctrlKey || event.metaKey || event.altKey)
-    ) {
-      callback(event);
-    }
-  };
-
   useEffect(() => {
-    window.addEventListener("keydown", handler);
+    if (!callback) return;
 
+    const handler = (event: KeyboardEvent) => {
+      if (
+        detectKeys.includes(event.key) &&
+        !(ignoreInputEvents && isInputEvent(event)) &&
+        !(event.ctrlKey || event.metaKey || event.altKey)
+      ) {
+        callback(event);
+      }
+    };
+
+    window.addEventListener("keydown", handler);
     return () => {
       window.removeEventListener("keydown", handler);
     };

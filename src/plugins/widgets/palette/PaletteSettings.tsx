@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
-import { getRandomColorPalette } from "./api";
-import { defaultData, Props, Data } from "./types";
+
 import { timingMessages } from "../../../locales/messages";
+import { getRandomColorPalette } from "./api";
+import { Data, defaultData, Props } from "./types";
 
 const PaletteSettings: FC<Props> = ({
   cache,

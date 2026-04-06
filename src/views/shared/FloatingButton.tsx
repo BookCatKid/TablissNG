@@ -1,12 +1,19 @@
-import React, { useState, useRef } from "react";
+import type {
+  FC,
+  MouseEvent as ReactMouseEvent,
+  PointerEvent,
+  ReactNode,
+} from "react";
+import { useRef, useState } from "react";
+
 import Button from "./Button";
 
 interface Props {
   onClick: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
-const FloatingButton: React.FC<Props> = ({ onClick, children }) => {
+const FloatingButton: FC<Props> = ({ onClick, children }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const wasDraggingRef = useRef(false);
@@ -19,7 +26,7 @@ const FloatingButton: React.FC<Props> = ({ onClick, children }) => {
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const currentPosRef = useRef(position);
 
-  const handlePointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const handlePointerDown = (e: PointerEvent<HTMLButtonElement>) => {
     if (!buttonRef.current) return;
 
     buttonRef.current.setPointerCapture(e.pointerId);
@@ -34,7 +41,7 @@ const FloatingButton: React.FC<Props> = ({ onClick, children }) => {
     wasDraggingRef.current = false;
   };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const handlePointerMove = (e: PointerEvent<HTMLButtonElement>) => {
     if (!isDragging || !buttonRef.current) return;
 
     wasDraggingRef.current = true;
@@ -57,7 +64,7 @@ const FloatingButton: React.FC<Props> = ({ onClick, children }) => {
     buttonRef.current.style.top = `${clampedY}px`;
   };
 
-  const handlePointerUp = (e: React.PointerEvent<HTMLButtonElement>) => {
+  const handlePointerUp = (e: PointerEvent<HTMLButtonElement>) => {
     if (!isDragging || !buttonRef.current) return;
 
     buttonRef.current.releasePointerCapture(e.pointerId);
@@ -66,7 +73,7 @@ const FloatingButton: React.FC<Props> = ({ onClick, children }) => {
     setPosition(currentPosRef.current);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: ReactMouseEvent<HTMLButtonElement>) => {
     if (wasDraggingRef.current) {
       e.preventDefault();
       e.stopPropagation();

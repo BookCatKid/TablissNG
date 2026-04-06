@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Session } from "../plugins/shared/types/Session";
+import { useEffect, useState } from "react";
 import { StoreApi, UseBoundStore } from "zustand";
+
 import { AuthState } from "../plugins/shared/interfaces/AuthState";
+import { Session } from "../plugins/shared/types/Session";
 
 // Typedef for a Zustand store type definition
 type Store<T> = UseBoundStore<StoreApi<T>>;

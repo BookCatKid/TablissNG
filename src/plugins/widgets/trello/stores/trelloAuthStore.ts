@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import { AuthState } from "../../../shared/interfaces/AuthState";
 
 export const trelloAuthStore = create<AuthState>()((set) => ({

@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
+
 import { defaultData, Props } from "./types";
 
 const CustomText: FC<Props> = ({ data = defaultData }) => {

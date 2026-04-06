@@ -1,8 +1,10 @@
-import React, { FC, useEffect, useState } from "react";
-import { useTime } from "../../../hooks";
-import { Props, defaultData } from "./types";
 import "./BinaryTime.sass";
+
 import { toZonedTime } from "date-fns-tz";
+import { FC, useEffect, useState } from "react";
+
+import { useTime } from "../../../hooks";
+import { defaultData, Props } from "./types";
 
 interface PipProps {
   isOn: boolean;

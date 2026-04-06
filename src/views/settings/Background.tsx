@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import type { FC } from "react";
+import { useMemo } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { setBackground } from "../../db/action";
 import { BackgroundDisplay, BackgroundPosition, db } from "../../db/state";
 import { useKey } from "../../lib/db/react";
-import { backgroundConfigs, getConfig } from "../../plugins";
 import { sectionMessages } from "../../locales/messages";
+import { backgroundConfigs, getConfig } from "../../plugins";
 import Plugin from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
 
@@ -21,7 +23,7 @@ const messages = defineMessages({
   },
 });
 
-const Background: React.FC = () => {
+const Background: FC = () => {
   const [data, setData] = useKey(db, "background");
   const intl = useIntl();
   const plugin = getConfig(data.key);
@@ -37,46 +39,6 @@ const Background: React.FC = () => {
   const setBackgroundDisplay = (display: BackgroundDisplay): void => {
     setData({ ...data, display: { ...data.display, ...display } });
   };
-
-  const sanitizeFilename = (filename: string): string => {
-    // Remove illegal characters and trim
-    return filename
-      .replace(/[/\\?%*:|"<>]/g, "-") // Replace illegal chars with dash
-      .replace(/\s+/g, "_") // Replace spaces with underscore
-      .replace(/-+/g, "-") // Replace multiple dashes with single dash
-      .trim();
-  };
-
-  // const handleDownloadWallpaper = async (): Promise<void> => {
-  //   const img = document.querySelector('.picture.fullscreen, .image.fullscreen') as HTMLElement;
-
-  //   if (!img) {
-  //     console.error('No image element found');
-  //     return;
-  //   }
-
-  //   try {
-  //     // Extract URL from background-image CSS property
-  //     const bgImage = img.style.backgroundImage;
-  //     const url = bgImage.replace(/^url\(['"](.+)['"]\)$/, '$1');
-
-  //     // Get the filename from the URL and sanitize it
-  //     const urlParts = new URL(url).pathname.split('/');
-  //     const rawFilename = urlParts[urlParts.length - 1];
-  //     const filename = sanitizeFilename(rawFilename);
-
-  //     console.log('Downloading wallpaper:', url, filename);
-
-  //     // Use browser.downloads API to download the file
-  //     await browser.downloads.download({
-  //       url: url,
-  //       filename: filename,
-  //       saveAs: true // Shows the "Save As" dialog
-  //     });
-  //   } catch (error) {
-  //     console.error('Failed to download wallpaper:', error);
-  //   }
-  // };
 
   return (
     <div>
@@ -113,24 +75,6 @@ const Background: React.FC = () => {
               <Plugin id={data.id} component={plugin.settingsComponent} />
             </div>
           )}
-
-          {/* <button
-            onClick={handleDownloadWallpaper}
-            className="button button--primary"
-            style={{
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}
-          >
-            <Icon icon="feather:download" />
-            <FormattedMessage
-              id="backgrounds.download"
-              defaultMessage="Download Wallpaper"
-              description="Download wallpaper button text"
-            />
-          </button> */}
 
           {plugin.supportsBackdrop && (
             <ToggleSection

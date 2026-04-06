@@ -1,9 +1,10 @@
-import React, { FC } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
-import { Props, defaultData } from "./types";
+import { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
+import { backgroundMessages } from "../../../locales/messages";
 import { DebounceInput } from "../../shared";
 import BaseSettings from "../base/BaseSettings";
-import { backgroundMessages } from "../../../locales/messages";
+import { defaultData, Props } from "./types";
 
 const messages = defineMessages({
   searchPlaceholder: {
@@ -90,13 +91,24 @@ const GiphySettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.nsfw}
-          onChange={() => setData({ ...data, nsfw: !data.nsfw })}
+          onChange={(event) => setData({ ...data, nsfw: event.target.checked })}
         />{" "}
         <FormattedMessage
           id="backgrounds.giphy.nsfw"
           defaultMessage="Include NSFW content"
           description="Label for Giphy NSFW toggle"
         />
+      </label>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={data.showControls}
+          onChange={(event) =>
+            setData({ ...data, showControls: event.target.checked })
+          }
+        />{" "}
+        <FormattedMessage {...backgroundMessages.showControls} />
       </label>
     </div>
   );

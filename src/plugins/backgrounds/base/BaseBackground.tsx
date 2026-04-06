@@ -1,13 +1,21 @@
-import React from "react";
-import { Icon } from "@iconify/react";
-import { CrossFade } from "react-crossfade-simple";
-import { db } from "../../../db/state";
-import { useValue } from "../../../lib/db/react";
-import { useIsNight } from "../../../hooks";
 import "./BaseBackground.sass";
 
+import { Icon } from "@iconify/react";
+import {
+  type CSSProperties,
+  type FC,
+  Fragment,
+  memo,
+  type ReactNode,
+} from "react";
+import { CrossFade } from "react-crossfade-simple";
+
+import { db } from "../../../db/state";
+import { useIsNight } from "../../../hooks";
+import { useValue } from "../../../lib/db/react";
+
 interface CreditLink {
-  label: React.ReactNode;
+  label: ReactNode;
   url?: string;
 }
 
@@ -19,13 +27,14 @@ interface Props {
   onPrev?: (() => void) | null;
   onNext?: (() => void) | null;
   showControls?: boolean;
+  controlsOnHover?: boolean;
   showInfo?: boolean;
   leftInfo?: CreditLink[];
   rightInfo?: CreditLink | null;
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
-const BaseBackground: React.FC<Props> = ({
+const BaseBackground: FC<Props> = ({
   containerClassName = "Unsplash fullscreen",
   url,
   paused = false,
@@ -33,6 +42,7 @@ const BaseBackground: React.FC<Props> = ({
   onPrev = null,
   onNext = null,
   showControls = true,
+  controlsOnHover = false,
   showInfo = true,
   leftInfo = [],
   rightInfo = null,
@@ -50,7 +60,7 @@ const BaseBackground: React.FC<Props> = ({
   } = background.display;
   const isNight = useIsNight();
 
-  const backdropStyle: React.CSSProperties = {};
+  const backdropStyle: CSSProperties = {};
 
   if (blur && !focus) {
     backdropStyle.filter = `blur(${blur}px)`;
@@ -99,7 +109,7 @@ const BaseBackground: React.FC<Props> = ({
         <div className="left-info">
           {showInfo &&
             leftInfo.map((info, index) => (
-              <React.Fragment key={index}>
+              <Fragment key={index}>
                 {index > 0 && ", "}
                 {info.url ? (
                   <a href={info.url} rel="noopener noreferrer">
@@ -108,12 +118,12 @@ const BaseBackground: React.FC<Props> = ({
                 ) : (
                   <span>{info.label}</span>
                 )}
-              </React.Fragment>
+              </Fragment>
             ))}
         </div>
 
         {showControls && (
-          <div className="controls">
+          <div className={`controls ${controlsOnHover ? "is-on-hover" : ""}`}>
             <a className={onPrev ? "" : "hidden"} onClick={onPrev ?? undefined}>
               <Icon icon="feather:arrow-left" />
             </a>{" "}
@@ -144,4 +154,4 @@ const BaseBackground: React.FC<Props> = ({
   );
 };
 
-export default React.memo(BaseBackground);
+export default memo(BaseBackground);

@@ -1,14 +1,15 @@
-import React from "react";
-import { useToggle } from "../../hooks";
+import type { FC, ReactNode } from "react";
 import { useIntl } from "react-intl";
+
+import { useToggle } from "../../hooks";
 import { sectionMessages } from "../../locales/messages";
 
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
   name: string;
 };
 
-const ToggleSection: React.FC<Props> = ({ name, children }) => {
+const ToggleSection: FC<Props> = ({ name, children }) => {
   const [isOpen, toggleOpen] = useToggle();
   const intl = useIntl();
 

@@ -1,9 +1,11 @@
-import React, { FC, useState, useMemo } from "react";
+import "./Palette.sass";
+
+import { FC, useMemo, useState } from "react";
+
 import { useCachedEffect } from "../../../hooks";
 import { getRandomColorPalette } from "./api";
-import { Props, defaultData } from "./types";
 import Color from "./Color";
-import "./Palette.sass";
+import { defaultData, Props } from "./types";
 
 const Palette: FC<Props> = ({
   cache,

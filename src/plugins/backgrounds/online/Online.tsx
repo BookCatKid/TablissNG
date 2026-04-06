@@ -1,8 +1,9 @@
-import React from "react";
+import { type FC } from "react";
+
 import BaseBackground from "../base/BaseBackground";
 import { defaultData, Props } from "./types";
 
-const Online: React.FC<Props> = ({ data = defaultData }) => {
+const Online: FC<Props> = ({ data = defaultData }) => {
   return (
     <BaseBackground
       containerClassName="Online fullscreen"

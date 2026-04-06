@@ -1,9 +1,10 @@
-import React from "react";
+import { type FC, useEffect } from "react";
 import { FormattedMessage } from "react-intl";
-import { buildLink, fetchImages } from "./api";
-import { defaultData, Image as UnsplashImage, Props } from "./types";
+
 import { useBackgroundRotation } from "../../../hooks";
 import BaseBackground from "../base/BaseBackground";
+import { buildLink, fetchImages } from "./api";
+import { defaultData, Image as UnsplashImage, Props } from "./types";
 
 const UTM = "?utm_source=Start&utm_medium=referral&utm_campaign=api-credit";
 
@@ -17,7 +18,7 @@ const getLocationUrl = (location: string, source: string) => {
   return urls[source as keyof typeof urls] || "#";
 };
 
-const Unsplash: React.FC<Props> = ({
+const Unsplash: FC<Props> = ({
   cache,
   data = defaultData,
   loader,
@@ -31,7 +32,7 @@ const Unsplash: React.FC<Props> = ({
   }
 
   // Migrate old pause setting
-  React.useEffect(() => {
+  useEffect(() => {
     if (data.timeout === Number.MAX_SAFE_INTEGER) {
       setData({
         ...data,
@@ -97,6 +98,8 @@ const Unsplash: React.FC<Props> = ({
     <BaseBackground
       containerClassName="Unsplash fullscreen"
       url={url}
+      showControls={true}
+      controlsOnHover={!data.showControls}
       showInfo={data.showTitle}
       leftInfo={credits}
       rightInfo={location}

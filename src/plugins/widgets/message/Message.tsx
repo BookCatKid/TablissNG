@@ -1,6 +1,6 @@
-import React, { FC } from "react";
+import { FC } from "react";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const Message: FC<Props> = ({ data = defaultData }) => (
   <div className="Message">

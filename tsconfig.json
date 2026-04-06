@@ -1,17 +1,23 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
-    "jsx": "react",
-    "lib": ["esnext", "dom"],
+    "target": "es2020",
+    "lib": ["esnext", "dom", "dom.iterable"],
     "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "sourceMap": true,
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "strict": true,
-    "target": "es2017",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "incremental": true,
     "types": ["jest", "react", "react-dom", "webextension-polyfill"],
     "typeRoots": ["node_modules/@types", "src/@types"],
-    "incremental": true
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src"],
   "exclude": ["**/*.test"]

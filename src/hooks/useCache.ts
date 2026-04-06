@@ -1,7 +1,8 @@
 import { EffectCallback, useEffect, useMemo, useRef } from "react";
+
 import { Cache } from "../plugins";
-import { useTime } from "./useTime";
 import { wrap } from "../utils";
+import { useTime } from "./useTime";
 
 /**
  * A cached effect that automatically reruns after the expires time or on deps change.

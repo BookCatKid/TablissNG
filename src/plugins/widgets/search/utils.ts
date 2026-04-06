@@ -1,7 +1,8 @@
 import tlds from "tlds";
+
+import { isSpecialUrl } from "../../../utils";
 import { engines } from "./engines";
 import { SEARCH_ENGINE_CUSTOM } from "./types";
-import { isSpecialUrl } from "../../../utils";
 
 // TODO: Add unit tests
 export function buildUrl(query: string, engineUrl: string) {

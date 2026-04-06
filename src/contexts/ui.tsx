@@ -1,4 +1,10 @@
-import React from "react";
+import {
+  createContext,
+  type FC,
+  type PropsWithChildren,
+  useMemo,
+  useState,
+} from "react";
 
 type UiState = {
   errors: boolean;
@@ -13,16 +19,16 @@ type UiContext = UiState & {
   toggleSettings: () => void;
 };
 
-export const UiContext = React.createContext({} as unknown as UiContext);
+export const UiContext = createContext({} as unknown as UiContext);
 
-const UiProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [state, setState] = React.useState<UiState>({
+const UiProvider: FC<PropsWithChildren> = ({ children }) => {
+  const [state, setState] = useState<UiState>({
     errors: false,
     pending: 0,
     settings: false,
   });
 
-  const methods = React.useMemo(
+  const methods = useMemo(
     () => ({
       pushLoader: () =>
         setState((state) => ({ ...state, pending: state.pending + 1 })),

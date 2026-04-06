@@ -1,8 +1,10 @@
-import React, { FC, useEffect } from "react";
-import { useTime } from "../../../hooks";
-import { getTimeCode, getQuoteByTimeCode } from "./api";
-import { Props, defaultData } from "./types";
 import "./LiteratureClock.sass";
+
+import { FC, useEffect } from "react";
+
+import { useTime } from "../../../hooks";
+import { getQuoteByTimeCode, getTimeCode } from "./api";
+import { defaultData, Props } from "./types";
 
 const LiteratureClock: FC<Props> = ({
   cache,

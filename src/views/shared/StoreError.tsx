@@ -1,12 +1,13 @@
-import React from "react";
-import Modal from "./modal/Modal";
+import type { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
+import Modal from "./modal/Modal";
 
 type Props = {
   onClose: () => void;
 };
 
-const StoreError: React.FC<Props> = ({ onClose }) => {
+const StoreError: FC<Props> = ({ onClose }) => {
   return (
     <Modal onClose={onClose}>
       <div className="Settings">

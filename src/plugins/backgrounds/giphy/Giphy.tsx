@@ -1,11 +1,12 @@
-import React from "react";
+import { type FC } from "react";
+
 import { useBackgroundRotation } from "../../../hooks";
 import BaseBackground from "../base/BaseBackground";
 import { getGifs } from "./api";
 import giphyLogo from "./giphy-logo.png";
 import { defaultData, Props } from "./types";
 
-const Giphy: React.FC<Props> = ({
+const Giphy: FC<Props> = ({
   cache,
   data = defaultData,
   setCache,
@@ -42,6 +43,8 @@ const Giphy: React.FC<Props> = ({
       onPause={handlePause}
       onPrev={go(-1)}
       onNext={go(1)}
+      showControls={true}
+      controlsOnHover={!data.showControls}
       showInfo={true}
       leftInfo={leftInfo}
     />

@@ -1,7 +1,9 @@
-import React, { FC, useEffect, useState } from "react";
-import { Props, defaultCache, defaultData } from "./types";
-import Display from "../links/Display";
 import "./TopSites.sass";
+
+import { FC, useEffect, useState } from "react";
+
+import { Display } from "../links/Display";
+import { defaultCache, defaultData, Props } from "./types";
 
 export const truncateText = (text: string, maxLength: number): string => {
   if (maxLength === 0 || text.length <= maxLength) return text;
@@ -102,5 +104,3 @@ export const TopSites: FC<Props> = ({
     </div>
   );
 };
-
-export default TopSites;

@@ -1,5 +1,7 @@
-import React, { FC } from "react";
 import "./Suggestions.sass";
+
+import { FC } from "react";
+
 import type { WikipediaSuggestionResult } from "./getSuggestions";
 
 type Props = {

@@ -1,11 +1,12 @@
-import React, { FC } from "react";
 import { Icon } from "@iconify/react";
+import type { ChangeEvent, FC } from "react";
 import { FormattedMessage } from "react-intl";
-import { Props, defaultData } from "./types";
+
 import { timingMessages } from "../../../locales/messages";
+import { defaultData, Props } from "./types";
 
 const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
-  const handleTimeoutChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimeoutChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = Number(event.target.value);
     setData({ ...data, timeout: value === -1 ? data.timeout : value });
   };

@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Time from "./Time";
 import TimeSettings from "./TimeSettings";
 

@@ -1,10 +1,11 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { db, FaviconMode } from "../../db/state";
-import { useKey } from "../../lib/db/react";
-import TimeZoneInput from "../shared/timeZone/TimeZoneInput";
 import { useSystemTheme } from "../../hooks";
+import { useKey } from "../../lib/db/react";
 import { Icon, IconButton } from "../shared";
+import TimeZoneInput from "../shared/timeZone/TimeZoneInput";
 
 const messages = defineMessages({
   faviconErrorSize: {
@@ -36,7 +37,7 @@ const positions = [
   },
 ] as const;
 
-const System: React.FC = () => {
+const System: FC = () => {
   const intl = useIntl();
   const [locale, setLocale] = useKey(db, "locale");
   const [timeZone, setTimeZone] = useKey(db, "timeZone");

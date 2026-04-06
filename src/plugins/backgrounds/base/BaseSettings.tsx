@@ -1,6 +1,7 @@
-import React from "react";
 import { Icon } from "@iconify/react";
+import { type ChangeEvent, type ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { timingMessages } from "../../../locales/messages";
 
 export interface BaseSettingsData {
@@ -11,7 +12,7 @@ export interface BaseSettingsData {
 interface Props<T extends BaseSettingsData> {
   data: T;
   setData: (data: T) => void;
-  title?: React.ReactNode;
+  title?: ReactNode;
 }
 
 const knownIntervals = [0, 300, 900, 3600, 86400, 604800];
@@ -26,7 +27,7 @@ const BaseSettings = <T extends BaseSettingsData>({
       ? data.timeout
       : -1;
 
-  const handleTimeoutChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimeoutChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = Number(event.target.value);
     setData({ ...data, timeout: value === -1 ? data.timeout : value });
   };

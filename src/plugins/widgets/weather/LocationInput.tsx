@@ -1,9 +1,11 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
-import { useToggle } from "../../../hooks";
-import { Icon } from "@iconify/react";
-import { geocodeLocation, requestLocation } from "./api";
 import "./LocationInput.sass";
+
+import { Icon } from "@iconify/react";
+import { type FC, type FormEvent, useState } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
+import { useToggle } from "../../../hooks";
+import { geocodeLocation, requestLocation } from "./api";
 import { Coordinates } from "./types";
 
 const messages = defineMessages({
@@ -50,11 +52,11 @@ type Props = {
   onChange: (location: Coordinates & { name?: string }) => void;
 };
 
-const GeocodeInput: React.FC<Props> = ({ onChange }) => {
-  const [query, setQuery] = React.useState("");
+const GeocodeInput: FC<Props> = ({ onChange }) => {
+  const [query, setQuery] = useState("");
   const intl = useIntl();
 
-  const handleGeocode = (event: React.FormEvent) => {
+  const handleGeocode = (event: FormEvent) => {
     event.preventDefault();
     geocodeLocation(query)
       .then((coords) => onChange({ ...coords, name: query }))
@@ -90,11 +92,7 @@ const GeocodeInput: React.FC<Props> = ({ onChange }) => {
 
 const geolocationAvailable = "geolocation" in navigator;
 
-const CoordinateInput: React.FC<Props> = ({
-  latitude,
-  longitude,
-  onChange,
-}) => {
+const CoordinateInput: FC<Props> = ({ latitude, longitude, onChange }) => {
   const intl = useIntl();
 
   const handleLocate = () => {
@@ -162,7 +160,7 @@ const CoordinateInput: React.FC<Props> = ({
   );
 };
 
-const LocationInput: React.FC<Props> = ({ onChange, ...props }) => {
+const LocationInput: FC<Props> = ({ onChange, ...props }) => {
   const hasCoordinates = props.longitude && props.latitude;
   const [lookUp, toggleLookUp] = useToggle(!hasCoordinates);
 

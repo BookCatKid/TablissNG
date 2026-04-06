@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import WorkHours from "./WorkHours";
 import WorkHoursSettings from "./WorkHoursSettings";
 

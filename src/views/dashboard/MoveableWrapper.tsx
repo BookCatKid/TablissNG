@@ -1,8 +1,8 @@
-import React from "react";
+import { type FC, type RefObject, useEffect, useRef, useState } from "react";
 import Moveable from "react-moveable";
 
 interface MoveableWrapperProps {
-  targetRef: React.RefObject<HTMLDivElement | null>;
+  targetRef: RefObject<HTMLDivElement | null>;
   isEditing: boolean;
   scale: number;
   rotation: number;
@@ -18,7 +18,7 @@ interface MoveableWrapperProps {
   }) => void;
 }
 
-const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
+const MoveableWrapper: FC<MoveableWrapperProps> = ({
   targetRef,
   isEditing,
   scale,
@@ -27,17 +27,17 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   y,
   onTransformEnd,
 }) => {
-  const moveableRef = React.useRef<Moveable>(null);
+  const moveableRef = useRef<Moveable>(null);
 
   // Track cumulative transform during interactions
-  const frameRef = React.useRef({
+  const frameRef = useRef({
     translate: [0, 0] as [number, number],
     rotate: rotation,
     scale: [scale, scale] as [number, number],
   });
 
   // Reset frame when editing starts or base transform changes
-  React.useEffect(() => {
+  useEffect(() => {
     frameRef.current = {
       translate: [0, 0],
       rotate: rotation,
@@ -54,17 +54,15 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   }, [isEditing, rotation, scale, x, y, targetRef]);
 
   // State for screen guidelines to allow snapping to edges/center
-  const [guidelines, setGuidelines] = React.useState({
+  const [guidelines, setGuidelines] = useState({
     vertical: [0, Math.round(window.innerWidth / 2), window.innerWidth],
     horizontal: [0, Math.round(window.innerHeight / 2), window.innerHeight],
   });
-  const [elementGuidelines, setElementGuidelines] = React.useState<Element[]>(
-    [],
-  );
-  const [isShiftPressed, setIsShiftPressed] = React.useState(false);
+  const [elementGuidelines, setElementGuidelines] = useState<Element[]>([]);
+  const [isShiftPressed, setIsShiftPressed] = useState(false);
 
   // Handle keys for interaction modifiers
-  React.useEffect(() => {
+  useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Shift") {
         setIsShiftPressed(e.type === "keydown");
@@ -79,7 +77,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   }, []);
 
   // Update guidelines on resize
-  React.useEffect(() => {
+  useEffect(() => {
     const handleResize = () => {
       setGuidelines({
         vertical: [0, Math.round(window.innerWidth / 2), window.innerWidth],
@@ -98,7 +96,7 @@ const MoveableWrapper: React.FC<MoveableWrapperProps> = ({
   }, [targetRef, isEditing]);
 
   // Handle keyboard arrows for precise movement
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isEditing) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {

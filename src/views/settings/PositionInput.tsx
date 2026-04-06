@@ -1,8 +1,10 @@
-import React from "react";
+import "./PositionInput.sass";
+
+import type { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { WidgetPosition } from "../../db/state";
 import { Icon, IconButton } from "../shared";
-import "./PositionInput.sass";
 
 const positions = [
   {
@@ -52,7 +54,7 @@ type Props = {
   onChange: (value: WidgetPosition) => void;
 };
 
-const PositionInput: React.FC<Props> = ({ value, onChange }) => (
+const PositionInput: FC<Props> = ({ value, onChange }) => (
   <div className="PositionInput">
     <label>
       <FormattedMessage

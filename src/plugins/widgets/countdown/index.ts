@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Countdown from "./Countdown";
 import CountdownSettings from "./CountdownSettings";
 

@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+
 import { parseLocalDate } from "../../../utils";
 import { Data, Image } from "./types";
 
@@ -50,5 +51,3 @@ export async function getImage(data: Data, loader: any): Promise<Image> {
     loader.pop();
   }
 }
-
-export default getImage;

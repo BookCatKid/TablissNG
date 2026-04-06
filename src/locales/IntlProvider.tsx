@@ -1,10 +1,11 @@
-import React from "react";
+import { type FC, type PropsWithChildren } from "react";
 import { IntlProvider as ReactIntlProvider } from "react-intl";
+
 import { db } from "../db/state";
 import { useValue } from "../lib/db/react";
 import { messages } from "./locales";
 
-const IntlProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+const IntlProvider: FC<PropsWithChildren> = ({ children }) => {
   const locale = useValue(db, "locale");
 
   return (

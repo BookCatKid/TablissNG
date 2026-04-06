@@ -1,9 +1,10 @@
 import { subDays } from "date-fns";
-import React from "react";
+import type { FC } from "react";
+
 import { useTime } from "../../../hooks";
 import { defaultData, Props } from "./types";
 
-const WorkHours: React.FC<Props> = ({ data = defaultData }) => {
+const WorkHours: FC<Props> = ({ data = defaultData }) => {
   let start = buildDateTime(data.startTime);
   const end = buildDateTime(data.endTime);
   const time = useTime();

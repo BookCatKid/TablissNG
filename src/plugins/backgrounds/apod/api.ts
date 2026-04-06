@@ -1,7 +1,8 @@
-import { API } from "../../types";
-import { Image, Data } from "./types";
 import { format } from "date-fns";
+
 import { parseLocalDate } from "../../../utils";
+import { API } from "../../types";
+import { Data, Image } from "./types";
 
 type Config = Data;
 

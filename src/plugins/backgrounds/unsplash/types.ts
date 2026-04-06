@@ -13,6 +13,7 @@ export interface Data {
   timeout: number;
   locationSource: string;
   showTitle: boolean;
+  showControls: boolean;
 }
 
 export interface Image {
@@ -39,4 +40,5 @@ export const defaultData: Data = {
   timeout: 900,
   locationSource: "google-maps",
   showTitle: true,
+  showControls: true,
 };

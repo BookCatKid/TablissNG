@@ -6,8 +6,9 @@
  * @url http://jenevoldsen.com/literature-clock/
  * @url https://github.com/JohannesNE/literature-clock
  */
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import LiteratureClock from "./LiteratureClock";
 import LiteratureClockSettings from "./LiteratureClockSettings";
 

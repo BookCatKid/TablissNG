@@ -1,8 +1,9 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { WidgetDisplay as WidgetDisplayType } from "../../db/state";
-import PositionInput from "./PositionInput";
 import { pluginMessages } from "../../locales/messages";
+import PositionInput from "./PositionInput";
 
 type Props = {
   display: WidgetDisplayType;
@@ -22,7 +23,7 @@ const messages = defineMessages({
   },
 });
 
-const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
+const WidgetDisplay: FC<Props> = ({ display, onChange }) => {
   const intl = useIntl();
 
   return (

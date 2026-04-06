@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Board, Data, TrelloSession } from "../types";
-import { getBoards } from "../utils/api";
+
 import useAuth from "../../../../hooks/useAuth";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
+import { Board, Data, TrelloSession } from "../types";
+import { getBoards } from "../utils/api";
 
 export default function useBoards(data: Data, setData: (data: Data) => void) {
   const { authStatus, getSession } = useAuth<TrelloSession>(

@@ -1,16 +1,17 @@
-import React from "react";
+import { type FC, useContext, useEffect, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
+
 import { usePushError } from "../api";
 import { UiContext } from "../contexts/ui";
 import { migrate } from "../db/migrate";
-import { cacheStorage, dbStorage, db } from "../db/state";
+import { cacheStorage, db, dbStorage } from "../db/state";
+import { useFavicon, useSystemTheme } from "../hooks";
 import { Stream } from "../lib";
 import { useValue } from "../lib/db/react";
 import Dashboard from "./dashboard";
 import { Settings } from "./settings";
 import Errors from "./shared/Errors";
 import StoreError from "./shared/StoreError";
-import { useSystemTheme, useFavicon } from "../hooks";
 
 function setHighlighting() {
   const checked = db.cache.get("highlightingEnabled");
@@ -32,28 +33,28 @@ const messages = defineMessages({
   },
 });
 
-const Root: React.FC = () => {
+const Root: FC = () => {
   // Set page title
   const intl = useIntl();
-  React.useEffect(() => {
+  useEffect(() => {
     document.title = intl.formatMessage(messages.pageTitle);
   }, [intl]);
 
   // Wait for storage to be ready before displaying
-  const [ready, setReady] = React.useState(false);
-  const [error, setError] = React.useState(false);
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState(false);
   const themePreference = useValue(db, "themePreference");
   const systemIsDark = useSystemTheme();
   const accent = useValue(db, "accent");
 
-  React.useEffect(() => {
+  useEffect(() => {
     const isDark =
       themePreference === "system" ? systemIsDark : themePreference === "dark";
     document.body.className = isDark ? "dark" : "";
   }, [themePreference, systemIsDark]);
 
   // Update CSS variable when accent color changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (accent) {
       document.documentElement.style.setProperty("--accent-color", accent);
     }
@@ -70,7 +71,7 @@ const Root: React.FC = () => {
       if (showError) setError(true);
     };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const subscriptions = Promise.all([
       // Config database
       dbStorage
@@ -126,7 +127,7 @@ const Root: React.FC = () => {
     };
   }, []);
 
-  const { errors, settings, toggleErrors } = React.useContext(UiContext);
+  const { errors, settings, toggleErrors } = useContext(UiContext);
 
   return (
     <>

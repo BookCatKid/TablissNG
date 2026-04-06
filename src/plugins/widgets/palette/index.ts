@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Palette from "./Palette";
 import PaletteSettings from "./PaletteSettings";
 

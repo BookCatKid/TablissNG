@@ -1,4 +1,14 @@
-import React, { ChangeEvent, FC } from "react";
+import { ChangeEvent, FC } from "react";
+import { FormattedMessage } from "react-intl";
+
+import useAuth from "../../../hooks/useAuth";
+import { useFreshReducer } from "../../../hooks/useFreshReducer";
+import Button from "../../../views/shared/Button";
+import { Spinner } from "../../shared";
+import { cacheReducer } from "./cacheReducer";
+import useBoards from "./hooks/useBoards";
+import useLists from "./hooks/useLists";
+import { trelloAuthStore } from "./stores/trelloAuthStore";
 import {
   BoardPreference,
   defaultCache,
@@ -6,18 +16,9 @@ import {
   Props,
   TrelloSession,
 } from "./types";
-import { cacheReducer } from "./cacheReducer";
-import { useFreshReducer } from "../../../hooks/useFreshReducer";
-import Button from "../../../views/shared/Button";
-import { FormattedMessage } from "react-intl";
 import { Board, List } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
-import { Spinner } from "../../shared";
-import useAuth from "../../../hooks/useAuth";
-import { trelloAuthStore } from "./stores/trelloAuthStore";
-import useBoards from "./hooks/useBoards";
-import useLists from "./hooks/useLists";
-import { trelloAuthFlow, onTrelloSignOut } from "./utils/auth";
+import { onTrelloSignOut, trelloAuthFlow } from "./utils/auth";
 
 const TrelloSettings: FC<Props> = ({
   data = defaultData,

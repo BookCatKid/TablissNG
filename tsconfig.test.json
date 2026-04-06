@@ -3,8 +3,10 @@
   "compilerOptions": {
     "incremental": true,
     "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "dist/test",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noEmit": false
   },
   "exclude": []
 }

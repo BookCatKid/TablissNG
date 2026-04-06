@@ -1,13 +1,15 @@
-import React from "react";
+import "./Dashboard.sass";
+
+import { type FC, memo } from "react";
+
+import { db } from "../../db/state";
 import { useTheme } from "../../hooks";
 import { useKey } from "../../lib/db/react";
-import { db } from "../../db/state";
 import Background from "./Background";
-import "./Dashboard.sass";
 import Overlay from "./Overlay";
 import Widgets from "./Widgets";
 
-const Dashboard: React.FC = () => {
+const Dashboard: FC = () => {
   const { isDark } = useTheme();
   const theme = isDark ? "dark" : "";
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
@@ -21,4 +23,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default React.memo(Dashboard);
+export default memo(Dashboard);

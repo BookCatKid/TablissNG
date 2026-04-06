@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+
 import { engines } from "./engines";
-import { Props, defaultData, SEARCH_ENGINE_CUSTOM, SearchStyle } from "./types";
 import { messages } from "./Search";
+import { defaultData, Props, SEARCH_ENGINE_CUSTOM, SearchStyle } from "./types";
 
 const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();

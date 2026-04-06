@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Nba from "./Nba";
 import NbaSettings from "./NbaSettings";
 

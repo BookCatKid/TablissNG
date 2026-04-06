@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Bookmarks from "./Bookmarks";
 import BookmarksSettings from "./BookmarksSettings";
 

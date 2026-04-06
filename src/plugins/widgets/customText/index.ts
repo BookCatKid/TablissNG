@@ -1,5 +1,6 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import CustomText from "./CustomText";
 import CustomTextSettings from "./CustomTextSettings";
 

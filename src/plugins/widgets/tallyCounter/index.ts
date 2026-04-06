@@ -1,7 +1,7 @@
 import { Config } from "../../types";
+import { messages } from "./messages";
 import TallyCounter from "./TallyCounter";
 import TallyCounterSettings from "./TallyCounterSettings";
-import { messages } from "./messages";
 
 const config: Config = {
   key: "widget/tallyCounter",

@@ -1,12 +1,14 @@
-import React from "react";
-import { Icon } from "@iconify/react";
-import { FormattedMessage, useIntl } from "react-intl";
-import { API } from "../../types";
-import { Data, defaultData } from "./types";
-import { messages } from "./messages";
 import "./TallyCounter.sass";
 
-const TallyCounter: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
+import { Icon } from "@iconify/react";
+import type { FC } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
+import { API } from "../../types";
+import { messages } from "./messages";
+import { Data, defaultData } from "./types";
+
+const TallyCounter: FC<API<Data>> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
 
   const increment = () => {

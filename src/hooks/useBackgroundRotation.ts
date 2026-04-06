@@ -1,7 +1,8 @@
-import React from "react";
-import { RotatingCache, useRotatingCache } from "./useCache";
+import { useCallback, useEffect } from "react";
+
 import { Cache, Loader } from "../plugins/types";
 import { wrap } from "../utils";
+import { RotatingCache, useRotatingCache } from "./useCache";
 
 type RotationData = { paused?: boolean; timeout?: number };
 
@@ -36,7 +37,7 @@ export function useBackgroundRotation<
   const item = useRotatingCache<T>(fetch, cacheObj, timeout, deps);
 
   // Preload next item when available
-  React.useEffect(() => {
+  useEffect(() => {
     const cache = cacheObj.cache;
     if (!cache || !buildUrl || !loader) return;
     const next = cache.items[cache.cursor + 1];
@@ -56,7 +57,7 @@ export function useBackgroundRotation<
     }
   }, [cacheObj.cache]);
 
-  const go = React.useCallback(
+  const go = useCallback(
     (amount: number) => {
       const cache = cacheObj.cache;
       if (!cache || cache.items.length === 0) return null;
@@ -74,12 +75,10 @@ export function useBackgroundRotation<
     [cacheObj],
   );
 
-  const handlePause = React.useCallback(() => {
+  const handlePause = useCallback(() => {
     if (!setData || !data) return;
     setData({ ...data, paused: !data.paused });
   }, [setData, data]);
 
   return { item, go, handlePause };
 }
-
-export default useBackgroundRotation;

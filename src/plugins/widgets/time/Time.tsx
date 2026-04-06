@@ -1,11 +1,13 @@
-import React, { FC, useRef } from "react";
+import "./Time.sass";
+
+import { toZonedTime } from "date-fns-tz";
+import { FC, useRef } from "react";
 import { FormattedDate } from "react-intl";
+
 import { useTime } from "../../../hooks";
 import Analogue from "./Analogue";
 import Digital from "./Digital";
-import { Props, defaultData } from "./types";
-import "./Time.sass";
-import { toZonedTime } from "date-fns-tz";
+import { defaultData, Props } from "./types";
 
 const Time: FC<Props> = ({ data = defaultData }) => {
   const {

@@ -1,19 +1,17 @@
-import React from "react";
+import { type FC, type HTMLAttributes, useLayoutEffect, useRef } from "react";
+
 import { useKeyPress } from "../../../hooks";
 
-interface Props extends Omit<
-  React.HTMLAttributes<HTMLSpanElement>,
-  "onChange"
-> {
+interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, "onChange"> {
   onChange: (value: string) => void;
   value: string;
   onBlur?: () => void;
 }
 
-const Input: React.FC<Props> = ({ onChange, value, onBlur, ...props }) => {
-  const span = React.useRef<HTMLSpanElement>(null);
+const Input: FC<Props> = ({ onChange, value, onBlur, ...props }) => {
+  const span = useRef<HTMLSpanElement>(null);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (span.current) {
       span.current.innerText = value;
       span.current.focus();

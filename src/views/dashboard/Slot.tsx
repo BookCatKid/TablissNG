@@ -1,8 +1,10 @@
-import React from "react";
+import "./Slot.sass";
+
+import type { FC } from "react";
+
 import { WidgetPosition, WidgetState } from "../../db/state";
 import { getConfig } from "../../plugins";
 import Plugin from "../shared/Plugin";
-import "./Slot.sass";
 import Widget from "./Widget";
 
 type Props = {
@@ -10,7 +12,7 @@ type Props = {
   widgets: WidgetState[];
 };
 
-const Slot: React.FC<Props> = ({ position, widgets }) => (
+const Slot: FC<Props> = ({ position, widgets }) => (
   <div className={`Slot ${position}`}>
     {widgets.map(({ display, id, key }) => (
       <Widget key={id} id={id} {...display}>

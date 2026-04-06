@@ -1,9 +1,10 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import { Icon } from "@iconify/react";
+import { type FC, useContext, useState } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { ErrorContext } from "../../contexts/error";
 import { formatErrorLog } from "../../errorHandler";
 import Modal from "./modal/Modal";
-import { Icon } from "@iconify/react";
 
 const messages = defineMessages({
   copyErrorLog: {
@@ -27,11 +28,11 @@ type Props = {
   onClose: () => void;
 };
 
-const Errors: React.FC<Props> = ({ onClose }) => {
-  const { errors } = React.useContext(ErrorContext);
+const Errors: FC<Props> = ({ onClose }) => {
+  const { errors } = useContext(ErrorContext);
   const intl = useIntl();
-  const [copied, setCopied] = React.useState(false);
-  const [copyFailed, setCopyFailed] = React.useState(false);
+  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
 
   const handleCopy = () => {
     if (!navigator.clipboard?.writeText) {

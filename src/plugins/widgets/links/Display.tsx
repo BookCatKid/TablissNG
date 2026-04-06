@@ -1,17 +1,9 @@
-import React, { FC, useMemo } from "react";
-import { defineMessages, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
-import { Link, Cache } from "./types";
-import { isSpecialUrl, normalizeUrl } from "../../../utils";
+import { type FC, type MouseEvent, useMemo } from "react";
+import { defineMessages, useIntl } from "react-intl";
 
-const displayUrl = (url: string): string => {
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname + (parsed.pathname !== "/" ? parsed.pathname : "");
-  } catch (e) {
-    return url;
-  }
-};
+import { isSpecialUrl, normalizeUrl } from "../../../utils";
+import { Cache, Link } from "./types";
 
 const getDomain = (url: string): string | null => {
   try {
@@ -98,7 +90,7 @@ export const Display: FC<Props> = ({
     [SvgString, customWidth, customHeight],
   );
 
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = async (e: MouseEvent) => {
     if (
       BUILD_TARGET !== "web" &&
       (useExtensionTabs || isSpecialUrl(normalizedUrl))
@@ -225,5 +217,3 @@ export const Display: FC<Props> = ({
     </a>
   );
 };
-
-export default Display;

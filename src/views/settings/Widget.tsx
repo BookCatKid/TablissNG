@@ -1,14 +1,16 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import "./Widget.sass";
+
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { setWidgetDisplay } from "../../db/action";
 import { WidgetState } from "../../db/state";
 import { useToggle } from "../../hooks";
-import { getConfig } from "../../plugins";
 import { sectionMessages } from "../../locales/messages";
+import { getConfig } from "../../plugins";
 import { DownIcon, Icon, IconButton, RemoveIcon, UpIcon } from "../shared";
 import PluginContainer from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
-import "./Widget.sass";
 import WidgetDisplay from "./WidgetDisplay";
 
 // Define messages used in props/attributes
@@ -40,12 +42,6 @@ const messages = defineMessages({
   },
 });
 
-interface Config {
-  name: { id: string; defaultMessage: string };
-  description: { id: string; defaultMessage: string };
-  settingsComponent?: React.ComponentType<any>;
-}
-
 interface Props {
   plugin: WidgetState;
   onMoveUp?: () => void;
@@ -53,12 +49,7 @@ interface Props {
   onRemove: () => void;
 }
 
-const Widget: React.FC<Props> = ({
-  plugin,
-  onMoveDown,
-  onMoveUp,
-  onRemove,
-}) => {
+const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
   const [isOpen, toggleIsOpen] = useToggle(onRemove === undefined);
   const intl = useIntl();
 

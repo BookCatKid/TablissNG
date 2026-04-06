@@ -1,5 +1,6 @@
-import React, { FC } from "react";
 import "./Analogue.sass";
+
+import { FC } from "react";
 
 type Props = {
   showHours: boolean;

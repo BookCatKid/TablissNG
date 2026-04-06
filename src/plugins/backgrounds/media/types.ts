@@ -4,6 +4,7 @@ import { API } from "../../types";
 export type Data = {
   paused?: boolean;
   timeout?: number;
+  showControls: boolean;
 };
 
 export type Cache = RotatingCache<File>;
@@ -20,4 +21,5 @@ export const defaultCache: Cache = {
 export const defaultData: Data = {
   paused: false,
   timeout: 900,
+  showControls: true,
 };

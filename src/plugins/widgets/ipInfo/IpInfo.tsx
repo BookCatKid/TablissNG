@@ -1,22 +1,18 @@
-import React from "react";
+import { type FC, useCallback, useEffect, useRef } from "react";
+
 import { usePushError } from "../../../api";
 import { getIpInfo } from "./api";
 import { defaultData, Props } from "./types";
 
-const IpInfo: React.FC<Props> = ({
-  cache,
-  data = defaultData,
-  setCache,
-  loader,
-}) => {
+const IpInfo: FC<Props> = ({ cache, data = defaultData, setCache, loader }) => {
   const pushError = usePushError();
-  const mounted = React.useRef(false);
+  const mounted = useRef(false);
 
-  const refreshData = React.useCallback(() => {
+  const refreshData = useCallback(() => {
     getIpInfo(loader).then(setCache).catch(pushError);
   }, [loader, setCache, pushError]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!mounted.current) {
       mounted.current = true;
       if (!cache) {

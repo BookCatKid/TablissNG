@@ -1,5 +1,6 @@
-import React, { FC } from "react";
-import { Props, defaultData } from "./types";
+import { FC } from "react";
+
+import { defaultData, Props } from "./types";
 
 const TopSitesSettings: FC<Props> = ({ data = defaultData, setData }) => {
   if (!setData) return null;

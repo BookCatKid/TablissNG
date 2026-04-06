@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import "./Since.sass";
+
+import { FC } from "react";
 import { FormattedRelativeTime } from "react-intl";
 
 import { useTime } from "../../../hooks";
-import { Props, defaultData } from "./types";
-import "./Since.sass";
+import { defaultData, Props } from "./types";
 
 const Since: FC<Props> = ({ data = defaultData }) => {
   const from = useTime().getTime();

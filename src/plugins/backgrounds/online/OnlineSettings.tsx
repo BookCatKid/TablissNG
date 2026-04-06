@@ -1,9 +1,10 @@
-import React from "react";
+import { type FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { DebounceInput } from "../../shared";
 import { defaultData, Props } from "./types";
 
-const OnlineSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
+const OnlineSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="OnlineSettings">
     <label>
       <FormattedMessage
