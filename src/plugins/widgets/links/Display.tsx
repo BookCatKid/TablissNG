@@ -46,6 +46,7 @@ export const Display: FC<Props> = ({
   linkOpenStyle,
   linksNumbered,
   iconifyValue,
+  imageUrl,
   iconCacheKey,
   cache,
   customWidth,
@@ -164,10 +165,10 @@ export const Display: FC<Props> = ({
       }
     }
 
-    if (icon === "_custom_ico" && iconCacheKey && cache?.[iconCacheKey]) {
+    if (icon === "_custom_ico" && imageUrl) {
       return (
         <CustomImage
-          src={cache[iconCacheKey].data}
+          src={imageUrl}
           alt={name}
           width={displayWidth}
           height={displayHeight}

@@ -95,22 +95,15 @@ export function migrateLinks(
       cacheChanged = true;
     }
 
-    // Migrate IconStringIco from Data to Cache
+    // Migrate IconStringIco to imageUrl
     if (
       updatedLink.icon === "_custom_ico" &&
       updatedLink.IconStringIco &&
-      !updatedLink.iconCacheKey
+      !updatedLink.imageUrl
     ) {
-      const cacheKey = `links_ico_${updatedLink.id}`;
-      newCache[cacheKey] = {
-        data: updatedLink.IconStringIco,
-        type: "ico",
-      };
-
-      updatedLink.iconCacheKey = cacheKey;
+      updatedLink.imageUrl = updatedLink.IconStringIco;
       delete updatedLink.IconStringIco;
       linkModified = true;
-      cacheChanged = true;
     }
 
     if (linkModified) {

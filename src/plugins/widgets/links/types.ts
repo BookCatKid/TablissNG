@@ -12,6 +12,7 @@ export type Link = {
   customWidth?: number;
   customHeight?: number;
   iconifyValue?: string;
+  imageUrl?: string; // Custom image URL for _custom_ico
   useExtensionTabs?: boolean;
   iconCacheKey?: string; // Reference to cached icon data
 };

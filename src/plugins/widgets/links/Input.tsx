@@ -75,7 +75,7 @@ const Input: FC<Props> = (props) => {
     props.icon === "_favicon_google" || props.icon === "_favicon_favicone";
   const isCustomIconify = props.icon === "_custom_iconify";
   const isCustomSvg = props.icon === "_custom_svg";
-  const isCustomICON = props.icon === "_custom_ico";
+  const isCustomImageUrl = props.icon === "_custom_ico";
   const isCustomUpload = props.icon === "_custom_upload";
   const isFeather = props.icon === "_feather";
 
@@ -321,9 +321,10 @@ const Input: FC<Props> = (props) => {
           />
           <textarea
             value={
-              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ||
+              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ??
               ""
             }
+            rows={20}
             style={{ resize: "vertical" }}
             onChange={(event) => {
               const value = event.target.value;
@@ -358,7 +359,7 @@ const Input: FC<Props> = (props) => {
         </label>
       )}
 
-      {isCustomICON && (
+      {isCustomImageUrl && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customImageUrlLabel"
@@ -366,22 +367,10 @@ const Input: FC<Props> = (props) => {
           />
           <input
             type="text"
-            value={
-              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ||
-              ""
+            value={props.imageUrl}
+            onChange={(event) =>
+              props.onChange({ imageUrl: event.target.value })
             }
-            onChange={(event) => {
-              const value = event.target.value;
-              const cacheKey = props.iconCacheKey || `icon_ico_${props.id}`;
-              props.setCache({
-                ...(props.cache || {}),
-                [cacheKey]: {
-                  data: value,
-                  type: "ico",
-                },
-              });
-              props.onChange({ iconCacheKey: cacheKey });
-            }}
           />
           <p>
             <FormattedMessage
