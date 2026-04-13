@@ -14,7 +14,7 @@ import {
 } from "../../../views/shared";
 import { IconPickerModal } from "./components/IconPickerModal";
 import { SizeInputs } from "./components/SizeInputs";
-import { Cache, IconCacheItem, Link } from "./types";
+import { Cache, FaviconConfig, IconCacheItem, IconConfig, Link } from "./types";
 
 const messages = defineMessages({
   removeLink: {
@@ -58,26 +58,103 @@ type Props = Link & {
   setCache: (cache: Cache) => void;
 };
 
+type IconSelectValue =
+  | ""
+  | "favicon_google"
+  | "favicon_duckduckgo"
+  | "favicon_favicone"
+  | "iconify"
+  | "custom_svg"
+  | "custom_image_url"
+  | "custom_upload"
+  | "feather";
+
+const getIconSelectValue = (iconConfig?: IconConfig): IconSelectValue => {
+  if (!iconConfig) return "";
+  if (iconConfig.type === "favicon")
+    return `favicon_${iconConfig.provider}` as const;
+  return iconConfig.type;
+};
+
+const getDefaultIconConfig = (
+  value: IconSelectValue,
+): IconConfig | undefined => {
+  switch (value) {
+    case "favicon_google":
+      return { type: "favicon", provider: "google" };
+    case "favicon_duckduckgo":
+      return { type: "favicon", provider: "duckduckgo" };
+    case "favicon_favicone":
+      return { type: "favicon", provider: "favicone" };
+    case "iconify":
+      return { type: "iconify", value: "" };
+    case "custom_svg":
+      return { type: "custom_svg", cacheKey: `icon_svg_${Date.now()}` };
+    case "custom_image_url":
+      return { type: "custom_image_url", url: "" };
+    case "custom_upload":
+      return { type: "custom_upload", cacheKey: "" };
+    case "feather":
+      return { type: "feather", value: "feather:bookmark" };
+    default:
+      return undefined;
+  }
+};
+
 const Input: FC<Props> = (props) => {
   const [urlValue, setUrlValue] = useState(props.url);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const intl = useIntl();
 
+  const iconSelectValue = getIconSelectValue(props.iconConfig);
+  const isFavicon = props.iconConfig?.type === "favicon";
+  const isCustomUpload = props.iconConfig?.type === "custom_upload";
+  const isFeather = props.iconConfig?.type === "feather";
+
+  const removeCacheKey = (
+    cache: Cache | undefined,
+    cacheKey?: string,
+  ): Cache => {
+    if (!cache || !cacheKey || !cache[cacheKey]) return cache || {};
+    const nextCache = { ...cache };
+    delete nextCache[cacheKey];
+    return nextCache;
+  };
+
+  const setIconConfig = (newConfig?: IconConfig) => {
+    const oldConfig = props.iconConfig;
+    const oldKey =
+      oldConfig?.type === "custom_svg" || oldConfig?.type === "custom_upload"
+        ? oldConfig.cacheKey
+        : undefined;
+
+    if (
+      oldKey &&
+      props.cache?.[oldKey] &&
+      oldConfig?.type !== newConfig?.type
+    ) {
+      props.setCache(removeCacheKey(props.cache, oldKey));
+    }
+
+    props.onChange({ iconConfig: newConfig });
+  };
+
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleIconSelect = (iconString: string) => {
-    props.onChange({ iconifyValue: iconString });
+    if (props.iconConfig?.type === "feather") {
+      setIconConfig({
+        ...props.iconConfig,
+        value: iconString,
+      });
+    }
     setIsModalOpen(false);
   };
 
-  const isGoogleOrFavicone =
-    props.icon === "_favicon_google" || props.icon === "_favicon_favicone";
-  const isCustomIconify = props.icon === "_custom_iconify";
-  const isCustomSvg = props.icon === "_custom_svg";
-  const isCustomImageUrl = props.icon === "_custom_ico";
-  const isCustomUpload = props.icon === "_custom_upload";
-  const isFeather = props.icon === "_feather";
+  const handleIconTypeChange = (value: IconSelectValue) => {
+    setIconConfig(getDefaultIconConfig(value));
+  };
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -87,37 +164,26 @@ const Input: FC<Props> = (props) => {
     reader.onload = (e) => {
       const result = e.target?.result;
       if (typeof result === "string") {
-        const cacheKey = `icon_${Date.now()}`;
-
         let iconData: IconCacheItem;
         if (file.type === "image/svg+xml") {
-          iconData = {
-            data: result,
-            type: "svg",
-          };
+          iconData = { data: result, type: "svg" };
         } else if (file.type === "image/x-icon") {
-          iconData = {
-            data: result,
-            type: "ico",
-          };
+          iconData = { data: result, type: "ico" };
         } else {
-          iconData = {
-            data: result,
-            type: "image",
-          };
+          iconData = { data: result, type: "image" };
         }
 
-        // Update cache with new icon data
-        props.setCache({
-          ...(props.cache || {}),
-          [cacheKey]: iconData,
-        });
-
-        // Update link with reference to cached icon
-        props.onChange({
-          icon: "_custom_upload",
-          iconCacheKey: cacheKey,
-        });
+        const oldKey =
+          props.iconConfig?.type === "custom_svg" ||
+          props.iconConfig?.type === "custom_upload"
+            ? props.iconConfig.cacheKey
+            : undefined;
+        const cacheKey = `icon_${Date.now()}`;
+        const baseCache = oldKey
+          ? removeCacheKey(props.cache, oldKey)
+          : props.cache;
+        props.setCache({ ...baseCache, [cacheKey]: iconData });
+        setIconConfig({ type: "custom_upload", cacheKey });
       }
     };
 
@@ -127,6 +193,21 @@ const Input: FC<Props> = (props) => {
       reader.readAsDataURL(file);
     }
   };
+
+  const faviconConfig =
+    props.iconConfig?.type === "favicon" ? props.iconConfig : undefined;
+  const iconifyConfig =
+    props.iconConfig?.type === "iconify" ? props.iconConfig : undefined;
+  const customSvgConfig =
+    props.iconConfig?.type === "custom_svg" ? props.iconConfig : undefined;
+  const customImageUrlConfig =
+    props.iconConfig?.type === "custom_image_url"
+      ? props.iconConfig
+      : undefined;
+  const customSvgValue =
+    (customSvgConfig && props.cache?.[customSvgConfig.cacheKey]?.data) || "";
+  const featherValue =
+    props.iconConfig?.type === "feather" ? props.iconConfig.value : "";
 
   return (
     <div className="LinkInput">
@@ -212,8 +293,10 @@ const Input: FC<Props> = (props) => {
           )
         </span>
         <select
-          value={props.icon}
-          onChange={(event) => props.onChange({ icon: event.target.value })}
+          value={iconSelectValue}
+          onChange={(event) =>
+            handleIconTypeChange(event.target.value as IconSelectValue)
+          }
         >
           <option value="">
             <FormattedMessage
@@ -222,19 +305,19 @@ const Input: FC<Props> = (props) => {
             />
           </option>
           <optgroup label={intl.formatMessage(messages.websiteIcons)}>
-            <option value="_favicon_google">
+            <option value="favicon_google">
               <FormattedMessage
                 id="plugins.links.input.fromGoogle"
                 defaultMessage="From Google"
               />
             </option>
-            <option value="_favicon_duckduckgo">
+            <option value="favicon_duckduckgo">
               <FormattedMessage
                 id="plugins.links.input.fromDuckDuckGo"
                 defaultMessage="From DuckDuckGo"
               />
             </option>
-            <option value="_favicon_favicone">
+            <option value="favicon_favicone">
               <FormattedMessage
                 id="plugins.links.input.fromFavicone"
                 defaultMessage="From Favicone"
@@ -242,25 +325,25 @@ const Input: FC<Props> = (props) => {
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.custom)}>
-            <option value="_custom_iconify">
+            <option value="iconify">
               <FormattedMessage
                 id="plugins.links.input.fromIconify"
                 defaultMessage="From Iconify"
               />
             </option>
-            <option value="_custom_svg">
+            <option value="custom_svg">
               <FormattedMessage
                 id="plugins.links.input.customSvgHtml"
                 defaultMessage="Custom SVG HTML"
               />
             </option>
-            <option value="_custom_ico">
+            <option value="custom_image_url">
               <FormattedMessage
                 id="plugins.links.input.customImageUrl"
                 defaultMessage="Custom Image URL"
               />
             </option>
-            <option value="_custom_upload">
+            <option value="custom_upload">
               <FormattedMessage
                 id="plugins.links.input.uploadCustomIcon"
                 defaultMessage="Upload Custom Icon"
@@ -268,7 +351,7 @@ const Input: FC<Props> = (props) => {
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
-            <option value="_feather">
+            <option value="feather">
               <FormattedMessage
                 id="plugins.links.input.feather"
                 defaultMessage="Feather"
@@ -278,7 +361,7 @@ const Input: FC<Props> = (props) => {
         </select>
       </label>
 
-      {isCustomIconify && (
+      {iconifyConfig && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customIconifyIdentifier"
@@ -286,10 +369,11 @@ const Input: FC<Props> = (props) => {
           />
           <input
             type="text"
-            value={props.iconifyValue || ""}
+            value={iconifyConfig.value}
             onChange={(event) =>
-              props.onChange({
-                iconifyValue: event.target.value,
+              setIconConfig({
+                ...iconifyConfig,
+                value: event.target.value,
               })
             }
           />
@@ -313,30 +397,25 @@ const Input: FC<Props> = (props) => {
         </label>
       )}
 
-      {isCustomSvg && (
+      {customSvgConfig && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customSvgHtmlLabel"
             defaultMessage="Custom SVG HTML"
           />
           <textarea
-            value={
-              (props.iconCacheKey && props.cache?.[props.iconCacheKey]?.data) ??
-              ""
-            }
+            value={customSvgValue}
             rows={20}
             style={{ resize: "vertical" }}
             onChange={(event) => {
               const value = event.target.value;
-              const cacheKey = props.iconCacheKey || `icon_svg_${props.id}`;
               props.setCache({
                 ...(props.cache || {}),
-                [cacheKey]: {
+                [customSvgConfig.cacheKey]: {
                   data: value,
                   type: "svg",
                 },
               });
-              props.onChange({ iconCacheKey: cacheKey });
             }}
           />
           <p>
@@ -359,7 +438,7 @@ const Input: FC<Props> = (props) => {
         </label>
       )}
 
-      {isCustomImageUrl && (
+      {customImageUrlConfig && (
         <label>
           <FormattedMessage
             id="plugins.links.input.customImageUrlLabel"
@@ -367,9 +446,12 @@ const Input: FC<Props> = (props) => {
           />
           <input
             type="text"
-            value={props.imageUrl}
+            value={customImageUrlConfig.url}
             onChange={(event) =>
-              props.onChange({ imageUrl: event.target.value })
+              setIconConfig({
+                ...customImageUrlConfig,
+                url: event.target.value,
+              })
             }
           />
           <p>
@@ -403,8 +485,9 @@ const Input: FC<Props> = (props) => {
             onClick={handleOpenModal}
             className="button button--primary"
             style={{ width: "100%" }}
+            type="button"
           >
-            {props.iconifyValue ? (
+            {featherValue ? (
               <FormattedMessage
                 id="plugins.links.input.openIconPicker"
                 defaultMessage="Open icon picker"
@@ -417,15 +500,15 @@ const Input: FC<Props> = (props) => {
             )}
           </button>
 
-          {props.iconifyValue && (
+          {featherValue && (
             <div className="selected-icon">
               <div className="selected-icon-preview">
-                <Icon icon={props.iconifyValue} />
+                <Icon icon={featherValue} />
               </div>
               <div className="selected-icon-name">
-                {(props.iconifyValue.includes(":")
-                  ? props.iconifyValue.split(":")[1]
-                  : props.iconifyValue
+                {(featherValue.includes(":")
+                  ? featherValue.split(":")[1]
+                  : featherValue
                 ).replace(/-/g, " ")}
               </div>
             </div>
@@ -437,9 +520,19 @@ const Input: FC<Props> = (props) => {
         customWidth={props.customWidth}
         customHeight={props.customHeight}
         conserveAspectRatio={props.conserveAspectRatio}
-        iconSize={props.iconSize}
-        showResolutionInput={isGoogleOrFavicone}
+        resolution={faviconConfig?.resolution}
+        showResolutionInput={isFavicon}
         onChange={props.onChange}
+        onResolutionChange={(resolution) => {
+          const currentIconConfig = props.iconConfig;
+          if (currentIconConfig?.type !== "favicon") return;
+
+          const nextFaviconConfig: FaviconConfig = {
+            ...currentIconConfig,
+            resolution,
+          };
+          setIconConfig(nextFaviconConfig);
+        }}
       />
 
       <label>

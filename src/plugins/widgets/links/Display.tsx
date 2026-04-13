@@ -38,16 +38,12 @@ type Props = Link & {
 };
 
 export const Display: FC<Props> = ({
-  icon,
-  iconSize,
+  iconConfig,
   name,
   number,
   url,
   linkOpenStyle,
   linksNumbered,
-  iconifyValue,
-  imageUrl,
-  iconCacheKey,
   cache,
   customWidth,
   customHeight,
@@ -109,50 +105,51 @@ export const Display: FC<Props> = ({
   };
 
   const renderIcon = () => {
-    if (
-      icon === "_favicon_duckduckgo" ||
-      icon === "_favicon_google" ||
-      icon === "_favicon" ||
-      icon === "_favicon_favicone"
-    ) {
-      return (
-        <Favicon
-          icon={icon}
-          domain={domain}
-          width={displayWidth}
-          height={displayHeight}
-          conserveAspectRatio={conserveAspectRatio}
-          resolution={iconSize}
-        />
-      );
-    }
+    if (!iconConfig) return null;
 
-    if (icon === "_custom_iconify" && iconifyValue) {
-      return (
-        <IconifyIcon
-          iconString={iconifyValue}
-          width={displayWidth}
-          height={displayHeight}
-        />
-      );
-    }
-
-    if (
-      (icon === "_custom_svg" || icon === "_custom_upload") &&
-      iconCacheKey &&
-      cache?.[iconCacheKey]
-    ) {
-      const cachedItem = cache[iconCacheKey];
-      if (cachedItem.type === "svg") {
+    switch (iconConfig.type) {
+      case "favicon":
         return (
-          <CustomSvg
-            svgString={cachedItem.data}
+          <Favicon
+            provider={iconConfig.provider}
+            domain={domain}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+            resolution={iconConfig.resolution}
+          />
+        );
+      case "iconify":
+        return (
+          <IconifyIcon
+            iconString={iconConfig.value}
             width={displayWidth}
             height={displayHeight}
             conserveAspectRatio={conserveAspectRatio}
           />
         );
-      } else {
+      case "custom_svg":
+      case "custom_upload": {
+        const cachedItem = cache?.[iconConfig.cacheKey];
+        if (!cachedItem) return null;
+
+        if (cachedItem.type === "svg") {
+          return (
+            <CustomSvg
+              svgString={cachedItem.data}
+              width={displayWidth}
+              height={displayHeight}
+              conserveAspectRatio={conserveAspectRatio}
+            />
+          );
+        }
+
+        if (iconConfig.type === "custom_svg") {
+          console.error(
+            `Expected cached icon ${iconConfig.cacheKey} to be svg, but found ${cachedItem.type}. Falling back to CustomImage.`,
+          );
+        }
+
         return (
           <CustomImage
             src={cachedItem.data}
@@ -163,31 +160,28 @@ export const Display: FC<Props> = ({
           />
         );
       }
+      case "custom_image_url":
+        return (
+          <CustomImage
+            src={iconConfig.url}
+            alt={name}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      case "feather":
+        return (
+          <IconifyIcon
+            iconString={iconConfig.value || "feather:bookmark"}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      default:
+        return null;
     }
-
-    if (icon === "_custom_ico" && imageUrl) {
-      return (
-        <CustomImage
-          src={imageUrl}
-          alt={name}
-          width={displayWidth}
-          height={displayHeight}
-          conserveAspectRatio={conserveAspectRatio}
-        />
-      );
-    }
-
-    if (icon === "_feather") {
-      return (
-        <IconifyIcon
-          iconString={iconifyValue || "feather:bookmark"}
-          width={displayWidth}
-          height={displayHeight}
-        />
-      );
-    }
-
-    return null;
   };
 
   return (

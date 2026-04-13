@@ -59,7 +59,10 @@ const ImportBookmarks: FC<Props> = ({ onImport }) => {
               collectedLinks.length,
             name: node.title,
             url: node.url,
-            icon: "_favicon_google",
+            iconConfig: {
+              type: "favicon",
+              provider: "google",
+            },
           });
         }
         if (node.children) {

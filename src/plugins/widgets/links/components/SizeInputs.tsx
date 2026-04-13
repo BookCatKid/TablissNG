@@ -7,18 +7,20 @@ interface SizeInputsProps {
   customWidth?: number;
   customHeight?: number;
   conserveAspectRatio?: boolean;
-  iconSize?: number;
+  resolution?: number;
   showResolutionInput: boolean;
   onChange: (values: Partial<Link>) => void;
+  onResolutionChange: (resolution: number) => void;
 }
 
 export const SizeInputs: FC<SizeInputsProps> = ({
   customWidth,
   customHeight,
   conserveAspectRatio,
-  iconSize,
+  resolution,
   showResolutionInput,
   onChange,
+  onResolutionChange,
 }) => {
   return (
     <>
@@ -29,10 +31,8 @@ export const SizeInputs: FC<SizeInputsProps> = ({
             defaultMessage="Resolution"
           />
           <select
-            value={iconSize ?? 256}
-            onChange={(event) =>
-              onChange({ iconSize: Number(event.target.value) })
-            }
+            value={resolution ?? 256}
+            onChange={(event) => onResolutionChange(Number(event.target.value))}
           >
             <option value="16">16x16</option>
             <option value="32">32x32</option>

@@ -1,20 +1,64 @@
 import { API } from "../../types";
 
-export type Link = {
-  id: string;
-  name?: string;
-  icon?: string;
+export type FaviconConfig = {
+  type: "favicon";
+  provider: "google" | "duckduckgo" | "favicone";
+  resolution?: number;
+};
+
+export type IconifyConfig = {
+  type: "iconify";
+  value: string;
+};
+
+export type FeatherConfig = {
+  type: "feather";
+  value: string;
+};
+
+export type CustomSvgConfig = {
+  type: "custom_svg";
+  cacheKey: string;
+};
+
+export type CustomImageUrlConfig = {
+  type: "custom_image_url";
   url: string;
-  keyboardShortcut?: string;
-  lastUsed?: number;
-  iconSize?: number;
+};
+
+export type CustomUploadConfig = {
+  type: "custom_upload";
+  cacheKey: string;
+};
+
+export type IconConfig =
+  | FaviconConfig
+  | IconifyConfig
+  | FeatherConfig
+  | CustomSvgConfig
+  | CustomImageUrlConfig
+  | CustomUploadConfig;
+
+export type Link = {
+  // Core link data.
+  id: string;
+  url: string;
+  name?: string;
+
+  // Icon configuration.
+  iconConfig?: IconConfig;
+
+  // Icon display and sizing.
   conserveAspectRatio?: boolean;
   customWidth?: number;
   customHeight?: number;
-  iconifyValue?: string;
-  imageUrl?: string; // Custom image URL for _custom_ico
+
+  // Other Settings
+  keyboardShortcut?: string;
   useExtensionTabs?: boolean;
-  iconCacheKey?: string; // Reference to cached icon data
+
+  // Metadata
+  lastUsed?: number;
 };
 
 export type IconCacheItem = {
@@ -51,6 +95,10 @@ export const defaultData: Data = {
       id: "default-link",
       url: "https://github.com/BookCatKid/TablissNG",
       name: "TablissNG",
+      iconConfig: {
+        type: "feather",
+        value: "feather:github",
+      },
     },
   ],
   visible: true,

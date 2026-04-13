@@ -100,7 +100,13 @@ export const TopSites: FC<Props> = ({
             cleanTitle(site.title || "", site.url),
             data.maxTextLength,
           )}
-          icon={data.iconProvider}
+          iconConfig={{
+            type: "favicon",
+            provider: data.iconProvider.replace("_favicon_", "") as
+              | "google"
+              | "favicone"
+              | "duckduckgo",
+          }}
           number={index + 1}
           linkOpenStyle={data.linkOpenStyle}
           linksNumbered={data.linksNumbered}

@@ -1,16 +1,16 @@
 import type { FC } from "react";
 
 interface FaviconProps {
-  icon: string;
+  provider: "google" | "duckduckgo" | "favicone";
   domain: string | null;
   width: number;
   height: number;
   conserveAspectRatio?: boolean;
-  resolution?: number; // Fetch resolution (iconSize)
+  resolution?: number;
 }
 
 export const Favicon: FC<FaviconProps> = ({
-  icon,
+  provider,
   domain,
   width,
   height,
@@ -24,41 +24,20 @@ export const Favicon: FC<FaviconProps> = ({
     height: conserveAspectRatio ? "auto" : `${height}px`,
   };
 
-  if (icon === "_favicon_duckduckgo") {
-    return (
-      <span className="Link-icon">
-        <img
-          alt={domain}
-          src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-          style={style}
-        />
-      </span>
-    );
-  }
+  const getSrc = () => {
+    switch (provider) {
+      case "duckduckgo":
+        return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+      case "google":
+        return `https://www.google.com/s2/favicons?domain=${domain}&sz=${resolution}`;
+      case "favicone":
+        return `https://favicone.com/${domain}?s=${resolution}`;
+    }
+  };
 
-  if (icon === "_favicon_google" || icon === "_favicon") {
-    return (
-      <span className="Link-icon">
-        <img
-          alt={domain}
-          src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${resolution}`}
-          style={style}
-        />
-      </span>
-    );
-  }
-
-  if (icon === "_favicon_favicone") {
-    return (
-      <span className="Link-icon">
-        <img
-          alt={domain}
-          src={`https://favicone.com/${domain}?s=${resolution}`}
-          style={style}
-        />
-      </span>
-    );
-  }
-
-  return null;
+  return (
+    <span className="Link-icon">
+      <img alt={domain} src={getSrc()} style={style} />
+    </span>
+  );
 };
