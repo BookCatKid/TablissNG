@@ -1,5 +1,4 @@
-import { Link } from "./types";
-import { Data } from "./types";
+import { Data, Link } from "./types";
 
 export function sortLinks(links: Link[], sortBy: Data["sortBy"]): Link[] {
   if (sortBy === "none") return links;

@@ -101,59 +101,69 @@ const getDefaultIconConfig = (
   }
 };
 
-const Input: FC<Props> = (props) => {
-  const [urlValue, setUrlValue] = useState(props.url);
+const removeCacheKey = (cache: Cache | undefined, cacheKey?: string): Cache => {
+  if (!cache || !cacheKey || !cache[cacheKey]) return cache || {};
+  const nextCache = { ...cache };
+  delete nextCache[cacheKey];
+  return nextCache;
+};
+
+const DocsLink: FC = () => (
+  <a
+    href="https://bookcatkid.github.io/TablissNG/docs/widgets/quick-links"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <FormattedMessage
+      id="plugins.links.input.docsPage"
+      defaultMessage="the documentation"
+    />
+  </a>
+);
+
+const Input: FC<Props> = ({
+  number,
+  url,
+  name,
+  iconConfig,
+  customWidth,
+  customHeight,
+  conserveAspectRatio,
+  keyboardShortcut,
+  useExtensionTabs,
+  cache,
+  onChange,
+  onMoveUp,
+  onMoveDown,
+  onRemove,
+  setCache,
+}) => {
+  const [urlValue, setUrlValue] = useState(url);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [svgDraft, setSvgDraft] = useState<string | null>(null);
   const intl = useIntl();
 
-  const iconSelectValue = getIconSelectValue(props.iconConfig);
-  const isFavicon = props.iconConfig?.type === "favicon";
-  const isCustomUpload = props.iconConfig?.type === "custom_upload";
-  const isFeather = props.iconConfig?.type === "feather";
-
-  const removeCacheKey = (
-    cache: Cache | undefined,
-    cacheKey?: string,
-  ): Cache => {
-    if (!cache || !cacheKey || !cache[cacheKey]) return cache || {};
-    const nextCache = { ...cache };
-    delete nextCache[cacheKey];
-    return nextCache;
-  };
+  const iconSelectValue = getIconSelectValue(iconConfig);
 
   const setIconConfig = (newConfig?: IconConfig) => {
-    const oldConfig = props.iconConfig;
+    const oldConfig = iconConfig;
     const oldKey =
       oldConfig?.type === "custom_svg" || oldConfig?.type === "custom_upload"
         ? oldConfig.cacheKey
         : undefined;
 
-    if (
-      oldKey &&
-      props.cache?.[oldKey] &&
-      oldConfig?.type !== newConfig?.type
-    ) {
-      props.setCache(removeCacheKey(props.cache, oldKey));
+    if (oldKey && cache?.[oldKey] && oldConfig?.type !== newConfig?.type) {
+      setCache(removeCacheKey(cache, oldKey));
     }
 
-    props.onChange({ iconConfig: newConfig });
+    onChange({ iconConfig: newConfig });
   };
-
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
 
   const handleIconSelect = (iconString: string) => {
-    if (props.iconConfig?.type === "feather") {
-      setIconConfig({
-        ...props.iconConfig,
-        value: iconString,
-      });
+    if (iconConfig?.type === "feather") {
+      setIconConfig({ ...iconConfig, value: iconString });
     }
     setIsModalOpen(false);
-  };
-
-  const handleIconTypeChange = (value: IconSelectValue) => {
-    setIconConfig(getDefaultIconConfig(value));
   };
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -174,15 +184,13 @@ const Input: FC<Props> = (props) => {
         }
 
         const oldKey =
-          props.iconConfig?.type === "custom_svg" ||
-          props.iconConfig?.type === "custom_upload"
-            ? props.iconConfig.cacheKey
+          iconConfig?.type === "custom_svg" ||
+          iconConfig?.type === "custom_upload"
+            ? iconConfig.cacheKey
             : undefined;
         const cacheKey = `icon_${Date.now()}`;
-        const baseCache = oldKey
-          ? removeCacheKey(props.cache, oldKey)
-          : props.cache;
-        props.setCache({ ...baseCache, [cacheKey]: iconData });
+        const baseCache = oldKey ? removeCacheKey(cache, oldKey) : cache;
+        setCache({ ...baseCache, [cacheKey]: iconData });
         setIconConfig({ type: "custom_upload", cacheKey });
       }
     };
@@ -194,42 +202,186 @@ const Input: FC<Props> = (props) => {
     }
   };
 
-  const faviconConfig =
-    props.iconConfig?.type === "favicon" ? props.iconConfig : undefined;
-  const iconifyConfig =
-    props.iconConfig?.type === "iconify" ? props.iconConfig : undefined;
-  const customSvgConfig =
-    props.iconConfig?.type === "custom_svg" ? props.iconConfig : undefined;
-  const customImageUrlConfig =
-    props.iconConfig?.type === "custom_image_url"
-      ? props.iconConfig
-      : undefined;
-  const customSvgValue =
-    (customSvgConfig && props.cache?.[customSvgConfig.cacheKey]?.data) || "";
-  const featherValue =
-    props.iconConfig?.type === "feather" ? props.iconConfig.value : "";
+  const renderIconFields = () => {
+    switch (iconConfig?.type) {
+      case "iconify":
+        return (
+          <label>
+            <FormattedMessage
+              id="plugins.links.input.customIconifyIdentifier"
+              defaultMessage="Custom Iconify Icon"
+            />
+            <input
+              type="text"
+              value={iconConfig.value}
+              onChange={(event) =>
+                setIconConfig({ ...iconConfig, value: event.target.value })
+              }
+            />
+            <p>
+              <FormattedMessage
+                id="plugins.links.input.iconifyHelp"
+                defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see "
+              />
+              <DocsLink />.
+            </p>
+          </label>
+        );
+
+      case "custom_svg": {
+        const savedValue = cache?.[iconConfig.cacheKey]?.data || "";
+        const displayValue = svgDraft ?? savedValue;
+        const hasUnappliedChanges =
+          svgDraft !== null && svgDraft !== savedValue;
+
+        return (
+          <label>
+            <FormattedMessage
+              id="plugins.links.input.customSvgHtmlLabel"
+              defaultMessage="Custom SVG HTML"
+            />
+            <textarea
+              value={displayValue}
+              rows={20}
+              style={{ resize: "vertical" }}
+              onChange={(event) => setSvgDraft(event.target.value)}
+            />
+            {hasUnappliedChanges && (
+              <button
+                type="button"
+                className="button button--primary"
+                style={{ marginTop: "0.5em" }}
+                onClick={() => {
+                  setCache({
+                    ...(cache || {}),
+                    [iconConfig.cacheKey]: { data: svgDraft, type: "svg" },
+                  });
+                  setSvgDraft(null);
+                }}
+              >
+                <FormattedMessage
+                  id="plugins.links.input.applySvg"
+                  defaultMessage="Apply"
+                />
+              </button>
+            )}
+            <p>
+              <FormattedMessage
+                id="plugins.links.input.customSvgHelp"
+                defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see "
+              />
+              <DocsLink />.
+            </p>
+          </label>
+        );
+      }
+
+      case "custom_image_url":
+        return (
+          <label>
+            <FormattedMessage
+              id="plugins.links.input.customImageUrlLabel"
+              defaultMessage="Custom Image URL"
+            />
+            <input
+              type="text"
+              value={iconConfig.url}
+              onChange={(event) =>
+                setIconConfig({ ...iconConfig, url: event.target.value })
+              }
+            />
+            <p>
+              <FormattedMessage
+                id="plugins.links.input.customImageUrlHelp"
+                defaultMessage="Enter a url on the internet for an image file"
+              />
+            </p>
+          </label>
+        );
+
+      case "custom_upload":
+        return (
+          <div>
+            <label>
+              <FormattedMessage
+                id="plugins.links.input.uploadIcon"
+                defaultMessage="Upload Icon"
+              />
+              <input
+                type="file"
+                accept=".svg,.ico,image/*"
+                onChange={handleFileUpload}
+              />
+            </label>
+          </div>
+        );
+
+      case "feather": {
+        const featherValue = iconConfig.value;
+        return (
+          <div className="icon-picker">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="button button--primary"
+              style={{ width: "100%" }}
+              type="button"
+            >
+              {featherValue ? (
+                <FormattedMessage
+                  id="plugins.links.input.openIconPicker"
+                  defaultMessage="Open icon picker"
+                />
+              ) : (
+                <FormattedMessage
+                  id="plugins.links.input.chooseIcon"
+                  defaultMessage="Choose an Icon"
+                />
+              )}
+            </button>
+
+            {featherValue && (
+              <div className="selected-icon">
+                <div className="selected-icon-preview">
+                  <Icon icon={featherValue} />
+                </div>
+                <div className="selected-icon-name">
+                  {(featherValue.includes(":")
+                    ? featherValue.split(":")[1]
+                    : featherValue
+                  ).replace(/-/g, " ")}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <div className="LinkInput">
       <h5>
         <div className="title--buttons">
           <IconButton
-            onClick={props.onRemove}
+            onClick={onRemove}
             title={intl.formatMessage(messages.removeLink)}
           >
             <RemoveIcon />
           </IconButton>
-          {props.onMoveDown && (
+          {onMoveDown && (
             <IconButton
-              onClick={props.onMoveDown}
+              onClick={onMoveDown}
               title={intl.formatMessage(messages.moveDown)}
             >
               <DownIcon />
             </IconButton>
           )}
-          {props.onMoveUp && (
+          {onMoveUp && (
             <IconButton
-              onClick={props.onMoveUp}
+              onClick={onMoveUp}
               title={intl.formatMessage(messages.moveUp)}
             >
               <UpIcon />
@@ -237,11 +389,11 @@ const Input: FC<Props> = (props) => {
           )}
         </div>
 
-        {props.number <= 9 ? (
+        {number <= 9 ? (
           <FormattedMessage
             id="plugins.links.input.keyboardShortcut"
             defaultMessage="Keyboard shortcut {number}"
-            values={{ number: props.number }}
+            values={{ number }}
           />
         ) : (
           <FormattedMessage
@@ -260,7 +412,7 @@ const Input: FC<Props> = (props) => {
           onBlur={() => {
             const normalized = normalizeUrl(urlValue);
             setUrlValue(normalized);
-            props.onChange({ url: normalized });
+            onChange({ url: normalized });
           }}
         />
       </label>
@@ -277,8 +429,8 @@ const Input: FC<Props> = (props) => {
         </span>
         <input
           type="text"
-          value={props.name}
-          onChange={(event) => props.onChange({ name: event.target.value })}
+          value={name}
+          onChange={(event) => onChange({ name: event.target.value })}
         />
       </label>
 
@@ -295,7 +447,9 @@ const Input: FC<Props> = (props) => {
         <select
           value={iconSelectValue}
           onChange={(event) =>
-            handleIconTypeChange(event.target.value as IconSelectValue)
+            setIconConfig(
+              getDefaultIconConfig(event.target.value as IconSelectValue),
+            )
           }
         >
           <option value="">
@@ -361,177 +515,20 @@ const Input: FC<Props> = (props) => {
         </select>
       </label>
 
-      {iconifyConfig && (
-        <label>
-          <FormattedMessage
-            id="plugins.links.input.customIconifyIdentifier"
-            defaultMessage="Custom Iconify Icon"
-          />
-          <input
-            type="text"
-            value={iconifyConfig.value}
-            onChange={(event) =>
-              setIconConfig({
-                ...iconifyConfig,
-                value: event.target.value,
-              })
-            }
-          />
-          <p>
-            <FormattedMessage
-              id="plugins.links.input.iconifyHelp"
-              defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see "
-            />
-            <a
-              href="https://bookcatkid.github.io/TablissNG/docs/widgets/quick-links"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FormattedMessage
-                id="plugins.links.input.docsPage"
-                defaultMessage="the documentation"
-              />
-            </a>
-            .
-          </p>
-        </label>
-      )}
-
-      {customSvgConfig && (
-        <label>
-          <FormattedMessage
-            id="plugins.links.input.customSvgHtmlLabel"
-            defaultMessage="Custom SVG HTML"
-          />
-          <textarea
-            value={customSvgValue}
-            rows={20}
-            style={{ resize: "vertical" }}
-            onChange={(event) => {
-              const value = event.target.value;
-              props.setCache({
-                ...(props.cache || {}),
-                [customSvgConfig.cacheKey]: {
-                  data: value,
-                  type: "svg",
-                },
-              });
-            }}
-          />
-          <p>
-            <FormattedMessage
-              id="plugins.links.input.customSvgHelp"
-              defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see "
-            />
-            <a
-              href="https://bookcatkid.github.io/TablissNG/docs/widgets/quick-links"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FormattedMessage
-                id="plugins.links.input.docsPage"
-                defaultMessage="the documentation"
-              />
-            </a>
-            .
-          </p>
-        </label>
-      )}
-
-      {customImageUrlConfig && (
-        <label>
-          <FormattedMessage
-            id="plugins.links.input.customImageUrlLabel"
-            defaultMessage="Custom Image URL"
-          />
-          <input
-            type="text"
-            value={customImageUrlConfig.url}
-            onChange={(event) =>
-              setIconConfig({
-                ...customImageUrlConfig,
-                url: event.target.value,
-              })
-            }
-          />
-          <p>
-            <FormattedMessage
-              id="plugins.links.input.customImageUrlHelp"
-              defaultMessage="Enter a url on the internet for an image file"
-            />
-          </p>
-        </label>
-      )}
-
-      {isCustomUpload && (
-        <div>
-          <label>
-            <FormattedMessage
-              id="plugins.links.input.uploadIcon"
-              defaultMessage="Upload Icon"
-            />
-            <input
-              type="file"
-              accept=".svg,.ico,image/*"
-              onChange={handleFileUpload}
-            />
-          </label>
-        </div>
-      )}
-
-      {isFeather && (
-        <div className="icon-picker">
-          <button
-            onClick={handleOpenModal}
-            className="button button--primary"
-            style={{ width: "100%" }}
-            type="button"
-          >
-            {featherValue ? (
-              <FormattedMessage
-                id="plugins.links.input.openIconPicker"
-                defaultMessage="Open icon picker"
-              />
-            ) : (
-              <FormattedMessage
-                id="plugins.links.input.chooseIcon"
-                defaultMessage="Choose an Icon"
-              />
-            )}
-          </button>
-
-          {featherValue && (
-            <div className="selected-icon">
-              <div className="selected-icon-preview">
-                <Icon icon={featherValue} />
-              </div>
-              <div className="selected-icon-name">
-                {(featherValue.includes(":")
-                  ? featherValue.split(":")[1]
-                  : featherValue
-                ).replace(/-/g, " ")}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {renderIconFields()}
 
       <SizeInputs
-        customWidth={props.customWidth}
-        customHeight={props.customHeight}
-        conserveAspectRatio={props.conserveAspectRatio}
-        resolution={faviconConfig?.resolution}
-        showResolutionInput={isFavicon}
-        onChange={props.onChange}
+        customWidth={customWidth}
+        customHeight={customHeight}
+        conserveAspectRatio={conserveAspectRatio}
+        resolution={
+          iconConfig?.type === "favicon" ? iconConfig.resolution : undefined
+        }
+        showResolutionInput={iconConfig?.type === "favicon"}
+        onChange={onChange}
         onResolutionChange={(resolution) => {
-          const currentIconConfig = props.iconConfig;
-          if (currentIconConfig?.type !== "favicon") return;
-
-          const nextFaviconConfig: FaviconConfig = {
-            ...currentIconConfig,
-            resolution,
-          };
-          setIconConfig(nextFaviconConfig);
+          if (iconConfig?.type !== "favicon") return;
+          setIconConfig({ ...iconConfig, resolution } as FaviconConfig);
         }}
       />
 
@@ -539,15 +536,15 @@ const Input: FC<Props> = (props) => {
         <FormattedMessage
           id="plugins.links.input.keyboardShortcut"
           defaultMessage="Keyboard shortcut {number}"
-          values={{ number: props.number }}
+          values={{ number }}
         />
         <input
           type="text"
-          value={props.keyboardShortcut || ""}
+          value={keyboardShortcut || ""}
           onChange={(event) =>
-            props.onChange({ keyboardShortcut: event.target.value })
+            onChange({ keyboardShortcut: event.target.value })
           }
-          placeholder={props.number <= 9 ? String(props.number) : ""}
+          placeholder={number <= 9 ? String(number) : ""}
           maxLength={1}
         />
       </label>
@@ -556,9 +553,9 @@ const Input: FC<Props> = (props) => {
         <label title={intl.formatMessage(messages.useExtensionTabsHelp)}>
           <input
             type="checkbox"
-            checked={props.useExtensionTabs || false}
+            checked={useExtensionTabs || false}
             onChange={(event) =>
-              props.onChange({ useExtensionTabs: event.target.checked })
+              onChange({ useExtensionTabs: event.target.checked })
             }
           />
           <FormattedMessage
@@ -572,7 +569,7 @@ const Input: FC<Props> = (props) => {
 
       <IconPickerModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => setIsModalOpen(false)}
         onSelect={handleIconSelect}
       />
     </div>

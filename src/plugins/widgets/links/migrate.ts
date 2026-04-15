@@ -28,7 +28,13 @@ const hasLegacyIconFields = (link: LegacyLink): boolean =>
 const getMigratedIconConfig = (
   link: LegacyLink,
   cache: Cache,
-): { iconConfig?: IconConfig; cache: Cache; cacheChanged: boolean } => {
+): {
+  iconConfig?: IconConfig;
+  cache: Cache;
+  cacheChanged: boolean;
+  iconCacheKey?: string;
+  imageUrl?: string;
+} => {
   let nextCache = cache;
   let cacheChanged = false;
 
@@ -42,6 +48,8 @@ const getMigratedIconConfig = (
 
   let legacyIcon = link.icon;
   let iconifyValue = link.iconifyValue;
+  let iconCacheKey = link.iconCacheKey;
+  let imageUrl = link.imageUrl;
 
   if (legacyIcon === "_favicon") {
     legacyIcon = "_favicon_google";
@@ -69,7 +77,7 @@ const getMigratedIconConfig = (
     iconifyValue = `${link.iconifyIdentifier || "feather:"}${iconifyValue}`;
   }
 
-  if (legacyIcon === "_custom_svg" && link.SvgString && !link.iconCacheKey) {
+  if (legacyIcon === "_custom_svg" && link.SvgString && !iconCacheKey) {
     const cacheKey = `links_svg_${link.id}`;
     nextCache = {
       ...nextCache,
@@ -79,11 +87,11 @@ const getMigratedIconConfig = (
       },
     };
     cacheChanged = true;
-    link.iconCacheKey = cacheKey;
+    iconCacheKey = cacheKey;
   }
 
-  if (legacyIcon === "_custom_ico" && link.IconStringIco && !link.imageUrl) {
-    link.imageUrl = link.IconStringIco;
+  if (legacyIcon === "_custom_ico" && link.IconStringIco && !imageUrl) {
+    imageUrl = link.IconStringIco;
   }
 
   switch (legacyIcon) {
@@ -130,36 +138,39 @@ const getMigratedIconConfig = (
       };
     case "_custom_svg":
       return {
-        iconConfig: link.iconCacheKey
+        iconConfig: iconCacheKey
           ? {
               type: "custom_svg",
-              cacheKey: link.iconCacheKey,
+              cacheKey: iconCacheKey,
             }
           : undefined,
         cache: nextCache,
         cacheChanged,
+        iconCacheKey,
       };
     case "_custom_ico":
       return {
-        iconConfig: link.imageUrl
+        iconConfig: imageUrl
           ? {
               type: "custom_image_url",
-              url: link.imageUrl,
+              url: imageUrl,
             }
           : undefined,
         cache: nextCache,
         cacheChanged,
+        imageUrl,
       };
     case "_custom_upload":
       return {
-        iconConfig: link.iconCacheKey
+        iconConfig: iconCacheKey
           ? {
               type: "custom_upload",
-              cacheKey: link.iconCacheKey,
+              cacheKey: iconCacheKey,
             }
           : undefined,
         cache: nextCache,
         cacheChanged,
+        iconCacheKey,
       };
     case "_feather":
       return {
@@ -192,19 +203,19 @@ export function migrateLinks(
   let cacheChanged = false;
   const newCache = { ...cache };
 
+  const seenIds = new Set<string>();
+
   const linksWithIds = data.links.map((link, index) => {
     const updatedLink = { ...link } as LegacyLink;
     let linkModified = false;
 
     // Ensure all links have unique IDs
-    if (
-      !updatedLink.id ||
-      data.links.filter((l) => l.id === updatedLink.id).length > 1
-    ) {
+    if (!updatedLink.id || seenIds.has(updatedLink.id)) {
       updatedLink.id =
         Date.now().toString(36) + Math.random().toString(36).slice(2) + index;
       linkModified = true;
     }
+    seenIds.add(updatedLink.id);
 
     if (hasLegacyIconFields(updatedLink)) {
       const migratedIcon = getMigratedIconConfig(updatedLink, newCache);
