@@ -152,8 +152,8 @@ const LinksSettings: FC<Props> = ({
         const originalIndex = data.links.findIndex((l) => l.id === link.id);
         return (
           <Input
-            {...link}
             key={link.id}
+            {...link}
             number={index + 1}
             onChange={(values) =>
               dispatch(updateLink(originalIndex, { ...link, ...values }))
