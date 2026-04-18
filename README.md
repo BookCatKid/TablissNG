@@ -104,7 +104,7 @@ pnpm install
 - `pnpm run test` — Run tests
 - `pnpm run translations` — Manage translation files (see TRANSLATING.md)
 - `pnpm run lint:fix` — Run ESLint with --fix (or just `pnpm run lint` for checking)
-- `pnpm run prettier` — Run Prettier with --write (or pnpm run `prettier:check` for checking)
+- `pnpm run prettier` — Run Prettier with --write (or `pnpm run prettier:check` for checking)
 - `pnpm run deps:update` — Run interactive dependency update tool (or `pnpm run deps:check` to just check for updates and unused dependencies)
 
 By default, build and dev will target the web version. To specify a platform (Chromium or Firefox), append `:chromium` or `:firefox` to the command. For example:
