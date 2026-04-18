@@ -41,7 +41,7 @@ jobs:
     name: Upload extension to Firefox Store
     runs-on: ubuntu-latest
     steps:
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
         with:
           standalone: true
       - uses: actions/setup-node@v6
@@ -89,7 +89,7 @@ jobs:
           cd dist/chromium
           zip -r ../../release.zip .
 
-      - uses: mnao305/chrome-extension-upload@v5.0.0
+      - uses: mnao305/chrome-extension-upload@v6.0.0
         with:
           file-path: release.zip
           extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
@@ -218,7 +218,7 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v3
         with:
           name: Version ${{ steps.version.outputs.version }}
           tag_name: ${{ steps.version.outputs.ref }}
