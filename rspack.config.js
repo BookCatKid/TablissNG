@@ -159,4 +159,76 @@ if (!isWeb) {
   );
 }
 
+if (isProduction && buildTarget !== "firefox") {
+  const workbox = require("workbox-build");
+  config.plugins.push({
+    apply(compiler) {
+      compiler.hooks.afterEmit.tapPromise("WorkboxPlugin", async () => {
+        await workbox.generateSW({
+          cacheId: "tabliss",
+          swDest: path.join(compiler.options.output.path, "service-worker.js"),
+          globDirectory: compiler.options.output.path,
+          globPatterns: [],
+          skipWaiting: true,
+          clientsClaim: true,
+          sourcemap: false,
+          runtimeCaching: [
+            // Cache for APIs (short term)
+            {
+              urlPattern: ({ url }) =>
+                url.hostname === "github-contributions-api.jogruber.de" ||
+                url.hostname === "leetcode-api-pied.vercel.app" ||
+                url.href.startsWith(
+                  "https://api.github.com/repos/BookCatKid/tablissNG",
+                ),
+
+              handler: "CacheFirst",
+              options: {
+                cacheName: "tabliss-cache-apis",
+                expiration: {
+                  maxAgeSeconds: 24 * 60 * 60, // 1 day
+                },
+              },
+            },
+
+            // Cache favicons (long term)
+            {
+              urlPattern: ({ url }) =>
+                url.href.startsWith("https://www.google.com/s2/favicons") ||
+                url.hostname === "icons.duckduckgo.com" ||
+                url.hostname === "favicone.com",
+
+              handler: "StaleWhileRevalidate",
+              options: {
+                cacheName: "tabliss-cache-swr",
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+                },
+              },
+            },
+
+            // Cache images (use NetworkFirst to respect server cache-control headers)
+            {
+              urlPattern: ({ request }) => request.destination === "image",
+
+              handler: "NetworkFirst",
+              options: {
+                cacheName: "tabliss-cache-images",
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+                },
+                cacheableResponse: {
+                  statuses: [0, 200], // allow opaque (0) responses to be cached
+                },
+              },
+            },
+          ],
+        });
+      });
+    },
+  });
+}
+
 module.exports = config;

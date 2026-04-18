@@ -95,6 +95,7 @@
     "sass-loader": "^16.0.7",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
-    "typescript-react-intl": "^0.4.1"
+    "typescript-react-intl": "^0.4.1",
+    "workbox-build": "^7.4.0"
   }
 }

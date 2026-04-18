@@ -12,7 +12,7 @@ This document gives you a step by step guide for how to add your own translation
 8. Commit your updated files
 9. Submit a Pull Request back to the Tabliss repository!
 
-You can test your changes at anytime by running a local development build of Tabliss with `pnpm run dev`.
+You can test your changes at any time by running a local development build of Tabliss with `pnpm run dev`.
 
 ### About Whitelist Files
 
