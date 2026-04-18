@@ -101,7 +101,7 @@
     "sass-loader": "^16.0.7",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.5.4",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",
     "typescript-react-intl": "^0.4.1",
     "url-loader": "^4.1.1",
