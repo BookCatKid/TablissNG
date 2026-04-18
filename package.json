@@ -43,9 +43,7 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "dependencies": {
-    "@emotion/react": "^11.14.0",
     "@iconify/react": "^6.0.2",
-    "@swc/core": "^1.15.26",
     "core-js": "^3.49.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
@@ -70,7 +68,6 @@
   },
   "devDependencies": {
     "@eslint-react/eslint-plugin": "^4.2.3",
-    "@eslint/compat": "^2.0.5",
     "@eslint/js": "^10.0.1",
     "@rspack/cli": "2.0.0-rc.3",
     "@rspack/core": "2.0.0-rc.3",
@@ -94,7 +91,7 @@
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
     "react-intl-translations-manager": "^5.0.3",
-    "sass": "^1.98.0",
+    "sass": "^1.99.0",
     "sass-loader": "^16.0.7",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.58.2",

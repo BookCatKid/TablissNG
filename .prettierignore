@@ -1,6 +1,6 @@
 src/locales/lang/
 target/
-package-lock.json
+pnpm-lock.yaml
 screenshots/
 updates.json
 docs/.docusaurus/

@@ -3,10 +3,9 @@
     "ignoreMatches": [
       "cross-env",
       "webextension-polyfill",
-      "eslint-plugin-react-hooks",
-      "eslint-plugin-react-refresh",
-      "style-loader",
-      "@emotion/react"
+      "normalize.css",
+      "sass",
+      "sass-loader"
     ]
   }
 }
