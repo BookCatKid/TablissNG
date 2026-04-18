@@ -1,4 +1,7 @@
-require("dotenv/config");
+const fs = require("fs");
+if (fs.existsSync(".env")) {
+  process.loadEnvFile();
+}
 
 const path = require("path");
 const { rspack } = require("@rspack/core");

@@ -1,5 +1,4 @@
 const fs = require("fs");
-const { glob } = require("glob");
 const manageTranslations = require("react-intl-translations-manager").default;
 const parser = require("typescript-react-intl").default;
 
@@ -57,7 +56,7 @@ const languages = [
 
 async function main() {
   // Extract messages from source
-  const files = await glob("src/**/*.@(tsx|ts)");
+  const files = fs.globSync("src/**/*.{tsx,ts}");
   const messages = files
     .map((file) => fs.readFileSync(file).toString())
     .reduce((carry, contents) => carry.concat(parser(contents)), []);
