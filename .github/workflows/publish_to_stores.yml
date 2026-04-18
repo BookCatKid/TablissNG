@@ -47,7 +47,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-
       - uses: actions/download-artifact@v7
         with:
           name: tabliss-firefox

@@ -68,12 +68,11 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-          cache-dependency-path: docs/pnpm-lock.yaml
       - name: Cache webpack
         uses: actions/cache@v5
         with:
           path: .cache
-          key: webpack-docs-${{ hashFiles('docs/pnpm-lock.yaml', 'docs/webpack.config.js') }}
+          key: webpack-docs-${{ hashFiles('pnpm-lock.yaml', 'docs/webpack.config.js') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
         working-directory: docs
