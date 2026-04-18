@@ -29,7 +29,7 @@ export default defineConfig(
   },
   {
     files: [
-      "webpack.config.js",
+      "rspack.config.js",
       "scripts/**/*.js",
       "eslint.config.mjs",
       "docs/sync-assets.js",

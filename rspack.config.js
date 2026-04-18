@@ -1,11 +1,8 @@
 require("dotenv/config");
 
 const path = require("path");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const workbox = require("workbox-webpack-plugin");
-const webpack = require("webpack");
+const { rspack } = require("@rspack/core");
+const { ReactRefreshRspackPlugin } = require("@rspack/plugin-react-refresh");
 
 const buildTarget = process.env.BUILD_TARGET || "web";
 const isProduction = process.env.NODE_ENV === "production";
@@ -25,6 +22,7 @@ const config = {
     path: path.resolve("dist", buildTarget),
     publicPath: isProduction ? "./" : "/",
     filename: isWeb ? "[name].[contenthash:12].js" : "[name].js",
+    cssFilename: isWeb ? "[name].[contenthash:12].css" : "[name].css",
     clean: true,
   },
   mode: isProduction ? "production" : "development",
@@ -35,10 +33,7 @@ const config = {
     rules: [
       {
         test: /\.css$/,
-        use: [
-          isWeb ? MiniCssExtractPlugin.loader : "style-loader",
-          "css-loader",
-        ],
+        type: "css",
       },
       {
         test: /\.(gif|jpe?g|png)$/,
@@ -54,11 +49,8 @@ const config = {
       },
       {
         test: /\.sass$/,
-        use: [
-          isWeb ? MiniCssExtractPlugin.loader : "style-loader",
-          "css-loader",
-          "sass-loader",
-        ],
+        use: ["sass-loader"],
+        type: "css",
       },
       {
         test: /\.svg$/,
@@ -69,7 +61,7 @@ const config = {
         include: path.resolve("./src"),
         use: [
           {
-            loader: "swc-loader",
+            loader: "builtin:swc-loader",
             options: {
               jsc: {
                 parser: {
@@ -81,6 +73,7 @@ const config = {
                   react: {
                     runtime: "automatic",
                     refresh: !isProduction,
+                    development: !isProduction,
                   },
                 },
                 target: "es2020",
@@ -92,7 +85,8 @@ const config = {
     ],
   },
   plugins: [
-    new CopyWebpackPlugin({
+    !isProduction && new ReactRefreshRspackPlugin(),
+    new rspack.CopyRspackPlugin({
       patterns: [
         { from: "target/shared" },
         {
@@ -115,14 +109,17 @@ const config = {
         },
       ],
     }),
-    new HtmlWebpackPlugin({
+    new rspack.HtmlRspackPlugin({
       template: "./target/index.html",
-      buildTarget,
+      templateParameters: () => ({
+        themeColorMeta: isWeb
+          ? '<meta name="theme-color" content="#3498db" />'
+          : "",
+        manifestLink: isWeb ? '<link rel="manifest" href="pwa.json" />' : "",
+      }),
     }),
-    new MiniCssExtractPlugin({
-      filename: isWeb ? "[name].[contenthash:12].css" : "[name].css",
-    }),
-    new webpack.DefinePlugin({
+
+    new rspack.DefinePlugin({
       BUILD_TARGET: JSON.stringify(buildTarget),
       DEV: JSON.stringify(!isProduction),
       GIPHY_API_KEY: JSON.stringify(process.env.GIPHY_API_KEY),
@@ -131,17 +128,10 @@ const config = {
       NASA_API_KEY: JSON.stringify(process.env.NASA_API_KEY),
       TRELLO_API_KEY: JSON.stringify(process.env.TRELLO_API_KEY),
     }),
-  ],
+  ].filter(Boolean),
   devtool: isWeb || !isProduction ? "source-map" : false,
   stats: {
     warnings: true,
-  },
-  cache: {
-    type: "filesystem",
-    name: buildTarget,
-    buildDependencies: {
-      config: [__filename],
-    },
   },
   optimization: {
     splitChunks: {
@@ -161,81 +151,10 @@ const config = {
   },
 };
 
-if (isProduction) {
-  config.plugins.push(
-    new webpack.LoaderOptionsPlugin({
-      minimize: true,
-      debug: false,
-    }),
-  );
-}
-
 if (!isWeb) {
   config.plugins.push(
-    new webpack.ProvidePlugin({
+    new rspack.ProvidePlugin({
       browser: "webextension-polyfill",
-    }),
-  );
-}
-
-if (isProduction && buildTarget !== "firefox") {
-  config.plugins.push(
-    new workbox.GenerateSW({
-      exclude: [/.*/], // Disable precaching
-      disableDevLogs: true, // Enable logging if required
-      runtimeCaching: [
-        // Cache for APIs (short term)
-        {
-          urlPattern: ({ url }) =>
-            url.hostname === "github-contributions-api.jogruber.de" ||
-            url.hostname === "leetcode-api-pied.vercel.app" ||
-            url.href.startsWith(
-              "https://api.github.com/repos/BookCatKid/tablissNG",
-            ),
-
-          handler: "CacheFirst",
-          options: {
-            cacheName: "tabliss-cache-apis",
-            expiration: {
-              maxAgeSeconds: 24 * 60 * 60, // 1 day
-            },
-          },
-        },
-
-        // Cache favicons (long term)
-        {
-          urlPattern: ({ url }) =>
-            url.href.startsWith("https://www.google.com/s2/favicons") ||
-            url.hostname === "icons.duckduckgo.com" ||
-            url.hostname === "favicone.com",
-
-          handler: "StaleWhileRevalidate",
-          options: {
-            cacheName: "tabliss-cache-swr",
-            expiration: {
-              maxEntries: 50,
-              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
-            },
-          },
-        },
-
-        // Cache images (use NetworkFirst to respect server cache-control headers)
-        {
-          urlPattern: ({ request }) => request.destination === "image",
-
-          handler: "NetworkFirst",
-          options: {
-            cacheName: "tabliss-cache-images",
-            expiration: {
-              maxEntries: 10,
-              maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
-            },
-            cacheableResponse: {
-              statuses: [0, 200], // allow opaque (0) responses to be cached
-            },
-          },
-        },
-      ],
     }),
   );
 }

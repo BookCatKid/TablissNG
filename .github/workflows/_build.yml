@@ -34,11 +34,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Cache webpack
-        uses: actions/cache@v5
-        with:
-          path: .cache
-          key: webpack-${{ matrix.build_target }}-${{ hashFiles('pnpm-lock.yaml', 'webpack.config.js') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -68,11 +63,6 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - name: Cache webpack
-        uses: actions/cache@v5
-        with:
-          path: .cache
-          key: webpack-docs-${{ hashFiles('pnpm-lock.yaml', 'docs/webpack.config.js') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
