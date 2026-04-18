@@ -75,7 +75,6 @@ jobs:
           key: webpack-docs-${{ hashFiles('pnpm-lock.yaml', 'docs/webpack.config.js') }}
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        working-directory: docs
 
       - name: Build
         run: pnpm run build
