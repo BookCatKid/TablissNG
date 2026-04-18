@@ -1,0 +1,40 @@
+name: Auto close fixed (not released)
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  close_issue:
+    if: github.event.label.name == 'fixed-not-released'
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: write
+
+    steps:
+      - name: Comment on issue
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              body: "✅ This issue has been fixed in development, but the fix is **not live yet**. It will be included in the next release.\n\nIf you'd like to test the fix early, you can install the latest nightly build by following the instructions in the [docs](https://bookcatkid.github.io/TablissNG/docs/category/installation).\n\nIf you believe this was closed in error or the issue persists after the next release, feel free to reopen this issue."
+            });
+
+      - name: Close issue
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const issueNumber = context.issue.number;
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber,
+              state: "closed"
+            });

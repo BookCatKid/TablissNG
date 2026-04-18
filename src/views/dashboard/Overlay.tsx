@@ -55,11 +55,12 @@ const Overlay: FC = () => {
   useKeyPress(handleToggleFullscreen || null, ["f"]);
 
   return (
-    <div className={`Overlay ${settingsIconPosition}`}>
+    <div
+      className={`Overlay ${settingsIconPosition}${hideSettingsIcon ? " hidden" : ""}`}
+    >
       <a
         onClick={toggleSettings}
         title={`${intl.formatMessage(messages.settingsHint)} (S)`}
-        className={hideSettingsIcon ? "on-hover" : ""}
       >
         <Icon icon="feather:settings" />
       </a>

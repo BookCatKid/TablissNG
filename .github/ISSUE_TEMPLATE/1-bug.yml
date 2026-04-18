@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a bug in TablissNG
+title: "[BUG] "
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Open a new tab
+        2. Click on '...'
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected vs. Actual Behavior
+      description: What did you expect to happen, and what happened instead?
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Extension Version
+      description: e.g., v1.6.6 (found in settings)
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser
+      placeholder: Chrome 123 / Firefox 124
+    validations:
+      required: true
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / Videos
+      description: Drag and drop images here to help us visualize the issue (if applicable).
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console Logs (if applicable)
+      description: Please paste any relevant errors from the browser console (F12).
+      render: shell
+    validations:
+      required: false

@@ -493,7 +493,7 @@
   "settings.font.weight": "Gewicht",
   "settings.github.star": "Stern",
   "settings.github.watch": "Beobachten",
-  "settings.hideIcon": "Einstellungssymbol ausblenden",
+  "settings.hideIcon": "Hide Settings Toolbar",
   "settings.hideMenu": "Einstellungsmenü automatisch ausblenden",
   "settings.highlighting": "Hervorheben zulassen",
   "settings.iconPosition": "Position des Einstellungssymbols",
