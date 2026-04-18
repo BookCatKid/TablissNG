@@ -19,12 +19,12 @@ This is handled by the `sync-assets.js` script, which runs automatically before 
 1. **Install dependencies**:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Start the development server**:
    ```bash
-   npm start
+   pnpm start
    ```
    This will run the asset sync and start the Docusaurus development server at [http://localhost:3000/TablissNG/docs/](http://localhost:3000/TablissNG/docs/).
 
@@ -33,7 +33,7 @@ This is handled by the `sync-assets.js` script, which runs automatically before 
 To generate the static site:
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 The output will be located in the `build/` directory.
@@ -41,7 +41,7 @@ The output will be located in the `build/` directory.
 You can view all available scripts by running:
 
 ```bash
-npm run
+pnpm run
 ```
 
 ## Deployment

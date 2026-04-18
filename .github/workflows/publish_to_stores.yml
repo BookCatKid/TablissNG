@@ -41,6 +41,9 @@ jobs:
     name: Upload extension to Firefox Store
     runs-on: ubuntu-latest
     steps:
+      - uses: pnpm/action-setup@v5
+        with:
+          standalone: true
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -51,7 +54,7 @@ jobs:
           path: dist/firefox
 
       - name: Install web-ext
-        run: npm install --global web-ext
+        run: pnpm add -g web-ext
 
       - name: Submit to Firefox Add-ons
         run: |
