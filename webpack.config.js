@@ -1,7 +1,6 @@
 require("dotenv/config");
 
 const path = require("path");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
@@ -26,6 +25,7 @@ const config = {
     path: path.resolve("dist", buildTarget),
     publicPath: isProduction ? "./" : "/",
     filename: isWeb ? "[name].[contenthash:12].js" : "[name].js",
+    clean: true,
   },
   mode: isProduction ? "production" : "development",
   resolve: {
@@ -69,10 +69,22 @@ const config = {
         include: path.resolve("./src"),
         use: [
           {
-            loader: "ts-loader",
+            loader: "swc-loader",
             options: {
-              transpileOnly: true,
-              experimentalWatchApi: true,
+              jsc: {
+                parser: {
+                  syntax: "typescript",
+                  tsx: true,
+                  dynamicImport: true,
+                },
+                transform: {
+                  react: {
+                    runtime: "automatic",
+                    refresh: !isProduction,
+                  },
+                },
+                target: "es2020",
+              },
             },
           },
         ],
@@ -80,7 +92,6 @@ const config = {
     ],
   },
   plugins: [
-    new CleanWebpackPlugin(),
     new CopyWebpackPlugin({
       patterns: [
         { from: "target/shared" },
@@ -127,6 +138,7 @@ const config = {
   },
   cache: {
     type: "filesystem",
+    name: buildTarget,
     buildDependencies: {
       config: [__filename],
     },
