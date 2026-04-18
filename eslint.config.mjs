@@ -7,6 +7,9 @@ import tseslint from "typescript-eslint";
 
 /** @type {import('eslint').Linter.Config} */
 export default defineConfig(
+  {
+    ignores: ["dist/", "docs/.docusaurus/", "docs/build/", "target/"],
+  },
   eslint.configs.recommended,
   tseslint.configs.recommended,
   eslintReact.configs["recommended-typescript"],
@@ -27,7 +30,6 @@ export default defineConfig(
   {
     files: [
       "webpack.config.js",
-      "jest.config.json",
       "scripts/**/*.js",
       "eslint.config.mjs",
       "docs/sync-assets.js",
