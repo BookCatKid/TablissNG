@@ -26,7 +26,7 @@ jobs:
           - web
           - safari
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
       - uses: pnpm/action-setup@v5
@@ -46,7 +46,7 @@ jobs:
           TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-${{ matrix.build_target }}${{ inputs.artifact_suffix }}
           path: dist/${{ matrix.build_target }}
@@ -55,7 +55,7 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
       - uses: pnpm/action-setup@v5
@@ -71,7 +71,7 @@ jobs:
         working-directory: docs
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-docs${{ inputs.artifact_suffix }}
           path: docs/build

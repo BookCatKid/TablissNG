@@ -68,7 +68,7 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
 
       - name: Upload Signed XPI Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-firefox-signed
           path: dist/signed-firefox/*.xpi
@@ -137,7 +137,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
