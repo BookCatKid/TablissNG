@@ -30,7 +30,7 @@
     "lint:fix": "pnpm run lint --fix",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
-    "test": "jest",
+    "test": "tsc && jest",
     "translations": "node ./scripts/translations.js",
     "sign:firefox": "node ./scripts/firefox-sign-manual.js",
     "deps:check": "pnpm dlx npm-check",
