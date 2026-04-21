@@ -1,11 +1,12 @@
 import React, {
   createContext,
-  useContext,
-  useState,
   useCallback,
-  useRef,
+  useContext,
   useEffect,
+  useRef,
+  useState,
 } from "react";
+
 import { DraggedItemStyle, Item } from "../types";
 
 type ListIdToDisplayList = Map<string, HTMLDivElement>;
@@ -107,6 +108,11 @@ interface DragContextProviderProps {
 
 export function DragContextProvider({ children }: DragContextProviderProps) {
   const [dragState, setDragState] = useState<DragState>(null);
+  const dragStateRef = useRef<DragState>(null);
+
+  useEffect(() => {
+    dragStateRef.current = dragState;
+  }, [dragState]);
 
   const displayListsRef = useRef<ListIdToDisplayList>(new Map());
   const itemsRef = useRef<ListIdToItemElements>(new Map());
@@ -262,17 +268,17 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   };
 
   useEffect(() => {
-    if (!dragState) return;
-
-    const sourceListId = dragState.sourceListId;
-    const dragStyle = dragState.style;
-
     const handlePointerMove = (e: PointerEvent) => {
+      const current = dragStateRef.current;
+      if (!current) return;
+
+      const sourceListId = current.sourceListId;
+      const dragStyle = current.style;
+
       let overListId: string | null = null;
       let overItemId: string | null = null;
       let destinationIndex: number | null = null;
 
-      // Find which list the cursor is over
       displayListsRef.current.forEach((element, listId) => {
         const rect = element.getBoundingClientRect();
         if (
@@ -286,15 +292,9 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       });
 
       if (overListId) {
-        console.log("Checking list ");
         const realItems = itemsRef.current.get(overListId) ?? [];
         const placeholder = placeholdersRef.current.get(overListId);
-        console.log("PLACE HOLDER", placeholder);
 
-        // Build a unified sorted list of real item elements + the placeholder
-        // element (if one exists in this list), ordered top-to-bottom by their
-        // current DOM position. This ensures destinationIndex accounts for the
-        // placeholder slot that has been rendered into the list.
         type SlotEntry =
           | { kind: "item"; element: HTMLDivElement; itemId: string }
           | { kind: "placeholder"; element: HTMLDivElement };
@@ -314,7 +314,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
             b.element.getBoundingClientRect().top,
         );
 
-        // Find which slot the cursor is inside
         for (const slot of slots) {
           const rect = slot.element.getBoundingClientRect();
           if (
@@ -326,9 +325,6 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
             if (slot.kind === "item") {
               overItemId = slot.itemId;
             }
-            // Whether it's an item or the placeholder itself, record the
-            // sorted index as the destination so callers get the correct
-            // position in the fully-rendered list
             destinationIndex = slots.indexOf(slot);
             break;
           }
@@ -361,7 +357,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
 
     window.addEventListener("pointermove", handlePointerMove);
     return () => window.removeEventListener("pointermove", handlePointerMove);
-  }, [dragState]);
+  }, []);
 
   const isDragging = dragState !== null;
 

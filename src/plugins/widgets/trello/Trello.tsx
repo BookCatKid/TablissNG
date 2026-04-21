@@ -1,6 +1,6 @@
 import "./Trello.sass";
 
-import { FC, useCallback, useEffect, useMemo,useRef } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef } from "react";
 import { FormattedMessage } from "react-intl";
 
 import useAuth from "../../../hooks/useAuth";
@@ -104,7 +104,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       try {
         if (controller.signal.aborted) {
-          console.log("Aborting before fetching");
           return;
         }
 
@@ -115,14 +114,13 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         );
 
         if (controller.signal.aborted) {
-          console.log("Aborting after fetching");
           return;
         }
 
         receivedToUILists(listsWithData);
       } catch (error: unknown) {
-        if (error instanceof Error && error.name === "AbortError") {
-          console.log("Request aborted");
+        if (error instanceof Error && error.name !== "AbortError") {
+          console.error(`TRELLO ${(error as Error).message}`);
         }
       }
     };
@@ -201,50 +199,52 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
             items: updatedDestItems,
           };
 
-          setCache({
-            ...cache,
-            lists: updatedResponses,
-          });
+          // setCache({
+          //   ...cache,
+          //   lists: updatedResponses,
+          // });
 
           const session = await getSession();
           console.log("SESSION ", session);
 
-          if (session) {
-            // Update positions on trello
-            await moveCardToList(
-              item.id,
-              insertIndex,
-              toListId,
-              updatedDestItems,
-              session,
-            );
+          // TODO change this to revalidate after period of inactivity
+          // Keep disabled while fixing bugs
+          // if (session) {
+          //   // Update positions on trello
+          //   await moveCardToList(
+          //     item.id,
+          //     insertIndex,
+          //     toListId,
+          //     updatedDestItems,
+          //     session,
+          //   );
 
-            // Revalidate both lists to update positions using Trello as the source of truth
-            const [updatedSourceItems, updatedDestinationItems] =
-              await Promise.all([
-                getItems(fromListId, session),
-                await getItems(toListId, session),
-              ]);
+          //   // Revalidate both lists to update positions using Trello as the source of truth
+          //   const [updatedSourceItems, updatedDestinationItems] =
+          //     await Promise.all([
+          //       getItems(fromListId, session),
+          //       await getItems(toListId, session),
+          //     ]);
 
-            const revalidated = { ...cacheRef.current.lists };
-            if (updatedSourceItems) {
-              revalidated[fromListId] = {
-                ...source,
-                status: "COMPLETED",
-                items: updatedSourceItems,
-              };
-            }
+          //   const revalidated = { ...cacheRef.current.lists };
+          //   if (updatedSourceItems) {
+          //     revalidated[fromListId] = {
+          //       ...source,
+          //       status: "COMPLETED",
+          //       items: updatedSourceItems,
+          //     };
+          //   }
 
-            if (updatedDestinationItems) {
-              revalidated[toListId] = {
-                ...destination,
-                status: "COMPLETED",
-                items: updatedDestinationItems,
-              };
-            }
+          //   if (updatedDestinationItems) {
+          //     revalidated[toListId] = {
+          //       ...destination,
+          //       status: "COMPLETED",
+          //       items: updatedDestinationItems,
+          //     };
+          //   }
 
-            setCache({ ...cache, lists: revalidated });
-          }
+          //   setCache({ ...cache, lists: revalidated });
+          // }
         }
       }
     },
@@ -273,10 +273,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         items: updatedItems,
       };
 
-      setCache({
-        ...cache,
-        lists: updatedResponses,
-      });
+      // setCache({
+      //   ...cache,
+      //   lists: updatedResponses,
+      // });
     },
     [cache, setCache],
   );
@@ -288,8 +288,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
       sourceListId: string,
       style: DraggedItemStyle,
     ) => {
-      const { width: skeletonWidth, height: skeletonHeight } = style.size;
-
       const fetchJob = cache.lists[sourceListId];
       if (!fetchJob) {
         return;
@@ -300,6 +298,7 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         isItem(i) && i.id !== item.id;
       const updatedItems = fetchJob.items.filter(notSourceItem);
 
+      const { width: skeletonWidth, height: skeletonHeight } = style.size;
       updatedItems.splice(sourceItemIndex, 0, {
         width: skeletonWidth,
         height: skeletonHeight,
@@ -333,10 +332,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
           (i) => i !== sourceListId,
         );
         const updated = clearPlaceholdersFromList({ ...cache.lists }, listIds);
-        setCache({
-          ...cache,
-          lists: updated,
-        });
+        // setCache({
+        //   ...cache,
+        //   lists: updated,
+        // });
         return;
       }
 
@@ -357,13 +356,13 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       let items = [...destination.items];
       items = items.filter((i) => isItem(i));
-      const { width: skeletonWidth, height: skeletonHeight } = style!.size;
+      // const { width: skeletonWidth, height: skeletonHeight } = style!.size;
 
       // Insert placeholder
-      items.splice(hoveredItemIndex, 0, {
-        width: skeletonWidth,
-        height: skeletonHeight,
-      } as PlaceholderItem);
+      // items.splice(hoveredItemIndex, 0, {
+      //   width: skeletonWidth,
+      //   height: skeletonHeight,
+      // } as PlaceholderItem);
 
       const updated: UIList = {
         ...destination,
@@ -372,10 +371,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       updatedResponses[hoveredListId] = updated;
 
-      setCache({
-        ...cache,
-        lists: updatedResponses,
-      });
+      // setCache({
+      //   ...cache,
+      //   lists: updatedResponses,
+      // });
     },
     [cache, setCache],
   );
@@ -417,8 +416,6 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
     handleDragItemOverlap,
     handleDragCancel,
   ]);
-
-  console.log(cache.lists);
 
   return (
     <>
