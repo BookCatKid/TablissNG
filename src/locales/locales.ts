@@ -40,6 +40,7 @@ import sr from "./lang/sr.json";
 import sv from "./lang/sv.json";
 import ta from "./lang/ta.json";
 import th from "./lang/th.json";
+import tok from "./lang/tok.json";
 import tr from "./lang/tr.json";
 import uk from "./lang/uk.json";
 import vi from "./lang/vi.json";
@@ -94,6 +95,7 @@ export const messages: Record<string, Record<string, string>> = {
   "zh-CN": zhCN,
   "zh-TW": zhTW,
   uk: uk,
+  tok: tok,
 };
 
 export const locales = Object.keys(messages);

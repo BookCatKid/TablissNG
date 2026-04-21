@@ -111,7 +111,7 @@ const WidgetDisplay: FC<Props> = ({ display, onChange }) => {
         <br />
         <input
           type="range"
-          value={display.scale}
+          value={display.scale ?? 1}
           list="scale-markers"
           min="0"
           max="3"

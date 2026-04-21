@@ -1,19 +1,23 @@
 .bg-base
     .info-bar
-        display: grid
-        grid-template-columns: 1fr auto 1fr
-        align-items: end
+        display: flex
+        justify-content: space-between
+        align-items: flex-end
         position: absolute
         bottom: 1rem
         left: 1rem
         right: 1rem
 
-        .left-info
-            grid-column: 1
+        .left-info, .right-info
+            max-width: calc(50% - 3rem)
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
 
         .controls
-            grid-column: 2
-            justify-self: center
+            position: absolute
+            left: 50%
+            transform: translateX(-50%)
 
             &.is-on-hover
                 opacity: 0
@@ -23,9 +27,7 @@
             .controls.is-on-hover
                 opacity: 1
         .right-info
-            grid-column: 3
             text-align: right
-            justify-self: end
 
         .hidden
             visibility: hidden

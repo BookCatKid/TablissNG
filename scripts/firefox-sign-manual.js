@@ -21,7 +21,7 @@ async function run() {
     }
 
     console.log("Running tests...");
-    execSync("npm run test", { stdio: "inherit" });
+    execSync("pnpm run test", { stdio: "inherit" });
 
     const pkg = JSON.parse(await fs.readFile("./package.json", "utf-8"));
     const baseVer = pkg.version;
@@ -43,7 +43,7 @@ async function run() {
     console.log(`Version: ${version}`);
 
     console.log("Building and signing...");
-    execSync("npm run build:firefox", { stdio: "inherit" });
+    execSync("pnpm run build:firefox", { stdio: "inherit" });
 
     // Honestly no idea if this even works
     const manifestPath = "./dist/firefox/manifest.json";
@@ -53,7 +53,7 @@ async function run() {
     await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
     execSync(
-      `npx web-ext sign --source-dir ./dist/firefox --artifacts-dir ./dist/signed --channel unlisted`,
+      `pnpm dlx web-ext sign --source-dir ./dist/firefox --artifacts-dir ./dist/signed --channel unlisted`,
       { stdio: "inherit" },
     );
 

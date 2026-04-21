@@ -493,7 +493,7 @@
   "settings.font.weight": "Толщина",
   "settings.github.star": "Поставить звезду",
   "settings.github.watch": "Следить",
-  "settings.hideIcon": "Скрыть иконку настроек",
+  "settings.hideIcon": "Hide Settings Toolbar",
   "settings.hideMenu": "Auto-hide Settings Menu",
   "settings.highlighting": "Разрешить выделение текста",
   "settings.iconPosition": "Позиция иконки Настроек",

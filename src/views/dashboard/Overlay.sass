@@ -4,45 +4,75 @@
     margin: 0.5rem
     padding: 0.5rem
     border-radius: 1.25rem
-    transition: all 0.25s ease-out
+    transition: opacity 0.25s ease-out, background-color 0.25s ease-out
     font-size: 1.1rem
 
-    &.topLeft
+    &.topLeft, &.topRight, &.topCentre
         top: 0
+
+    &.bottomLeft, &.bottomRight, &.bottomCentre
+        bottom: 0
+
+    &.topLeft, &.bottomLeft
         left: 0
 
-    &.topRight
-        top: 0
+    &.topRight, &.bottomRight
         right: 0
         flex-direction: row-reverse
 
-    &.bottomLeft
-        bottom: 0
-        left: 0
+    &.topCentre, &.bottomCentre
+        left: 50%
+        transform: translateX(-50%)
+        margin-left: 0
+        margin-right: 0
+        justify-content: center
 
-    &.bottomRight
-        bottom: 0
-        right: 0
-        flex-direction: row-reverse
+    &__group
+        display: flex
+        align-items: center
 
-    .on-hover
+        &--side
+            flex: 1
+            min-width: 1.5rem
+
+        &--left
+            justify-content: flex-end
+
+        &--right
+            justify-content: flex-start
+
+        &--center
+            justify-content: center
+            flex-shrink: 0
+
+    &.hidden
         opacity: 0
-        transition: all 0.25s ease-out
+
+    &__group--side, .on-hover
+        opacity: 0
+        transition: opacity 0.25s ease-out
 
     &:hover
         opacity: 1
         background-color: var(--bg-overlay)
 
-        .on-hover
+        .on-hover, .Overlay__group--side
             opacity: 1
 
         svg
             color: var(--accent-color)
             filter: none
 
-    a, span
+    button, span
         margin: 0 0.25em
         display: inline-flex
+
+    button
+        cursor: pointer
+        background: none
+        border: none
+        padding: 0
+        color: inherit
 
     svg, i
         transition: stroke 0.25s ease-out

@@ -7,7 +7,12 @@ This guide provides step-by-step instructions for setting up your development en
 Before you begin, ensure you have the following installed on your system:
 
 - **Node.js**: Version 22.x or higher is recommended.
-- **npm**: Usually comes bundled with Node.js.
+- **pnpm**: You can install pnpm globally using npm: (you can also install it with other package managers, see https://pnpm.io/installation)
+
+  ```bash
+  npm install -g pnpm
+  ```
+
 - **Git**: To clone the repository.
 
 ## Setup
@@ -21,7 +26,7 @@ Before you begin, ensure you have the following installed on your system:
 
 2. **Install dependencies**:
    ```bash
-   npm install
+   pnpm install
    ```
 
 ## Development
@@ -33,7 +38,7 @@ To run TablissNG in development mode with hot reloading:
 This will start a local development server and open the web version in your browser.
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### Browser Extensions
@@ -42,13 +47,13 @@ To develop for specific browsers with auto-rebuild on file changes:
 
 ```bash
 # Chromium (Chrome, Edge, Brave, etc.)
-npm run dev:chromium
+pnpm run dev:chromium
 
 # Firefox
-npm run dev:firefox
+pnpm run dev:firefox
 
 # Safari
-npm run dev:safari
+pnpm run dev:safari
 ```
 
 The output will be in the `dist/` directory. You can then load this as an "unpacked extension" in your browser.
@@ -65,33 +70,33 @@ To create a production-ready build for a specific platform:
 
 ```bash
 # Chromium (Chrome, Edge, Brave, etc.)
-npm run build:chromium
+pnpm run build:chromium
 
 # Firefox
-npm run build:firefox
+pnpm run build:firefox
 
 # Safari
-npm run build:safari
+pnpm run build:safari
 ```
 
 ### Web Build
 
 ```bash
-npm run build
+pnpm run build
 ```
 
 All production builds are located in the `dist/` directory, organized by platform (e.g., `dist/firefox/`, `dist/chromium/`).
 
 ## Other Scripts
 
-- `npm test`: Run the test suite.
-- `npm run lint`: Check for code style and potential errors.
-- `npm run lint:fix`: Automatically fix linting errors.
-- `npm run prettier`: Format the codebase using Prettier.
-- `npm run prettier:check`: Check if the codebase follows Prettier formatting rules.
-- `npm run typecheck`: Run TypeScript type checking.
-- `npm run translations`: Manage and update translation files.
-- `npm run sign:firefox`: Manually sign the Firefox extension (requires credentials, mostly for gh workflows).
-- `npm run deps:check`: Check for outdated dependencies using `npm-check`.
-- `npm run deps:update`: Interactively update dependencies.
-- `npm run prepare`: Set up Husky git hooks.
+- `pnpm test`: Run the test suite.
+- `pnpm run lint`: Check for code style and potential errors.
+- `pnpm run lint:fix`: Automatically fix linting errors.
+- `pnpm run prettier`: Format the codebase using Prettier.
+- `pnpm run prettier:check`: Check if the codebase follows Prettier formatting rules.
+- `pnpm run typecheck`: Run TypeScript type checking.
+- `pnpm run translations`: Manage and update translation files.
+- `pnpm run sign:firefox`: Manually sign the Firefox extension (requires credentials, mostly for gh workflows).
+- `pnpm run deps:check`: Check for outdated dependencies using `npm-check`.
+- `pnpm run deps:update`: Interactively update dependencies.
+- `pnpm run prepare`: Set up Husky git hooks.

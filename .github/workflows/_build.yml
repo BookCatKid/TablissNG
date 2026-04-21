@@ -26,23 +26,19 @@ jobs:
           - web
           - safari
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-      - name: Cache webpack
-        uses: actions/cache@v5
-        with:
-          path: .cache
-          key: webpack-${{ matrix.build_target }}-${{ hashFiles('package-lock.json', 'webpack.config.js') }}
+          cache: pnpm
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Build ${{ matrix.build_target }}
-        run: npm run build:${{ matrix.build_target }}
+        run: pnpm run build:${{ matrix.build_target }}
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
@@ -50,7 +46,7 @@ jobs:
           TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-${{ matrix.build_target }}${{ inputs.artifact_suffix }}
           path: dist/${{ matrix.build_target }}
@@ -59,29 +55,23 @@ jobs:
     name: Build Documentation
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
-          cache: npm
-          cache-dependency-path: docs/package-lock.json
-      - name: Cache webpack
-        uses: actions/cache@v5
-        with:
-          path: .cache
-          key: webpack-docs-${{ hashFiles('docs/package-lock.json', 'docs/webpack.config.js') }}
+          cache: pnpm
       - name: Install dependencies
-        run: npm ci
-        working-directory: docs
+        run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
         working-directory: docs
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-docs${{ inputs.artifact_suffix }}
           path: docs/build

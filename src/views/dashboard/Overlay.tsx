@@ -54,50 +54,86 @@ const Overlay: FC = () => {
   const [isFullscreen, handleToggleFullscreen] = useFullscreen();
   useKeyPress(handleToggleFullscreen || null, ["f"]);
 
+  const isCenter =
+    settingsIconPosition === "topCentre" ||
+    settingsIconPosition === "bottomCentre";
+
+  const wrapperClass = `Overlay ${settingsIconPosition}${hideSettingsIcon ? " hidden" : ""}`;
+
+  const settingsBtn = (
+    <button
+      type="button"
+      onClick={toggleSettings}
+      title={`${intl.formatMessage(messages.settingsHint)} (S)`}
+    >
+      <Icon icon="feather:settings" />
+    </button>
+  );
+
+  const errorBtn = errors.length > 0 && (
+    <button
+      type="button"
+      onClick={toggleErrors}
+      title={intl.formatMessage(messages.errorHint)}
+    >
+      <Icon icon="feather:alert-triangle" />
+    </button>
+  );
+
+  const loadingBtn = pending > 0 && (
+    <span title={intl.formatMessage(messages.loadingHint)}>
+      <Icon icon="feather:zap" />
+    </span>
+  );
+
+  const focusBtn = (
+    <button
+      type="button"
+      className={focus ? "" : "on-hover"}
+      onClick={toggleFocus}
+      title={`${intl.formatMessage(messages.focusHint)} (W)`}
+    >
+      <Icon icon={`feather:${focus ? "eye-off" : "eye"}`} />
+    </button>
+  );
+
+  const fullscreenBtn = handleToggleFullscreen && (
+    <button
+      type="button"
+      className="on-hover"
+      onClick={handleToggleFullscreen}
+      title={`${intl.formatMessage(messages.fullscreenHint)} (F)`}
+    >
+      <Icon icon={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`} />
+    </button>
+  );
+
+  if (isCenter) {
+    return (
+      <div className={wrapperClass}>
+        <div className="Overlay__group Overlay__group--side Overlay__group--left">
+          {fullscreenBtn}
+        </div>
+        <div className="Overlay__group Overlay__group--center">
+          {settingsBtn}
+          {errorBtn}
+          {loadingBtn}
+          {focus && focusBtn}
+        </div>
+        <div className="Overlay__group Overlay__group--side Overlay__group--right">
+          {!focus && focusBtn}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`Overlay ${settingsIconPosition}`}>
-      <a
-        onClick={toggleSettings}
-        title={`${intl.formatMessage(messages.settingsHint)} (S)`}
-        className={hideSettingsIcon ? "on-hover" : ""}
-      >
-        <Icon icon="feather:settings" />
-      </a>
-
-      {errors.length > 0 ? (
-        <a
-          onClick={toggleErrors}
-          title={intl.formatMessage(messages.errorHint)}
-        >
-          <Icon icon="feather:alert-triangle" />
-        </a>
-      ) : null}
-
-      {pending > 0 ? (
-        <span title={intl.formatMessage(messages.loadingHint)}>
-          <Icon icon="feather:zap" />
-        </span>
-      ) : null}
-
-      <a
-        className={focus ? "" : "on-hover"}
-        onClick={toggleFocus}
-        title={`${intl.formatMessage(messages.focusHint)} (W)`}
-      >
-        <Icon icon={`feather:${focus ? "eye-off" : "eye"}`} />
-      </a>
-
-      {handleToggleFullscreen ? (
-        <a
-          className="on-hover"
-          onClick={handleToggleFullscreen}
-          title={`${intl.formatMessage(messages.fullscreenHint)} (F)`}
-        >
-          <Icon
-            icon={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`}
-          />
-        </a>
-      ) : null}
+    <div className={wrapperClass}>
+      {settingsBtn}
+      {errorBtn}
+      {loadingBtn}
+      {focusBtn}
+      {fullscreenBtn}
     </div>
   );
 };

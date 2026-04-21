@@ -24,12 +24,20 @@ const positions = [
     icon: "arrow-up-left",
   },
   {
+    value: "topCentre",
+    icon: "arrow-up",
+  },
+  {
     value: "topRight",
     icon: "arrow-up-right",
   },
   {
     value: "bottomLeft",
     icon: "arrow-down-left",
+  },
+  {
+    value: "bottomCentre",
+    icon: "arrow-down",
   },
   {
     value: "bottomRight",
@@ -227,6 +235,9 @@ const System: FC = () => {
           </option>
           <option value="th" title="Thai">
             ไทย
+          </option>
+          <option value="tok" title="Toki Pona">
+            toki pona
           </option>
           <option value="tr" title="Turkish">
             Türkçe
@@ -447,7 +458,7 @@ const System: FC = () => {
           />
         </label>
         <div className="PositionInput">
-          <div className="u-grid-2x2-compact">
+          <div className="u-grid-3x2-compact">
             {positions.map((position) => (
               <IconButton
                 key={position.value}
@@ -479,8 +490,8 @@ const System: FC = () => {
         <span>
           <FormattedMessage
             id="settings.hideIcon"
-            defaultMessage="Hide Settings Icon"
-            description="Hide settings icon toggle label"
+            defaultMessage="Hide Settings Toolbar"
+            description="Hide settings toolbar toggle label"
           />
         </span>
         <input

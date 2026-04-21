@@ -2,6 +2,7 @@
   // This file is not used in compilation. It is here just for a nice editor experience.
   "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
+    "ignoreDeprecations": "6.0", // TODO: remove this when @docusaurus/tsconfig supports TypeScript 6
     "baseUrl": "."
   },
   "exclude": [".docusaurus", "build"]

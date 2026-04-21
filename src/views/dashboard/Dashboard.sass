@@ -29,6 +29,10 @@
         .Slot.topLeft
             top: 2rem
 
+    &.topCentre
+        .Slot.topCentre
+            top: 2rem
+
     &.topRight
         .Slot.topRight
             top: 2rem
@@ -39,6 +43,15 @@
             bottom: 6rem
         .info-bar .left-info
             transform: translateY(-3rem)
+
+    &.bottomCentre
+        .Overlay.bottomCentre
+            bottom: 2.5rem
+        .Slot.bottomCentre
+            bottom: 4.5rem
+        &:not(:has(.info-bar .controls))
+            .Overlay.bottomCentre
+                bottom: 0
 
     &.bottomRight
         .Slot.bottomRight,
