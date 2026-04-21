@@ -10,7 +10,7 @@
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
-- [ ] Translation update <!-- If your change is a Translation update, PLEASE run `npm run translation` before you start editing and after before commiting. Then check the box at the bottom of the checklist.-->
+- [ ] Translation update <!-- If your change is a Translation update, PLEASE run `pnpm run translations` before you start editing and again before committing. Then check the box at the bottom of the checklist.-->
 
 ## Changelog Entry
 
@@ -34,5 +34,5 @@
 - [ ] Added or updated unit tests (if applicable)
 - [ ] All new and existing tests passed
 - [ ] I have added a changelog entry
-- [ ] I ran `npm run translations`
+- [ ] I ran `pnpm run translations`
 - [ ] This PR is ready to be merged

@@ -23,9 +23,13 @@ export async function getForecast(
     "hourly=weathercode&" +
     "timeformat=unixtime&" +
     `temperature_unit=${units === "us" ? "fahrenheit" : "celsius"}`;
-  const res = await fetch(url);
-  const body = await res.json();
-  loader.pop();
+  let body;
+  try {
+    const res = await fetch(url);
+    body = await res.json();
+  } finally {
+    loader.pop();
+  }
 
   // Process results
   // TODO: validate response

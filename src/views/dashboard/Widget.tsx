@@ -157,6 +157,19 @@ const Widget: FC<WidgetProps> = ({
     }
   };
 
+  const transformOriginMap: Record<string, string> = {
+    topLeft: "top left",
+    topCentre: "top center",
+    topRight: "top right",
+    middleLeft: "center left",
+    middleCentre: "center center",
+    middleRight: "center right",
+    bottomLeft: "bottom left",
+    bottomCentre: "bottom center",
+    bottomRight: "bottom right",
+    free: "center center",
+  };
+
   const styles: CSSProperties = {
     position: position === "free" ? "absolute" : "relative",
     color: useAccentColor ? accent : colour,
@@ -170,6 +183,7 @@ const Widget: FC<WidgetProps> = ({
     transform: isEditingPosition
       ? undefined
       : `scale(${scale}) rotate(${rotation}deg)`,
+    transformOrigin: transformOriginMap[position] || "center center",
     ...(position === "free" && {
       left: `${offset.x}px`,
       top: `${offset.y}px`,

@@ -68,6 +68,34 @@ const ImageSettings: FC<Props> = ({
         }
       />
       <label>
+        <FormattedMessage
+          id="backgrounds.media.sortOrder"
+          defaultMessage="Sort order"
+        />
+        <select
+          value={data.sortOrder}
+          onChange={(event) =>
+            setData({
+              ...data,
+              sortOrder: event.target.value as "sequence" | "random",
+            })
+          }
+        >
+          <option value="sequence">
+            <FormattedMessage
+              id="backgrounds.media.sortOrderSequence"
+              defaultMessage="In sequence"
+            />
+          </option>
+          <option value="random">
+            <FormattedMessage
+              id="backgrounds.media.sortOrderRandom"
+              defaultMessage="Random"
+            />
+          </option>
+        </select>
+      </label>
+      <label>
         <input
           accept=".mp4, .webm, .ogg, image/*"
           multiple={true}

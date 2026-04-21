@@ -82,7 +82,7 @@ If you want to install the extension manually, or want nightly builds, see [INST
 
 ## Running Locally
 
-For local development, you'll need Node.js and NPM installed. Latest versions should work.
+For local development, you'll need Node.js and pnpm installed. Latest versions should work.
 
 First, clone the repo:
 
@@ -94,24 +94,24 @@ cd TablissNG
 Then install the dependencies:
 
 ```sh
-npm install
+pnpm install
 ```
 
 ### Available Commands
 
-- `npm run dev` — Start a local development server
-- `npm run build` — Build the project
-- `npm run test` — Run tests
-- `npm run translations` — Manage translation files (see TRANSLATING.md)
-- `npm run lint:fix` — Run ESLint with --fix (or just `npm run lint` for checking)
-- `npm run prettier` — Run Prettier with --write (or npm run `prettier:check` for checking)
-- `npm run deps:update` — Run interactive dependency update tool (or `npm run deps:check` to just check for updates and unused dependencies)
+- `pnpm run dev` — Start a local development server
+- `pnpm run build` — Build the project
+- `pnpm run test` — Run tests
+- `pnpm run translations` — Manage translation files (see TRANSLATING.md)
+- `pnpm run lint:fix` — Run ESLint with --fix (or just `pnpm run lint` for checking)
+- `pnpm run prettier` — Run Prettier with --write (or `pnpm run prettier:check` for checking)
+- `pnpm run deps:update` — Run interactive dependency update tool (or `pnpm run deps:check` to just check for updates and unused dependencies)
 
 By default, build and dev will target the web version. To specify a platform (Chromium or Firefox), append `:chromium` or `:firefox` to the command. For example:
 
 ```sh
-npm run dev:chromium
-npm run build:firefox
+pnpm run dev:chromium
+pnpm run build:firefox
 ```
 
 <details>

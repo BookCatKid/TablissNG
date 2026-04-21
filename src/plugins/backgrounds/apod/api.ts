@@ -33,10 +33,11 @@ export async function getPicture(
   }
 
   loader.push();
-  const res = await fetch(`${url}?${params}`);
-  const json = await res.json();
-
-  loader.pop();
-
-  return json;
+  try {
+    const res = await fetch(`${url}?${params}`);
+    const json = await res.json();
+    return json;
+  } finally {
+    loader.pop();
+  }
 }

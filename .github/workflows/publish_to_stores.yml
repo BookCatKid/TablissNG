@@ -41,17 +41,19 @@ jobs:
     name: Upload extension to Firefox Store
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+        with:
+          standalone: true
+      - uses: actions/setup-node@v6
         with:
           node-version: 24
-
       - uses: actions/download-artifact@v7
         with:
           name: tabliss-firefox
           path: dist/firefox
 
       - name: Install web-ext
-        run: npm install --global web-ext
+        run: pnpm add -g web-ext
 
       - name: Submit to Firefox Add-ons
         run: |
@@ -66,7 +68,7 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
 
       - name: Upload Signed XPI Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: tabliss-firefox-signed
           path: dist/signed-firefox/*.xpi
@@ -87,7 +89,7 @@ jobs:
           cd dist/chromium
           zip -r ../../release.zip .
 
-      - uses: mnao305/chrome-extension-upload@v5.0.0
+      - uses: mnao305/chrome-extension-upload@v6.0.0
         with:
           file-path: release.zip
           extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
@@ -135,7 +137,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
@@ -216,7 +218,7 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v3
         with:
           name: Version ${{ steps.version.outputs.version }}
           tag_name: ${{ steps.version.outputs.ref }}

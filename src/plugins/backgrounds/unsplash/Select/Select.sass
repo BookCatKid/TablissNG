@@ -1,0 +1,89 @@
+.multiselect
+    position: relative
+    display: flex
+    align-items: center
+    border: 1px solid var(--border-main)
+    border-radius: 0.2em
+    background: var(--bg-input)
+    cursor: pointer
+    min-height: 36px
+    padding: 2px 5px
+    outline: none
+
+    &:focus, &--open
+        border-color: var(--accent-color)
+
+    &__content
+        display: flex
+        flex: 1
+        flex-wrap: wrap
+        align-items: center
+        gap: 0.25em
+        min-width: 0
+
+    &__placeholder
+        color: var(--text-muted)
+        padding: 0.25em
+
+    &__tags
+        display: flex
+        flex-wrap: wrap
+        gap: 0.25em
+        padding: 0.25em
+
+    &__tag
+        background: var(--accent-color)
+        color: var(--text-on-primary)
+        padding: 2px 8px
+        border-radius: 1em
+        font-size: 0.9em
+
+    &__input
+        border: none
+        background: transparent
+        outline: none
+        font-size: inherit
+        color: inherit
+        padding: 0.25em
+        flex: 1
+        min-width: 60px
+        width: auto
+        margin: 0
+
+    &__handle
+        display: flex
+        align-items: center
+        padding: 0 2px
+        color: var(--text-secondary)
+
+    &__dropdown
+        position: absolute
+        top: calc(100% + 2px)
+        left: -1px
+        right: -1px
+        background: var(--bg-input)
+        border: 1px solid var(--border-main)
+        border-radius: 0.2em
+        overflow: auto
+        z-index: 9
+        padding: 0
+
+    &__item
+        padding: 5px 10px
+        cursor: pointer
+
+        &:hover, &--active
+            background: color-mix(in srgb, var(--accent-color) 15%, transparent)
+
+        &--selected
+            background: var(--accent-color)
+            color: var(--text-on-primary)
+
+            &:hover, &.multiselect__item--active
+                background: var(--accent-color)
+                opacity: 0.9
+
+    &__no-data
+        padding: 10px
+        text-align: center
+        color: var(--text-muted)

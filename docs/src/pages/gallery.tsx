@@ -1,8 +1,21 @@
-import type { ReactNode } from "react";
-import Layout from "@theme/Layout";
-import Heading from "@theme/Heading";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import Heading from "@theme/Heading";
+import Layout from "@theme/Layout";
+import type { ReactNode } from "react";
+
 import styles from "./index.module.sass";
+
+function ScreenshotImage({ src, index }: { src: string; index: number }) {
+  return (
+    <div>
+      <img
+        src={useBaseUrl(`img/screenshots/${src}`)}
+        alt={`Tabliss Screenshot ${index + 1}`}
+        className={styles.showcaseImage}
+      />
+    </div>
+  );
+}
 
 export default function Gallery(): ReactNode {
   const screenshots = [
@@ -33,13 +46,7 @@ export default function Gallery(): ReactNode {
             }}
           >
             {screenshots.map((src, index) => (
-              <div key={index}>
-                <img
-                  src={useBaseUrl(`img/screenshots/${src}`)}
-                  alt={`Tabliss Screenshot ${index + 1}`}
-                  className={styles.showcaseImage}
-                />
-              </div>
+              <ScreenshotImage key={index} src={src} index={index} />
             ))}
           </div>
         </div>

@@ -487,7 +487,7 @@
   "settings.font.weight": "Graisse",
   "settings.github.star": "Étoile",
   "settings.github.watch": "Veille",
-  "settings.hideIcon": "Cacher l’icône des paramètres",
+  "settings.hideIcon": "Hide Settings Toolbar",
   "settings.hideMenu": "Cacher automatiquement le menu des paramètres",
   "settings.highlighting": "Autoriser le surlignage",
   "settings.iconPosition": "Position de l’icône des paramètres",

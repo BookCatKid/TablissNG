@@ -8,6 +8,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+### Translations
+
+- Added toki pona translation.
+
 ## [1.6.6] - 4/4/2026 | LeetCode widget, APOD improvements, and important bugfixes
 
 Adds a new LeetCode calendar widget, APOD video support and cache improvements, a backgrounds controls visibility toggle, configurable quote refresh timeout, and a critical quick link upload bugfix. Also includes translation updates and A LOT OF INTERNAL REFACTORS.

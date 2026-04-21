@@ -43,10 +43,7 @@ const Unsplash: FC<Props> = ({
   }, []);
 
   const { item, go, handlePause } = useBackgroundRotation({
-    fetch: () => {
-      loader.push();
-      return fetchImages(data).finally(loader.pop);
-    },
+    fetch: () => fetchImages(data),
     cacheObj: { cache, setCache },
     data,
     setData,

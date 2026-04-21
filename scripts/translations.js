@@ -1,11 +1,10 @@
 const fs = require("fs");
-const { glob } = require("glob");
 const manageTranslations = require("react-intl-translations-manager").default;
 const parser = require("typescript-react-intl").default;
 
 // Add your language here
 // `xx` and `xx-XX` formats are accepted (e.g. 'en' or 'en-AU')
-// Then run `npm run translations` to create your language files!
+// Then run `pnpm run translations` to create your language files!
 const languages = [
   "ar",
   "be",
@@ -53,11 +52,12 @@ const languages = [
   "zh-CN",
   "zh-TW",
   "uk",
+  "tok",
 ];
 
 async function main() {
   // Extract messages from source
-  const files = await glob("src/**/*.@(tsx|ts)");
+  const files = fs.globSync("src/**/*.{tsx,ts}");
   const messages = files
     .map((file) => fs.readFileSync(file).toString())
     .reduce((carry, contents) => carry.concat(parser(contents)), []);
