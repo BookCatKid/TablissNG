@@ -20,6 +20,7 @@ const messages = defineMessages({
   searchIcons: {
     id: "plugins.links.input.searchIcons",
     defaultMessage: "Search icons...",
+    description: "Placeholder text for searching icons",
   },
 });
 
@@ -62,6 +63,7 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
           <FormattedMessage
             id="plugins.links.input.cancel"
             defaultMessage="Cancel"
+            description="Button text to cancel icon selection"
           />
         </button>
       }
@@ -70,6 +72,7 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
         <FormattedMessage
           id="plugins.links.input.selectIcon"
           defaultMessage="Select an Icon"
+          description="Dialog title for the icon picker"
         />
       </h2>
 
@@ -99,6 +102,7 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
             <FormattedMessage
               id="plugins.links.input.noIconsFound"
               defaultMessage="No icons found"
+              description="Message shown when icon search yields no results"
             />
           </p>
         )}

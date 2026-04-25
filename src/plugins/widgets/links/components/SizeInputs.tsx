@@ -29,6 +29,7 @@ export const SizeInputs: FC<SizeInputsProps> = ({
           <FormattedMessage
             id="plugins.links.input.resolution"
             defaultMessage="Resolution"
+            description="Label for icon resolution selector"
           />
           <select
             value={resolution ?? 256}
@@ -54,6 +55,7 @@ export const SizeInputs: FC<SizeInputsProps> = ({
         <FormattedMessage
           id="plugins.links.input.conserveAspectRatio"
           defaultMessage="Conserve Aspect Ratio"
+          description="Checkbox label to maintain icon aspect ratio"
         />
       </label>
 
@@ -62,6 +64,7 @@ export const SizeInputs: FC<SizeInputsProps> = ({
           <FormattedMessage
             id="plugins.links.input.scale"
             defaultMessage="Scale"
+            description="Input label for scaling the icon size proportionately"
           />
           <input
             type="number"
@@ -81,6 +84,7 @@ export const SizeInputs: FC<SizeInputsProps> = ({
             <FormattedMessage
               id="plugins.links.input.iconWidth"
               defaultMessage="Icon Width"
+              description="Input label for icon width"
             />
             <input
               type="number"
@@ -94,6 +98,7 @@ export const SizeInputs: FC<SizeInputsProps> = ({
             <FormattedMessage
               id="plugins.links.input.iconHeight"
               defaultMessage="Icon Height"
+              description="Input label for icon height"
             />
             <input
               type="number"
