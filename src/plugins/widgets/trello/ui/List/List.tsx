@@ -1,4 +1,4 @@
-import "./DisplayList.sass";
+import "./List.sass";
 
 import { useRef } from "react";
 
@@ -7,26 +7,21 @@ import { useDragContext } from "../../contexts/DragContext";
 import { isItem, RealOrPlaceholderItem } from "../../types";
 import DisplayItem from "./DisplayItem";
 
-interface DisplayListComponentProps {
+interface ListComponentProps {
   header: string;
   listId: string;
   items: RealOrPlaceholderItem[] | undefined;
   loading: boolean | undefined;
 }
 
-export default function DisplayList({
-  header,
-  listId,
-  items,
-  loading,
-}: DisplayListComponentProps) {
+export function List({ header, listId, items, loading }: ListComponentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { registerDisplayListRef } = useDragContext();
+  const { registerListRef } = useDragContext();
 
   // Register this list as a drop zone
   const setRef = (element: HTMLDivElement | null) => {
     if (element) {
-      registerDisplayListRef(listId, element);
+      registerListRef(listId, element);
     }
     containerRef.current = element;
   };

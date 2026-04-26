@@ -14,26 +14,18 @@ import {
   isItem,
   isPlaceholder,
   Item,
-  List,
   PlaceholderItem,
   Props,
   RealOrPlaceholderItem,
+  SettingsListOption,
   TrelloSession,
   UIList,
 } from "./types";
-import DisplayList from "./ui/DisplayList/DisplayList";
-import DraggableItem from "./ui/DisplayList/DraggableItem";
+import { List } from "./ui/List";
+import DraggableItem from "./ui/List/DraggableItem";
 import { getItems, moveCardToList } from "./utils/api";
 
-const Trello: FC<Props> = (props) => {
-  return (
-    <DragContextProvider>
-      <TrelloContent {...props} />
-    </DragContextProvider>
-  );
-};
-
-const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
+const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
@@ -433,10 +425,10 @@ const TrelloContent: FC<Props> = ({ cache = defaultCache, setCache }) => {
         />
       ) : (
         <div className="display-list-container">
-          {cache.order.map((list: List) => {
+          {cache.order.map((list) => {
             const response = cache.lists[list.id];
             return (
-              <DisplayList
+              <List
                 key={list.id}
                 header={list.name}
                 listId={list.id}

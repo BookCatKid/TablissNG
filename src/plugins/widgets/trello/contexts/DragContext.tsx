@@ -9,7 +9,7 @@ import React, {
 
 import { DraggedItemStyle, Item } from "../types";
 
-type ListIdToDisplayList = Map<string, HTMLDivElement>;
+type ListIdToList = Map<string, HTMLDivElement>;
 type ListIdToItemElements = Map<
   string,
   { element: HTMLDivElement; item: Item }[]
@@ -64,11 +64,8 @@ type DragState = null | {
 interface DragContextValue {
   dragState: DragState;
   itemsRef: ListIdToItemElements;
-  displayListsRef: ListIdToDisplayList;
-  registerDisplayListRef: (
-    listId: string,
-    element: HTMLDivElement | null,
-  ) => void;
+  ListsRef: ListIdToList;
+  registerListRef: (listId: string, element: HTMLDivElement | null) => void;
   registerItemRef: (
     listId: string,
     element: HTMLDivElement | null,
@@ -114,7 +111,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
     dragStateRef.current = dragState;
   }, [dragState]);
 
-  const displayListsRef = useRef<ListIdToDisplayList>(new Map());
+  const ListsRef = useRef<ListIdToList>(new Map());
   const itemsRef = useRef<ListIdToItemElements>(new Map());
 
   // Tracks the single placeholder element per list (at most one at a time)
@@ -126,12 +123,12 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
   const dragDropCallbackRef = useRef<OnDragItemDrop | null>(null);
   const dragCancelCallbackRef = useRef<OnDragCancel | null>(null);
 
-  const registerDisplayListRef = useCallback(
+  const registerListRef = useCallback(
     (listId: string, element: HTMLDivElement | null) => {
       if (element) {
-        displayListsRef.current.set(listId, element);
+        ListsRef.current.set(listId, element);
       } else {
-        displayListsRef.current.delete(listId);
+        ListsRef.current.delete(listId);
       }
     },
     [],
@@ -279,7 +276,7 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       let overItemId: string | null = null;
       let destinationIndex: number | null = null;
 
-      displayListsRef.current.forEach((element, listId) => {
+      ListsRef.current.forEach((element, listId) => {
         const rect = element.getBoundingClientRect();
         if (
           e.clientX >= rect.left &&
@@ -377,8 +374,8 @@ export function DragContextProvider({ children }: DragContextProviderProps) {
       value={{
         dragState,
         itemsRef: itemsRef.current,
-        displayListsRef: displayListsRef.current,
-        registerDisplayListRef,
+        ListsRef: ListsRef.current,
+        registerListRef,
         registerItemRef,
         unregisterItemRef,
         registerPlaceholderRef,

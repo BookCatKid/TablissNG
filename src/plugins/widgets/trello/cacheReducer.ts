@@ -1,9 +1,15 @@
-import { Cache, createUIList, defaultCache, List, UIList } from "./types";
+import {
+  Cache,
+  createUIList,
+  defaultCache,
+  SettingsListOption,
+  UIList,
+} from "./types";
 
 export type CacheReducerAction =
-  | { type: "UPDATE"; order: List[]; lists: UIList[] }
+  | { type: "UPDATE"; order: SettingsListOption[]; lists: UIList[] }
   | { type: "CLEAR" }
-  | { type: "TOGGLE"; order: List[]; target: List };
+  | { type: "TOGGLE"; order: SettingsListOption[]; target: SettingsListOption };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {

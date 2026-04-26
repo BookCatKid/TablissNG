@@ -16,7 +16,7 @@ import {
   Props,
   TrelloSession,
 } from "./types";
-import { Board, List } from "./types";
+import { Board } from "./types";
 import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
 import { onTrelloSignOut, trelloAuthFlow } from "./utils/auth";
 
@@ -35,6 +35,7 @@ const TrelloSettings: FC<Props> = ({
 
   const { boards, isLoading: boardsLoading } = useBoards(data, setData);
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
+
   const {
     lists,
     setLists,
@@ -56,23 +57,21 @@ const TrelloSettings: FC<Props> = ({
   };
 
   const onListCheckboxSelect = (listID: string) => {
-    const targetList = lists.find((list: List) => list.id === listID);
+    const targetList = lists.find((l) => l.id === listID);
     if (!targetList) {
       return;
     }
 
     // Toggle the selected status for the checked list
-    const updatedSettingsOptions = lists.map((list: List) => {
-      return list.id === listID ? { ...list, selected: !list.selected } : list;
+    const updatedSettingsOptions = lists.map((l) => {
+      return l.id === listID ? { ...l, selected: !l.selected } : l;
     });
     setLists(updatedSettingsOptions);
 
     // Call to data reducer
 
     // Update preferences
-    const selectedLists = updatedSettingsOptions.filter(
-      (list: List) => list.selected,
-    );
+    const selectedLists = updatedSettingsOptions.filter((l) => l.selected);
     const newPreference: BoardPreference = {
       boardId: data.selectedID!,
       lists: selectedLists,
@@ -162,7 +161,7 @@ const TrelloSettings: FC<Props> = ({
                 Loading... <Spinner size={16} />
               </div>
             ) : (
-              lists.map((list: List, index) => {
+              lists.map((list, index) => {
                 return (
                   <ListCheckbox
                     key={list.id}
