@@ -3,17 +3,15 @@ import React, { useContext } from "react";
 import { DragContext } from "./Drag";
 
 interface DropZoneProps {
-  as?: React.ElementType;
   dropId: string;
   dropType: string; // Type category — only DragItems with matching dragType can be dropped here
   remember?: boolean; // If true, dropId persists even after the pointer leaves this zone
   style?: React.CSSProperties;
   children?: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-function DropZone({
-  as,
+export function DropZone({
   dropId,
   dropType,
   remember,
@@ -49,9 +47,8 @@ function DropZone({
     }
   }
 
-  const Component = as || "div";
   return (
-    <Component
+    <div
       onDragEnter={(e: React.DragEvent) => {
         e.preventDefault();
         // Only register as active drop zone if types match and something is being dragged
@@ -63,16 +60,14 @@ function DropZone({
       {...props}
     >
       {children}
-      // Invisible overlay that tracks pointer leaving; clears drop zone when it
-      does
+      {/* Invisible overlay that tracks pointer leaving; clears drop zone when it
+      does */}
       {drop === dropId && (
         <div
           style={{ position: "absolute", inset: "0px" }}
           onDragLeave={handleLeave}
         ></div>
       )}
-    </Component>
+    </div>
   );
 }
-
-export default DropZone;

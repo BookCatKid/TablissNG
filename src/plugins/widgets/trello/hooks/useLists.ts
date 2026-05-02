@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Data, List, TrelloSession, createUIList } from "../types";
+
+import useAuth from "../../../../hooks/useAuth";
 import { CacheReducerAction } from "../cacheReducer";
+import { trelloAuthStore } from "../stores/trelloAuthStore";
+import { createListItems,Data, List, TrelloSession } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
-import { trelloAuthStore } from "../stores/trelloAuthStore";
-import useAuth from "../../../../hooks/useAuth";
 
 export default function useLists(
   data: Data,
@@ -41,14 +42,14 @@ export default function useLists(
       setIsLoading(false);
 
       const selectedLists = lists.filter((l) => l.selected);
-      const uiLists = selectedLists.map((l) => createUIList(l.id));
-      dispatchUI({ type: "UPDATE", order: selectedLists, lists: uiLists });
+      const ListItemss = selectedLists.map((l) => createListItems(l.id));
+      dispatchUI({ type: "UPDATE", order: selectedLists, lists: ListItemss });
     };
 
     if (authStatus === "authenticated") {
       effect();
     }
-  }, [data.selectedID, authStatus]);
+  }, [data.selectedID, authStatus, data.preferences, dispatchUI, getSession]);
 
   return { lists, setLists, isLoading };
 }

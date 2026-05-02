@@ -2,14 +2,17 @@ import React, { useContext } from "react";
 
 import { DragContext } from "./Drag";
 
-interface DragItemProps {
-  as?: React.ElementType;
+interface DraggableItemProps {
   dragId: string;
   dragType: string; // Type category for matching with compatible DropZones
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-function DragItem({ as, dragId, dragType, ...props }: DragItemProps) {
+export function DraggableItem({
+  dragId,
+  dragType,
+  ...props
+}: DraggableItemProps) {
   const context = useContext(DragContext);
 
   if (!context) {
@@ -19,16 +22,17 @@ function DragItem({ as, dragId, dragType, ...props }: DragItemProps) {
 
   const { draggable, dragStart, drag, dragEnd } = context;
 
-  const Component = as || "div";
+  const onDragStart = (e: React.DragEvent) => {
+    dragStart(e, dragId, dragType, e.currentTarget as HTMLElement);
+  };
+
   return (
-    <Component
-      onDragStart={(e: React.DragEvent) => dragStart(e, dragId, dragType)}
-      onDrag={(e: React.DragEvent) => drag(e, dragId, dragType)}
+    <div
+      onDragStart={onDragStart}
+      onDrag={(e: React.DragEvent) => drag(e)}
       draggable={draggable}
       onDragEnd={dragEnd}
       {...props}
     />
   );
 }
-
-export default DragItem;

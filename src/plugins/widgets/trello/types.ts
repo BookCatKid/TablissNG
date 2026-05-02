@@ -113,24 +113,22 @@ export interface TrelloSession extends Session {
   userId: string;
 }
 
-export type RealOrPlaceholderItem = Item | PlaceholderItem;
-
 /**
- * Represents a Trello list in the plugin's UI
- * Each list fetches their items independently and indicate fetching using status = LOADING
+ * Represents the result of fetched trello items in the plugin's UI
+ * Each list fetches their items independently and indicates fetching using status = LOADING
  */
-export type UIList = {
+export type ListItems = {
   listId: string;
-  items: RealOrPlaceholderItem[];
+  items: Item[];
   status: "COMPLETED" | "LOADING" | "FAILED";
 };
 
-export const createUIList = (listId: string) => {
+export const createListItems = (listId: string) => {
   return {
     listId: listId,
     items: [],
     status: "LOADING",
-  } as UIList;
+  } as ListItems;
 };
 
 export type Board = {
@@ -151,29 +149,15 @@ export type Item = {
   labels: TrelloListItemLabel[];
 };
 
-// A blank space / placeholder item that is used for drag previews
-export type PlaceholderItem = {
-  width: number;
-  height: number;
-};
-
 // Store style info on the currently dragged item
-export type DraggedItemStyle = {
+export type DragItemStyle = {
   size: { width: number; height: number };
   fontSize: number; // measured in pixels
 };
 
-export const isPlaceholder = (item: RealOrPlaceholderItem): item is Item => {
-  return !("id" in item);
-};
-
-export const isItem = (item: RealOrPlaceholderItem): item is Item => {
-  return "id" in item;
-};
-
 export type Cache = {
   order: SettingsListOption[]; // Fixed order to render lists
-  lists: Record<string, UIList>; // map list ids to their corresponding job
+  lists: Record<string, ListItems>; // map list ids to their corresponding job
 };
 
 export type Data = {

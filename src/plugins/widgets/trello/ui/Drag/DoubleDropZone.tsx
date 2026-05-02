@@ -1,18 +1,18 @@
 import React, { useContext } from "react";
 
 import { DragContext } from "./Drag";
-import DropZone from "./DropZone";
+import { DropZone } from "./DropZone";
 
 interface DoubleDropZoneProps {
   dropType: string;
-  prevId: string; // dropId for the first half (e.g. "before" or "top")
+  previousId: string; // dropId for the first half (e.g. "before" or "top")
   nextId: string; // dropId for the second half (e.g. "after" or "bottom")
   split?: "x" | "y"; // Split direction: "y" for top/bottom, "x" for left/right
 
   // DropZone props
   remember?: boolean;
   children?: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -20,9 +20,9 @@ interface DoubleDropZoneProps {
  * Only visible while a compatible drag is in progress.
  * Useful for insert-before / insert-after behaviour (eg moving a card above or below its neighbour)
  */
-function DoubleDropZone({
+export function DoubleDropZone({
   dropType,
-  prevId,
+  previousId,
   nextId,
   split = "y",
   remember,
@@ -37,7 +37,7 @@ function DoubleDropZone({
 
   const { dragType, isDragging } = context;
   return (
-    <div style={{ position: "absolute", inset: "0px" }} {...props}>
+    <div style={{ position: "relative" }} {...props}>
       {children}
       {dragType === dropType && isDragging && (
         <div
@@ -49,7 +49,7 @@ function DoubleDropZone({
           }}
         >
           <DropZone
-            dropId={prevId}
+            dropId={previousId}
             style={{ width: "100%", height: "100%" }}
             dropType={dropType}
             remember={remember}
@@ -65,5 +65,3 @@ function DoubleDropZone({
     </div>
   );
 }
-
-export default DoubleDropZone;

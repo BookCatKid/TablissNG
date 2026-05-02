@@ -6,24 +6,11 @@ import { FormattedMessage } from "react-intl";
 import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import { cacheReducer } from "./cacheReducer";
-import { DragContextProvider, useDragContext } from "./contexts/DragContext";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import {
-  defaultCache,
-  DraggedItemStyle,
-  isItem,
-  isPlaceholder,
-  Item,
-  PlaceholderItem,
-  Props,
-  RealOrPlaceholderItem,
-  SettingsListOption,
-  TrelloSession,
-  UIList,
-} from "./types";
+import { defaultCache, Item, ListItems,Props, TrelloSession } from "./types";
+import { Drag, DropPayload } from "./ui/Drag";
 import { List } from "./ui/List";
-import DraggableItem from "./ui/List/DraggableItem";
-import { getItems, moveCardToList } from "./utils/api";
+import { getItems } from "./utils/api";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
@@ -31,12 +18,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     trelloAuthStore,
   );
 
-  const { registerCallbacks, unregisterItemRef, isDragging } = useDragContext();
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
-
-  // Used for throttling updates with overlap callback to prevent flickering
-  const lastOverlapUpdateRef = useRef<DOMHighResTimeStamp>(0);
-  const THROTTLE_MS = 100;
 
   // Keep track of latest version of cache
   const cacheRef = useRef(cache);
@@ -59,32 +41,38 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   type FetchResult = { listId: string; items: Item[] } | null;
 
-  const fetchItemsForList = async (listId: string): Promise<FetchResult> => {
-    const session = await getSession();
-    if (!session) return null;
-    const items = await getItems(listId, session);
-    return items ? { listId: listId, items } : null;
-  };
+  const fetchItemsForList = useCallback(
+    async (listId: string): Promise<FetchResult> => {
+      const session = await getSession();
+      if (!session) return null;
+      const items = await getItems(listId, session);
+      return items ? { listId: listId, items } : null;
+    },
+    [getSession, getItems],
+  );
 
-  // Convert received data into UILists and render
-  const receivedToUILists = (received: FetchResult[]): void => {
-    const updatedLists: UIList[] = [];
-    received.forEach((obj) => {
-      if (obj) {
-        updatedLists.push({
-          listId: obj.listId,
-          items: obj.items,
-          status: "COMPLETED",
-        });
-      }
-    });
+  // Transform received data and render
+  const receivedToListItems = useCallback(
+    (received: FetchResult[]): void => {
+      const updatedLists: ListItems[] = [];
+      received.forEach((obj) => {
+        if (obj) {
+          updatedLists.push({
+            listId: obj.listId,
+            items: obj.items,
+            status: "COMPLETED",
+          });
+        }
+      });
 
-    dispatchUI({
-      type: "UPDATE",
-      order: cacheRef.current.order,
-      lists: updatedLists,
-    });
-  };
+      dispatchUI({
+        type: "UPDATE",
+        order: cacheRef.current.order,
+        lists: updatedLists,
+      });
+    },
+    [dispatchUI],
+  );
 
   /**
    * Fetch items for all selected lists on first load
@@ -109,7 +97,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
           return;
         }
 
-        receivedToUILists(listsWithData);
+        receivedToListItems(listsWithData);
       } catch (error: unknown) {
         if (error instanceof Error && error.name !== "AbortError") {
           console.error(`TRELLO ${(error as Error).message}`);
@@ -122,7 +110,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     }
 
     return () => controller.abort();
-  }, [authStatus]);
+  }, [authStatus, receivedToListItems, fetchItemsForList]);
 
   /**
    * Refetch data when any item's state becomes set to LOADING
@@ -148,7 +136,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
           return;
         }
 
-        receivedToUILists(listsWithData);
+        receivedToListItems(listsWithData);
       } catch (error: unknown) {
         if (error instanceof Error && error.name === "AbortError") {
           console.log("Request Aborted");
@@ -158,256 +146,14 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
     revalidate();
     return () => controller.abort();
-  }, [loadingListIds]);
+  }, [loadingListIds, receivedToListItems, fetchItemsForList]);
 
-  // ================= Drag callbacks ==================
-
-  const handleDrop = useCallback(
-    async (
-      item: Item,
-      insertIndex: number,
-      fromListId: string,
-      toListId: string,
-    ) => {
-      const updatedResponses = { ...cacheRef.current.lists };
-      const source = updatedResponses[fromListId];
-      const destination = updatedResponses[toListId];
-
-      if (source && destination) {
-        const skeletonIndex = source.items.findIndex((i) => isPlaceholder(i));
-
-        if (skeletonIndex !== -1) {
-          let sourceItems = [...source.items];
-          const destItems = [...destination.items];
-
-          destItems.splice(insertIndex, 0, item);
-
-          sourceItems = sourceItems.filter((i) => isItem(i));
-          const updatedDestItems = destItems.filter((i) => isItem(i));
-
-          updatedResponses[fromListId] = { ...source, items: sourceItems };
-          updatedResponses[toListId] = {
-            ...destination,
-            items: updatedDestItems,
-          };
-
-          // setCache({
-          //   ...cache,
-          //   lists: updatedResponses,
-          // });
-
-          const session = await getSession();
-          console.log("SESSION ", session);
-
-          // TODO change this to revalidate after period of inactivity
-          // Keep disabled while fixing bugs
-          // if (session) {
-          //   // Update positions on trello
-          //   await moveCardToList(
-          //     item.id,
-          //     insertIndex,
-          //     toListId,
-          //     updatedDestItems,
-          //     session,
-          //   );
-
-          //   // Revalidate both lists to update positions using Trello as the source of truth
-          //   const [updatedSourceItems, updatedDestinationItems] =
-          //     await Promise.all([
-          //       getItems(fromListId, session),
-          //       await getItems(toListId, session),
-          //     ]);
-
-          //   const revalidated = { ...cacheRef.current.lists };
-          //   if (updatedSourceItems) {
-          //     revalidated[fromListId] = {
-          //       ...source,
-          //       status: "COMPLETED",
-          //       items: updatedSourceItems,
-          //     };
-          //   }
-
-          //   if (updatedDestinationItems) {
-          //     revalidated[toListId] = {
-          //       ...destination,
-          //       status: "COMPLETED",
-          //       items: updatedDestinationItems,
-          //     };
-          //   }
-
-          //   setCache({ ...cache, lists: revalidated });
-          // }
-        }
-      }
-    },
-    [cache, setCache, getSession],
-  );
-
-  const handleDragCancel = useCallback(
-    (sourceItem: Item, sourceItemIndex: number, sourceListId: string) => {
-      const listIds = Object.keys(cacheRef.current.lists);
-      const updatedResponses = clearPlaceholdersFromList(
-        { ...cacheRef.current.lists },
-        listIds,
-      );
-
-      const response = updatedResponses[sourceListId];
-      if (!response) {
-        console.error("TRELLO: failed to cancel");
-        return;
-      }
-
-      const updatedItems = [...response.items];
-      updatedItems.splice(sourceItemIndex, 0, sourceItem);
-
-      updatedResponses[sourceListId] = {
-        ...response,
-        items: updatedItems,
-      };
-
-      // setCache({
-      //   ...cache,
-      //   lists: updatedResponses,
-      // });
-    },
-    [cache, setCache],
-  );
-
-  const handleDragStart = useCallback(
-    (
-      item: Item,
-      sourceItemIndex: number,
-      sourceListId: string,
-      style: DraggedItemStyle,
-    ) => {
-      const fetchJob = cache.lists[sourceListId];
-      if (!fetchJob) {
-        return;
-      }
-      unregisterItemRef(sourceListId, item);
-
-      const notSourceItem = (i: RealOrPlaceholderItem) =>
-        isItem(i) && i.id !== item.id;
-      const updatedItems = fetchJob.items.filter(notSourceItem);
-
-      const { width: skeletonWidth, height: skeletonHeight } = style.size;
-      updatedItems.splice(sourceItemIndex, 0, {
-        width: skeletonWidth,
-        height: skeletonHeight,
-      } as PlaceholderItem);
-
-      const updated: UIList = {
-        ...fetchJob,
-        items: updatedItems,
-      };
-
-      const updatedResponses = { ...cache.lists };
-      updatedResponses[sourceListId] = updated;
-
-      setCache({
-        ...cache,
-        lists: updatedResponses,
-      });
-    },
-    [cache, setCache],
-  );
-
-  const handleDragItemOverlap = useCallback(
-    (
-      sourceListId: string,
-      hoveredItemIndex: number | null,
-      hoveredListId: string | null,
-      style: DraggedItemStyle | null,
-    ) => {
-      if (!hoveredListId) {
-        const listIds = Object.keys(cache.lists).filter(
-          (i) => i !== sourceListId,
-        );
-        const updated = clearPlaceholdersFromList({ ...cache.lists }, listIds);
-        // setCache({
-        //   ...cache,
-        //   lists: updated,
-        // });
-        return;
-      }
-
-      if (hoveredItemIndex === null) {
-        return;
-      }
-
-      // Throttle updates
-      const now = performance.now();
-      if (now - lastOverlapUpdateRef.current < THROTTLE_MS) return;
-      lastOverlapUpdateRef.current = now;
-
-      const updatedResponses = { ...cache.lists };
-      const destination = updatedResponses[hoveredListId];
-      if (!destination) {
-        return;
-      }
-
-      let items = [...destination.items];
-      items = items.filter((i) => isItem(i));
-      // const { width: skeletonWidth, height: skeletonHeight } = style!.size;
-
-      // Insert placeholder
-      // items.splice(hoveredItemIndex, 0, {
-      //   width: skeletonWidth,
-      //   height: skeletonHeight,
-      // } as PlaceholderItem);
-
-      const updated: UIList = {
-        ...destination,
-        items: items,
-      };
-
-      updatedResponses[hoveredListId] = updated;
-
-      // setCache({
-      //   ...cache,
-      //   lists: updatedResponses,
-      // });
-    },
-    [cache, setCache],
-  );
-
-  /**
-   * Clear all skeletons/placeholders from specified lists.
-   * Returns an updated responses map — does not call setCache itself.
-   */
-  const clearPlaceholdersFromList = (
-    responses: Record<string, UIList>,
-    listIds: string[],
-  ) => {
-    const updatedResponses = { ...responses };
-
-    for (const listId of listIds) {
-      const fetchJob = updatedResponses[listId];
-      if (fetchJob) {
-        updatedResponses[listId] = {
-          ...fetchJob,
-          items: fetchJob.items.filter((i) => isItem(i)),
-        };
-      }
-    }
-
-    return updatedResponses;
-  };
-
-  useEffect(() => {
-    registerCallbacks(
-      handleDragStart,
-      handleDrop,
-      handleDragItemOverlap,
-      handleDragCancel,
+  const handleDrop = ({ dragItemId, dragType, dropZoneId }: DropPayload) => {
+    console.log("TRELLO: DROPPED");
+    console.log(
+      `dragItemId: ${dragItemId}, dragType: ${dragType}, dropZoneId: ${dropZoneId}`,
     );
-  }, [
-    registerCallbacks,
-    handleDragStart,
-    handleDrop,
-    handleDragItemOverlap,
-    handleDragCancel,
-  ]);
+  };
 
   return (
     <>
@@ -425,19 +171,20 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         />
       ) : (
         <div className="display-list-container">
-          {cache.order.map((list) => {
-            const response = cache.lists[list.id];
-            return (
-              <List
-                key={list.id}
-                header={list.name}
-                listId={list.id}
-                items={response?.items}
-                loading={response?.status === "LOADING"}
-              />
-            );
-          })}
-          {isDragging && <DraggableItem />}
+          <Drag handleDrop={handleDrop}>
+            {cache.order.map((selectedList) => {
+              const { items, status } = cache.lists[selectedList.id];
+              return (
+                <List
+                  key={selectedList.id}
+                  header={selectedList.name}
+                  listId={selectedList.id}
+                  items={items}
+                  loading={status === "LOADING"}
+                />
+              );
+            })}
+          </Drag>
         </div>
       )}
     </>

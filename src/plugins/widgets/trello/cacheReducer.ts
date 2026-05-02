@@ -1,13 +1,13 @@
 import {
   Cache,
-  createUIList,
+  createListItems,
   defaultCache,
+  ListItems,
   SettingsListOption,
-  UIList,
 } from "./types";
 
 export type CacheReducerAction =
-  | { type: "UPDATE"; order: SettingsListOption[]; lists: UIList[] }
+  | { type: "UPDATE"; order: SettingsListOption[]; lists: ListItems[] }
   | { type: "CLEAR" }
   | { type: "TOGGLE"; order: SettingsListOption[]; target: SettingsListOption };
 
@@ -28,7 +28,7 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
 
       // Add or remove list from UI
       if (operation === "ADD") {
-        updatedLists[target.id] = createUIList(target.id);
+        updatedLists[target.id] = createListItems(target.id);
       } else {
         delete updatedLists[target.id];
       }

@@ -1,46 +1,40 @@
 import "./List.sass";
 
-import { useRef } from "react";
-
 import { Spinner } from "../../../../shared";
-import { useDragContext } from "../../contexts/DragContext";
-import { isItem, RealOrPlaceholderItem } from "../../types";
-import DisplayItem from "./DisplayItem";
+import { Item } from "../../types";
+import { DoubleDropZone, DraggableItem,DropGuide } from "../Drag";
+import ListItem from "./ListItem";
 
 interface ListComponentProps {
   header: string;
   listId: string;
-  items: RealOrPlaceholderItem[] | undefined;
+  items: Item[];
   loading: boolean | undefined;
 }
 
 export function List({ header, listId, items, loading }: ListComponentProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { registerListRef } = useDragContext();
-
-  // Register this list as a drop zone
-  const setRef = (element: HTMLDivElement | null) => {
-    if (element) {
-      registerListRef(listId, element);
-    }
-    containerRef.current = element;
-  };
-
   return (
-    <div className="display-list">
-      <h3 className="display-list-header">{header}</h3>
+    <div className="list">
+      <h3 className="list-header">{header}</h3>
       {loading || !items ? (
         <div className="loader-container">
           <Spinner size={24} />
         </div>
       ) : (
-        <div className={`display-list-items`} ref={setRef}>
+        <div className="list-item-container">
           {items.map((item, i) => (
-            <DisplayItem
-              key={isItem(item) ? item.id : `skeleton-${i}`}
-              item={item}
-              listId={listId}
-            />
+            <DoubleDropZone
+              key={item.id}
+              previousId={`list-${listId}-item-${i}`}
+              nextId={`list-${listId}-item-${i + 1}`}
+              dropType="ITEM"
+              remember
+            >
+              <DropGuide dropType="ITEM" dropId={`list-${listId}-item-${i}`} />
+              <DraggableItem dragId={item.id} dragType="ITEM">
+                <ListItem key={item.id} item={item} />
+              </DraggableItem>
+            </DoubleDropZone>
           ))}
         </div>
       )}

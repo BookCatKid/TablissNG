@@ -1,4 +1,4 @@
-import { BoardPreference, List } from "../types";
+import { BoardPreference, SettingsListOption } from "../types";
 
 /**
  * Returns a filtered subset of lists with only those selected by the user
@@ -6,7 +6,7 @@ import { BoardPreference, List } from "../types";
  * @param lists
  */
 export const applyPreferences = async (
-  lists: List[],
+  lists: SettingsListOption[],
   preference: BoardPreference,
 ) => {
   return lists.map((list) => {

@@ -1,3 +1,5 @@
+import "./Drag.sass";
+
 import React, { useContext } from "react";
 
 import { DragContext } from "./Drag";
@@ -8,21 +10,27 @@ import { DragContext } from "./Drag";
  * that previews where the item will be placed.
  */
 interface DropGuideProps {
-  as?: React.ElementType;
   dropId: string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-function DropGuide({ as, dropId, ...props }: DropGuideProps) {
+export function DropGuide({ dropId, ...props }: DropGuideProps) {
   const context = useContext(DragContext);
 
   if (!context) {
     return null;
   }
 
-  const { dropZoneId } = context;
-  const Component = as || "div";
-  return dropZoneId === dropId ? <Component {...props} /> : null;
-}
+  const { dropZoneId, dragItemStyle } = context;
 
-export default DropGuide;
+  return dropZoneId !== dropId ? null : (
+    <div
+      className="drop-guide"
+      style={{
+        height: `${dragItemStyle?.size.height}px`,
+        width: `${dragItemStyle?.size.width}px`,
+      }}
+      {...props}
+    />
+  );
+}
