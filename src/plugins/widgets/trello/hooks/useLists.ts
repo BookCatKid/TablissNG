@@ -60,7 +60,7 @@ export default function useLists(
     if (authStatus === "authenticated") {
       fetchLists();
     }
-  }, [data.selectedID, dispatchUI, authStatus]);
+  }, [data.selectedID, authStatus]);
 
   return { lists, setLists, isLoading };
 }

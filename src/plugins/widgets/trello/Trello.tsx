@@ -108,7 +108,6 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   const handleDrop = () => {};
 
-  console.log(cache.order);
   return (
     <>
       {authStatus !== "authenticated" ? (
