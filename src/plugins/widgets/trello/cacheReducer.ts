@@ -1,15 +1,9 @@
-import {
-  Cache,
-  createListItems,
-  defaultCache,
-  ListItems,
-  SettingsListOption,
-} from "./types";
+import { Cache, createListItems, defaultCache, List,ListItems } from "./types";
 
 export type CacheReducerAction =
-  | { type: "UPDATE"; order: SettingsListOption[]; lists: ListItems[] }
+  | { type: "UPDATE"; order: List[]; lists: ListItems[] }
   | { type: "CLEAR" }
-  | { type: "TOGGLE"; order: SettingsListOption[]; target: SettingsListOption };
+  | { type: "TOGGLE"; order: List[]; target: List };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {

@@ -1,8 +1,8 @@
-import { BoardPreference, Data, SettingsListOption } from "./types";
+import { BoardPreference, Data, List } from "./types";
 
 type DataReducerAction =
   | { type: "SET_SELECTED_BOARD"; boardId: string }
-  | { type: "ADD_PREFERENCE"; boardId: string; lists: SettingsListOption[] };
+  | { type: "ADD_PREFERENCE"; boardId: string; lists: List[] };
 
 export function dataReducer(data: Data, action: DataReducerAction) {
   switch (action.type) {

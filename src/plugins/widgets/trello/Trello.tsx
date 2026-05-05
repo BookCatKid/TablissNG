@@ -7,7 +7,7 @@ import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import { cacheReducer } from "./cacheReducer";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import { defaultCache, Item, ListItems,Props, TrelloSession } from "./types";
+import { defaultCache, Item, ListItems, Props, TrelloSession } from "./types";
 import { Drag, DropPayload } from "./ui/Drag";
 import { List } from "./ui/List";
 import { getItems } from "./utils/api";
@@ -74,6 +74,12 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [dispatchUI],
   );
 
+  const fetchItemsForListRef = useRef(fetchItemsForList);
+  fetchItemsForListRef.current = fetchItemsForList;
+
+  const receivedToListItemsRef = useRef(receivedToListItems);
+  receivedToListItemsRef.current = receivedToListItems;
+
   /**
    * Fetch items for all selected lists on first load
    */
@@ -89,7 +95,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
         const listsWithData = await Promise.all(
           Object.values(cacheRef.current.lists).map((list) =>
-            fetchItemsForList(list.listId),
+            fetchItemsForListRef.current(list.listId),
           ),
         );
 
@@ -97,7 +103,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
           return;
         }
 
-        receivedToListItems(listsWithData);
+        receivedToListItemsRef.current(listsWithData);
       } catch (error: unknown) {
         if (error instanceof Error && error.name !== "AbortError") {
           console.error(`TRELLO ${(error as Error).message}`);
@@ -110,7 +116,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     }
 
     return () => controller.abort();
-  }, [authStatus, receivedToListItems, fetchItemsForList]);
+  }, [authStatus]);
 
   /**
    * Refetch data when any item's state becomes set to LOADING
@@ -127,16 +133,16 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         console.log("TRELLO: fetching items for new jobs");
         const listsWithData = await Promise.all(
           Object.values(cacheRef.current.lists).map((list) =>
-            fetchItemsForList(list.listId),
+            fetchItemsForListRef.current(list.listId),
           ),
         );
 
         if (controller.signal.aborted) {
-          console.log("Aborting after fetching");
+          console.log("Aborting after fetch");
           return;
         }
 
-        receivedToListItems(listsWithData);
+        receivedToListItemsRef.current(listsWithData);
       } catch (error: unknown) {
         if (error instanceof Error && error.name === "AbortError") {
           console.log("Request Aborted");
@@ -146,7 +152,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
     revalidate();
     return () => controller.abort();
-  }, [loadingListIds, receivedToListItems, fetchItemsForList]);
+  }, [loadingListIds]);
 
   const handleDrop = ({ dragItemId, dragType, dropZoneId }: DropPayload) => {
     console.log("TRELLO: DROPPED");

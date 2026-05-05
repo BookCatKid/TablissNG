@@ -1,3 +1,5 @@
+import "./ListItem.sass";
+
 import { colourPalette, Item } from "../../types";
 
 interface DisplayItemProps {
@@ -6,7 +8,7 @@ interface DisplayItemProps {
 
 export default function ListItem({ item }: DisplayItemProps) {
   return (
-    <div className="display-list-item-content">
+    <div className="item-content-container">
       <div className="labels-container">
         {item.labels.map((label) => (
           <div

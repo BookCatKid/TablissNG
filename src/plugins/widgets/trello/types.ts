@@ -7,7 +7,7 @@ import { API } from "../../types";
  */
 export type BoardPreference = {
   boardId: string;
-  lists: SettingsListOption[];
+  lists: List[];
 };
 
 export type TrelloBoardResponse = {
@@ -136,7 +136,7 @@ export type Board = {
   name: string;
 };
 
-export type SettingsListOption = {
+export type List = {
   id: string;
   name: string;
   selected: boolean;
@@ -156,7 +156,7 @@ export type DragItemStyle = {
 };
 
 export type Cache = {
-  order: SettingsListOption[]; // Fixed order to render lists
+  order: List[]; // Fixed order to render lists
   lists: Record<string, ListItems>; // map list ids to their corresponding job
 };
 

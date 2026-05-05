@@ -1,6 +1,6 @@
 import "./Drag.sass";
 
-import React, { useContext } from "react";
+import { useContext } from "react";
 
 import { DragContext } from "./Drag";
 
@@ -21,9 +21,21 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
     return null;
   }
 
-  const { dropZoneId, dragItemStyle } = context;
+  const { dropZoneId, isDragging, dragItemId, dragItemStyle } = context;
 
-  return dropZoneId !== dropId ? null : (
+  /*
+    If the current target drop zone does not match its own id, render nothing.
+    This behaviour is overridden, however, if the current dragging item's id matches
+    with its id since this implies this dropzone was where the original item came from.
+
+    Trello shows a visual gap when pulling an item out of a list and this replicates that.
+  */
+
+  if (dropZoneId !== dropId && !(isDragging && dragItemId === dropId)) {
+    return null;
+  }
+
+  return (
     <div
       className="drop-guide"
       style={{

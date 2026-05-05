@@ -1,4 +1,4 @@
-.loader-container
+.list-loader-container
   margin: 0 1vw 0 1vw
   padding-top: 4rem
   width: 30vh
@@ -18,7 +18,7 @@
 
 .list-item-container
   width: 30vh
-  height: 31vh
+  height: 30vh
   overflow-y: auto
   scrollbar-color: rgba(255, 255, 255, 0.09) transparent
   scrollbar-width: thin !important
@@ -30,36 +30,5 @@
   &::-webkit-scrollbar-button
     display: none
 
-  // Drop target highlighting
-  &.is-drop-target
-    background: rgba(255, 255, 255, 0.05)
-
-.display-list-item-content
-  overflow-wrap: anywhere
-  word-break: break-word
-  text-align: left
-  padding: 0.25rem
-
-  span
-    user-select: none
-
-  &:hover
-    background: rgba(255, 255, 255, 0.09)
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
-    border-radius: 0.25rem
-    backdrop-filter: blur(5px)
-    -webkit-backdrop-filter: blur(5px)
-
-.labels-container
-  display: flex
-  gap: 0.25rem
-
-// Dragged item styling
-.dragged-item
-    opacity: 0.9
-    cursor: grabbing
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+.hide-list-item
+  display: none

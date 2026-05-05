@@ -27,7 +27,6 @@ export function DoubleDropZone({
   split = "y",
   remember,
   children,
-  ...props
 }: DoubleDropZoneProps) {
   const context = useContext(DragContext);
 
@@ -37,7 +36,7 @@ export function DoubleDropZone({
 
   const { dragType, isDragging } = context;
   return (
-    <div style={{ position: "relative" }} {...props}>
+    <div style={{ position: "relative" }}>
       {children}
       {dragType === dropType && isDragging && (
         <div

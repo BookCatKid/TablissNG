@@ -1,7 +1,7 @@
 import {
   Board,
   Item,
-  SettingsListOption,
+  List,
   TrelloBoardResponse,
   TrelloItemsResponse,
   TrelloListResponse,
@@ -55,7 +55,7 @@ export const getBoards = async (session: TrelloSession) => {
  * @returns
  */
 export const getLists = async (boardId: string, session: TrelloSession) => {
-  return await trelloFetch<TrelloListResponse[], SettingsListOption[]>(
+  return await trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
     session,
     (data) =>
@@ -65,7 +65,7 @@ export const getLists = async (boardId: string, session: TrelloSession) => {
             id: item.id,
             name: item.name,
             selected: false,
-          }) as SettingsListOption,
+          }) as List,
       ),
   );
 };
