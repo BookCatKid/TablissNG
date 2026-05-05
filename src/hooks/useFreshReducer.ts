@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 /**
  * Created in response to the problems with useSavedReducer.
@@ -17,8 +17,11 @@ export function useFreshReducer<S, A>(
   state: S,
   save: (state: S) => void,
 ) {
+  const stateRef = useRef(state);
+  stateRef.current = state;
+
   return useCallback(
-    (action: A) => save(reducer(state, action)),
-    [reducer, state, save],
+    (action: A) => save(reducer(stateRef.current, action)),
+    [reducer, save],
   );
 }

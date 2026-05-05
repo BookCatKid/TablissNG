@@ -1,5 +1,6 @@
 import {
   Board,
+  createFList,
   Item,
   List,
   TrelloBoardResponse,
@@ -40,7 +41,9 @@ const trelloFetch = async <TResponse, TData>(
  * @param session
  * @returns
  */
-export const getBoards = async (session: TrelloSession) => {
+export const getBoards = async (
+  session: TrelloSession,
+): Promise<Board[] | null> => {
   return await trelloFetch<TrelloBoardResponse[], Board[]>(
     `members/${session.userId}/boards`,
     session,
@@ -54,19 +57,14 @@ export const getBoards = async (session: TrelloSession) => {
  * @param session
  * @returns
  */
-export const getLists = async (boardId: string, session: TrelloSession) => {
+export const getLists = async (
+  boardId: string,
+  session: TrelloSession,
+): Promise<List[] | null> => {
   return await trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
     session,
-    (data) =>
-      data.map(
-        (item) =>
-          ({
-            id: item.id,
-            name: item.name,
-            selected: false,
-          }) as List,
-      ),
+    (data) => data.map((item) => createFList(item.id, item.name)),
   );
 };
 
@@ -76,7 +74,10 @@ export const getLists = async (boardId: string, session: TrelloSession) => {
  * @param session
  * @returns
  */
-export const getItems = async (listId: string, session: TrelloSession) => {
+export const getItems = async (
+  listId: string,
+  session: TrelloSession,
+): Promise<Item[] | null> => {
   return await trelloFetch<TrelloItemsResponse[], Item[]>(
     `lists/${listId}/cards`,
     session,

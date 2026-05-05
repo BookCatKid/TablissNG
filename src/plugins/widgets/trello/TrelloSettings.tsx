@@ -17,7 +17,7 @@ import {
   TrelloSession,
 } from "./types";
 import { Board } from "./types";
-import ListCheckbox from "./ui/ListCheckbox/ListCheckbox";
+import { ListCheckbox } from "./ui/ListCheckbox";
 import { onTrelloSignOut, trelloAuthFlow } from "./utils/auth";
 
 const TrelloSettings: FC<Props> = ({
@@ -68,10 +68,12 @@ const TrelloSettings: FC<Props> = ({
     });
     setLists(updatedSettingsOptions);
 
-    // Call to data reducer
+    // Call to data reducer here
 
     // Update preferences
     const selectedLists = updatedSettingsOptions.filter((l) => l.selected);
+    const order = selectedLists.map((l) => l.id);
+
     const newPreference: BoardPreference = {
       boardId: data.selectedID!,
       lists: selectedLists,
@@ -82,7 +84,7 @@ const TrelloSettings: FC<Props> = ({
       [data.selectedID!]: newPreference,
     };
 
-    dispatchUI({ type: "TOGGLE", order: selectedLists, target: targetList });
+    dispatchUI({ type: "TOGGLE", order: order, target: targetList });
     setData({ ...data, preferences: updated });
   };
 

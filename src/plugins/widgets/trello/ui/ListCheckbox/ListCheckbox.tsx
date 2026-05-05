@@ -9,7 +9,7 @@ interface ListCheckboxProps {
   onChange: (listID: string) => void;
 }
 
-const ListCheckbox: FC<ListCheckboxProps> = ({
+export const ListCheckbox: FC<ListCheckboxProps> = ({
   index,
   listID,
   label,
@@ -33,5 +33,3 @@ const ListCheckbox: FC<ListCheckboxProps> = ({
     </label>
   );
 };
-
-export default ListCheckbox;

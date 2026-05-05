@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import { CacheReducerAction } from "../cacheReducer";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
-import { createListItems, Data, List, TrelloSession } from "../types";
+import { Data, List, TrelloSession } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 
@@ -21,14 +21,18 @@ export default function useLists(
   preferencesRef.current = data.preferences;
 
   useEffect(() => {
-    const effect = async () => {
+    const fetchLists = async () => {
       if (!data.selectedID) return;
       setIsLoading(true);
       console.log("TRELLO: Fetching lists");
       const session = await getSession();
-      if (!session) return;
+      if (!session) {
+        return;
+      }
       let lists = await getLists(data.selectedID, session);
-      if (!lists) return;
+      if (!lists) {
+        return;
+      }
 
       if (
         !!preferencesRef.current &&
@@ -36,6 +40,7 @@ export default function useLists(
       ) {
         console.log("TRELLO: Attempting to apply preferences");
         const preferences = preferencesRef.current[data.selectedID];
+        console.log("TRELLO: preferences ", preferences);
         lists = await applyPreferences(lists, preferences);
         console.log("TRELLO: Applied preferences");
       }
@@ -44,14 +49,18 @@ export default function useLists(
       setIsLoading(false);
 
       const selectedLists = lists.filter((l) => l.selected);
-      const ListItemss = selectedLists.map((l) => createListItems(l.id));
-      dispatchUI({ type: "UPDATE", order: selectedLists, lists: ListItemss });
+      const order = selectedLists.map((l) => l.id);
+      dispatchUI({
+        type: "UPDATE",
+        order: order,
+        lists: selectedLists,
+      });
     };
 
     if (authStatus === "authenticated") {
-      effect();
+      fetchLists();
     }
-  }, [data.selectedID, authStatus, dispatchUI, getSession]);
+  }, [data.selectedID, dispatchUI, authStatus]);
 
   return { lists, setLists, isLoading };
 }

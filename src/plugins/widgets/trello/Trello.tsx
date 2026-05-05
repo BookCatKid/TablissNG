@@ -7,9 +7,9 @@ import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import { cacheReducer } from "./cacheReducer";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import { defaultCache, Item, ListItems, Props, TrelloSession } from "./types";
-import { Drag, DropPayload } from "./ui/Drag";
-import { List } from "./ui/List";
+import { defaultCache, Item, List, Props, TrelloSession } from "./types";
+import { Drag } from "./ui/Drag";
+import { List as ListComponent } from "./ui/List";
 import { getItems } from "./utils/api";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
@@ -23,12 +23,12 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   // Keep track of latest version of cache
   const cacheRef = useRef(cache);
 
-  // Track if any lists change their status to loading
+  // Track if any lists change their status to loading, indicating a new fetch is needed
   const loadingListIds = useMemo(
     () =>
       Object.values(cache.lists)
         .filter((l) => l.status === "LOADING")
-        .map((l) => l.listId)
+        .map((l) => l.id)
         .join(","),
     [cache.lists],
   );
@@ -39,14 +39,14 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   // =================== Data fetching ==================
 
-  type FetchResult = { listId: string; items: Item[] } | null;
+  type FetchResult = { id: string; name: string; items: Item[] } | null;
 
   const fetchItemsForList = useCallback(
-    async (listId: string): Promise<FetchResult> => {
+    async (list: List): Promise<FetchResult | null> => {
       const session = await getSession();
       if (!session) return null;
-      const items = await getItems(listId, session);
-      return items ? { listId: listId, items } : null;
+      const items = await getItems(list.id, session);
+      return items ? { id: list.id, name: list.name, items: items } : null;
     },
     [getSession, getItems],
   );
@@ -54,12 +54,14 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   // Transform received data and render
   const receivedToListItems = useCallback(
     (received: FetchResult[]): void => {
-      const updatedLists: ListItems[] = [];
-      received.forEach((obj) => {
-        if (obj) {
+      const updatedLists: List[] = [];
+      received.forEach((o) => {
+        if (o) {
           updatedLists.push({
-            listId: obj.listId,
-            items: obj.items,
+            id: o.id,
+            name: o.name,
+            items: o.items,
+            selected: true,
             status: "COMPLETED",
           });
         }
@@ -74,93 +76,39 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [dispatchUI],
   );
 
-  const fetchItemsForListRef = useRef(fetchItemsForList);
-  fetchItemsForListRef.current = fetchItemsForList;
-
-  const receivedToListItemsRef = useRef(receivedToListItems);
-  receivedToListItemsRef.current = receivedToListItems;
-
-  /**
-   * Fetch items for all selected lists on first load
-   */
+  // Fetch items on first load and when a lists' state changes
   useEffect(() => {
+    if (authStatus !== "authenticated") return;
     const controller = new AbortController();
+
     const fetchData = async () => {
-      console.log("TRELLO: fetching items for all selected lists");
-
+      console.log("TRELLO: fetching items for lists");
       try {
-        if (controller.signal.aborted) {
-          return;
-        }
+        if (controller.signal.aborted) return;
 
-        const listsWithData = await Promise.all(
-          Object.values(cacheRef.current.lists).map((list) =>
-            fetchItemsForListRef.current(list.listId),
+        const fetchResults = await Promise.all(
+          Object.values(cacheRef.current.lists).map((l) =>
+            fetchItemsForList(l),
           ),
         );
 
-        if (controller.signal.aborted) {
-          return;
-        }
+        if (controller.signal.aborted) return;
 
-        receivedToListItemsRef.current(listsWithData);
+        receivedToListItems(fetchResults);
       } catch (error: unknown) {
         if (error instanceof Error && error.name !== "AbortError") {
-          console.error(`TRELLO ${(error as Error).message}`);
+          console.error(`TRELLO ${error.message}`);
         }
       }
     };
 
-    if (authStatus === "authenticated") {
-      fetchData();
-    }
-
+    fetchData();
     return () => controller.abort();
-  }, [authStatus]);
+  }, [authStatus, loadingListIds]);
 
-  /**
-   * Refetch data when any item's state becomes set to LOADING
-   */
-  useEffect(() => {
-    const controller = new AbortController();
-    const revalidate = async () => {
-      try {
-        if (controller.signal.aborted) {
-          console.log("Aborted before fetch");
-          return;
-        }
+  const handleDrop = () => {};
 
-        console.log("TRELLO: fetching items for new jobs");
-        const listsWithData = await Promise.all(
-          Object.values(cacheRef.current.lists).map((list) =>
-            fetchItemsForListRef.current(list.listId),
-          ),
-        );
-
-        if (controller.signal.aborted) {
-          console.log("Aborting after fetch");
-          return;
-        }
-
-        receivedToListItemsRef.current(listsWithData);
-      } catch (error: unknown) {
-        if (error instanceof Error && error.name === "AbortError") {
-          console.log("Request Aborted");
-        }
-      }
-    };
-
-    revalidate();
-    return () => controller.abort();
-  }, [loadingListIds]);
-
-  const handleDrop = ({ dragItemId, dragType, dropZoneId }: DropPayload) => {
-    console.log("TRELLO: DROPPED");
-    console.log(
-      `dragItemId: ${dragItemId}, dragType: ${dragType}, dropZoneId: ${dropZoneId}`,
-    );
-  };
-
+  console.log(cache.order);
   return (
     <>
       {authStatus !== "authenticated" ? (
@@ -178,13 +126,13 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       ) : (
         <div className="display-list-container">
           <Drag handleDrop={handleDrop}>
-            {cache.order.map((selectedList) => {
-              const { items, status } = cache.lists[selectedList.id];
+            {cache.order.map((listId) => {
+              const { items, name, status } = cache.lists[listId];
               return (
-                <List
-                  key={selectedList.id}
-                  header={selectedList.name}
-                  listId={selectedList.id}
+                <ListComponent
+                  key={listId}
+                  header={name}
+                  listId={listId}
                   items={items}
                   loading={status === "LOADING"}
                 />

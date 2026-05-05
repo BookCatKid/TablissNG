@@ -116,30 +116,30 @@ export interface TrelloSession extends Session {
 /**
  * Represents the result of fetched trello items in the plugin's UI
  * Each list fetches their items independently and indicates fetching using status = LOADING
+ *
+ * Selected: whether the list should be displayed in the homepage
  */
-export type ListItems = {
-  listId: string;
+export type List = {
+  id: string;
+  name: string;
   items: Item[];
   status: "COMPLETED" | "LOADING" | "FAILED";
+  selected: boolean;
 };
 
-export const createListItems = (listId: string) => {
+export const createFList = (listId: string, name: string): List => {
   return {
-    listId: listId,
+    id: listId,
+    name: name,
     items: [],
     status: "LOADING",
-  } as ListItems;
+    selected: false,
+  };
 };
 
 export type Board = {
   id: string;
   name: string;
-};
-
-export type List = {
-  id: string;
-  name: string;
-  selected: boolean;
 };
 
 export type Item = {
@@ -156,8 +156,8 @@ export type DragItemStyle = {
 };
 
 export type Cache = {
-  order: List[]; // Fixed order to render lists
-  lists: Record<string, ListItems>; // map list ids to their corresponding job
+  order: string[]; // Array of lists' ids to consistently determine order
+  lists: Record<string, List>; // map list ids to their corresponding list
 };
 
 export type Data = {
