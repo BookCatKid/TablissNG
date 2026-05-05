@@ -113,25 +113,25 @@ export const moveCardToList = async (
     index >= 0 && index < arr.length ? arr[index] : null;
 
   const prevItem = getOrNull(listItems, insertIndex - 1);
-  const nextItem = getOrNull(listItems, insertIndex + 1);
+  const nextItem = getOrNull(listItems, insertIndex);
 
   console.log("PREVIOUS ITEM ", prevItem?.name);
   console.log("NEXT ITEM ", nextItem?.name);
 
-  let newPos: number;
+  let newPosition: number;
 
   if (!prevItem && !nextItem) {
     // Only card in the list
-    newPos = 65536;
+    newPosition = 65536;
   } else if (!prevItem) {
     // Inserting at the top
-    newPos = nextItem!.position / 2;
+    newPosition = nextItem!.position / 2;
   } else if (!nextItem) {
     // Inserting at the bottom
-    newPos = prevItem.position + 65536;
+    newPosition = prevItem.position + 65536;
   } else {
     // Inserting between two cards
-    newPos = (prevItem.position + nextItem.position) / 2;
+    newPosition = (prevItem.position + nextItem.position) / 2;
   }
 
   const response = await fetch(`https://api.trello.com/1/cards/${cardId}`, {
@@ -139,7 +139,7 @@ export const moveCardToList = async (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       idList: targetListId,
-      pos: newPos,
+      pos: newPosition,
       key: TRELLO_API_KEY,
       token: session.accessToken,
     }),

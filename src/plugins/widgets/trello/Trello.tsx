@@ -8,9 +8,9 @@ import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import { cacheReducer } from "./cacheReducer";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
 import { defaultCache, Item, List, Props, TrelloSession } from "./types";
-import { Drag } from "./ui/Drag";
+import { Drag, DropPayload } from "./ui/Drag";
 import { List as ListComponent } from "./ui/List";
-import { getItems } from "./utils/api";
+import { getItems, moveCardToList } from "./utils/api";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
@@ -106,7 +106,69 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     return () => controller.abort();
   }, [authStatus, loadingListIds]);
 
-  const handleDrop = () => {};
+  const handleDrop = useCallback(
+    async (payload: DropPayload) => {
+      if (
+        !payload.dragItemId ||
+        !payload.dropZoneId ||
+        payload.dragType !== "ITEM"
+      ) {
+        return;
+      }
+
+      const dragParts = payload.dragItemId.split("-item-");
+      const dropParts = payload.dropZoneId.split("-item-");
+      if (dragParts.length !== 2 || dropParts.length !== 2) return;
+
+      // Parse source and target
+      const sourceListId = dragParts[0].replace("list-", "");
+      const targetListId = dropParts[0].replace("list-", "");
+      const sourceIndex = parseInt(dragParts[1], 10);
+      const targetIndex = parseInt(dropParts[1], 10);
+      if (isNaN(sourceIndex) || isNaN(targetIndex)) return;
+
+      const currentCache = cacheRef.current;
+      const sourceList = currentCache.lists[sourceListId];
+      const targetList = currentCache.lists[targetListId];
+      if (!sourceList || !targetList) return;
+
+      const movedItem = sourceList.items[sourceIndex];
+      if (!movedItem) return;
+
+      if (sourceListId === targetListId && sourceIndex === targetIndex) return;
+
+      // Update UI
+      dispatchUI({
+        type: "MOVE_ITEM",
+        sourceListId,
+        sourceIndex,
+        targetListId,
+        targetIndex,
+      });
+
+      let adjacentTarget = targetIndex;
+      if (sourceListId === targetListId && sourceIndex < adjacentTarget) {
+        adjacentTarget--;
+      }
+
+      const targetItemsWithoutCard = targetList.items.filter(
+        (_, i) => !(sourceListId === targetListId && i === sourceIndex),
+      );
+
+      // Sync state with trello by applying the same move
+      const session = await getSession();
+      if (!session) return;
+
+      await moveCardToList(
+        movedItem.id,
+        adjacentTarget,
+        targetListId,
+        targetItemsWithoutCard,
+        session,
+      );
+    },
+    [getSession, dispatchUI],
+  );
 
   return (
     <>
