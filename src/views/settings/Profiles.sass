@@ -1,0 +1,58 @@
+.Profiles
+    margin-bottom: 2rem
+
+    .list
+        display: flex
+        flex-direction: column
+        gap: 0.5rem
+        margin: 1rem 0
+
+    .item
+        display: flex
+        align-items: center
+        justify-content: space-between
+        padding: 0.5rem 0.75rem
+        background: var(--bg-button)
+        border-radius: 0.25rem
+
+        &.active
+            background: color-mix(in srgb, var(--accent-color), transparent 75%)
+            border: 1px solid color-mix(in srgb, var(--accent-color), transparent 70%)
+
+    .content
+        flex: 1
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        font-weight: 500
+
+        .name
+            white-space: nowrap
+            overflow: hidden
+            text-overflow: ellipsis
+
+        input
+            padding: 0.25rem 0.5rem
+            width: 100%
+            background: var(--bg-input)
+            border: 1px solid var(--border-main)
+            border-radius: 0.2rem
+            color: inherit
+
+            &:focus
+                border-color: var(--accent-color)
+                outline: none
+
+    .actions
+        display: flex
+        gap: 0.25rem
+        margin-left: 0.5rem
+
+    .create-form
+        margin-top: 1rem
+        display: flex
+        gap: 0.5rem
+        align-items: center
+
+        input
+            flex: 1

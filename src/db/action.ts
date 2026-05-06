@@ -1,9 +1,17 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { nanoid } from "nanoid";
 
 import { DB } from "../lib";
 import migrateFrom2 from "./migrations/migrate2";
 import { selectWidgets } from "./select";
-import { BackgroundDisplay, cache, db, WidgetDisplay } from "./state";
+import {
+  BackgroundDisplay,
+  cache,
+  db,
+  initData,
+  ProfileState,
+  WidgetDisplay,
+} from "./state";
 
 export const createId = (): string => nanoid(12);
 
@@ -99,6 +107,10 @@ export const addWidget = (key: string): void => {
 export const removeWidget = (id: string): void => {
   DB.put(db, `widget/${id}`, null);
   DB.del(db, `data/${id}`);
+  // Delete profile-scoped cache entry
+  const activeProfileId = DB.get(db, "activeProfileId");
+  DB.del(cache, `${activeProfileId}/${id}`);
+  // Delete legacy unscoped cache entry for backward compatibility
   DB.del(cache, id);
 };
 
@@ -133,6 +145,190 @@ export const setWidgetDisplay = (
 /** Toggle dashboard focus mode */
 export const toggleFocus = () => {
   DB.put(db, "focus", !DB.get(db, "focus"));
+};
+
+// Profile actions
+
+/** Get current state as a profile object */
+const getProfileState = (id: string, name: string): ProfileState => {
+  const state: Partial<ProfileState> = { id, name };
+  const globalKeys = new Set(["profiles", "activeProfileId"]);
+
+  const profileData = Object.fromEntries(
+    Array.from(DB.prefix(db, "")).filter(([key]) => !globalKeys.has(key)),
+  ) as Partial<ProfileState>;
+
+  Object.assign(state, profileData);
+
+  return state as ProfileState;
+};
+
+/** Create a new profile */
+export const createProfile = (name: string): void => {
+  const id = createId();
+
+  // Extract default settings from initData, excluding global state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { profiles: _p, activeProfileId: _a, ...defaults } = initData;
+
+  // Create profile using defaults, but inherit current locale
+  const profile: ProfileState = {
+    ...defaults,
+    id,
+    name,
+    locale: DB.get(db, "locale"),
+  } as ProfileState;
+
+  const profiles = { ...DB.get(db, "profiles") };
+  profiles[id] = profile;
+  DB.put(db, "profiles", profiles);
+};
+
+/** Switch to a different profile */
+export const switchProfile = (id: string): void => {
+  const currentId = DB.get(db, "activeProfileId");
+  if (id === currentId) return;
+
+  const profiles = { ...DB.get(db, "profiles") };
+  const targetProfile = profiles[id];
+
+  if (!targetProfile) {
+    console.error(`Profile ${id} not found`);
+    return;
+  }
+
+  // Save current state to profiles (Full save)
+  const currentName = profiles[currentId]?.name || "Default";
+  profiles[currentId] = getProfileState(currentId, currentName);
+
+  // Load target profile
+  DB.atomic(db, () => {
+    // 1. Clear everything
+    const keys = [];
+    for (const [key] of DB.prefix(db, "")) keys.push(key);
+    keys.forEach((key) => DB.del(db, key as any));
+
+    // 2. Restore defaults (excluding widgets/data to avoid resurrecting deleted defaults)
+    Object.entries(initData).forEach(([key, val]) => {
+      if (
+        !key.startsWith("widget/") &&
+        !key.startsWith("data/") &&
+        key !== "profiles"
+      ) {
+        // @ts-ignore
+        DB.put(db, key, val);
+      }
+    });
+
+    // 3. Apply target profile settings
+    Object.entries(targetProfile).forEach(([key, val]) => {
+      if (key !== "id" && key !== "name") {
+        // @ts-ignore
+        DB.put(db, key, val);
+      }
+    });
+
+    // 4. Update profiles map:
+    //    - Current profile is now saved fully (done above)
+    //    - Target profile becomes "hollow" (metadata only) to avoid duplication
+    profiles[id] = { id: targetProfile.id, name: targetProfile.name };
+    DB.put(db, "profiles", profiles);
+
+    // 5. Set active ID
+    DB.put(db, "activeProfileId", id);
+  });
+};
+
+/** Rename a profile */
+export const renameProfile = (id: string, name: string): void => {
+  const profiles = { ...DB.get(db, "profiles") };
+  if (profiles[id]) {
+    profiles[id] = { ...profiles[id], name };
+    DB.put(db, "profiles", profiles);
+
+    // If renaming active profile, we don't need to do anything else
+    // because the name is stored in the profiles map, not the root state
+  }
+};
+
+/** Delete a profile */
+export const deleteProfile = (id: string): void => {
+  const activeId = DB.get(db, "activeProfileId");
+  if (id === activeId) {
+    console.error("Cannot delete active profile");
+    return;
+  }
+
+  // Clean up cache entries scoped to this profile
+  const cachePrefix = `${id}/`;
+  for (const [key] of DB.prefix(cache, cachePrefix) as Iterable<
+    [string, unknown]
+  >) {
+    DB.del(cache, key);
+  }
+
+  const profiles = { ...DB.get(db, "profiles") };
+  delete profiles[id];
+  DB.put(db, "profiles", profiles);
+};
+
+/** Duplicate a profile */
+export const duplicateProfile = (id: string): void => {
+  const profiles = { ...DB.get(db, "profiles") };
+  const activeId = DB.get(db, "activeProfileId");
+  const source =
+    id === activeId
+      ? getProfileState(id, profiles[id]?.name || "Default")
+      : profiles[id];
+
+  if (!source) return;
+
+  const newId = createId();
+  const newProfile: Record<string, unknown> & { id: string; name: string } = {
+    id: newId,
+    name: `${source.name} (Copy)`,
+  };
+
+  // 1. Copy non-widget/non-data properties
+  Object.entries(source).forEach(([key, val]) => {
+    if (
+      !key.startsWith("widget/") &&
+      !key.startsWith("data/") &&
+      key !== "id" &&
+      key !== "name"
+    ) {
+      newProfile[key] = val;
+    }
+  });
+
+  // 2. Process widgets and their associated data
+  Object.entries(source).forEach(([key, val]) => {
+    if (!key.startsWith("widget/")) return;
+
+    if (!val) {
+      newProfile[key] = null;
+      return;
+    }
+
+    const oldWidgetId = val.id;
+    const isDefaultWidget =
+      oldWidgetId === "default-time" || oldWidgetId === "default-greeting";
+    const newWidgetId = isDefaultWidget ? oldWidgetId : createId();
+
+    // Add new widget
+    newProfile[`widget/${newWidgetId}`] = { ...val, id: newWidgetId };
+
+    // Handle associated data
+    const oldDataKey = `data/${oldWidgetId}`;
+    // @ts-ignore
+    if (source[oldDataKey]) {
+      // @ts-ignore
+      newProfile[`data/${newWidgetId}`] = source[oldDataKey];
+    }
+  });
+
+  profiles[newId] = newProfile as ProfileState;
+  DB.put(db, "profiles", profiles);
 };
 
 // Store actions

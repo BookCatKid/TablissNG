@@ -36,8 +36,36 @@ const migrateWeb = async (): Promise<void> => {
   }
 };
 
+/** Migrate un-scoped cache keys to profile-scoped keys */
+const migrateCacheKeys = (): void => {
+  const activeProfileId = DB.get(db, "activeProfileId");
+  if (!activeProfileId) return;
+
+  const toMigrate: [string, unknown][] = [];
+
+  for (const [key, val] of DB.prefix(cache, "") as Iterable<
+    [string, unknown]
+  >) {
+    // Skip keys that are already profile-scoped (contain a slash)
+    if (!key.includes("/")) {
+      toMigrate.push([key, val]);
+    }
+  }
+
+  if (toMigrate.length === 0) return;
+
+  for (const [key, val] of toMigrate) {
+    DB.put(cache, `${activeProfileId}/${key}`, val);
+    DB.del(cache, key);
+  }
+};
+
 /** Check and migrate data */
-export const migrate = BUILD_TARGET === "web" ? migrateWeb : migrateExtension;
+const migrateLegacy = BUILD_TARGET === "web" ? migrateWeb : migrateExtension;
+export const migrate = (): void => {
+  migrateLegacy();
+  migrateCacheKeys();
+};
 
 /** Migrate cache data */
 const migrateCache = (): void => {
@@ -52,8 +80,9 @@ const migrateCache = (): void => {
     read.onsuccess = () => {
       const data: Record<string, unknown> = read.result;
       const used = findUsedIds();
+      const activeProfileId = DB.get(db, "activeProfileId");
       for (const id of used) {
-        if (id in data) DB.put(cache, id, data[id]);
+        if (id in data) DB.put(cache, `${activeProfileId}/${id}`, data[id]);
       }
       // For unexplained reasons this needs to be in a timeout
       setTimeout(() => {
@@ -77,10 +106,14 @@ const findUsedIds = (): Set<string> => {
 /** Find and remove dangling data stored from previous versions */
 const clearDangling = (): void => {
   const used = findUsedIds();
+  const activeProfileId = DB.get(db, "activeProfileId");
   for (const [key] of DB.prefix(db, "data/")) {
     if (!used.has(key.substring(5))) DB.del(db, key);
   }
-  for (const [key] of cache) {
-    if (!used.has(key)) DB.del(cache, key);
+  for (const [key] of DB.prefix(cache, `${activeProfileId}/`) as Iterable<
+    [string, unknown]
+  >) {
+    const pluginId = key.substring(activeProfileId.length + 1);
+    if (!used.has(pluginId)) DB.del(cache, key);
   }
 };

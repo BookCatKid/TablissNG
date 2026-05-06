@@ -15,6 +15,7 @@ import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
 import Background from "./Background";
 import Persist from "./Persist";
+import Profiles from "./Profiles";
 import System from "./System";
 import Widgets from "./Widgets";
 
@@ -206,6 +207,7 @@ const Settings: FC = () => {
         </div>
         <Background />
         <Widgets />
+        <Profiles />
         <System />
         <p style={{ marginBottom: "2rem" }}>
           <FormattedMessage

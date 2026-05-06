@@ -4,7 +4,7 @@ import { defaultLocale } from "../locales";
 /**
  * Database state
  */
-export interface State {
+export interface SettingsState {
   /** Background state */
   background: BackgroundState;
   /** Widget state */
@@ -52,6 +52,16 @@ export interface FaviconState {
   mode: FaviconMode;
   url: string;
   data: string | null;
+}
+
+/**
+ * Database state
+ */
+export interface State extends SettingsState {
+  /** Available profiles */
+  profiles: Record<string, ProfileState>;
+  /** ID of the currently active profile */
+  activeProfileId: string;
 }
 
 export interface BackgroundState {
@@ -125,8 +135,13 @@ export type WidgetPosition =
   | "bottomRight"
   | "free";
 
-// Init data for the store
-const initData: State = {
+export interface ProfileState extends Partial<SettingsState> {
+  id: string;
+  name: string;
+}
+
+// Default settings
+const defaultSettings: SettingsState = {
   background: {
     id: "default-unsplash",
     key: "background/unsplash",
@@ -170,6 +185,18 @@ const initData: State = {
     data: null,
   },
   accent: "#3498db",
+};
+
+// Init data for the store
+export const initData: State = {
+  ...defaultSettings,
+  profiles: {
+    default: {
+      id: "default",
+      name: "Default",
+    },
+  },
+  activeProfileId: "default",
 };
 
 // Database storage
