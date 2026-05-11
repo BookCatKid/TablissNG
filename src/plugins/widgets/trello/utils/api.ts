@@ -15,10 +15,6 @@ import {
 /**
  * Make authenticated call to Trello's API
  * and transform the response into a TData array
- * @param path
- * @param session
- * @param transform
- * @returns
  */
 const trelloFetch = async <TResponse, TData>(
   path: string,
@@ -38,8 +34,6 @@ const trelloFetch = async <TResponse, TData>(
 
 /**
  * Fetch boards all boards owned by the current authenticated user
- * @param session
- * @returns
  */
 export const getBoards = async (
   session: TrelloSession,
@@ -53,9 +47,6 @@ export const getBoards = async (
 
 /**
  * Fetch lists under a specific board owned by the authenticated user
- * @param boardId
- * @param session
- * @returns
  */
 export const getLists = async (
   boardId: string,
@@ -96,10 +87,6 @@ export const getItems = async (
 
 /**
  * Move a card to a different list
- * @param cardId The ID of the card to move
- * @param targetListId The ID of the destination list
- * @param session The Trello session for authentication
- * @returns true if successful, false otherwise
  */
 export const moveCardToList = async (
   cardId: string,
@@ -115,11 +102,7 @@ export const moveCardToList = async (
   const prevItem = getOrNull(listItems, insertIndex - 1);
   const nextItem = getOrNull(listItems, insertIndex);
 
-  console.log("PREVIOUS ITEM ", prevItem?.name);
-  console.log("NEXT ITEM ", nextItem?.name);
-
   let newPosition: number;
-
   if (!prevItem && !nextItem) {
     // Only card in the list
     newPosition = 65536;

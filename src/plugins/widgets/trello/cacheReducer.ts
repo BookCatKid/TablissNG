@@ -50,25 +50,36 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
         return cache;
       }
 
-      const newSourceItems = sourceList.items.filter(
+      // Remove item from source
+      const updatedSourceItems = sourceList.items.filter(
         (_, i) => i !== sourceIndex,
       );
 
-      let adjacentTarget = targetIndex;
-      if (sourceListId === targetListId && sourceIndex < adjacentTarget) {
-        adjacentTarget--;
-      }
-
-      const newTargetItems = [...targetList.items];
-      newTargetItems.splice(adjacentTarget, 0, movedItem);
+      // Insert into target list
+      const updatedTargetItems = [...targetList.items];
+      updatedTargetItems.splice(targetIndex, 0, movedItem);
 
       const updatedLists = { ...cache.lists };
-      updatedLists[sourceListId] = { ...sourceList, items: newSourceItems };
       if (sourceListId !== targetListId) {
-        updatedLists[targetListId] = { ...targetList, items: newTargetItems };
-      } else {
-        updatedLists[sourceListId] = { ...sourceList, items: newTargetItems };
+        updatedLists[sourceListId] = {
+          ...sourceList,
+          items: updatedSourceItems,
+        };
+        updatedLists[targetListId] = {
+          ...targetList,
+          items: updatedTargetItems,
+        };
+        return { ...cache, lists: updatedLists };
       }
+
+      // Handle cases where the item is moved lower within the same list
+      const newItems = sourceList.items.filter((_, i) => i !== sourceIndex);
+
+      // If moving the card down in the same list
+      const adjusted =
+        sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+      newItems.splice(adjusted, 0, movedItem);
+      updatedLists[sourceListId] = { ...sourceList, items: newItems };
 
       return { ...cache, lists: updatedLists };
     }

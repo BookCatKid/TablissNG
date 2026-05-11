@@ -116,15 +116,17 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         return;
       }
 
-      const dragParts = payload.dragItemId.split("-item-");
-      const dropParts = payload.dropZoneId.split("-item-");
-      if (dragParts.length !== 2 || dropParts.length !== 2) return;
+      const dragSourceParts = payload.dragItemId.split("-item-");
+      const dropSourceParts = payload.dropZoneId.split("-item-");
+      if (dragSourceParts.length !== 2 || dropSourceParts.length !== 2) {
+        return;
+      }
 
       // Parse source and target
-      const sourceListId = dragParts[0].replace("list-", "");
-      const targetListId = dropParts[0].replace("list-", "");
-      const sourceIndex = parseInt(dragParts[1], 10);
-      const targetIndex = parseInt(dropParts[1], 10);
+      const sourceListId = dragSourceParts[0].replace("list-", "");
+      const targetListId = dropSourceParts[0].replace("list-", "");
+      const sourceIndex = parseInt(dragSourceParts[1], 10);
+      const targetIndex = parseInt(dropSourceParts[1], 10);
       if (isNaN(sourceIndex) || isNaN(targetIndex)) return;
 
       const currentCache = cacheRef.current;
@@ -146,22 +148,24 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         targetIndex,
       });
 
-      let adjacentTarget = targetIndex;
-      if (sourceListId === targetListId && sourceIndex < adjacentTarget) {
-        adjacentTarget--;
+      // Sync state with trello by applying the same move
+      let adjustedTargetIndex = targetIndex;
+
+      // Handle cases where the item is moved lower in the same list
+      if (sourceListId === targetListId && sourceIndex < targetIndex) {
+        adjustedTargetIndex--;
       }
 
       const targetItemsWithoutCard = targetList.items.filter(
         (_, i) => !(sourceListId === targetListId && i === sourceIndex),
       );
 
-      // Sync state with trello by applying the same move
       const session = await getSession();
       if (!session) return;
 
       await moveCardToList(
         movedItem.id,
-        adjacentTarget,
+        adjustedTargetIndex,
         targetListId,
         targetItemsWithoutCard,
         session,

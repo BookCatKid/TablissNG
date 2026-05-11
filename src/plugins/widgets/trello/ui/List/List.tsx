@@ -2,6 +2,7 @@ import "./List.sass";
 
 import { useContext } from "react";
 
+import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
 import { Item } from "../../types";
 import {
@@ -31,7 +32,10 @@ export function List({ header, listId, items, loading }: ListComponentProps) {
 
   return (
     <div className="list">
-      <h3 className="list-header">{header}</h3>
+      <div className="list-header-container">
+        <h3 className="list-header">{header}</h3>
+        <ExpandIcon />
+      </div>
       {loading || !items ? (
         <div className="list-loader-container">
           <Spinner size={24} />
