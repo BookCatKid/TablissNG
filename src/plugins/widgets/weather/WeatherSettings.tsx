@@ -22,7 +22,7 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
           onChange={(event) =>
             setData({ ...data, autoUpdate: event.target.checked })
           }
-        />{" "}
+        />
         <FormattedMessage
           id="plugins.weather.autoUpdate"
           defaultMessage="Follow location"
@@ -30,7 +30,7 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-      {data.latitude && data.longitude ? (
+      {data.latitude && data.longitude && (
         <>
           <label>
             <FormattedMessage
@@ -54,11 +54,45 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
           <label>
             <input
               type="checkbox"
+              checked={data.showSummary}
+              onChange={(event) =>
+                setData({ ...data, showSummary: event.target.checked })
+              }
+            />
+            <FormattedMessage
+              id="plugins.weather.showSummary"
+              defaultMessage="Show summary"
+              description="Show weather summary title"
+            />
+          </label>
+
+          {data.showSummary && (
+            <div style={{ marginLeft: "1em" }}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={data.showCity}
+                  onChange={(event) =>
+                    setData({ ...data, showCity: event.target.checked })
+                  }
+                />
+                <FormattedMessage
+                  id="plugins.weather.showCity"
+                  defaultMessage="Show city display name"
+                  description="Show city display name title"
+                />
+              </label>
+            </div>
+          )}
+
+          <label>
+            <input
+              type="checkbox"
               checked={data.showDetails}
               onChange={(event) =>
                 setData({ ...data, showDetails: event.target.checked })
               }
-            />{" "}
+            />
             <FormattedMessage
               id="plugins.weather.showDetails"
               defaultMessage="Show extended details"
@@ -69,15 +103,15 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
           <label>
             <input
               type="checkbox"
-              checked={data.showCity}
+              checked={data.showForecast}
               onChange={(event) =>
-                setData({ ...data, showCity: event.target.checked })
+                setData({ ...data, showForecast: event.target.checked })
               }
-            />{" "}
+            />
             <FormattedMessage
-              id="plugins.weather.showCity"
-              defaultMessage="Show city display name"
-              description="Show city display name title"
+              id="plugins.weather.showForecast"
+              defaultMessage="Show 5-day forecast"
+              description="Show 5-day forecast title"
             />
           </label>
 
@@ -86,7 +120,7 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               type="radio"
               checked={data.units === "si"}
               onChange={() => setData({ ...data, units: "si" })}
-            />{" "}
+            />
             <FormattedMessage
               id="plugins.weather.metricUnits"
               defaultMessage="Metric units"
@@ -99,7 +133,7 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               type="radio"
               checked={data.units === "us"}
               onChange={() => setData({ ...data, units: "us" })}
-            />{" "}
+            />
             <FormattedMessage
               id="plugins.weather.imperialUnits"
               defaultMessage="Imperial units"
@@ -121,7 +155,7 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
             </a>
           </p>
         </>
-      ) : null}
+      )}
     </div>
   );
 };

@@ -24,4 +24,5 @@ export const config: Config = {
   dashboardComponent: Unknown,
   settingsComponent: UnknownSettings,
   supportsBackdrop: false,
+  defaultData: {},
 };

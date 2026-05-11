@@ -56,11 +56,24 @@ pnpm run dev:firefox
 pnpm run dev:safari
 ```
 
-The output will be in the `dist/` directory. You can then load this as an "unpacked extension" in your browser.
+The output will be in the `dist/` directory.
+
+### Loading the extension
+
+- **Chromium**
+  1.  Go to [chrome://extensions](chrome://extensions).
+  2.  Enable Developer Mode (top right).
+  3.  Click "Load unpacked".
+  4.  Select the `dist/chromium` folder.
+
+- **Firefox**
+  1.  Go to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox).
+  2.  Click "Load Temporary Add-on".
+  3.  Select the `manifest.json` inside the `dist/firefox` folder.
 
 **Warning: Data Persistence Notice**
 
-Installing manual or nightly builds alongside the store version can cause configuration conflicts. Switching back from a manual build to a store version often requires a full re-installation, which **will erase your settings and data** unless you have exported them. Always [export your settings](https://bookcatkid.github.io/TablissNG/docs/guides/backup-and-export) before switching versions.
+Installing manual or nightly builds alongside the store version can cause configuration conflicts. Switching back from a manual build to a store version often requires a full re-installation, which **will erase your settings and data** unless you have exported them. Always [export your settings](https://tablissng.smrff.dev/guides/backup-and-export) before switching versions.
 
 ## Building for Production
 
@@ -95,7 +108,11 @@ All production builds are located in the `dist/` directory, organized by platfor
 - `pnpm run prettier`: Format the codebase using Prettier.
 - `pnpm run prettier:check`: Check if the codebase follows Prettier formatting rules.
 - `pnpm run typecheck`: Run TypeScript type checking.
-- `pnpm run translations`: Manage and update translation files.
+- `pnpm run translations`: Extract and sync translation files.
+- `pnpm run translations status`: Show translation status (`pnpm run translations status fr`).
+- `pnpm run translations create`: Create a new locale file (`pnpm run translations create de-AT`) and add the locale to `src/locales/registry.ts`.
+- `pnpm run translations compile`: Build production locale artifacts in `src/locales/lang.compiled`.
+- `pnpm run translations migrate`: Migrate renamed translation keys (`pnpm run translations migrate --map old.id=new.id`).
 - `pnpm run sign:firefox`: Manually sign the Firefox extension (requires credentials, mostly for gh workflows).
 - `pnpm run deps:check`: Check for outdated dependencies using `npm-check`.
 - `pnpm run deps:update`: Interactively update dependencies.

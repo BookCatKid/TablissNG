@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import GitHubCalendarWidget from "./GitHub";
 import GitHubSettings from "./GitHubSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: GitHubCalendarWidget,
   settingsComponent: GitHubSettings,
+  defaultData,
 };
 
 export default config;

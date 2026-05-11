@@ -22,8 +22,10 @@ TablissNG allows you to export your entire configuration to a file. This is usef
 3. Select the `.json` file you previously exported.
 4. Your dashboard will refresh and apply the imported settings immediately.
 
-:::tip Data Sync & Persistence
+:::tip[Data Sync & Persistence]
 **Browser Extensions**: If you are signed into your browser (Chrome, Firefox, or Edge), your settings are often synced automatically across your devices.
 
 **Web Version**: Automatic sync is not available on the web version. You can, however, use the **Persist Settings** button in the settings menu to ask your browser to protect your data from being automatically cleared. Note that browsers (especially Chrome) may occasionally deny this request. Your data is typically safe regardless, but a manual export is always the most secure option.
+
+**Limitations**: Cache is not saved or included in exports. This means temporary data such as uploaded images, or other locally cached assets will not be synced or restored when importing settings.
 :::

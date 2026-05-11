@@ -1,102 +1,86 @@
 import { pick } from "in-browser-language";
 
-import ar from "./lang/ar.json";
-import be from "./lang/be.json";
-import caES from "./lang/ca-ES.json";
-import cs from "./lang/cs.json";
-import de from "./lang/de.json";
-import el from "./lang/el.json";
-import enAU from "./lang/en-AU.json";
-import enCA from "./lang/en-CA.json";
-import enGB from "./lang/en-GB.json";
-import es from "./lang/es.json";
-import fa from "./lang/fa.json";
-import fi from "./lang/fi.json";
-import fr from "./lang/fr.json";
-import ga from "./lang/ga.json";
-import gd from "./lang/gd.json";
-import gl from "./lang/gl.json";
-import gu from "./lang/gu.json";
-import hi from "./lang/hi.json";
-import hu from "./lang/hu.json";
-import id from "./lang/id.json";
-import it from "./lang/it.json";
-import ja from "./lang/ja.json";
-import ko from "./lang/ko.json";
-import kp from "./lang/kp.json";
-import lb from "./lang/lb.json";
-import lt from "./lang/lt.json";
-import ne from "./lang/ne.json";
-import nl from "./lang/nl.json";
-import no from "./lang/no.json";
-import pl from "./lang/pl.json";
-import pt from "./lang/pt.json";
-import ptBR from "./lang/pt-BR.json";
-import ro from "./lang/ro.json";
-import ru from "./lang/ru.json";
-import sk from "./lang/sk.json";
-import sq from "./lang/sq.json";
-import sr from "./lang/sr.json";
-import sv from "./lang/sv.json";
-import ta from "./lang/ta.json";
-import th from "./lang/th.json";
-import tok from "./lang/tok.json";
-import tr from "./lang/tr.json";
-import uk from "./lang/uk.json";
-import vi from "./lang/vi.json";
-import zhCN from "./lang/zh-CN.json";
-import zhTW from "./lang/zh-TW.json";
+import extractedMessages from "./extractedMessages/messages.json";
+import {
+  localeAliases,
+  locales as localeCodes,
+  translatableLocales,
+} from "./registry";
 
-export const messages: Record<string, Record<string, string>> = {
-  ar: ar,
-  be: be,
-  "ca-ES": caES,
-  cs: cs,
-  de: de,
-  el: el,
-  en: {},
-  "en-AU": enAU,
-  "en-CA": enCA,
-  "en-GB": enGB,
-  es: es,
-  fa: fa,
-  fi: fi,
-  fr: fr,
-  ga: ga,
-  gd: gd,
-  gl: gl,
-  gu: gu,
-  hi: hi,
-  hu: hu,
-  id: id,
-  it: it,
-  ja: ja,
-  ko: ko,
-  kp: kp,
-  lt: lt,
-  lb: lb,
-  ne: ne,
-  nl: nl,
-  no: no,
-  ro: ro,
-  ru: ru,
-  sk: sk,
-  sq: sq,
-  sr: sr,
-  sv: sv,
-  pl: pl,
-  pt: pt,
-  "pt-BR": ptBR,
-  ta: ta,
-  th: th,
-  tr: tr,
-  vi: vi,
-  zh: {},
-  "zh-CN": zhCN,
-  "zh-TW": zhTW,
-  uk: uk,
-  tok: tok,
+export type LocaleMessages = Record<string, string>;
+
+type LocaleModule = { default: LocaleMessages };
+type LocaleLoader = () => Promise<LocaleModule>;
+
+export const baseMessages: LocaleMessages = Object.fromEntries(
+  Object.entries(extractedMessages).map(([id, entry]) => [
+    id,
+    typeof entry.defaultMessage === "string" ? entry.defaultMessage : "",
+  ]),
+);
+
+const createLocaleLoader = (code: string): LocaleLoader => {
+  if (DEV) {
+    return () =>
+      import(
+        /* webpackChunkName: "locales/[request]" */
+        `./lang/${code}.json`
+      );
+  }
+
+  return () =>
+    import(
+      /* webpackChunkName: "locales/[request]" */
+      `./lang.compiled/${code}.json`
+    );
 };
 
-export const locales = Object.keys(messages);
+const localeLoaders: Record<string, LocaleLoader> = Object.fromEntries(
+  translatableLocales.map((code) => [code, createLocaleLoader(code)]),
+);
+
+const loadedLocaleMessages = new Map<string, LocaleMessages>();
+
+export const locales = [...localeCodes, ...Object.keys(localeAliases)];
 export const defaultLocale = pick(locales, "en");
+
+export const resolveLocale = (locale: string): string => {
+  if (locale === "en") return "en";
+  if (localeLoaders[locale]) return locale;
+
+  const mappedLocale = localeAliases[locale];
+  if (mappedLocale) return mappedLocale;
+
+  const baseLocale = locale.split("-")[0];
+  if (baseLocale) {
+    if (baseLocale === "en") return "en";
+
+    const mappedBaseLocale = localeAliases[baseLocale];
+    if (mappedBaseLocale) return mappedBaseLocale;
+
+    if (localeLoaders[baseLocale]) return baseLocale;
+  }
+
+  return "en";
+};
+
+export const loadMessages = async (locale: string): Promise<LocaleMessages> => {
+  const resolvedLocale = resolveLocale(locale);
+  if (resolvedLocale === "en") return {};
+
+  const cached = loadedLocaleMessages.get(resolvedLocale);
+  if (cached) return cached;
+
+  const loader = localeLoaders[resolvedLocale];
+  if (!loader) return {};
+
+  try {
+    const module = await loader();
+    const messages = module.default;
+    loadedLocaleMessages.set(resolvedLocale, messages);
+    return messages;
+  } catch (error) {
+    console.error(`Failed to load locale "${resolvedLocale}":`, error);
+    return {};
+  }
+};

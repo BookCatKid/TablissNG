@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import IpInfo from "./IpInfo";
 import IpInfoSettings from "./IpInfoSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: IpInfo,
   settingsComponent: IpInfoSettings,
+  defaultData,
 };
 
 export default config;

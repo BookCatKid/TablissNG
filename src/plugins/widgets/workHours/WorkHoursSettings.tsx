@@ -1,12 +1,20 @@
 import { FC } from "react";
-import { FormattedMessage } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
-import { useFormatMessages } from "../../../hooks/useFormatMessages";
-import { days } from "./messages";
+import { weekdayFullMessages } from "../../../locales/messages";
 import { defaultData, Props } from "./types";
 
 const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
-  const dayNames = useFormatMessages(days);
+  const intl = useIntl();
+  const dayNames = {
+    sunday: intl.formatMessage(weekdayFullMessages.sunday),
+    monday: intl.formatMessage(weekdayFullMessages.monday),
+    tuesday: intl.formatMessage(weekdayFullMessages.tuesday),
+    wednesday: intl.formatMessage(weekdayFullMessages.wednesday),
+    thursday: intl.formatMessage(weekdayFullMessages.thursday),
+    friday: intl.formatMessage(weekdayFullMessages.friday),
+    saturday: intl.formatMessage(weekdayFullMessages.saturday),
+  };
   const daysArray = [
     { index: 0, name: dayNames.sunday },
     { index: 1, name: dayNames.monday },

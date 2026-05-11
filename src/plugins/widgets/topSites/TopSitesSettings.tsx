@@ -1,4 +1,5 @@
 import { FC } from "react";
+import { FormattedMessage } from "react-intl";
 
 import { defaultData, Props } from "./types";
 
@@ -8,7 +9,11 @@ const TopSitesSettings: FC<Props> = ({ data = defaultData, setData }) => {
   return (
     <div className="TopSitesSettings">
       <label>
-        Number of columns
+        <FormattedMessage
+          id="plugins.topSites.columns"
+          defaultMessage="Number of columns"
+          description="Label for the number of columns input in Top Sites settings"
+        />
         <input
           type="number"
           value={data.columns}
@@ -27,7 +32,11 @@ const TopSitesSettings: FC<Props> = ({ data = defaultData, setData }) => {
             setData({ ...data, linkOpenStyle: !data.linkOpenStyle })
           }
         />
-        Links open in a new tab
+        <FormattedMessage
+          id="plugins.topSites.newTab"
+          defaultMessage="Links open in a new tab"
+          description="Label for the toggle that makes links open in a new tab"
+        />
       </label>
 
       <label>
@@ -38,13 +47,21 @@ const TopSitesSettings: FC<Props> = ({ data = defaultData, setData }) => {
             setData({ ...data, linksNumbered: !data.linksNumbered })
           }
         />
-        Links are numbered
+        <FormattedMessage
+          id="plugins.topSites.numbered"
+          defaultMessage="Links are numbered"
+          description="Label for the toggle that displays numbers next to links"
+        />
       </label>
 
       <hr />
 
       <label>
-        Icon Provider
+        <FormattedMessage
+          id="plugins.topSites.iconProvider"
+          defaultMessage="Icon Provider"
+          description="Label for the icon provider select input"
+        />
         <select
           value={data.iconProvider}
           onChange={(event) =>
@@ -58,7 +75,11 @@ const TopSitesSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
 
       <label>
-        Maximum Text Length
+        <FormattedMessage
+          id="plugins.topSites.maxTextLength"
+          defaultMessage="Maximum Text Length"
+          description="Label for the maximum text length input"
+        />
         <input
           type="number"
           min="0"

@@ -27,6 +27,7 @@ export default function Gallery(): ReactNode {
     "screenshot_6.png",
     "screenshot_7.png",
     "screenshot_8.png",
+    // "screenshot_9.png", // keep this off until we get another screenshot to balance the grid
   ];
 
   return (

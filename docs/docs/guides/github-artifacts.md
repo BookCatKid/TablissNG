@@ -16,7 +16,7 @@ Artifacts are files generated during the build process of every commit. They are
 3. Scroll down to the **Artifacts** section at the bottom of the page.
 4. Click on the `.zip` file for your browser (e.g., `tabliss-chromium`, `tabliss-firefox`, or `tabliss-safari`) to download it.
 
-:::note GitHub Account Required
+:::note[GitHub Account Required]
 You must be logged into a GitHub account to download artifacts directly from the Actions tab.
 
 **If you don't have an account or can't log in:**
@@ -32,7 +32,7 @@ Once downloaded, you can follow the **Manual Installation** steps for your brows
 - [Microsoft Edge](../getting-started/installation/edge.md#method-2-manual-installation)
 - [Safari](../getting-started/installation/safari.md#installation)
 
-:::tip Which artifact to choose?
+:::tip[Which artifact to choose?]
 
 - For Chrome, Edge, and Brave, use **`tabliss-chromium`**.
 - For Firefox, use **`tabliss-firefox`**.

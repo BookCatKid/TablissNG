@@ -55,6 +55,7 @@ const BaseSettings = <T extends BaseSettingsData>({
         <FormattedMessage
           id="backgrounds.base.showNewPhoto"
           defaultMessage="Show a new photo"
+          description="Label for the setting that controls how often a new background photo is shown"
         />
       )}
 
@@ -75,11 +76,7 @@ const BaseSettings = <T extends BaseSettingsData>({
           <FormattedMessage {...timingMessages.everyDay} />
         </option>
         <option value="604800">
-          <FormattedMessage
-            id="plugins.everyWeek"
-            defaultMessage="Every week"
-            description="Every week title"
-          />
+          <FormattedMessage {...timingMessages.everyWeek} />
         </option>
       </select>
     </label>

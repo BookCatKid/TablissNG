@@ -22,6 +22,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
     showSeconds,
     timeZone,
     showDayPeriod = true,
+    showSeparator,
   } = data;
   let time = useTime(timeZone ? "absolute" : "zoned");
 
@@ -63,7 +64,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
 
       {showDate && (
         <>
-          {(!hideTime || name) && (
+          {(!hideTime || name) && showSeparator && (
             <hr
               style={{
                 borderColor: color,

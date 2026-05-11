@@ -175,14 +175,14 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       {authStatus !== "authenticated" ? (
         <FormattedMessage
           id="plugins.trello.unauthenticatedMessage"
-          defaultMessage={"Sign into Trello to use me"}
-          description={"Sign into Trello to use me"}
+          defaultMessage="Sign into Trello to use me"
+          description="Sign into Trello to use me"
         />
       ) : !cache.order || (!!cache && cache.order.length === 0) ? (
         <FormattedMessage
           id="plugins.trello.noListsMessage"
-          defaultMessage={"Add some lists to view"}
-          description={"Add some lists to view"}
+          defaultMessage="Add some lists to view"
+          description="Add some lists to view"
         />
       ) : (
         <div className="display-list-container">

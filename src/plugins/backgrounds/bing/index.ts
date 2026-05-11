@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Bing from "./Bing";
 import BingSettings from "./BingSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -24,6 +25,7 @@ const config: Config = {
   dashboardComponent: Bing,
   settingsComponent: BingSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

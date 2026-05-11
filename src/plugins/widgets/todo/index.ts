@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Todo from "./Todo";
 import TodoSettings from "./TodoSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Todo,
   settingsComponent: TodoSettings,
+  defaultData,
 };
 
 export default config;

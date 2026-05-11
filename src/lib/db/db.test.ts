@@ -36,7 +36,7 @@ test("database del", () => {
 
 test("database listen", () => {
   const db = DB.init();
-  const fn = jest.fn();
+  const fn = rstest.fn();
   DB.listen(db, fn);
   DB.put(db, "test", "test");
   expect(fn).toHaveBeenCalledWith(["test", "test"]);
@@ -44,7 +44,7 @@ test("database listen", () => {
 
 test("database listen unsubscribe", () => {
   const db = DB.init();
-  const fn = jest.fn();
+  const fn = rstest.fn();
   const unsub = DB.listen(db, fn);
   unsub();
   DB.put(db, "test", "test");

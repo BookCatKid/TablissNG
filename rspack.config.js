@@ -17,6 +17,7 @@ const config = {
     maxEntrypointSize: 1024000,
     maxAssetSize: 1024000,
   },
+  lazyCompilation: false,
   entry: {
     polyfills: "./src/polyfills.ts",
     main: ["normalize.css", "./src/styles.sass", "./src/main.tsx"],

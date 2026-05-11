@@ -7,6 +7,14 @@ export interface Conditions {
   weatherCode: number;
 }
 
+/** Daily weather conditions for a date */
+export interface DailyConditions {
+  timestamp: number;
+  temperatureMax: number;
+  temperatureMin: number;
+  weatherCode: number;
+}
+
 /** Find conditions for the current time */
 export const findCurrent = (
   conditions: Conditions[],

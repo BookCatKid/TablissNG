@@ -28,7 +28,7 @@ Use these methods if you want the absolute latest features (Nightly) or want to 
 
 ### Method 2: Manual Installation (Developer Mode)
 
-:::info key included in manifest
+:::info[key included in manifest]
 A key is included in the manifest primarily for ease of testing the Trello widget. The key makes the extension install with the same ID every time like it does on Firefox, even when manually installing it.
 :::
 
@@ -42,11 +42,11 @@ A key is included in the manifest primarily for ease of testing the Trello widge
 6. Click **"Load unpacked"**.
 7. Select the folder where you unzipped the extension (ensure `manifest.json` is in the root of that folder).
 
-:::warning Keep Folder Location
+:::warning[Keep Folder Location]
 **Do not move or rename the extension folder after installation.** If you move or delete it, the extension will stop working.
 :::
 
-:::note
+:::note[Note]
 This **does** persist across browser restarts.
 :::
 

@@ -4,7 +4,6 @@ import { FC } from "react";
 import { GitHubCalendar } from "react-github-calendar";
 import { useIntl } from "react-intl";
 
-import { useFormatMessages } from "../../../hooks/useFormatMessages";
 import { useTheme } from "../../../hooks/useTheme";
 import {
   calendarLegendMessages,
@@ -16,9 +15,33 @@ import { defaultData, Props } from "./types";
 
 const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
   const intl = useIntl();
-  const months = useFormatMessages(monthMessages);
-  const weekdays = useFormatMessages(weekdayMessages);
-  const legend = useFormatMessages(calendarLegendMessages);
+  const months = {
+    jan: intl.formatMessage(monthMessages.jan),
+    feb: intl.formatMessage(monthMessages.feb),
+    mar: intl.formatMessage(monthMessages.mar),
+    apr: intl.formatMessage(monthMessages.apr),
+    may: intl.formatMessage(monthMessages.may),
+    jun: intl.formatMessage(monthMessages.jun),
+    jul: intl.formatMessage(monthMessages.jul),
+    aug: intl.formatMessage(monthMessages.aug),
+    sep: intl.formatMessage(monthMessages.sep),
+    oct: intl.formatMessage(monthMessages.oct),
+    nov: intl.formatMessage(monthMessages.nov),
+    dec: intl.formatMessage(monthMessages.dec),
+  };
+  const weekdays = {
+    sun: intl.formatMessage(weekdayMessages.sun),
+    mon: intl.formatMessage(weekdayMessages.mon),
+    tue: intl.formatMessage(weekdayMessages.tue),
+    wed: intl.formatMessage(weekdayMessages.wed),
+    thu: intl.formatMessage(weekdayMessages.thu),
+    fri: intl.formatMessage(weekdayMessages.fri),
+    sat: intl.formatMessage(weekdayMessages.sat),
+  };
+  const legend = {
+    less: intl.formatMessage(calendarLegendMessages.less),
+    more: intl.formatMessage(calendarLegendMessages.more),
+  };
   const { isDark } = useTheme();
 
   if (!data.username) return null;

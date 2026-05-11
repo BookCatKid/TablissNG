@@ -9,11 +9,12 @@ import Crashed from "./Crashed";
 type Props = {
   id: string;
   component: ComponentType<API<any, any>>;
+  defaultData: unknown;
 };
 
-const Plugin: FC<Props> = ({ id, component: Component }) => {
+const Plugin: FC<Props> = ({ id, component: Component, defaultData }) => {
   // Create plugin API
-  const api = useApi(id);
+  const api = useApi(id, defaultData);
 
   return <Component {...api} />;
 };

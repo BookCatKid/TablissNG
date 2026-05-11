@@ -3,6 +3,7 @@ import { FormattedMessage } from "react-intl";
 
 import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
+import { commonMessages } from "../../../locales/messages";
 import Button from "../../../views/shared/Button";
 import { Spinner } from "../../shared";
 import { cacheReducer } from "./cacheReducer";
@@ -111,9 +112,19 @@ const TrelloSettings: FC<Props> = ({
           primary={authState !== "pending"}
           onClick={onAuthenticateClick}
         >
-          {authState === "unauthenticated" || authState === "pending"
-            ? "Authenticate"
-            : "Authenticating..."}
+          {authState === "unauthenticated" ? (
+            <FormattedMessage
+              id="plugins.trello.authenticate.button"
+              defaultMessage="Authenticate"
+              description="Button text to start Trello authentication"
+            />
+          ) : (
+            <FormattedMessage
+              id="plugins.trello.authenticating"
+              defaultMessage="Authenticating..."
+              description="Status message while Trello authentication is in progress"
+            />
+          )}
         </Button>
       </>
     );
@@ -130,7 +141,8 @@ const TrelloSettings: FC<Props> = ({
         <div>
           {boardsLoading ? (
             <div className="loading" style={{ marginLeft: "4px" }}>
-              Loading... <Spinner size={16} />
+              <FormattedMessage {...commonMessages.loading} />{" "}
+              <Spinner size={16} />
             </div>
           ) : (
             <select
@@ -154,13 +166,14 @@ const TrelloSettings: FC<Props> = ({
         <label>
           <FormattedMessage
             id="plugins.trello.listSelect"
-            defaultMessage={"Select lists"}
-            description={`Select lists`}
+            defaultMessage="Select lists"
+            description="Select lists"
           />
           <div className="list-select-container">
             {listsLoading || boardsLoading ? (
               <div className="loading">
-                Loading... <Spinner size={16} />
+                <FormattedMessage {...commonMessages.loading} />{" "}
+                <Spinner size={16} />
               </div>
             ) : (
               lists.map((list, index) => {
@@ -181,7 +194,11 @@ const TrelloSettings: FC<Props> = ({
       </div>
       <div className="offset">
         <Button primary onClick={onSignout}>
-          Sign Out
+          <FormattedMessage
+            id="plugins.trello.signout"
+            defaultMessage="Sign Out"
+            description="Button text to sign out of Trello"
+          />
         </Button>
       </div>
     </>

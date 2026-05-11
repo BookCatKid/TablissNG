@@ -23,7 +23,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issueNumber,
-              body: "✅ This issue has been fixed in development, but the fix is **not live yet**. It will be included in the next release.\n\nIf you'd like to test the fix early, you can install the latest nightly build by following the instructions in the [docs](https://bookcatkid.github.io/TablissNG/docs/category/installation).\n\nIf you believe this was closed in error or the issue persists after the next release, feel free to reopen this issue."
+              body: "✅ This issue has been fixed in development, but the fix is **not live yet**. It will be included in the next release.\n\nIf you'd like to test the fix early, you can install the latest nightly build by following the instructions in the [docs](https://tablissng.smrff.dev/category/installation).\n\nIf you believe this was closed in error or the issue persists after the next release, feel free to reopen this issue."
             });
 
       - name: Close issue

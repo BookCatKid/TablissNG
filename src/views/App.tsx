@@ -13,23 +13,33 @@ import { Settings } from "./settings";
 import Errors from "./shared/Errors";
 import StoreError from "./shared/StoreError";
 
-function setHighlighting() {
-  const checked = db.cache.get("highlightingEnabled");
-  const element = document.querySelector(".Widgets") as HTMLElement;
-  if (element) {
-    if (checked || checked === undefined) {
-      element.style.userSelect = "auto";
-    } else {
-      element.style.userSelect = "none";
-    }
-  }
-}
-
 const messages = defineMessages({
   pageTitle: {
     id: "app.pageTitle",
     description: "Page title that Tabliss displays in the title bar.",
     defaultMessage: "New Tab",
+  },
+  saveSettingsError: {
+    id: "app.error.saveSettings",
+    defaultMessage:
+      "Cannot save your settings. You may have hit the maximum storage capacity.",
+    description: "Error message when settings cannot be saved",
+  },
+  openSettingsError: {
+    id: "app.error.openSettings",
+    defaultMessage:
+      "Cannot open settings storage. Your settings cannot be loaded or saved.",
+    description: "Error message when settings storage cannot be opened",
+  },
+  saveCacheWarning: {
+    id: "app.error.saveCache",
+    defaultMessage: "Cannot save cache. Start up performance may be degraded.",
+    description: "Warning message when cache cannot be saved",
+  },
+  openCacheWarning: {
+    id: "app.error.openCache",
+    defaultMessage: "Cannot open cache. Start up performance may be degraded.",
+    description: "Warning message when cache storage cannot be opened",
   },
 });
 
@@ -46,12 +56,17 @@ const Root: FC = () => {
   const themePreference = useValue(db, "themePreference");
   const systemIsDark = useSystemTheme();
   const accent = useValue(db, "accent");
+  const highlightingEnabled = useValue(db, "highlightingEnabled");
 
   useEffect(() => {
     const isDark =
       themePreference === "system" ? systemIsDark : themePreference === "dark";
-    document.body.className = isDark ? "dark" : "";
-  }, [themePreference, systemIsDark]);
+    document.body.classList.toggle("dark", isDark);
+    document.body.classList.toggle(
+      "no-highlight",
+      highlightingEnabled === false,
+    );
+  }, [themePreference, systemIsDark, highlightingEnabled]);
 
   // Update CSS variable when accent color changes
   useEffect(() => {
@@ -63,49 +78,38 @@ const Root: FC = () => {
   useFavicon();
 
   const pushError = usePushError();
-  const handleError =
-    (message: string, showError: boolean) => (error: Error) => {
-      pushError({ message });
-      console.error(error);
-      console.error("Caused by:", error.cause);
-      if (showError) setError(true);
-    };
 
   useEffect(() => {
+    const handleError =
+      (message: string, showError: boolean) => (error: Error) => {
+        pushError({ message });
+        console.error(error);
+        console.error("Caused by:", error.cause);
+        if (showError) setError(true);
+      };
+
     const subscriptions = Promise.all([
       // Config database
       dbStorage
         .then((errors) =>
           Stream.subscribe(
             errors,
-            handleError(
-              "Cannot save your settings. You may have hit the maximum storage capacity.",
-              true,
-            ),
+            handleError(intl.formatMessage(messages.saveSettingsError), true),
           ),
         )
         .catch(
-          handleError(
-            "Cannot open settings storage. Your settings cannot be loaded or saved.",
-            true,
-          ),
+          handleError(intl.formatMessage(messages.openSettingsError), true),
         ),
       // Cache database
       cacheStorage
         .then((errors) =>
           Stream.subscribe(
             errors,
-            handleError(
-              "Cannot save cache. Start up performance may be degraded.",
-              false,
-            ),
+            handleError(intl.formatMessage(messages.saveCacheWarning), false),
           ),
         )
         .catch(
-          handleError(
-            "Cannot open cache. Start up performance may be degraded.",
-            false,
-          ),
+          handleError(intl.formatMessage(messages.openCacheWarning), false),
         ),
     ]);
 
@@ -113,9 +117,6 @@ const Root: FC = () => {
     subscriptions.then(() => {
       setReady(true);
       migrate();
-      setTimeout(() => {
-        setHighlighting();
-      }, 1);
     });
 
     return () => {
@@ -125,7 +126,7 @@ const Root: FC = () => {
         if (cacheSub) cacheSub();
       });
     };
-  }, []);
+  }, [intl, pushError]);
 
   const { errors, settings, toggleErrors } = useContext(UiContext);
 

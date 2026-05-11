@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Trello from "./Trello";
 import TrelloSettings from "./TrelloSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Trello,
   settingsComponent: TrelloSettings,
+  defaultData,
 };
 
 export default config;

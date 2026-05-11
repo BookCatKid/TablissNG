@@ -19,6 +19,11 @@ const messages = defineMessages({
     defaultMessage: "Collection ID number",
     description: "Placeholder text for collection ID input",
   },
+  topicsPlaceholder: {
+    id: "backgrounds.unsplash.topics.placeholder",
+    defaultMessage: "Select topics...",
+    description: "Placeholder text for the unsplash topics multi-select input",
+  },
 });
 
 const UnsplashSettings: FC<Props> = ({ data = defaultData, setData }) => {
@@ -98,10 +103,7 @@ const UnsplashSettings: FC<Props> = ({ data = defaultData, setData }) => {
             }}
             searchable
             dropdownHeight="300px"
-            placeholder={intl.formatMessage({
-              id: "backgrounds.unsplash.topics.placeholder",
-              defaultMessage: "Select topics...",
-            })}
+            placeholder={intl.formatMessage(messages.topicsPlaceholder)}
             style={{ marginTop: "0.5em" }}
           />
           <i>

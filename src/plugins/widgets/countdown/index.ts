@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Countdown from "./Countdown";
 import CountdownSettings from "./CountdownSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Countdown,
   settingsComponent: CountdownSettings,
+  defaultData,
 };
 
 export default config;

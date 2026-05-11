@@ -22,17 +22,17 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Download web artifact
-        uses: actions/download-artifact@v7
-        with:
-          name: tabliss-web
-          path: combined-dist
-
       - name: Download docs artifact
         uses: actions/download-artifact@v7
         with:
           name: tabliss-docs
-          path: combined-dist/docs
+          path: combined-dist
+
+      - name: Download web artifact
+        uses: actions/download-artifact@v7
+        with:
+          name: tabliss-web
+          path: combined-dist/web
 
       - name: Upload combined artifact
         uses: actions/upload-pages-artifact@v5

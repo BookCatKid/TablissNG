@@ -38,11 +38,11 @@ Use these methods if you want the absolute latest features (Nightly) or want to 
 6. Click **"Load unpacked"**.
 7. Select the unzipped folder.
 
-:::warning Keep Folder Location
+:::warning[Keep Folder Location]
 **Do not move or rename the extension folder after installation.** If you move or delete it, the extension will stop working.
 :::
 
-:::note
+:::note[Note]
 This **does** persist across browser restarts.
 :::
 

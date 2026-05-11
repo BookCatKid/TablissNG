@@ -2,6 +2,7 @@ import { getTimezoneOffset } from "date-fns-tz";
 import { type FC, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { commonMessages } from "../../../locales/messages";
 import zones from "./zones.json";
 
 type Props = {
@@ -65,7 +66,9 @@ const TimeZoneInput: FC<Props> = ({ timeZone, onChange }) => {
           </option>
         ))
       ) : (
-        <option disabled>Loading...</option>
+        <option value="loading" disabled>
+          <FormattedMessage {...commonMessages.loading} />
+        </option>
       )}
     </select>
   );

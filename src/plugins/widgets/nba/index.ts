@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Nba from "./Nba";
 import NbaSettings from "./NbaSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Nba,
   settingsComponent: NbaSettings,
+  defaultData,
 };
 
 export default config;

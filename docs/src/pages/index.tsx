@@ -27,7 +27,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to="https://bookcatkid.github.io/TablissNG/"
+            to="https://tablissng.smrff.dev/web/"
           >
             Try in Browser
           </Link>

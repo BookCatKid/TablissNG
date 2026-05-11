@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Greeting from "./Greeting";
 import GreetingSettings from "./GreetingSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Greeting,
   settingsComponent: GreetingSettings,
+  defaultData,
 };
 
 export default config;

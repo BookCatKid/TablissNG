@@ -32,10 +32,11 @@ const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
           onChange={(e) =>
             setData({ ...data, markdownEnabled: e.target.checked })
           }
-        />{" "}
+        />
         <FormattedMessage
           id="plugins.notes.enableMarkdown"
           defaultMessage="Enable Markdown formatting"
+          description="Checkbox label to enable Markdown formatting in notes"
         />
       </label>
 
@@ -44,6 +45,7 @@ const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
           <FormattedMessage
             id="plugins.notes.textAlignment"
             defaultMessage="Text Alignment"
+            description="Label for the note text alignment setting"
           />
         </label>
         <div className="alignment">
@@ -60,7 +62,13 @@ const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
       </div>
 
       <div>
-        <label>Icon Alignment</label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.iconAlignment"
+            defaultMessage="Icon Alignment"
+            description="Label for the note icon alignment setting"
+          />
+        </label>
         <div className="alignment">
           {alignments.map((alignment) => (
             <IconButton
@@ -75,7 +83,13 @@ const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
       </div>
 
       <div>
-        <label>Placeholder Style</label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.placeholderStyle"
+            defaultMessage="Placeholder Style"
+            description="Label for the note placeholder style setting"
+          />
+        </label>
         <div className="alignment">
           <IconButton
             onClick={() => setData({ ...data, placeholderStyle: "icon" })}
@@ -96,7 +110,7 @@ const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
         <FormattedMessage
           id="plugins.notes.keybind"
           defaultMessage="Notes keybind"
-          description="Notes keybind title"
+          description="Label for setting the keyboard shortcut to open notes"
         />
         <input
           type="text"

@@ -96,6 +96,82 @@ export const timingMessages = defineMessages({
   // everyCustom
 });
 
+export const weekdayFullMessages = defineMessages({
+  sunday: {
+    id: "time.weekday.full.sunday",
+    defaultMessage: "Sunday",
+    description: "Sunday full day name",
+  },
+  monday: {
+    id: "time.weekday.full.monday",
+    defaultMessage: "Monday",
+    description: "Monday full day name",
+  },
+  tuesday: {
+    id: "time.weekday.full.tuesday",
+    defaultMessage: "Tuesday",
+    description: "Tuesday full day name",
+  },
+  wednesday: {
+    id: "time.weekday.full.wednesday",
+    defaultMessage: "Wednesday",
+    description: "Wednesday full day name",
+  },
+  thursday: {
+    id: "time.weekday.full.thursday",
+    defaultMessage: "Thursday",
+    description: "Thursday full day name",
+  },
+  friday: {
+    id: "time.weekday.full.friday",
+    defaultMessage: "Friday",
+    description: "Friday full day name",
+  },
+  saturday: {
+    id: "time.weekday.full.saturday",
+    defaultMessage: "Saturday",
+    description: "Saturday full day name",
+  },
+});
+
+export const weekdayShortMessages = defineMessages({
+  sun: {
+    id: "time.weekday.short.sun",
+    defaultMessage: "Sun",
+    description: "Sunday short name for GitHub calendar",
+  },
+  mon: {
+    id: "time.weekday.short.mon",
+    defaultMessage: "Mon",
+    description: "Monday short name for GitHub calendar",
+  },
+  tue: {
+    id: "time.weekday.short.tue",
+    defaultMessage: "Tue",
+    description: "Tuesday short name for GitHub calendar",
+  },
+  wed: {
+    id: "time.weekday.short.wed",
+    defaultMessage: "Wed",
+    description: "Wednesday short name for GitHub calendar",
+  },
+  thu: {
+    id: "time.weekday.short.thu",
+    defaultMessage: "Thu",
+    description: "Thursday short name for GitHub calendar",
+  },
+  fri: {
+    id: "time.weekday.short.fri",
+    defaultMessage: "Fri",
+    description: "Friday short name for GitHub calendar",
+  },
+  sat: {
+    id: "time.weekday.short.sat",
+    defaultMessage: "Sat",
+    description: "Saturday short name for GitHub calendar",
+  },
+});
+
 export const backgroundMessages = defineMessages({
   customDate: {
     id: "backgrounds.customDate",
@@ -141,6 +217,14 @@ export const backgroundMessages = defineMessages({
     id: "backgrounds.searchTerm",
     defaultMessage: "Search Term",
     description: "Label for background search term input",
+  },
+});
+
+export const commonMessages = defineMessages({
+  loading: {
+    id: "common.loading",
+    defaultMessage: "Loading...",
+    description: "Generic loading message used across the application",
   },
 });
 

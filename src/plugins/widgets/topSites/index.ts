@@ -11,6 +11,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import { TopSites } from "./TopSites";
 import TopSitesSettings from "./TopSitesSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -31,6 +32,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: TopSites,
   settingsComponent: TopSitesSettings,
+  defaultData,
 };
 
 export default config;

@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { useMemo } from "react";
-import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { setBackground } from "../../db/action";
 import { BackgroundDisplay, BackgroundPosition, db } from "../../db/state";
@@ -10,26 +10,13 @@ import { backgroundConfigs, getConfig } from "../../plugins";
 import Plugin from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
 
-const messages = defineMessages({
-  lighten: {
-    id: "backgrounds.display.lighten",
-    defaultMessage: "Lighten",
-    description: "Label for maximum luminosity",
-  },
-  darken: {
-    id: "backgrounds.display.darken",
-    defaultMessage: "Darken",
-    description: "Label for minimum luminosity",
-  },
-});
-
 const Background: FC = () => {
   const [data, setData] = useKey(db, "background");
   const intl = useIntl();
   const plugin = getConfig(data.key);
 
   const sortedBackgroundConfigs = useMemo(() => {
-    return [...backgroundConfigs].sort((a, b) => {
+    return backgroundConfigs.toSorted((a, b) => {
       const nameA = intl.formatMessage(a.name);
       const nameB = intl.formatMessage(b.name);
       return nameA.localeCompare(nameB);
@@ -72,7 +59,11 @@ const Background: FC = () => {
 
           {plugin.settingsComponent && (
             <div className="settings">
-              <Plugin id={data.id} component={plugin.settingsComponent} />
+              <Plugin
+                id={data.id}
+                component={plugin.settingsComponent}
+                defaultData={plugin.defaultData}
+              />
             </div>
           )}
 
@@ -128,15 +119,9 @@ const Background: FC = () => {
                     }
                   />
                   <datalist id="luminosity-markers">
-                    <option
-                      value="-1"
-                      label={intl.formatMessage(messages.darken)}
-                    />
+                    <option value="-1" />
                     <option value="0" />
-                    <option
-                      value="1"
-                      label={intl.formatMessage(messages.lighten)}
-                    />
+                    <option value="1" />
                   </datalist>
                 </label>
 

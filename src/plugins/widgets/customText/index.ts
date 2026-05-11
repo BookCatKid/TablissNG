@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import CustomText from "./CustomText";
 import CustomTextSettings from "./CustomTextSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: CustomText,
   settingsComponent: CustomTextSettings,
+  defaultData,
 };
 
 export default config;

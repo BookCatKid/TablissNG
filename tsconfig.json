@@ -13,7 +13,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "incremental": true,
-    "types": ["jest", "react", "react-dom", "webextension-polyfill"],
+    "types": ["react", "react-dom", "webextension-polyfill"],
     "typeRoots": ["node_modules/@types", "src/@types"],
     "noUnusedLocals": true,
     "noUnusedParameters": true,

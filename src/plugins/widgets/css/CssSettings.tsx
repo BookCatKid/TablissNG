@@ -22,8 +22,7 @@ const CssSettings: FC<Props> = ({ data = defaultData, setData }) => (
     <p className="info">
       <FormattedMessage
         id="plugins.css.Warning"
-        defaultMessage="Warning: this functionality is intended for advanced users. Custom styles
-          may break at any time."
+        defaultMessage="Warning: this functionality is intended for advanced users. Custom styles may break at any time."
         description="Warning CSS title"
       />
     </p>

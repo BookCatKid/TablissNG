@@ -11,6 +11,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import LiteratureClock from "./LiteratureClock";
 import LiteratureClockSettings from "./LiteratureClockSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -31,6 +32,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: LiteratureClock,
   settingsComponent: LiteratureClockSettings,
+  defaultData,
 };
 
 export default config;

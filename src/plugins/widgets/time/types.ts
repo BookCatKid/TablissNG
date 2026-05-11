@@ -8,7 +8,8 @@ type Data = {
   showHours: boolean;
   showMinutes: boolean;
   showSeconds: boolean;
-  showDayPeriod?: boolean;
+  showDayPeriod: boolean;
+  showSeparator: boolean;
   timeZone: string | null;
   name?: string;
   colorCircles: boolean;
@@ -25,6 +26,7 @@ export const defaultData: Data = {
   showMinutes: true,
   showSeconds: false,
   showDayPeriod: true,
+  showSeparator: true,
   timeZone: null,
   colorCircles: true,
 };

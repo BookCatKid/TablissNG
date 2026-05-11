@@ -176,23 +176,26 @@ export async function getQuote(
 
   let data;
   try {
-    data =
-      category === "developerexcuses"
-        ? await getDeveloperExcuse()
-        : category === "randomBible"
-          ? await getRandomBibleVerse()
-          : category === "dwyl"
-            ? await getRandomDwylQuote()
-            : category === "quotable"
-              ? await getRandomQuotableQuote()
-              : {
-                  quote:
-                    "Selected category is invalid, pease create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
-                  author: "Simon",
-                };
-    // : category === "bible"
-    //   ? await getBibleVerse()
-    //   : await getQuoteOfTheDay(category);
+    const categoryHandlers: Record<
+      string,
+      () => Promise<{ quote: string; author?: string }>
+    > = {
+      developerexcuses: getDeveloperExcuse,
+      randomBible: getRandomBibleVerse,
+      dwyl: getRandomDwylQuote,
+      quotable: getRandomQuotableQuote,
+    };
+
+    const handler = categoryHandlers[category];
+
+    if (handler) {
+      data = await handler();
+    } else {
+      data = {
+        quote:
+          "Selected category is invalid, please create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
+      };
+    }
   } finally {
     loader.pop();
   }

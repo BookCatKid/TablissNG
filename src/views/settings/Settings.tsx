@@ -30,6 +30,28 @@ const messages = defineMessages({
       "Are you sure you want to delete all of your TablissNG settings? This cannot be undone.",
     description: "Confirmation message when resetting settings",
   },
+  ariaRepo: {
+    id: "settings.aria.repository",
+    defaultMessage: "Open repository BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub repository link",
+  },
+  ariaWatch: {
+    id: "settings.aria.watch",
+    defaultMessage: "Watch BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub watch button",
+  },
+  ariaStar: {
+    id: "settings.aria.star",
+    defaultMessage: "Star BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub star button",
+  },
+  settingsImportExportReset: {
+    id: "settings.importExportReset",
+    defaultMessage:
+      "<import>Import</import>, <export>export</export> or <reset>reset</reset> your settings",
+    description:
+      "Links for import/export/reset at the bottom of settings. Uses XML-like tags to style each action word as a clickable link.",
+  },
 });
 
 const Settings: FC = () => {
@@ -186,37 +208,13 @@ const Settings: FC = () => {
         <Widgets />
         <System />
         <p style={{ marginBottom: "2rem" }}>
-          <a onClick={handleImport}>
-            <FormattedMessage
-              id="settings.import"
-              defaultMessage="Import"
-              description="Import title"
-            />
-          </a>
-          ,{" "}
-          <a onClick={handleExport}>
-            <FormattedMessage
-              id="settings.export"
-              defaultMessage="export"
-              description="Export title"
-            />
-          </a>{" "}
           <FormattedMessage
-            id="settings.or"
-            defaultMessage="or"
-            description="your settings title"
-          />{" "}
-          <a onClick={handleReset}>
-            <FormattedMessage
-              id="settings.reset"
-              defaultMessage="reset"
-              description="Reset title"
-            />
-          </a>{" "}
-          <FormattedMessage
-            id="settings.description"
-            defaultMessage="your settings"
-            description="your settings title"
+            {...messages.settingsImportExportReset}
+            values={{
+              import: (chunks) => <a onClick={handleImport}>{chunks}</a>,
+              export: (chunks) => <a onClick={handleExport}>{chunks}</a>,
+              reset: (chunks) => <a onClick={handleReset}>{chunks}</a>,
+            }}
           />
         </p>
         {/* Only relevant for the web build where IndexedDB may be evicted. Hide for extension builds to avoid confusing prompts in Firefox/Chromium. */}
@@ -249,7 +247,7 @@ const Settings: FC = () => {
                     data-size="large"
                     data-show-count="false"
                     data-color-scheme={isDark ? "dark" : "light"}
-                    aria-label="Open repository BookCatKid/tablissNG on GitHub"
+                    aria-label={intl.formatMessage(messages.ariaRepo)}
                   >
                     <span
                       style={{
@@ -284,7 +282,7 @@ const Settings: FC = () => {
                       data-size="large"
                       data-show-count="true"
                       data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label="Watch BookCatKid/tablissNG on GitHub"
+                      aria-label={intl.formatMessage(messages.ariaWatch)}
                     >
                       <FormattedMessage
                         id="settings.github.watch"
@@ -301,7 +299,7 @@ const Settings: FC = () => {
                       data-size="large"
                       data-show-count="true"
                       data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label="Star BookCatKid/tablissNG on GitHub"
+                      aria-label={intl.formatMessage(messages.ariaStar)}
                     >
                       <FormattedMessage
                         id="settings.github.star"

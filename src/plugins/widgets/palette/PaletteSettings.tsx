@@ -25,6 +25,7 @@ const PaletteSettings: FC<Props> = ({
         <FormattedMessage
           id="plugins.palette.colorFormat"
           defaultMessage="Color Format"
+          description="Label for the color format dropdown"
         />
         <select
           value={data.colorFormat}
@@ -36,21 +37,31 @@ const PaletteSettings: FC<Props> = ({
           }
         >
           <option value="hex">
-            <FormattedMessage id="plugins.palette.hex" defaultMessage="HEX" />
+            <FormattedMessage
+              id="plugins.palette.hex"
+              defaultMessage="HEX"
+              description="Dropdown option for HEX color format"
+            />
           </option>
           <option value="rgb">
-            <FormattedMessage id="plugins.palette.rgb" defaultMessage="RGB" />
+            <FormattedMessage
+              id="plugins.palette.rgb"
+              defaultMessage="RGB"
+              description="Dropdown option for RGB color format"
+            />
           </option>
           <option value="hex_hidden">
             <FormattedMessage
               id="plugins.palette.hexHidden"
               defaultMessage="HEX (hidden)"
+              description="Dropdown option for HEX color format that is hidden by default"
             />
           </option>
           <option value="rgb_hidden">
             <FormattedMessage
               id="plugins.palette.rgbHidden"
               defaultMessage="RGB (hidden)"
+              description="Dropdown option for RGB color format that is hidden by default"
             />
           </option>
         </select>
@@ -60,6 +71,7 @@ const PaletteSettings: FC<Props> = ({
         <FormattedMessage
           id="plugins.palette.refreshInterval"
           defaultMessage="Refresh Palette"
+          description="Label for the palette refresh interval dropdown"
         />
         <select
           value={data.refreshInterval}
@@ -89,6 +101,7 @@ const PaletteSettings: FC<Props> = ({
         <FormattedMessage
           id="plugins.palette.newPalette"
           defaultMessage="Generate new palette"
+          description="Button text to manually generate a new color palette"
         />
       </button>
     </div>

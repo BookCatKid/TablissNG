@@ -26,6 +26,12 @@ export const messages = defineMessages({
     description: "Placeholder text to show in the search box before typing",
     defaultMessage: "Type to search",
   },
+  firefoxRestriction: {
+    id: "plugins.search.firefoxRestriction",
+    defaultMessage:
+      "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
+    description: "Error message when Firefox prevents opening a special URL",
+  },
 });
 
 const Search: FC<Props> = ({ data = defaultData }) => {
@@ -138,9 +144,7 @@ const Search: FC<Props> = ({ data = defaultData }) => {
     // If it's a special URL, handle it regardless of search engine
     if (isSpecialUrl(url)) {
       if (BUILD_TARGET === "firefox") {
-        alert(
-          "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
-        );
+        alert(intl.formatMessage(messages.firefoxRestriction));
         return;
       }
 

@@ -16,6 +16,16 @@ const messages = defineMessages({
     defaultMessage: "Remove media",
     description: "Title for remove media button",
   },
+  expand: {
+    id: "backgrounds.media.expand",
+    defaultMessage: "Expand",
+    description: "Link text to expand uploaded media previews",
+  },
+  collapse: {
+    id: "backgrounds.media.collapse",
+    defaultMessage: "Collapse",
+    description: "Link text to collapse uploaded media previews",
+  },
 });
 
 const ImageSettings: FC<Props> = ({
@@ -64,6 +74,7 @@ const ImageSettings: FC<Props> = ({
           <FormattedMessage
             id="backgrounds.media.showNewMedia"
             defaultMessage="Show new media"
+            description="Label for the setting that controls how often new media is shown"
           />
         }
       />
@@ -71,6 +82,7 @@ const ImageSettings: FC<Props> = ({
         <FormattedMessage
           id="backgrounds.media.sortOrder"
           defaultMessage="Sort order"
+          description="Label for selecting media display order"
         />
         <select
           value={data.sortOrder}
@@ -85,12 +97,14 @@ const ImageSettings: FC<Props> = ({
             <FormattedMessage
               id="backgrounds.media.sortOrderSequence"
               defaultMessage="In sequence"
+              description="Option label to show uploaded media in original order"
             />
           </option>
           <option value="random">
             <FormattedMessage
               id="backgrounds.media.sortOrderRandom"
               defaultMessage="Random"
+              description="Option label to show uploaded media in random order"
             />
           </option>
         </select>
@@ -110,9 +124,14 @@ const ImageSettings: FC<Props> = ({
           id="backgrounds.media.uploadCount"
           defaultMessage="{count} media uploaded."
           values={{ count: (cache.items || []).length }}
+          description="Displays the number of currently uploaded media files"
         />{" "}
         <a className="link" onClick={() => setIsExpanded(!isExpanded)}>
-          {isExpanded ? "Collapse" : "Expand"}
+          {isExpanded ? (
+            <FormattedMessage {...messages.collapse} />
+          ) : (
+            <FormattedMessage {...messages.expand} />
+          )}
         </a>
       </p>
       <div className="grid">
@@ -145,6 +164,7 @@ const ImageSettings: FC<Props> = ({
           <FormattedMessage
             id="backgrounds.media.performanceWarning"
             defaultMessage="Large media may affect performance."
+            description="Warning text indicating that large media files may slow down the extension"
           />
         </p>
       )}
@@ -152,6 +172,7 @@ const ImageSettings: FC<Props> = ({
         <FormattedMessage
           id="backgrounds.media.syncWarning"
           defaultMessage="Media does not sync between devices."
+          description="Warning text indicating that custom media files are not synced using browser sync"
         />
       </p>
       <label>

@@ -1,6 +1,7 @@
 import { defineMessages } from "react-intl";
 
 import { Config } from "../../types";
+import { defaultData } from "./data";
 import Notes from "./Notes";
 import NotesSettings from "./NotesSettings";
 
@@ -23,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Notes,
   settingsComponent: NotesSettings,
+  defaultData,
 };
 
 export default config;

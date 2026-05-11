@@ -102,7 +102,10 @@ pnpm install
 - `pnpm run dev` — Start a local development server
 - `pnpm run build` — Build the project
 - `pnpm run test` — Run tests
-- `pnpm run translations` — Manage translation files (see TRANSLATING.md)
+- `pnpm run translations` — Extract and sync translation files (see [TRANSLATING.md](TRANSLATING.md) for details)
+- `pnpm run translations status` — Show translation status (pass language, e.g. `pnpm run translations status fr`)
+- `pnpm run translations create` — Create a new locale file (pass language, e.g. `pnpm run translations create de-AT`)
+- `pnpm run translations migrate` — Migrate renamed translation keys (e.g. `pnpm run translations migrate --map old.id=new.id`)
 - `pnpm run lint:fix` — Run ESLint with --fix (or just `pnpm run lint` for checking)
 - `pnpm run prettier` — Run Prettier with --write (or `pnpm run prettier:check` for checking)
 - `pnpm run deps:update` — Run interactive dependency update tool (or `pnpm run deps:check` to just check for updates and unused dependencies)

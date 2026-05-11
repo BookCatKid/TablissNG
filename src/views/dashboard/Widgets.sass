@@ -2,6 +2,7 @@
     padding: 0
     text-align: center
     pointer-events: none
+    user-select: auto
 
     .container
         position: relative
@@ -29,3 +30,6 @@
 
         & > *
             pointer-events: none
+
+body.no-highlight .Widgets
+    user-select: none

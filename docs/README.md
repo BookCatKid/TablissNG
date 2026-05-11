@@ -26,7 +26,7 @@ This is handled by the `sync-assets.js` script, which runs automatically before 
    ```bash
    pnpm start
    ```
-   This will run the asset sync and start the Docusaurus development server at [http://localhost:3000/TablissNG/docs/](http://localhost:3000/TablissNG/docs/).
+   This will run the asset sync and start the Docusaurus development server at [http://localhost:3000/](http://localhost:3000/).
 
 ## Build
 
@@ -46,6 +46,6 @@ pnpm run
 
 ## Deployment
 
-Deployment is handled automatically via GitHub Actions whenever changes are pushed to the `main` branch. The site is hosted at `https://bookcatkid.github.io/TablissNG/docs/`.
+Deployment is handled automatically via GitHub Actions whenever changes are pushed to the `main` branch. The site is hosted at `https://tablissng.smrff.dev/` (with the web preview at `https://tablissng.smrff.dev/web/`).
 
 The documentation build is part of a unified workflow that assembles both the main web preview and the documentation site into a single deployment.

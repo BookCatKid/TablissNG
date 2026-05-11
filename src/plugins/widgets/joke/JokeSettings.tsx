@@ -107,12 +107,7 @@ const JokeSettings: FC<Props> = ({ data = defaultData, setData }) => {
                   setData({ ...data, categories });
                 }}
               />{" "}
-              <FormattedMessage
-                id={category.name}
-                defaultMessage={
-                  category.key.charAt(0).toUpperCase() + category.key.slice(1)
-                }
-              />
+              <FormattedMessage {...category.message} />
             </label>
           );
         })}

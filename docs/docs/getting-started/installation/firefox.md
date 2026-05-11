@@ -26,7 +26,7 @@ Install directly from the <FirefoxLink /> for automatic updates and the most sta
 
 Use these methods if you want the absolute latest features (Nightly) or need to install TablissNG on a version of Firefox where the store is unavailable.
 
-:::tip .xpi vs .zip
+:::tip[.xpi vs .zip]
 
 - **.xpi files**: These are compiled Firefox extensions. All `.xpi` files distributed in our releases are **signed** by Mozilla, meaning they can be installed permanently in any version of Firefox.
 - **.zip files**: These contain the raw extension source code. These are generally used for **Temporary Installation** (Method 3), but can sometimes be installed permanently depending on your browser (Method 4).
@@ -34,7 +34,7 @@ Use these methods if you want the absolute latest features (Nightly) or need to 
 
 ### Method 2: Manual Installation
 
-:::tip Nightly Signed Build
+:::tip[Nightly Signed Build]
 For the latest experimental features, you can install the **Signed Nightly** build. This version is signed by Mozilla and will work on standard Firefox releases.
 
 <div style={{ marginBottom: "1rem" }}>
@@ -71,7 +71,7 @@ _Note: to get the absolute latest builds, you can download from [GitHub Actions]
 
 If you want to test a build without permanent installation (e.g., from a `.zip` file), you can load it temporarily.
 
-1. Open Firefox and type `about:debugging` in the address bar.
+1. Open Firefox and type `about:debugging#/runtime/this-firefox` in the address bar.
 2. Click **"This Firefox"** in the sidebar.
 3. Click **"Load Temporary Add-on..."**.
 4. Select the `.zip` file.
@@ -104,7 +104,7 @@ To force an update check:
 3. Select **"Check for Updates"**.
 4. This will trigger an update check for all installed extensions.
 
-:::info
+:::info[Info]
 To update a manual installation, you can simply navigate to the [Releases page](https://github.com/BookCatKid/TablissNG/releases) in Firefox and click on the `.xpi` file. Firefox will automatically detect it as an update and prompt you to install it.
 :::
 

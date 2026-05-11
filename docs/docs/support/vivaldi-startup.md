@@ -29,6 +29,6 @@ To fix this, you can manually set your homepage to the TablissNG extension page:
 
 Now, when you start Vivaldi or click the Home button, TablissNG will load correctly.
 
-:::info key included in manifest
+:::info[key included in manifest]
 A key is included in the manifest primarily for ease of testing the Trello widget. The key makes the extension install with the same ID every time like it does on Firefox, even when manually installing it. This is also why everybody will be able to specify the same `chrome-extension://` URL.
 :::

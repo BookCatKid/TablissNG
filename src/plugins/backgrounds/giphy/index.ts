@@ -3,6 +3,7 @@ import { defineMessages } from "react-intl";
 import { Config } from "../../types";
 import Giphy from "./Giphy";
 import GiphySettings from "./GiphySettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -24,6 +25,7 @@ const config: Config = {
   dashboardComponent: Giphy,
   settingsComponent: GiphySettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;
