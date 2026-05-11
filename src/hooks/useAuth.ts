@@ -54,7 +54,7 @@ export default function useAuth<T extends Session>(
         const auth = await checkAuth();
         setAuthStatus(auth ? "authenticated" : "unauthenticated");
       } catch (err) {
-        console.error("TRELLO AUTH CHECK ERROR: ", err);
+        console.error("AUTH: Error checking authentication status: ", err);
         setAuthError("Failed to check authentication status");
         setAuthStatus("unauthenticated");
       }
@@ -73,7 +73,7 @@ export default function useAuth<T extends Session>(
    * @param authFlow
    */
   const signIn = async (authFlow: () => Promise<T | null>) => {
-    console.log("Authenticating");
+    console.log("AUTH: Authenticating");
     setAuthStatus("pending");
     try {
       const session: T | null = await authFlow();
@@ -83,7 +83,7 @@ export default function useAuth<T extends Session>(
       await browser.storage.local.set({ [sessionName]: { ...session } });
       setAuthStatus("authenticated");
     } catch (err) {
-      console.error("TRELLO SIGN IN ERROR: ", err);
+      console.error("AUTH: SIGN IN ERROR: ", err);
       setAuthError("Failed to authenticate user");
       setAuthStatus("unauthenticated");
     }
@@ -104,7 +104,7 @@ export default function useAuth<T extends Session>(
         await onSignOut(session);
       }
     } catch (error) {
-      console.error("TRELLO: Failed to run onSignOut");
+      console.error("AUTH: Failed to run onSignOut");
     } finally {
       setAuthStatus("unauthenticated");
     }
