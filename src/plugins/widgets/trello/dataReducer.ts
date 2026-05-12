@@ -1,25 +1,29 @@
 import { BoardPreference, Data, List } from "./types";
 
-type DataReducerAction =
+export type DataReducerAction =
   | { type: "SET_SELECTED_BOARD"; boardId: string }
   | { type: "ADD_PREFERENCE"; boardId: string; lists: List[] };
 
 export function dataReducer(data: Data, action: DataReducerAction) {
   switch (action.type) {
+    case "SET_SELECTED_BOARD": {
+      return {
+        ...data,
+        selectedID: action.boardId,
+      };
+    }
     case "ADD_PREFERENCE": {
       const newPreference: BoardPreference = {
         boardId: action.boardId,
         lists: action.lists,
       };
 
-      const updated = {
-        ...data.preferences,
-        [action.boardId]: newPreference,
-      };
-
       return {
         ...data,
-        preferences: updated,
+        preferences: {
+          ...data.preferences,
+          [action.boardId]: newPreference,
+        },
       };
     }
     default:

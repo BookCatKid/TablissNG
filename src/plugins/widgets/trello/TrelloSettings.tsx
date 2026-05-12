@@ -7,16 +7,11 @@ import { commonMessages } from "../../../locales/messages";
 import Button from "../../../views/shared/Button";
 import { Spinner } from "../../shared";
 import { cacheReducer } from "./cacheReducer";
+import { dataReducer } from "./dataReducer";
 import useBoards from "./hooks/useBoards";
 import useLists from "./hooks/useLists";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import {
-  BoardPreference,
-  defaultCache,
-  defaultData,
-  Props,
-  TrelloSession,
-} from "./types";
+import { defaultCache, defaultData, Props, TrelloSession } from "./types";
 import { Board } from "./types";
 import { ListCheckbox } from "./ui/ListCheckbox";
 import { onTrelloSignOut, trelloAuthFlow } from "./utils/auth";
@@ -34,7 +29,8 @@ const TrelloSettings: FC<Props> = ({
     signOut,
   } = useAuth<TrelloSession>("trello", trelloAuthStore);
 
-  const { boards, isLoading: boardsLoading } = useBoards(data, setData);
+  const dispatchData = useFreshReducer(dataReducer, data, setData);
+  const { boards, isLoading: boardsLoading } = useBoards(data, dispatchData);
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
 
   const {
@@ -53,7 +49,7 @@ const TrelloSettings: FC<Props> = ({
   };
 
   const onBoardSelect = (event: ChangeEvent<HTMLSelectElement>) => {
-    setData({ ...data, selectedID: event.target.value });
+    dispatchData({ type: "SET_SELECTED_BOARD", boardId: event.target.value });
     dispatchUI({ type: "CLEAR" });
   };
 
@@ -69,24 +65,16 @@ const TrelloSettings: FC<Props> = ({
     });
     setLists(updatedSettingsOptions);
 
-    // Call to data reducer here
-
     // Update preferences
     const selectedLists = updatedSettingsOptions.filter((l) => l.selected);
     const order = selectedLists.map((l) => l.id);
 
-    const newPreference: BoardPreference = {
+    dispatchData({
+      type: "ADD_PREFERENCE",
       boardId: data.selectedID!,
       lists: selectedLists,
-    };
-
-    const updated = {
-      ...data.preferences,
-      [data.selectedID!]: newPreference,
-    };
-
+    });
     dispatchUI({ type: "TOGGLE", order: order, target: targetList });
-    setData({ ...data, preferences: updated });
   };
 
   if (authState !== "authenticated") {

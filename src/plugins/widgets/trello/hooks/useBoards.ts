@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 
 import useAuth from "../../../../hooks/useAuth";
+import { DataReducerAction } from "../dataReducer";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
 import { Board, Data, TrelloSession } from "../types";
 import { getBoards } from "../utils/api";
 
-export default function useBoards(data: Data, setData: (data: Data) => void) {
+export default function useBoards(
+  data: Data,
+  dispatchData: React.Dispatch<DataReducerAction>,
+) {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
@@ -25,7 +29,7 @@ export default function useBoards(data: Data, setData: (data: Data) => void) {
       // if the user has not yet selected a board
       // set a default for them using the first board
       if (!data.selectedID) {
-        setData({ ...data, selectedID: boards[0].id });
+        dispatchData({ type: "SET_SELECTED_BOARD", boardId: boards[0].id });
       }
 
       setIsLoading(false);
