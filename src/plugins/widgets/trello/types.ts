@@ -127,7 +127,7 @@ export type List = {
   selected: boolean;
 };
 
-export const createFList = (listId: string, name: string): List => {
+export const createList = (listId: string, name: string): List => {
   return {
     id: listId,
     name: name,

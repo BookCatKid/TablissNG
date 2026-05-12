@@ -1,12 +1,12 @@
-import "./ListItem.sass";
+import "./style.sass";
 
-import { colourPalette, Item } from "../../types";
+import { colourPalette, Item } from "../../../types";
 
 interface DisplayItemProps {
   item: Item;
 }
 
-export default function ListItem({ item }: DisplayItemProps) {
+export function ListItem({ item }: DisplayItemProps) {
   return (
     <div className="item-content-container">
       <div className="labels-container">

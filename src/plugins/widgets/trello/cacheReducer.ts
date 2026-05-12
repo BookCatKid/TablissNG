@@ -1,4 +1,4 @@
-import { Cache, createFList, defaultCache, List } from "./types";
+import { Cache, createList, defaultCache, List } from "./types";
 
 export type CacheReducerAction =
   | { type: "UPDATE"; order: string[]; lists: List[] }
@@ -29,7 +29,7 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
 
       // Add or remove list from UI
       if (operation === "ADD") {
-        updatedLists[target.id] = createFList(target.id, target.name);
+        updatedLists[target.id] = createList(target.id, target.name);
       } else {
         delete updatedLists[target.id];
       }

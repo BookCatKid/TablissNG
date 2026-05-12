@@ -1,8 +1,8 @@
-import "./Drag.sass";
+import "./style.sass";
 
 import { useContext } from "react";
 
-import { DragContext } from "./Drag";
+import { DragContext } from "../Drag";
 
 /**
  * Conditionally renders its children only when dropId matches the

@@ -15,12 +15,28 @@
 .list-header-container
   display: flex
   align-items: center
-  justify-content: space-between
+  justify-content: start
   gap: 5px
 
 .list-header
-  padding: 0.25rem 0
+  padding: 0.75rem 0
   user-select: none
+
+.add-item-button
+  display: flex
+  font-size: 1.12rem
+  opacity: 0
+  transition: opacity 0.2s ease, max-height 0.2s ease
+
+  i
+    margin-top: 2.5px
+
+
+  &:hover
+    cursor: pointer
+
+  &.visible
+    opacity: 1
 
 .list-item-container
   width: 30vh

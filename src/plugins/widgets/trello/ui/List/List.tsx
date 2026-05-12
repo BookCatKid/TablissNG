@@ -1,9 +1,11 @@
 import "./List.sass";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
+// import { ItemCreatorForm } from "./ItemCreatorForm";
+import { CacheReducerAction } from "../../cacheReducer";
 import { Item } from "../../types";
 import {
   DoubleDropZone,
@@ -12,29 +14,48 @@ import {
   DropGuide,
   DropZone,
 } from "../Drag";
-import ListItem from "./ListItem";
+import { ListItem } from "./ListItem";
 
 interface ListComponentProps {
   header: string;
   listId: string;
   items: Item[];
   loading: boolean | undefined;
+  dispatchUI: React.Dispatch<CacheReducerAction>;
 }
 
-export function List({ header, listId, items, loading }: ListComponentProps) {
+export function List({
+  header,
+  listId,
+  items,
+  loading,
+  dispatchUI,
+}: ListComponentProps) {
   const context = useContext(DragContext);
+  const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
+  // const [itemCreatorOpen, setItemCreatorOpen] = useState<boolean>(true);
 
   if (!context) {
     return null;
   }
 
   const { isDragging, dragItemId } = context;
+  const openItemCreator = () => {};
 
   return (
     <div className="list">
-      <div className="list-header-container">
+      <div
+        className="list-header-container"
+        onMouseEnter={() => setHoveringOverHeader(true)}
+        onMouseLeave={() => setHoveringOverHeader(false)}
+      >
         <h3 className="list-header">{header}</h3>
-        <ExpandIcon />
+        <span
+          onClick={() => openItemCreator}
+          className={`add-item-button ${hoveringOverHeader ? "visible" : ""}`}
+        >
+          <ExpandIcon /> Add a card
+        </span>
       </div>
       {loading || !items ? (
         <div className="list-loader-container">
@@ -42,6 +63,7 @@ export function List({ header, listId, items, loading }: ListComponentProps) {
         </div>
       ) : (
         <div className="list-item-container">
+          {/* <ItemCreatorForm dispatchUI={dispatchUI} /> */}
           {items.map((item, i) => (
             <DoubleDropZone
               key={item.id}

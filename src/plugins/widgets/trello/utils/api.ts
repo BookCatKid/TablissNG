@@ -1,6 +1,6 @@
 import {
   Board,
-  createFList,
+  createList,
   Item,
   List,
   TrelloBoardResponse,
@@ -55,7 +55,7 @@ export const getLists = async (
   return await trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
     session,
-    (data) => data.map((item) => createFList(item.id, item.name)),
+    (data) => data.map((item) => createList(item.id, item.name)),
   );
 };
 
