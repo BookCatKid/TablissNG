@@ -48,7 +48,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       const items = await getItems(list.id, session);
       return items ? { id: list.id, name: list.name, items: items } : null;
     },
-    [getSession, getItems],
+    [getSession],
   );
 
   // Transform received data and render
@@ -104,6 +104,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
     fetchData();
     return () => controller.abort();
+    // eslint-disable-next-line @eslint-react/exhaustive-deps
   }, [authStatus, loadingListIds]);
 
   const handleDrop = useCallback(
@@ -200,6 +201,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
                   listId={listId}
                   items={items}
                   loading={status === "LOADING"}
+                  dispatchUI={dispatchUI}
                 />
               );
             })}

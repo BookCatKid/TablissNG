@@ -1,10 +1,9 @@
 import "./List.sass";
 
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
-// import { ItemCreatorForm } from "./ItemCreatorForm";
 import { CacheReducerAction } from "../../cacheReducer";
 import { Item } from "../../types";
 import {
@@ -14,6 +13,7 @@ import {
   DropGuide,
   DropZone,
 } from "../Drag";
+import { ItemCreatorForm } from "./ItemCreatorForm";
 import { ListItem } from "./ListItem";
 
 interface ListComponentProps {
@@ -33,14 +33,28 @@ export function List({
 }: ListComponentProps) {
   const context = useContext(DragContext);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
-  // const [itemCreatorOpen, setItemCreatorOpen] = useState<boolean>(true);
+  const [itemCreatorOpen, setItemCreatorOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setItemCreatorOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   if (!context) {
     return null;
   }
 
   const { isDragging, dragItemId } = context;
-  const openItemCreator = () => {};
+  const openItemCreator = () => {
+    console.log("opening item creator");
+    setItemCreatorOpen(true);
+  };
 
   return (
     <div className="list">
@@ -51,10 +65,11 @@ export function List({
       >
         <h3 className="list-header">{header}</h3>
         <span
-          onClick={() => openItemCreator}
-          className={`add-item-button ${hoveringOverHeader ? "visible" : ""}`}
+          onClick={() => openItemCreator()}
+          className={`add-item-button ${hoveringOverHeader && !itemCreatorOpen ? "visible" : ""}`}
         >
-          <ExpandIcon /> Add a card
+          <ExpandIcon />
+          {"Add a card"}
         </span>
       </div>
       {loading || !items ? (
@@ -63,7 +78,13 @@ export function List({
         </div>
       ) : (
         <div className="list-item-container">
-          {/* <ItemCreatorForm dispatchUI={dispatchUI} /> */}
+          {itemCreatorOpen && (
+            <ItemCreatorForm
+              listId={listId}
+              dispatchUI={dispatchUI}
+              onFormSubmit={() => setItemCreatorOpen(false)}
+            />
+          )}
           {items.map((item, i) => (
             <DoubleDropZone
               key={item.id}

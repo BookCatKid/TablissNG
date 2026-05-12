@@ -1,6 +1,8 @@
 .item-creator-form-container
+    display: flex
+    align-items: center
     width: 100%
-    padding: 10px 4px
+    padding: 0 4px
     background: rgba(255, 255, 255, 0.11)
     border-radius: 4px
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
@@ -10,10 +12,16 @@
     margin-bottom: 10px
 
 .item-creator-form-text-input
+    color: #FFFFFF
     width: 100%
+    resize: none
     background: transparent
-    border: none
+    scrollbar-width: none
+    -ms-overflow-style: none
 
+    &::-webkit-scrollbar
+        display: none
+    border: none
     &:active,
     &:focus
         border: none

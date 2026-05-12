@@ -91,7 +91,7 @@ export const getItems = async (
 export const moveCardToList = async (
   cardId: string,
   insertIndex: number,
-  targetListId: string,
+  listId: string,
   listItems: Item[],
   session: TrelloSession,
 ): Promise<boolean> => {
@@ -121,12 +121,31 @@ export const moveCardToList = async (
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      idList: targetListId,
+      idList: listId,
       pos: newPosition,
       key: TRELLO_API_KEY,
       token: session.accessToken,
     }),
   });
 
+  return response.ok;
+};
+
+export const addCardToList = async (
+  card: Item,
+  listId: string,
+  session: TrelloSession,
+) => {
+  const response = await fetch(`https://api.trello.com/1/cards`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      idList: listId,
+      pos: "top",
+      key: TRELLO_API_KEY,
+      name: card.name,
+      token: session.accessToken,
+    }),
+  });
   return response.ok;
 };

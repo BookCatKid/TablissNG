@@ -1,3 +1,5 @@
+import { nanoid } from "nanoid";
+
 import { Session } from "../../shared/types/Session";
 import { API } from "../../types";
 
@@ -147,6 +149,15 @@ export type Item = {
   name: string;
   position: number;
   labels: TrelloListItemLabel[];
+};
+
+export const createItem = (name: string): Item => {
+  return {
+    id: nanoid(),
+    name,
+    position: 0, // in Trello's api 0 indicates at the top of the list
+    labels: [],
+  };
 };
 
 // Store style info on the currently dragged item

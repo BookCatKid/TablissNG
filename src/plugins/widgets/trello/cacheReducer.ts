@@ -1,4 +1,4 @@
-import { Cache, createList, defaultCache, List } from "./types";
+import { Cache, createList, defaultCache, Item, List } from "./types";
 
 export type CacheReducerAction =
   | { type: "UPDATE"; order: string[]; lists: List[] }
@@ -10,7 +10,9 @@ export type CacheReducerAction =
       sourceIndex: number;
       targetListId: string;
       targetIndex: number;
-    };
+    }
+  | { type: "ADD"; card: Item; listId: string }
+  | { type: "REMOVE_TOP"; listId: string };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {
@@ -81,6 +83,26 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
       newItems.splice(adjusted, 0, movedItem);
       updatedLists[sourceListId] = { ...sourceList, items: newItems };
 
+      return { ...cache, lists: updatedLists };
+    }
+    case "ADD": {
+      const targetListId = action.listId;
+      const targetList = cache.lists[targetListId];
+      const updatedLists = { ...cache.lists };
+
+      const updatedItems = targetList.items;
+      updatedItems.unshift(action.card);
+      updatedLists[targetListId] = { ...targetList, items: updatedItems };
+      return { ...cache, lists: updatedLists };
+    }
+    case "REMOVE_TOP": {
+      const targetListId = action.listId;
+      const targetList = cache.lists[targetListId];
+      const updatedLists = { ...cache.lists };
+
+      const updatedItems = targetList.items;
+      updatedItems.shift();
+      updatedLists[targetListId] = { ...targetList, items: updatedItems };
       return { ...cache, lists: updatedLists };
     }
     default:
