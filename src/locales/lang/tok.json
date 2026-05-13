@@ -420,6 +420,7 @@
   "plugins.topSites.newTab": "Links open in a new tab",
   "plugins.topSites.numbered": "Links are numbered",
   "plugins.topSites.permissionRequired": "Top Sites permission required for this widget (click to request)",
+  "plugins.trello.addCard": "Add a card",
   "plugins.trello.authenticate": "o kama kepeken kulupu TRELLO",
   "plugins.trello.authenticate.button": "Authenticate",
   "plugins.trello.authenticate.error": "lon kama la pakala li kama",

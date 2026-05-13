@@ -420,6 +420,7 @@
   "plugins.topSites.newTab": "Links open in a new tab",
   "plugins.topSites.numbered": "Links are numbered",
   "plugins.topSites.permissionRequired": "Top Sites permission required for this widget (click to request)",
+  "plugins.trello.addCard": "Add a card",
   "plugins.trello.authenticate": "Sign in With Trello",
   "plugins.trello.authenticate.button": "Authenticate",
   "plugins.trello.authenticate.error": "Error occurred during authentication",

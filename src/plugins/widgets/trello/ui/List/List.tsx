@@ -1,6 +1,7 @@
 import "./List.sass";
 
 import { useContext, useEffect, useState } from "react";
+import { FormattedMessage } from "react-intl";
 
 import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
@@ -68,7 +69,11 @@ export function List({
           className={`add-card-button ${hoveringOverHeader && !cardCreatorOpen ? "visible" : ""}`}
         >
           <ExpandIcon />
-          {"Add a card"}
+          <FormattedMessage
+            id="plugins.trello.addCard"
+            defaultMessage="Add a card"
+            description="Add a card"
+          />
         </span>
       </div>
       {loading || !cards ? (
