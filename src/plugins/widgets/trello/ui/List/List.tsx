@@ -111,6 +111,7 @@ export function List({
           <DropZone
             dropId={`list-${listId}-item-${items.length}`}
             dropType="ITEM"
+            style={{ minHeight: items.length === 0 ? "4rem" : undefined }}
           >
             <DropGuide
               dropType="ITEM"
