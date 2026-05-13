@@ -106,20 +106,22 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
       onMouseEnter={() => setHoveringOverHeader(true)}
       onMouseLeave={() => setHoveringOverHeader(false)}
     >
-      <div className="card-labels-container">
-        {card.labels.map((label) => (
-          <div
-            key={label.color}
-            className="card-label"
-            style={{
-              width: "2.5rem",
-              height: "0.26rem",
-              borderRadius: "0.5rem",
-              marginBottom: "0.5rem",
-              background: colourPalette[label.color],
-            }}
-          />
-        ))}
+      <div className="card-header">
+        <div className="card-labels-container">
+          {card.labels.map((label) => (
+            <div
+              key={label.color}
+              className="card-label"
+              style={{
+                width: "2.5rem",
+                height: "0.26rem",
+                borderRadius: "0.5rem",
+                marginBottom: "0.5rem",
+                background: colourPalette[label.color],
+              }}
+            />
+          ))}
+        </div>
         <span
           onClick={isEditing ? handleDelete : handleEdit}
           className={`edit-card-button ${hoveringOverHeader ? "visible" : ""}`}
