@@ -1,31 +1,30 @@
 import { Cache, Card, createList, defaultCache, List } from "../types";
 
 export type CacheReducerAction =
-  | { type: "UPDATE"; order: string[]; lists: List[] }
+  | { type: "UPDATE_LISTS"; order: string[]; lists: List[] }
   | { type: "CLEAR" }
-  | { type: "TOGGLE"; order: string[]; target: List }
+  | { type: "TOGGLE_LIST_VISIBILITY"; order: string[]; target: List }
   | {
-      type: "MOVE_ITEM";
+      type: "MOVE_CARD";
       sourceListId: string;
       sourceIndex: number;
       targetListId: string;
       targetIndex: number;
     }
-  | { type: "ADD"; card: Card; listId: string; position?: number }
-  | { type: "REMOVE_TOP"; listId: string }
+  | { type: "ADD_CARD"; card: Card; listId: string; position?: number }
   | { type: "EDIT_CARD_NAME"; cardId: string; listId: string; name: string }
   | { type: "DELETE_CARD"; cardId: string; listId: string };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {
-    case "UPDATE":
+    case "UPDATE_LISTS":
       return {
         order: action.order,
         lists: Object.fromEntries(action.lists.map((l) => [l.id, l])),
       };
     case "CLEAR":
       return defaultCache;
-    case "TOGGLE": {
+    case "TOGGLE_LIST_VISIBILITY": {
       const target = action.target;
       const order = action.order;
       const operation = target.selected ? "REMOVE" : "ADD";
@@ -43,7 +42,7 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
         lists: updatedLists,
       };
     }
-    case "MOVE_ITEM": {
+    case "MOVE_CARD": {
       const { sourceListId, sourceIndex, targetListId, targetIndex } = action;
       const sourceList = cache.lists[sourceListId];
       const targetList = cache.lists[targetListId];
@@ -87,7 +86,7 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
 
       return { ...cache, lists: updatedLists };
     }
-    case "ADD": {
+    case "ADD_CARD": {
       const { card, listId } = action;
       const list = cache.lists[listId];
       if (!list) return cache;
@@ -101,16 +100,6 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
         updatedCards.unshift(card);
       }
 
-      updatedLists[listId] = { ...list, cards: updatedCards };
-      return { ...cache, lists: updatedLists };
-    }
-    case "REMOVE_TOP": {
-      const { listId } = action;
-      const list = cache.lists[listId];
-      const updatedLists = { ...cache.lists };
-
-      const updatedCards = [...list.cards];
-      updatedCards.shift();
       updatedLists[listId] = { ...list, cards: updatedCards };
       return { ...cache, lists: updatedLists };
     }

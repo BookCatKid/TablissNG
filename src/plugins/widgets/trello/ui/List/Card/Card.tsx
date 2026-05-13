@@ -85,7 +85,7 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
     const actionSuccessful = await deleteCard(card.id, session);
     if (!actionSuccessful) {
       dispatchUI({
-        type: "ADD",
+        type: "ADD_CARD",
         card: originalCard,
         listId: listId,
         position: position,

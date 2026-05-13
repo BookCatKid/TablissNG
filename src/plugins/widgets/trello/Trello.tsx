@@ -68,7 +68,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       });
 
       dispatchUI({
-        type: "UPDATE",
+        type: "UPDATE_LISTS",
         order: cacheRef.current.order,
         lists: updatedLists,
       });
@@ -142,7 +142,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
       // Update UI
       dispatchUI({
-        type: "MOVE_ITEM",
+        type: "MOVE_CARD",
         sourceListId,
         sourceIndex,
         targetListId,

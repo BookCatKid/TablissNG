@@ -74,7 +74,11 @@ const TrelloSettings: FC<Props> = ({
       boardId: data.selectedID!,
       lists: selectedLists,
     });
-    dispatchUI({ type: "TOGGLE", order: order, target: targetList });
+    dispatchUI({
+      type: "TOGGLE_LIST_VISIBILITY",
+      order: order,
+      target: targetList,
+    });
   };
 
   if (authState !== "authenticated") {

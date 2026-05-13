@@ -51,7 +51,7 @@ export default function useLists(
       const selectedLists = lists.filter((l) => l.selected);
       const order = selectedLists.map((l) => l.id);
       dispatchUI({
-        type: "UPDATE",
+        type: "UPDATE_LISTS",
         order: order,
         lists: selectedLists,
       });

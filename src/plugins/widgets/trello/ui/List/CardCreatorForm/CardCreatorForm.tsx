@@ -36,11 +36,11 @@ export function CardCreatorForm({
       if (!session) return;
       const cleanedFormContent = formContent.replace(/(\r\n|\n|\r)/gm, "");
       const created = createCard(cleanedFormContent);
-      dispatchUI({ type: "ADD", card: created, listId: listId });
+      dispatchUI({ type: "ADD_CARD", card: created, listId: listId });
       const actionSuccessful = await addCardToList(created, listId, session);
 
       if (!actionSuccessful) {
-        dispatchUI({ type: "REMOVE_TOP", listId: listId });
+        dispatchUI({ type: "DELETE_CARD", listId: listId, cardId: created.id });
       }
     }
   };
