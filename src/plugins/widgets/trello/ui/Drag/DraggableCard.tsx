@@ -2,21 +2,21 @@ import React, { useContext } from "react";
 
 import { DragContext } from "./Drag";
 
-interface DraggableItemProps {
+interface DraggableCardProps {
   dragId: string;
   dragType: string; // Type category for matching with compatible DropZones
   [key: string]: unknown;
 }
 
-export function DraggableItem({
+export function DraggableCard({
   dragId,
   dragType,
   ...props
-}: DraggableItemProps) {
+}: DraggableCardProps) {
   const context = useContext(DragContext);
 
   if (!context) {
-    console.error("DragItem must be used within Drag component");
+    console.error("DragCard must be used within Drag component");
     return null;
   }
 

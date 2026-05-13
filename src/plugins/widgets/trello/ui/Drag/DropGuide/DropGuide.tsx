@@ -7,7 +7,7 @@ import { DragContext } from "../Drag";
 /**
  * Conditionally renders its children only when dropId matches the
  * currently active DropZone. Used to show a visual indicator
- * that previews where the item will be placed.
+ * that previews where the card will be placed.
  */
 interface DropGuideProps {
   dropId: string | null;
@@ -21,7 +21,7 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
     return null;
   }
 
-  const { dropZoneId, dragItemStyle } = context;
+  const { dropZoneId, dragCardStyle } = context;
   console.log("Current drop zone id ", dropZoneId);
   console.log("self id ", dropId);
   if (dropZoneId !== dropId) {
@@ -32,8 +32,8 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
     <div
       className="drop-guide"
       style={{
-        height: `${dragItemStyle?.size.height}px`,
-        width: `${dragItemStyle?.size.width}px`,
+        height: `${dragCardStyle?.size.height}px`,
+        width: `${dragCardStyle?.size.width}px`,
       }}
       {...props}
     />

@@ -1,10 +1,10 @@
 import {
   Board,
+  Card,
   createList,
-  Item,
   List,
   TrelloBoardResponse,
-  TrelloItemsResponse,
+  TrelloCardsResponse,
   TrelloListResponse,
   TrelloSession,
 } from "../types";
@@ -41,7 +41,7 @@ export const getBoards = async (
   return await trelloFetch<TrelloBoardResponse[], Board[]>(
     `members/${session.userId}/boards`,
     session,
-    (data) => data.map((item) => ({ id: item.id, name: item.name }) as Board),
+    (data) => data.map((card) => ({ id: card.id, name: card.name }) as Board),
   );
 };
 
@@ -55,32 +55,32 @@ export const getLists = async (
   return await trelloFetch<TrelloListResponse[], List[]>(
     `boards/${boardId}/lists`,
     session,
-    (data) => data.map((item) => createList(item.id, item.name)),
+    (data) => data.map((card) => createList(card.id, card.name)),
   );
 };
 
 /**
- * Fetch items under a specific list owned by the authenticated user
+ * Fetch cards under a specific list owned by the authenticated user
  * @param listId
  * @param session
  * @returns
  */
-export const getItems = async (
+export const getCards = async (
   listId: string,
   session: TrelloSession,
-): Promise<Item[] | null> => {
-  return await trelloFetch<TrelloItemsResponse[], Item[]>(
+): Promise<Card[] | null> => {
+  return await trelloFetch<TrelloCardsResponse[], Card[]>(
     `lists/${listId}/cards`,
     session,
     (data) =>
       data.map(
-        (item) =>
+        (card) =>
           ({
-            id: item.id,
-            name: item.name,
-            position: item.pos,
-            labels: item.labels,
-          }) as Item,
+            id: card.id,
+            name: card.name,
+            position: card.pos,
+            labels: card.labels,
+          }) as Card,
       ),
   );
 };
@@ -92,29 +92,29 @@ export const moveCardToList = async (
   cardId: string,
   insertIndex: number,
   listId: string,
-  listItems: Item[],
+  listCards: Card[],
   session: TrelloSession,
 ): Promise<boolean> => {
-  // listItems should already have the card excluded so indices are clean
+  // listCards should already have the card excluded so indices are clean
   const getOrNull = <T>(arr: T[], index: number): T | null =>
     index >= 0 && index < arr.length ? arr[index] : null;
 
-  const prevItem = getOrNull(listItems, insertIndex - 1);
-  const nextItem = getOrNull(listItems, insertIndex);
+  const prevCard = getOrNull(listCards, insertIndex - 1);
+  const nextCard = getOrNull(listCards, insertIndex);
 
   let newPosition: number;
-  if (!prevItem && !nextItem) {
+  if (!prevCard && !nextCard) {
     // Only card in the list
     newPosition = 65536;
-  } else if (!prevItem) {
+  } else if (!prevCard) {
     // Inserting at the top
-    newPosition = nextItem!.position / 2;
-  } else if (!nextItem) {
+    newPosition = nextCard!.position / 2;
+  } else if (!nextCard) {
     // Inserting at the bottom
-    newPosition = prevItem.position + 65536;
+    newPosition = prevCard.position + 65536;
   } else {
     // Inserting between two cards
-    newPosition = (prevItem.position + nextItem.position) / 2;
+    newPosition = (prevCard.position + nextCard.position) / 2;
   }
 
   const response = await fetch(`https://api.trello.com/1/cards/${cardId}`, {
@@ -132,7 +132,7 @@ export const moveCardToList = async (
 };
 
 export const addCardToList = async (
-  card: Item,
+  card: Card,
   listId: string,
   session: TrelloSession,
 ) => {

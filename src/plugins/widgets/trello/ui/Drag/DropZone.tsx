@@ -4,7 +4,7 @@ import { DragContext } from "./Drag";
 
 interface DropZoneProps {
   dropId: string;
-  dropType: string; // Type category — only DragItems with matching dragType can be dropped here
+  dropType: string; // Type category — only DragCards with matching dragType can be dropped here
   remember?: boolean; // If true, dropId persists even after the pointer leaves this zone
   style?: React.CSSProperties;
   children?: React.ReactNode;
@@ -27,7 +27,7 @@ export function DropZone({
   }
 
   const {
-    dragItemId: dragItem,
+    dragCardId: dragCard,
     dragType: contextDragType,
     setDropZoneId: setDrop,
     dropZoneId: drop,
@@ -52,7 +52,7 @@ export function DropZone({
       onDragEnter={(e: React.DragEvent) => {
         e.preventDefault();
         // Only register as active drop zone if types match and something is being dragged
-        return dragItem && dropType === contextDragType && setDrop(dropId);
+        return dragCard && dropType === contextDragType && setDrop(dropId);
       }}
       onDragOver={handleDragOver}
       onDrop={onDrop}

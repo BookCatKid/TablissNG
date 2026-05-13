@@ -1,16 +1,16 @@
 import "./style.sass";
 
-import { colourPalette, Item } from "../../../types";
+import { Card as CardType,colourPalette } from "../../../types";
 
-interface DisplayItemProps {
-  item: Item;
+interface CardProps {
+  card: CardType;
 }
 
-export function ListItem({ item }: DisplayItemProps) {
+export function Card({ card }: CardProps) {
   return (
-    <div className="item-content-container">
+    <div className="card-content-container">
       <div className="labels-container">
-        {item.labels.map((label) => (
+        {card.labels.map((label) => (
           <div
             key={label.color}
             style={{
@@ -23,7 +23,7 @@ export function ListItem({ item }: DisplayItemProps) {
           />
         ))}
       </div>
-      <span>{item.name}</span>
+      <span>{card.name}</span>
     </div>
   );
 }

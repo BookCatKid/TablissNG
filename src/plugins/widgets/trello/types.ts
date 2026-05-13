@@ -22,11 +22,11 @@ export type TrelloListResponse = {
   name: string;
 };
 
-export type TrelloItemsResponse = {
+export type TrelloCardsResponse = {
   id: string;
   name: string;
   pos: number;
-  labels: TrelloListItemLabel[];
+  labels: TrelloListCardLabel[];
 };
 
 export type TrelloColour =
@@ -105,7 +105,7 @@ export const colourPalette: Record<TrelloColour, string> = {
   black_dark: "#374151",
 };
 
-export type TrelloListItemLabel = {
+export type TrelloListCardLabel = {
   color: TrelloColour;
   name: string;
 };
@@ -116,15 +116,15 @@ export interface TrelloSession extends Session {
 }
 
 /**
- * Represents the result of fetched trello items in the plugin's UI
- * Each list fetches their items independently and indicates fetching using status = LOADING
+ * Represents the result of fetched trello cards in the plugin's UI
+ * Each list fetches their cards independently and indicates fetching using status = LOADING
  *
  * Selected: whether the list should be displayed in the homepage
  */
 export type List = {
   id: string;
   name: string;
-  items: Item[];
+  cards: Card[];
   status: "COMPLETED" | "LOADING" | "FAILED";
   selected: boolean;
 };
@@ -133,7 +133,7 @@ export const createList = (listId: string, name: string): List => {
   return {
     id: listId,
     name: name,
-    items: [],
+    cards: [],
     status: "LOADING",
     selected: false,
   };
@@ -144,14 +144,14 @@ export type Board = {
   name: string;
 };
 
-export type Item = {
+export type Card = {
   id: string;
   name: string;
   position: number;
-  labels: TrelloListItemLabel[];
+  labels: TrelloListCardLabel[];
 };
 
-export const createItem = (name: string): Item => {
+export const createCard = (name: string): Card => {
   return {
     id: nanoid(),
     name,
@@ -160,8 +160,8 @@ export const createItem = (name: string): Item => {
   };
 };
 
-// Store style info on the currently dragged item
-export type DragItemStyle = {
+// Store style info on the currently dragged card
+export type DragCardStyle = {
   size: { width: number; height: number };
   fontSize: number; // measured in pixels
 };

@@ -5,21 +5,21 @@ import { useContext, useEffect, useState } from "react";
 import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
 import { CacheReducerAction } from "../../cacheReducer";
-import { Item } from "../../types";
+import { Card } from "../../types";
 import {
   DoubleDropZone,
   DragContext,
-  DraggableItem,
+  DraggableCard,
   DropGuide,
   DropZone,
 } from "../Drag";
-import { ItemCreatorForm } from "./ItemCreatorForm";
-import { ListItem } from "./ListItem";
+import { Card as CardComponent } from "./Card";
+import { CardCreatorForm } from "./CardCreatorForm";
 
 interface ListComponentProps {
   header: string;
   listId: string;
-  items: Item[];
+  cards: Card[];
   loading: boolean | undefined;
   dispatchUI: React.Dispatch<CacheReducerAction>;
 }
@@ -27,18 +27,18 @@ interface ListComponentProps {
 export function List({
   header,
   listId,
-  items,
+  cards,
   loading,
   dispatchUI,
 }: ListComponentProps) {
   const context = useContext(DragContext);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
-  const [itemCreatorOpen, setItemCreatorOpen] = useState<boolean>(false);
+  const [cardCreatorOpen, setCardCreatorOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setItemCreatorOpen(false);
+        setCardCreatorOpen(false);
       }
     };
 
@@ -50,10 +50,10 @@ export function List({
     return null;
   }
 
-  const { isDragging, dragItemId } = context;
-  const openItemCreator = () => {
-    console.log("opening item creator");
-    setItemCreatorOpen(true);
+  const { isDragging, dragCardId } = context;
+  const openCardCreator = () => {
+    console.log("opening card creator");
+    setCardCreatorOpen(true);
   };
 
   return (
@@ -65,57 +65,57 @@ export function List({
       >
         <h3 className="list-header">{header}</h3>
         <span
-          onClick={() => openItemCreator()}
-          className={`add-item-button ${hoveringOverHeader && !itemCreatorOpen ? "visible" : ""}`}
+          onClick={() => openCardCreator()}
+          className={`add-card-button ${hoveringOverHeader && !cardCreatorOpen ? "visible" : ""}`}
         >
           <ExpandIcon />
           {"Add a card"}
         </span>
       </div>
-      {loading || !items ? (
+      {loading || !cards ? (
         <div className="list-loader-container">
           <Spinner size={24} />
         </div>
       ) : (
-        <div className="list-item-container">
-          {itemCreatorOpen && (
-            <ItemCreatorForm
+        <div className="list-card-container">
+          {cardCreatorOpen && (
+            <CardCreatorForm
               listId={listId}
               dispatchUI={dispatchUI}
-              onFormSubmit={() => setItemCreatorOpen(false)}
+              onFormSubmit={() => setCardCreatorOpen(false)}
             />
           )}
-          {items.map((item, i) => (
+          {cards.map((card, i) => (
             <DoubleDropZone
-              key={item.id}
-              previousId={`list-${listId}-item-${i}`}
-              nextId={`list-${listId}-item-${i + 1}`}
+              key={card.id}
+              previousId={`list-${listId}-card-${i}`}
+              nextId={`list-${listId}-card-${i + 1}`}
               dropType="ITEM"
               remember
             >
-              <DropGuide dropType="ITEM" dropId={`list-${listId}-item-${i}`} />
-              <DraggableItem
-                dragId={`list-${listId}-item-${i}`}
+              <DropGuide dropType="ITEM" dropId={`list-${listId}-card-${i}`} />
+              <DraggableCard
+                dragId={`list-${listId}-card-${i}`}
                 dragType="ITEM"
                 className={
                   isDragging &&
-                  dragItemId === `list-${listId}-item-${i}` &&
-                  "hide-list-item"
+                  dragCardId === `list-${listId}-card-${i}` &&
+                  "hide-list-card"
                 }
               >
-                <ListItem key={item.id} item={item} />
-              </DraggableItem>
+                <CardComponent key={card.id} card={card} />
+              </DraggableCard>
             </DoubleDropZone>
           ))}
-          {/* allow placing items at the end of the list */}
+          {/* allow placing cards at the end of the list */}
           <DropZone
-            dropId={`list-${listId}-item-${items.length}`}
+            dropId={`list-${listId}-card-${cards.length}`}
             dropType="ITEM"
-            style={{ minHeight: items.length === 0 ? "4rem" : undefined }}
+            style={{ minHeight: cards.length === 0 ? "4rem" : undefined }}
           >
             <DropGuide
               dropType="ITEM"
-              dropId={`list-${listId}-item-${items.length}`}
+              dropId={`list-${listId}-card-${cards.length}`}
             />
           </DropZone>
         </div>

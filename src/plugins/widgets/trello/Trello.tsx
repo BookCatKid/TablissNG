@@ -7,10 +7,10 @@ import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
 import { cacheReducer } from "./cacheReducer";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import { defaultCache, Item, List, Props, TrelloSession } from "./types";
+import { Card, defaultCache, List, Props, TrelloSession } from "./types";
 import { Drag, DropPayload } from "./ui/Drag";
 import { List as ListComponent } from "./ui/List";
-import { getItems, moveCardToList } from "./utils/api";
+import { getCards, moveCardToList } from "./utils/api";
 
 const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
@@ -39,20 +39,20 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
 
   // =================== Data fetching ==================
 
-  type FetchResult = { id: string; name: string; items: Item[] } | null;
+  type FetchResult = { id: string; name: string; cards: Card[] } | null;
 
-  const fetchItemsForList = useCallback(
+  const fetchCardsForList = useCallback(
     async (list: List): Promise<FetchResult | null> => {
       const session = await getSession();
       if (!session) return null;
-      const items = await getItems(list.id, session);
-      return items ? { id: list.id, name: list.name, items: items } : null;
+      const cards = await getCards(list.id, session);
+      return cards ? { id: list.id, name: list.name, cards: cards } : null;
     },
     [getSession],
   );
 
   // Transform received data and render
-  const receivedToListItems = useCallback(
+  const receivedToListCards = useCallback(
     (received: FetchResult[]): void => {
       const updatedLists: List[] = [];
       received.forEach((o) => {
@@ -60,7 +60,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
           updatedLists.push({
             id: o.id,
             name: o.name,
-            items: o.items,
+            cards: o.cards,
             selected: true,
             status: "COMPLETED",
           });
@@ -76,25 +76,25 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [dispatchUI],
   );
 
-  // Fetch items on first load and when a lists' state changes
+  // Fetch cards on first load and when a lists' state changes
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     const controller = new AbortController();
 
     const fetchData = async () => {
-      console.log("TRELLO: fetching items for lists");
+      console.log("TRELLO: fetching cards for lists");
       try {
         if (controller.signal.aborted) return;
 
         const fetchResults = await Promise.all(
           Object.values(cacheRef.current.lists).map((l) =>
-            fetchItemsForList(l),
+            fetchCardsForList(l),
           ),
         );
 
         if (controller.signal.aborted) return;
 
-        receivedToListItems(fetchResults);
+        receivedToListCards(fetchResults);
       } catch (error: unknown) {
         if (error instanceof Error && error.name !== "AbortError") {
           console.error(`TRELLO ${error.message}`);
@@ -110,15 +110,15 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
   const handleDrop = useCallback(
     async (payload: DropPayload) => {
       if (
-        !payload.dragItemId ||
+        !payload.dragCardId ||
         !payload.dropZoneId ||
         payload.dragType !== "ITEM"
       ) {
         return;
       }
 
-      const dragSourceParts = payload.dragItemId.split("-item-");
-      const dropSourceParts = payload.dropZoneId.split("-item-");
+      const dragSourceParts = payload.dragCardId.split("-card-");
+      const dropSourceParts = payload.dropZoneId.split("-card-");
       if (dragSourceParts.length !== 2 || dropSourceParts.length !== 2) {
         return;
       }
@@ -135,8 +135,8 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       const targetList = currentCache.lists[targetListId];
       if (!sourceList || !targetList) return;
 
-      const movedItem = sourceList.items[sourceIndex];
-      if (!movedItem) return;
+      const movedCard = sourceList.cards[sourceIndex];
+      if (!movedCard) return;
 
       if (sourceListId === targetListId && sourceIndex === targetIndex) return;
 
@@ -152,12 +152,12 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       // Sync state with trello by applying the same move
       let adjustedTargetIndex = targetIndex;
 
-      // Handle cases where the item is moved lower in the same list
+      // Handle cases where the card is moved lower in the same list
       if (sourceListId === targetListId && sourceIndex < targetIndex) {
         adjustedTargetIndex--;
       }
 
-      const targetItemsWithoutCard = targetList.items.filter(
+      const targetCardsWithoutCard = targetList.cards.filter(
         (_, i) => !(sourceListId === targetListId && i === sourceIndex),
       );
 
@@ -165,10 +165,10 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
       if (!session) return;
 
       await moveCardToList(
-        movedItem.id,
+        movedCard.id,
         adjustedTargetIndex,
         targetListId,
-        targetItemsWithoutCard,
+        targetCardsWithoutCard,
         session,
       );
     },
@@ -193,13 +193,13 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
         <div className="display-list-container">
           <Drag handleDrop={handleDrop}>
             {cache.order.map((listId) => {
-              const { items, name, status } = cache.lists[listId];
+              const { cards, name, status } = cache.lists[listId];
               return (
                 <ListComponent
                   key={listId}
                   header={name}
                   listId={listId}
-                  items={items}
+                  cards={cards}
                   loading={status === "LOADING"}
                   dispatchUI={dispatchUI}
                 />
