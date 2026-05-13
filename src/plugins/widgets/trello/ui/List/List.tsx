@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 import { ExpandIcon } from "../../../../../views/shared";
 import { Spinner } from "../../../../shared";
-import { CacheReducerAction } from "../../cacheReducer";
+import { CacheReducerAction } from "../../reducers";
 import { Card } from "../../types";
 import {
   DoubleDropZone,
@@ -52,7 +52,6 @@ export function List({
 
   const { isDragging, dragCardId } = context;
   const openCardCreator = () => {
-    console.log("opening card creator");
     setCardCreatorOpen(true);
   };
 
@@ -103,7 +102,13 @@ export function List({
                   "hide-list-card"
                 }
               >
-                <CardComponent key={card.id} card={card} />
+                <CardComponent
+                  position={i}
+                  key={card.id}
+                  card={card}
+                  listId={listId}
+                  dispatchUI={dispatchUI}
+                />
               </DraggableCard>
             </DoubleDropZone>
           ))}

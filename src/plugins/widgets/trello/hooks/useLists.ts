@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import useAuth from "../../../../hooks/useAuth";
-import { CacheReducerAction } from "../cacheReducer";
+import { CacheReducerAction } from "../reducers";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
 import { Data, List, TrelloSession } from "../types";
 import { getLists } from "../utils/api";

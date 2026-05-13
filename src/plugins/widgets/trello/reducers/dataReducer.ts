@@ -1,4 +1,4 @@
-import { BoardPreference, Data, List } from "./types";
+import { BoardPreference, Data, List } from "../types";
 
 export type DataReducerAction =
   | { type: "SET_SELECTED_BOARD"; boardId: string }

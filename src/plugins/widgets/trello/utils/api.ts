@@ -149,3 +149,35 @@ export const addCardToList = async (
   });
   return response.ok;
 };
+
+export const updateCardName = async (
+  cardId: string,
+  name: string,
+  session: TrelloSession,
+): Promise<boolean> => {
+  const response = await fetch(`https://api.trello.com/1/cards/${cardId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name,
+      key: TRELLO_API_KEY,
+      token: session.accessToken,
+    }),
+  });
+  return response.ok;
+};
+
+export const deleteCard = async (
+  cardId: string,
+  session: TrelloSession,
+): Promise<boolean> => {
+  const response = await fetch(`https://api.trello.com/1/cards/${cardId}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      key: TRELLO_API_KEY,
+      token: session.accessToken,
+    }),
+  });
+  return response.ok;
+};

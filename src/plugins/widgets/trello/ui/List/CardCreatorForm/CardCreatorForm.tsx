@@ -3,7 +3,7 @@ import "./style.sass";
 import { useState } from "react";
 
 import useAuth from "../../../../../../hooks/useAuth";
-import { CacheReducerAction } from "../../../cacheReducer";
+import { CacheReducerAction } from "../../../reducers";
 import { trelloAuthStore } from "../../../stores/trelloAuthStore";
 import { createCard, TrelloSession } from "../../../types";
 import { addCardToList } from "../../../utils/api";

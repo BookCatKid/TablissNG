@@ -5,7 +5,7 @@ import { FormattedMessage } from "react-intl";
 
 import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
-import { cacheReducer } from "./cacheReducer";
+import { cacheReducer } from "./reducers";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
 import { Card, defaultCache, List, Props, TrelloSession } from "./types";
 import { Drag, DropPayload } from "./ui/Drag";

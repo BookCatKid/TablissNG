@@ -1,4 +1,4 @@
-import { Cache, Card, createList, defaultCache, List } from "./types";
+import { Cache, Card, createList, defaultCache, List } from "../types";
 
 export type CacheReducerAction =
   | { type: "UPDATE"; order: string[]; lists: List[] }
@@ -11,8 +11,10 @@ export type CacheReducerAction =
       targetListId: string;
       targetIndex: number;
     }
-  | { type: "ADD"; card: Card; listId: string }
-  | { type: "REMOVE_TOP"; listId: string };
+  | { type: "ADD"; card: Card; listId: string; position?: number }
+  | { type: "REMOVE_TOP"; listId: string }
+  | { type: "EDIT_CARD_NAME"; cardId: string; listId: string; name: string }
+  | { type: "DELETE_CARD"; cardId: string; listId: string };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {
@@ -89,9 +91,12 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
       const targetListId = action.listId;
       const targetList = cache.lists[targetListId];
       const updatedLists = { ...cache.lists };
-
       const updatedCards = targetList.cards;
-      updatedCards.unshift(action.card);
+      if (action.position) {
+        updatedCards.splice(action.position, 0, action.card);
+      } else {
+        updatedCards.unshift(action.card);
+      }
       updatedLists[targetListId] = { ...targetList, cards: updatedCards };
       return { ...cache, lists: updatedLists };
     }
@@ -104,6 +109,32 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
       updatedCards.shift();
       updatedLists[targetListId] = { ...targetList, cards: updatedCards };
       return { ...cache, lists: updatedLists };
+    }
+    case "EDIT_CARD_NAME": {
+      const { cardId, listId, name } = action;
+      const list = cache.lists[listId];
+      if (!list) return cache;
+      const updatedCards = list.cards.map((c) =>
+        c.id === cardId ? { ...c, name } : c,
+      );
+      const updatedLists = {
+        ...cache.lists,
+        [listId]: { ...list, cards: updatedCards },
+      };
+      return { ...cache, lists: updatedLists };
+    }
+    case "DELETE_CARD": {
+      const { cardId: deleteCardId, listId: deleteListId } = action;
+      const deleteList = cache.lists[deleteListId];
+      if (!deleteList) return cache;
+      const filteredCards = deleteList.cards.filter(
+        (c) => c.id !== deleteCardId,
+      );
+      const updatedListsAfterDelete = {
+        ...cache.lists,
+        [deleteListId]: { ...deleteList, cards: filteredCards },
+      };
+      return { ...cache, lists: updatedListsAfterDelete };
     }
     default:
       return cache;

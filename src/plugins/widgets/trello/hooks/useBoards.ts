@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import useAuth from "../../../../hooks/useAuth";
-import { DataReducerAction } from "../dataReducer";
+import { DataReducerAction } from "../reducers";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
 import { Board, Data, TrelloSession } from "../types";
 import { getBoards } from "../utils/api";
