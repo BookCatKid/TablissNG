@@ -1,13 +1,19 @@
 import "./style.sass";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import useAuth from "../../../../../../hooks/useAuth";
-import { EditIcon, RemoveIcon } from "../../../../../../views/shared";
+import {
+  EditIcon,
+  LabelsIcon,
+  RemoveIcon,
+} from "../../../../../../views/shared";
 import { CacheReducerAction } from "../../../reducers";
 import { trelloAuthStore } from "../../../stores/trelloAuthStore";
 import { Card as CardType, colourPalette, TrelloSession } from "../../../types";
 import { deleteCard, updateCardName } from "../../../utils/api";
+import { SelectLabelsForm } from "../Labels/SelectLabelsForm";
 
 interface CardProps {
   card: CardType;
@@ -18,23 +24,59 @@ interface CardProps {
 
 export function Card({ card, listId, position, dispatchUI }: CardProps) {
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
+  const [isEditingTags, setIsEditingTags] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
+
+  const selfRef = useRef<HTMLDivElement>(null);
+
+  // Portals are used to display the tag editor
+  const portalRef = useRef<HTMLDivElement>(null);
+  const [tagEditorPosition, setTagPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { getSession } = useAuth<TrelloSession>("trello", trelloAuthStore);
 
   useEffect(() => {
-    if (isEditing && textareaRef.current) {
+    if (isEditingContent && textareaRef.current) {
       textareaRef.current.focus();
       textareaRef.current.select();
     }
-  }, [isEditing]);
+  }, [isEditingContent]);
+
+  useEffect(() => {
+    if (isEditingTags && selfRef.current) {
+      const r = selfRef.current.getBoundingClientRect();
+      setTagPosition({ top: r.top, left: r.right + 8 });
+    }
+  }, [isEditingTags]);
+
+  // Reposition on scroll/resize
+  useEffect(() => {
+    if (!isEditingTags) return;
+    const update = () => {
+      if (selfRef.current) {
+        const r = selfRef.current.getBoundingClientRect();
+        setTagPosition({ top: r.top, left: r.right + 8 });
+      }
+    };
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [isEditingTags]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        setIsEditing(false);
+        setIsEditingContent(false);
         setEditValue(card.name);
+        setIsEditingTags(false);
       }
     };
 
@@ -43,8 +85,12 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
   }, [card.name]);
 
   const handleEdit = () => {
-    setIsEditing(true);
+    setIsEditingContent(true);
     setEditValue(card.name);
+  };
+
+  const handleEditTags = () => {
+    setIsEditingTags(true);
   };
 
   const handleSave = async () => {
@@ -69,7 +115,7 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
         name: originalName,
       });
     }
-    setIsEditing(false);
+    setIsEditingContent(false);
   };
 
   const handleDelete = async () => {
@@ -102,6 +148,7 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
 
   return (
     <div
+      ref={selfRef}
       className="card-content-container"
       onMouseEnter={() => setHoveringOverHeader(true)}
       onMouseLeave={() => setHoveringOverHeader(false)}
@@ -123,15 +170,29 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
           ))}
         </div>
         <span
-          onClick={isEditing ? handleDelete : handleEdit}
-          className={`edit-card-button ${hoveringOverHeader ? "visible" : ""}`}
+          className={`edit-card-buttons ${hoveringOverHeader ? "visible" : ""}`}
         >
-          {isEditing ? <RemoveIcon /> : <EditIcon />}
+          {!isEditingTags && (
+            <>
+              {isEditingContent ? (
+                <span onClick={handleDelete}>
+                  <RemoveIcon />
+                </span>
+              ) : (
+                <span onClick={handleEdit}>
+                  <EditIcon />
+                </span>
+              )}
+            </>
+          )}
+          <span onClick={handleEditTags}>
+            <LabelsIcon />
+          </span>
         </span>
       </div>
 
       {/* Card editor */}
-      {isEditing ? (
+      {isEditingContent ? (
         <textarea
           ref={textareaRef}
           className="card-name-editor"
@@ -142,6 +203,23 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
       ) : (
         <span>{card.name}</span>
       )}
+
+      {isEditingTags &&
+        tagEditorPosition &&
+        createPortal(
+          <div
+            ref={portalRef}
+            style={{
+              position: "fixed",
+              top: tagEditorPosition.top,
+              left: tagEditorPosition.left,
+              zIndex: 1000,
+            }}
+          >
+            <SelectLabelsForm />
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

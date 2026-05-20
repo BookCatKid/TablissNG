@@ -1,8 +1,10 @@
 .card-content-container
+  position: relative
   overflow-wrap: anywhere
   word-break: break-word
   text-align: left
   padding: 0.4rem 0.25rem
+  border-radius: 0.25rem
 
   span
     user-select: none
@@ -10,7 +12,6 @@
   &:hover
     background: rgba(255, 255, 255, 0.09)
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
-    border-radius: 0.25rem
     backdrop-filter: blur(5px)
     -webkit-backdrop-filter: blur(5px)
 
@@ -26,7 +27,10 @@
 .card-label
   margin-top: auto
 
-.edit-card-button
+.edit-card-buttons
+  display: flex
+  align-items: center
+  gap: 0.6rem
   opacity: 0
   transition: opacity 0.1s ease, max-height 0.1s ease
 
@@ -34,6 +38,10 @@
     &:hover
       cursor: pointer
       opacity: 1
+
+.card-tag-editor
+  position: absolute
+  z-index: 1000
 
 .card-name-editor
   color: inherit

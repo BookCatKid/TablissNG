@@ -128,7 +128,21 @@ export const moveCardToList = async (
     }),
   });
 
-  return response.ok;
+  if (!response.ok) {
+    console.error("TRELLO moveCardToList: non-ok response from Trello", {
+      cardId,
+      listId,
+      insertIndex,
+      status: response.status,
+      statusText: response.statusText,
+    });
+
+    throw new Error(
+      `Failed to move Trello card ${cardId} to list ${listId} (status ${response.status} ${response.statusText})`,
+    );
+  }
+
+  return true;
 };
 
 export const addCardToList = async (

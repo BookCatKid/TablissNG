@@ -1,4 +1,4 @@
-import "./List.sass";
+import "./style.sass";
 
 import { useContext, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";

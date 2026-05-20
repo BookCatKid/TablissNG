@@ -22,8 +22,6 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
   }
 
   const { dropZoneId, dragCardStyle } = context;
-  console.log("Current drop zone id ", dropZoneId);
-  console.log("self id ", dropId);
   if (dropZoneId !== dropId) {
     return null;
   }

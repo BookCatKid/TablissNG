@@ -11,3 +11,5 @@ export const DownIcon = () => <Icon name="arrow-down" />;
 // Toggles
 export const ExpandIcon = () => <Icon name="plus" />;
 export const CollapseIcon = () => <Icon name="minus" />;
+
+export const LabelsIcon = () => <Icon name="tag" />;
