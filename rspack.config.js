@@ -53,19 +53,8 @@ const config = {
       },
       {
         test: /\.sass$/,
-        use: [
-          "style-loader",
-          "css-loader",
-          {
-            loader: "postcss-loader",
-            options: {
-              postcssOptions: {
-                plugins: [require("autoprefixer")],
-              },
-            },
-          },
-          "sass-loader",
-        ],
+        use: ["sass-loader"],
+        type: "css",
       },
       {
         test: /\.svg$/,
