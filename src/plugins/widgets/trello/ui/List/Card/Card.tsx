@@ -1,5 +1,6 @@
 import "./style.sass";
 
+import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -24,9 +25,12 @@ interface CardProps {
 
 export function Card({ card, listId, position, dispatchUI }: CardProps) {
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
+
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingTags, setIsEditingTags] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
+
+  const isSelected = isEditingContent || isEditingTags;
 
   const selfRef = useRef<HTMLDivElement>(null);
 
@@ -118,6 +122,22 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
     setIsEditingContent(false);
   };
 
+  useEffect(() => {
+    if (!isEditingTags) return;
+    const handler = (e: MouseEvent) => {
+      if (
+        portalRef.current &&
+        !portalRef.current.contains(e.target as Node) &&
+        selfRef.current &&
+        !selfRef.current.contains(e.target as Node)
+      ) {
+        setIsEditingTags(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isEditingTags]);
+
   const handleDelete = async () => {
     const session = await getSession();
     if (!session) return;
@@ -149,7 +169,7 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
   return (
     <div
       ref={selfRef}
-      className="card-content-container"
+      className={clsx("card-content-container", isSelected ? "selected" : "")}
       onMouseEnter={() => setHoveringOverHeader(true)}
       onMouseLeave={() => setHoveringOverHeader(false)}
     >
@@ -170,29 +190,39 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
           ))}
         </div>
         <span
-          className={`edit-card-buttons ${hoveringOverHeader ? "visible" : ""}`}
-        >
-          {!isEditingTags && (
-            <>
-              {isEditingContent ? (
-                <span onClick={handleDelete}>
-                  <RemoveIcon />
-                </span>
-              ) : (
-                <span onClick={handleEdit}>
-                  <EditIcon />
-                </span>
-              )}
-            </>
+          className={clsx(
+            "edit-card-buttons",
+            hoveringOverHeader ? "visible" : "",
           )}
-          <span onClick={handleEditTags}>
+        >
+          {isEditingContent ? (
+            <span
+              onClick={isEditingTags ? undefined : handleDelete}
+              className={clsx("icon", isEditingTags ? "disabled" : "")}
+            >
+              <RemoveIcon />
+            </span>
+          ) : (
+            <span
+              onClick={isEditingTags ? undefined : handleEdit}
+              className={clsx("icon", isEditingTags ? "disabled" : "")}
+            >
+              <EditIcon />
+            </span>
+          )}
+          <span
+            onClick={isEditingContent ? undefined : handleEditTags}
+            className={clsx("icon", isEditingContent ? "disabled" : "")}
+          >
             <LabelsIcon />
           </span>
         </span>
       </div>
 
       {/* Card editor */}
-      {isEditingContent ? (
+      {!isEditingContent ? (
+        <span>{card.name}</span>
+      ) : (
         <textarea
           ref={textareaRef}
           className="card-name-editor"
@@ -200,8 +230,6 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-      ) : (
-        <span>{card.name}</span>
       )}
 
       {isEditingTags &&

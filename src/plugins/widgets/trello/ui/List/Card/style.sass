@@ -1,4 +1,5 @@
 .card-content-container
+  color: inherit
   position: relative
   overflow-wrap: anywhere
   word-break: break-word
@@ -13,6 +14,11 @@
     background: rgba(255, 255, 255, 0.09)
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
     backdrop-filter: blur(5px)
+
+  &.selected
+    background: rgba(255, 255, 255, 0.09)
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
+    backdrop-filter: blur(5px)    
 
 .card-header
   display: flex
@@ -38,10 +44,6 @@
       cursor: pointer
       opacity: 1
 
-.card-tag-editor
-  position: absolute
-  z-index: 1000
-
 .card-name-editor
   color: inherit
   width: 100%
@@ -60,3 +62,10 @@
     border: none
     outline: none
     box-shadow: none
+
+
+.icon
+  &.disabled
+    &:hover
+      cursor: default
+    color: var(--text-muted)
