@@ -1,6 +1,10 @@
-import React from "react";
-import { Icon } from "@iconify/react";
 import "./RichTextEditor.sass";
+
+import { Icon } from "@iconify/react";
+import DOMPurify from "dompurify";
+import React from "react";
+
+import { sanitizeRichText } from "../../utils/richText";
 
 type RichTextEditorProps = {
   value: string;
@@ -17,20 +21,64 @@ const fontFamilies = [
 
 const fontSizes = [12, 16, 20, 24, 32];
 
-const emojiPalette = ["😀", "😊", "✨", "🔥", "🌟", "❤️", "👍", "🙏", "🎯", "📌", "💡", "✅"];
+const emojiPalette = [
+  "😀",
+  "😊",
+  "✨",
+  "🔥",
+  "🌟",
+  "❤️",
+  "👍",
+  "🙏",
+  "🎯",
+  "📌",
+  "💡",
+  "✅",
+];
 
-const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeholder }) => {
+const RichTextEditor: React.FC<RichTextEditorProps> = ({
+  value,
+  onChange,
+  placeholder,
+}) => {
   const editorRef = React.useRef<HTMLDivElement>(null);
-  const [selectionAnchor, setSelectionAnchor] = React.useState<Range | null>(null);
+  const lastRenderedValue = React.useRef("");
+  const [selectionAnchor, setSelectionAnchor] = React.useState<Range | null>(
+    null,
+  );
+
+  const replaceEditorContent = React.useCallback(
+    (element: HTMLDivElement, nextValue: string) => {
+      const sanitized = sanitizeRichText(nextValue);
+      const fragment = DOMPurify.sanitize(sanitized, {
+        RETURN_DOM_FRAGMENT: true,
+      }) as DocumentFragment;
+
+      element.replaceChildren(fragment);
+      lastRenderedValue.current = sanitized;
+    },
+    [],
+  );
 
   React.useEffect(() => {
     if (!editorRef.current) {
       return;
     }
-    if (editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value || "";
+
+    const sanitized = sanitizeRichText(value || "");
+
+    if (lastRenderedValue.current !== sanitized) {
+      replaceEditorContent(editorRef.current, sanitized);
     }
-  }, [value]);
+  }, [value, replaceEditorContent]);
+
+  const emitChange = () => {
+    if (!editorRef.current) return;
+
+    const sanitized = sanitizeRichText(editorRef.current.innerHTML);
+    lastRenderedValue.current = sanitized;
+    onChange(sanitized);
+  };
 
   const saveSelection = () => {
     const selection = window.getSelection();
@@ -43,6 +91,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
     if (!selectionAnchor) {
       return;
     }
+
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(selectionAnchor);
@@ -50,22 +99,27 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
 
   const exec = (command: string, valueArg?: string) => {
     if (!editorRef.current) return;
+
     editorRef.current.focus();
     document.execCommand(command, false, valueArg);
-    onChange(editorRef.current.innerHTML);
+    emitChange();
   };
 
   const applyStyle = (style: Partial<CSSStyleDeclaration>) => {
     if (!editorRef.current) return;
+
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
+
     const range = selection.getRangeAt(0);
+
     if (!editorRef.current.contains(range.commonAncestorContainer)) {
       editorRef.current.focus();
       return;
     }
 
     const wrapper = document.createElement("span");
+
     Object.entries(style).forEach(([key, val]) => {
       if (val) {
         // @ts-expect-error - dynamic style assignment
@@ -75,38 +129,64 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
 
     wrapper.appendChild(range.extractContents());
     range.insertNode(wrapper);
+
     selection.removeAllRanges();
+
     const newRange = document.createRange();
     newRange.selectNodeContents(wrapper);
     selection.addRange(newRange);
-    onChange(editorRef.current.innerHTML);
+
+    emitChange();
   };
 
   const handleInput = () => {
-    if (!editorRef.current) return;
-    onChange(editorRef.current.innerHTML);
+    emitChange();
   };
 
   const handleEmojiInsert = (emoji: string) => {
     if (!editorRef.current) return;
+
     editorRef.current.focus();
     document.execCommand("insertText", false, emoji);
-    onChange(editorRef.current.innerHTML);
+    emitChange();
   };
 
   return (
     <div className="RichTextEditor">
       <div className="toolbar" role="toolbar" aria-label="Formatting options">
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("bold")} title="Bold">
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("bold")}
+          title="Bold"
+        >
           <Icon icon="mdi:format-bold" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("italic")} title="Italic">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("italic")}
+          title="Italic"
+        >
           <Icon icon="mdi:format-italic" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("underline")} title="Underline">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("underline")}
+          title="Underline"
+        >
           <Icon icon="mdi:format-underline" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("strikeThrough")} title="Strikethrough">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("strikeThrough")}
+          title="Strikethrough"
+        >
           <Icon icon="mdi:format-strikethrough" />
         </button>
 
@@ -117,12 +197,14 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
           onMouseDown={saveSelection}
           onChange={(event) => {
             restoreSelection();
-            const value = event.target.value;
-            if (!value) {
+            const nextValue = event.target.value;
+
+            if (!nextValue) {
               exec("removeFormat");
             } else {
-              applyStyle({ fontFamily: value });
+              applyStyle({ fontFamily: nextValue });
             }
+
             event.target.value = "";
           }}
         >
@@ -140,11 +222,13 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
           onChange={(event) => {
             restoreSelection();
             const size = Number(event.target.value);
+
             if (!size) {
               exec("removeFormat");
             } else {
               applyStyle({ fontSize: `${size}px` });
             }
+
             event.target.value = "";
           }}
         >
@@ -158,34 +242,79 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
 
         <div className="toolbar-divider" />
 
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("justifyLeft")} title="Align left">
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("justifyLeft")}
+          title="Align left"
+        >
           <Icon icon="mdi:format-align-left" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("justifyCenter")} title="Align center">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("justifyCenter")}
+          title="Align center"
+        >
           <Icon icon="mdi:format-align-center" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("justifyRight")} title="Align right">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("justifyRight")}
+          title="Align right"
+        >
           <Icon icon="mdi:format-align-right" />
         </button>
 
         <div className="toolbar-divider" />
 
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("insertUnorderedList")} title="Bullet list">
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("insertUnorderedList")}
+          title="Bullet list"
+        >
           <Icon icon="mdi:format-list-bulleted" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("insertOrderedList")} title="Numbered list">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("insertOrderedList")}
+          title="Numbered list"
+        >
           <Icon icon="mdi:format-list-numbered" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("indent")} title="Indent">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("indent")}
+          title="Indent"
+        >
           <Icon icon="mdi:format-indent-increase" />
         </button>
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("outdent")} title="Outdent">
+
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("outdent")}
+          title="Outdent"
+        >
           <Icon icon="mdi:format-indent-decrease" />
         </button>
 
         <div className="toolbar-divider" />
 
-        <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => exec("removeFormat")} title="Clear formatting">
+        <button
+          type="button"
+          onMouseDown={(event) => event.preventDefault()}
+          onClick={() => exec("removeFormat")}
+          title="Clear formatting"
+        >
           <Icon icon="mdi:eraser" />
         </button>
 
@@ -195,9 +324,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, placeh
           <button type="button" onMouseDown={(event) => event.preventDefault()}>
             <Icon icon="mdi:emoticon-happy-outline" />
           </button>
+
           <div className="emoji-list">
             {emojiPalette.map((emoji) => (
-              <button key={emoji} type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => handleEmojiInsert(emoji)}>
+              <button
+                key={emoji}
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => handleEmojiInsert(emoji)}
+              >
                 {emoji}
               </button>
             ))}

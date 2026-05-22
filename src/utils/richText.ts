@@ -1,27 +1,29 @@
-const allowedTags = new Set([
-  "B",
-  "STRONG",
-  "I",
-  "EM",
-  "U",
-  "S",
-  "SPAN",
-  "DIV",
-  "P",
-  "BR",
-  "UL",
-  "OL",
-  "LI",
-  "BLOCKQUOTE",
-  "CODE",
-  "PRE",
-  "H1",
-  "H2",
-  "H3",
-  "H4",
-  "H5",
-  "H6",
-]);
+import DOMPurify from "dompurify";
+
+const allowedTags = [
+  "b",
+  "strong",
+  "i",
+  "em",
+  "u",
+  "s",
+  "span",
+  "div",
+  "p",
+  "br",
+  "ul",
+  "ol",
+  "li",
+  "blockquote",
+  "code",
+  "pre",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+];
 
 const allowedStyles = [
   "text-align",
@@ -37,65 +39,59 @@ const allowedStyles = [
   "line-height",
 ];
 
+let purifierConfigured = false;
+
 const sanitizeStyle = (styleValue: string) => {
-  const declarations = styleValue.split(";").map((item) => item.trim()).filter(Boolean);
+  const declarations = styleValue
+    .split(";")
+    .map((item) => item.trim())
+    .filter(Boolean);
+
   const safeDeclarations = declarations.filter((declaration) => {
     const [property] = declaration.split(":");
     return property && allowedStyles.includes(property.trim().toLowerCase());
   });
+
   return safeDeclarations.join("; ");
 };
 
-const sanitizeNode = (node: Node) => {
-  if (node.nodeType === Node.ELEMENT_NODE) {
-    const element = node as HTMLElement;
-    if (!allowedTags.has(element.tagName)) {
-      const parent = element.parentNode;
-      if (!parent) {
-        element.remove();
-      } else {
-        while (element.firstChild) {
-          parent.insertBefore(element.firstChild, element);
-        }
-        parent.removeChild(element);
-      }
-      return;
+const configurePurifier = () => {
+  if (purifierConfigured) return;
+
+  DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
+    if (data.attrName === "style") {
+      data.attrValue = sanitizeStyle(data.attrValue);
     }
+  });
 
-    Array.from(element.attributes).forEach((attribute) => {
-      if (attribute.name === "style") {
-        const safeStyle = sanitizeStyle(attribute.value);
-        if (safeStyle) {
-          element.setAttribute("style", safeStyle);
-        } else {
-          element.removeAttribute("style");
-        }
-      } else if (attribute.name === "title") {
-        // allow title for accessibility
-      } else {
-        element.removeAttribute(attribute.name);
-      }
-    });
-  }
-
-  Array.from(node.childNodes).forEach(sanitizeNode);
+  purifierConfigured = true;
 };
 
-export const sanitizeRichText = (value: string): string => {
-  if (typeof document === "undefined") {
-    return value;
+export const sanitizeRichText = (value?: string): string => {
+  if (typeof window === "undefined") {
+    return value ?? "";
   }
-  const template = document.createElement("template");
-  template.innerHTML = value ?? "";
-  sanitizeNode(template.content);
-  return template.innerHTML;
+
+  configurePurifier();
+
+  return DOMPurify.sanitize(value ?? "", {
+    ALLOWED_TAGS: allowedTags,
+    ALLOWED_ATTR: ["style", "title"],
+    ALLOW_DATA_ATTR: false,
+    KEEP_CONTENT: true,
+  });
 };
 
-export const stripRichText = (value: string): string => {
-  if (typeof document === "undefined") {
-    return value;
+export const stripRichText = (value?: string): string => {
+  if (typeof window === "undefined") {
+    return value ?? "";
   }
-  const div = document.createElement("div");
-  div.innerHTML = value ?? "";
-  return div.textContent || "";
+
+  configurePurifier();
+
+  return DOMPurify.sanitize(value ?? "", {
+    ALLOWED_TAGS: [],
+    ALLOWED_ATTR: [],
+    KEEP_CONTENT: true,
+  });
 };
