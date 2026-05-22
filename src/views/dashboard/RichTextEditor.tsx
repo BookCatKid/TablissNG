@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react";
 import DOMPurify from "dompurify";
 import React from "react";
 
-import { sanitizeRichText } from "../../utils/richText";
+import { sanitizeRichText, sanitizeRichTextNode } from "../../utils/richText";
 
 type RichTextEditorProps = {
   value: string;
@@ -75,7 +75,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const emitChange = () => {
     if (!editorRef.current) return;
 
-    const sanitized = sanitizeRichText(editorRef.current.innerHTML);
+    const sanitized = sanitizeRichTextNode(editorRef.current);
     lastRenderedValue.current = sanitized;
     onChange(sanitized);
   };

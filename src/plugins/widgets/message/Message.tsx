@@ -1,6 +1,7 @@
-import React, { FC } from "react";
+import { type FC } from "react";
+
 import { sanitizeRichText } from "../../../utils/richText";
-import { defaultData, Props, } from "./types";
+import { defaultData, Props } from "./types";
 
 const Message: FC<Props> = ({ data = defaultData }) => {
   const content = data.messages?.[0] ?? "";

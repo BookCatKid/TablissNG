@@ -1,126 +1,54 @@
 .widget-settings-backdrop
     position: fixed
-    top: 0
-    left: 0
-    width: 100%
-    height: 100%
-    background: rgba(0, 0, 0, 0.32)
+    inset: 0
+    background: color-mix(in srgb, var(--bg-overlay) 80%, transparent)
+    backdrop-filter: blur(2px)
     z-index: 1900
 
 .WidgetSettings
     position: fixed
-    width: min(460px, calc(100vw - 48px))
-    max-height: min(520px, calc(100vh - 48px))
-    background: #ffffff
-    border: 1px solid #e6eaf0
+    width: min(420px, calc(100vw - 32px))
+    max-height: min(520px, calc(100vh - 32px))
+    background: var(--bg-main)
+    border: 1px solid var(--border-light)
     border-radius: 8px
-    padding: 0
-    box-shadow: 0 6px 20px rgba(17, 24, 39, 0.08)
+    color: var(--text-main)
+    box-shadow: 0 12px 32px var(--shadow-main)
     z-index: 2000
     transform-origin: top left
     overflow: hidden
     pointer-events: auto
     display: flex
     flex-direction: column
+    color-scheme: light
+
+    .dark &
+        color-scheme: dark
 
     &.is-dragging
         .settings-header
             cursor: grabbing
 
     &.WidgetSettings--plugin
-        width: min(520px, calc(100vw - 40px))
-        max-height: min(560px, calc(100vh - 40px))
-        border-color: #e6eaf0
-        .settings-content
-            padding: 1.5rem
+        width: min(560px, calc(100vw - 32px))
+        max-height: min(560px, calc(100vh - 32px))
+        overflow: visible
+
+        .settings-content,
         .widget-plugin-settings
-            max-height: calc(100% - 0px)
-            overflow-y: auto
-            display: flex
-            flex-direction: column
-            gap: 1rem
+            overflow: visible
 
-            &::-webkit-scrollbar
-                width: 6px
-
-            &::-webkit-scrollbar-thumb
-                background: #cfd6dd
-                border-radius: 3px
-
-            p,
-            span,
-            label
-                color: #3b4348
-                font-size: 0.95rem
-
-            label
-                display: block
-                text-transform: none
-                letter-spacing: 0
-                margin-bottom: 0.5rem
-
-            input:not([type="checkbox"]):not([type="radio"]),
-            select,
-            textarea
-                width: 100%
-                margin-top: 0.35rem
-                border-radius: 6px
-                border: 1px solid #d6dbe2
-                background: #ffffff
-                color: #333333
-                padding: 0.5rem 0.6rem
-                font-size: 0.95rem
-                font-family: inherit
-                transition: border-color 0.12s ease, box-shadow 0.12s ease
-
-                &:focus
-                    outline: none
-                    border-color: #3498db
-                    box-shadow: 0 0 6px rgba(52, 152, 219, 0.12)
-
-            textarea
-                min-height: 120px
-                resize: vertical
-
-            input[type="checkbox"],
-            input[type="radio"]
-                margin-right: 0.35rem
-
-        .widget-settings-empty
-            border: 1px dashed #e9edf2
-            border-radius: 8px
-            padding: 1rem
-            text-align: center
-            color: #6b757b
-
-    &--plugin
-        .settings-content
-            padding: 1.5rem
-
-        .widget-plugin-settings
-            display: flex
-            flex-direction: column
-            gap: 1rem
-            max-height: calc(100% - 76px)
-            overflow-y: auto
-
-        .widget-settings-empty
-            padding: 2rem 1rem
-            text-align: center
-            color: rgba(255, 255, 255, 0.8)
-
-    // Corner decorations
     .corner-decoration
         display: none
 
     .settings-header
         position: relative
-        padding: 1.25rem 1.5rem
-        border-bottom: 1px solid rgba(0, 217, 255, 0.3)
+        padding: 1rem 1.25rem
+        border-bottom: 1px solid var(--border-light)
         display: flex
         align-items: center
         justify-content: space-between
-        overflow: hidden
+        gap: 1rem
         cursor: grab
         user-select: none
 
@@ -129,242 +57,208 @@
 
         h3
             margin: 0
+            color: var(--text-heading)
             font-size: 1rem
-            color: #222
-            text-transform: none
+            font-weight: 700
             letter-spacing: 0
-            font-weight: 600
-            position: relative
-            z-index: 1
+            text-transform: none
+            min-width: 0
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
 
         .close-btn
-            background: none
-            border: 1px solid #d6dbe2
-            color: #444
+            flex: 0 0 auto
             width: 32px
             height: 32px
+            border-radius: 4px
+            border: 1px solid var(--border-main)
+            background: var(--bg-main)
+            color: var(--text-main)
             display: flex
             align-items: center
             justify-content: center
             cursor: pointer
-            border-radius: 4px
-            transition: background 0.15s ease, transform 0.12s ease
-            position: relative
-            z-index: 1
-            font-size: 16px
+            transition: background 0.12s ease, transform 0.12s ease
 
             &:hover
-                background: #f4f6f9
+                background: var(--bg-button)
                 transform: translateY(-1px)
 
-        .settings-content
-            padding: 1.5rem
-            flex: 1 1 auto
-            max-height: calc(100% - 76px)
-            overflow-y: auto
+            &:focus-visible
+                outline: 2px solid var(--accent-color)
+                outline-offset: 2px
 
-            &::-webkit-scrollbar
-                width: 6px
+    .settings-content
+        padding: 1rem
+        flex: 1 1 auto
+        overflow-y: auto
 
-            &::-webkit-scrollbar-thumb
-                background: #cfd6dd
-                border-radius: 3px
+    .setting-group
+        margin-bottom: 0.85rem
 
-            .setting-group
-                margin-bottom: 1rem
+    .holo-card
+        padding: 0.85rem
+        border: 1px solid var(--border-light)
+        border-radius: 8px
+        background: var(--bg-secondary)
 
-            .holo-card
-                padding: 0.75rem 1rem
-                border: 1px solid #e9edf2
-                border-radius: 8px
-                background: #ffffff
-                box-shadow: 0 2px 6px rgba(17, 24, 39, 0.04)
-                position: relative
-                overflow: visible
+    .setting-label
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        margin-bottom: 0.55rem
+        color: var(--text-heading)
+        font-size: 0.9rem
+        font-weight: 700
 
-                .setting-label
-                    display: flex
-                    align-items: center
-                    gap: 0.5rem
-                    margin-bottom: 0.45rem
-                    color: #333333
-                    font-size: 0.9rem
-                    font-weight: 600
-                    text-transform: none
-                    letter-spacing: 0
+        svg
+            font-size: 16px
 
-                    svg
-                        font-size: 16px
+        &.has-action
+            justify-content: space-between
+            margin-bottom: 0
 
-                    &.has-action
-                        justify-content: space-between
-                        margin-bottom: 0
+            .label-main
+                display: flex
+                align-items: center
+                gap: 0.5rem
 
-                        .label-main
-                            display: flex
-                            align-items: center
-                            gap: 0.5rem
+    .setting-value
+        margin-left: auto
+        color: var(--text-secondary)
+        font-size: 0.85rem
+        font-weight: 500
 
-                .holo-icon-btn
-                    width: 40px
-                    height: 40px
-                    border-radius: 6px
-                    border: 1px solid #d6dbe2
-                    background: #ffffff
-                    color: #333
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    cursor: pointer
-                    transition: background 0.12s ease, transform 0.12s ease
-                    position: relative
+    .holo-icon-btn
+        width: 36px
+        height: 36px
+        border-radius: 6px
+        border: 1px solid var(--border-main)
+        background: var(--bg-main)
+        color: var(--text-main)
+        display: flex
+        align-items: center
+        justify-content: center
+        cursor: pointer
+        transition: background 0.12s ease, transform 0.12s ease
 
-                    svg
-                        font-size: 1rem
+        &:hover
+            background: var(--bg-button)
+            transform: translateY(-1px)
 
-                    &:hover
-                        background: #f4f6f9
-                        transform: translateY(-1px)
+        &:focus-visible
+            outline: 2px solid var(--accent-color)
+            outline-offset: 2px
 
-                    &:focus-visible
-                        outline: 2px solid rgba(52, 152, 219, 0.12)
-                        outline-offset: 2px
+    input[type="range"]
+        width: 100%
+        margin-top: 0.45rem
+        accent-color: var(--accent-color)
 
-                input[type="range"]
-                    width: 100%
-                    margin-top: 0.5rem
-                    cursor: pointer
-                    background: transparent
+    .quick-align-grid
+        display: grid
+        grid-template-columns: repeat(3, minmax(0, 1fr))
+        gap: 0.4rem
 
-                    &::-webkit-slider-runnable-track
-                        height: 4px
-                        background: #d6dbe2
-                        border-radius: 4px
-
-                    &::-webkit-slider-thumb
-                        width: 14px
-                        height: 14px
-                        margin-top: -5px
-                        background: #888
-                        border-radius: 50%
-
-                .setting-value
-                    margin-left: auto
-                    font-size: 0.85rem
-                    color: #6b757b
-
-                .holo-btn
-                    margin-top: 0.5rem
-                    width: 100%
-                    padding: 0.6rem 0.75rem
-                    border: 1px solid #d6dbe2
-                    border-radius: 6px
-                    background: #f7f9fb
-                    color: #333
-                    text-transform: none
-                    letter-spacing: 0
-                    font-weight: 600
-                    display: flex
-                    align-items: center
-                    justify-content: center
-                    gap: 0.5rem
-                    cursor: pointer
-                    transition: background 0.12s ease, transform 0.12s ease
-
-                    svg
-                        font-size: 1rem
-
-                    &:hover
-                        background: #eef3f8
-                        transform: translateY(-1px)
-
-                .quick-align-grid
-                    display: grid
-                    grid-template-columns: repeat(3, minmax(0, 1fr))
-                    gap: 0.4rem
-                    margin-top: 0.5rem
-
-                    .holo-chip
-                        padding: 0.4rem 0.35rem
-                        border-radius: 4px
-                        border: 1px solid #e9edf2
-                        background: #ffffff
-                        color: #4b5563
-                        font-size: 0.78rem
-                        text-transform: none
-                        letter-spacing: 0
-                        cursor: pointer
-                        transition: background 0.12s ease, border-color 0.12s ease
-
-                        &.active
-                            border-color: #3498db
-                            color: #3498db
-
-                        &:hover
-                            border-color: #bcd8f5
-                            color: #2b6cb0
-        .setting-divider
-            height: 1px
-            background: #eef3f8
-            margin: 1.25rem 0
-            position: relative
-
-        .delete-btn
-            width: 100%
-            padding: 0.75rem 1rem
-            background: #fff5f5
-            border: 1px solid #f5c6c6
-            border-radius: 6px
-            color: #c53030
-            font-size: 0.9rem
-            font-weight: 600
-            text-transform: uppercase
-            letter-spacing: 1px
+        .holo-chip
+            min-height: 34px
+            padding: 0.35rem 0.3rem
+            border-radius: 4px
+            border: 1px solid var(--border-main)
+            background: var(--bg-main)
+            color: var(--text-main)
+            font-size: 0.78rem
             cursor: pointer
-            display: flex
-            align-items: center
-            justify-content: center
-            gap: 0.75rem
-            transition: all 0.3s ease
+            transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease
 
-            svg
-                font-size: 18px
-                filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.6))
+            &.active
+                border-color: var(--accent-color)
+                color: var(--accent-color)
+                background: color-mix(in srgb, var(--accent-color) 10%, var(--bg-main))
 
             &:hover
-                background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(185, 28, 28, 0.4))
-                border-color: #ef4444
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.5), inset 0 0 15px rgba(239, 68, 68, 0.2)
-                transform: translateY(-2px)
+                border-color: var(--accent-color)
+                color: var(--accent-color)
 
-            &:active
-                transform: translateY(0)
+    .setting-divider
+        height: 1px
+        background: var(--border-light)
+        margin: 1rem 0
+
+    .delete-btn
+        width: 100%
+        padding: 0.7rem 1rem
+        background: color-mix(in srgb, #dc2626 8%, var(--bg-main))
+        border: 1px solid color-mix(in srgb, #dc2626 45%, var(--border-main))
+        border-radius: 6px
+        color: #dc2626
+        font-size: 0.9rem
+        font-weight: 700
+        cursor: pointer
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 0.55rem
+        transition: background 0.12s ease, transform 0.12s ease
+
+        &:hover
+            background: color-mix(in srgb, #dc2626 14%, var(--bg-main))
+            transform: translateY(-1px)
+
+    .widget-plugin-settings
+        display: flex
+        flex-direction: column
+        gap: 0.85rem
+
+        label
+            display: block
+            margin-bottom: 0.55rem
+            color: var(--text-main)
+            font-size: 0.92rem
+
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea
+            width: 100%
+            margin-top: 0.35rem
+            border-radius: 6px
+            border: 1px solid var(--border-main)
+            background: var(--bg-input)
+            color: var(--text-heading)
+            padding: 0.5rem 0.6rem
+            font-size: 0.92rem
+            font-family: inherit
+
+            &:focus
+                outline: 2px solid color-mix(in srgb, var(--accent-color) 35%, transparent)
+                border-color: var(--accent-color)
+
+        textarea
+            min-height: 110px
+            resize: vertical
+
+        input[type="checkbox"],
+        input[type="radio"]
+            margin-right: 0.35rem
+            accent-color: var(--accent-color)
+
+        hr
+            border: 0
+            border-top: 1px solid var(--border-light)
+            margin: 0.85rem 0
+
+    .widget-settings-empty
+        border: 1px dashed var(--border-main)
+        border-radius: 8px
+        padding: 1rem
+        text-align: center
+        color: var(--text-secondary)
 
 @media (max-width: 640px)
     .WidgetSettings
-        width: calc(100vw - 32px)
-        max-height: calc(100vh - 32px)
-        border-width: 1px
+        width: calc(100vw - 24px)
+        max-height: calc(100vh - 24px)
 
         .settings-content
-            padding: 1.25rem
-
-@keyframes backdrop-fade-in
-    from
-        opacity: 0
-    to
-        opacity: 1
-
-@keyframes settings-slide-in
-    0%
-        opacity: 0
-        transform: scale(0.7) translateY(-20px)
-    100%
-        opacity: 1
-        transform: scale(1) translateY(0)
-
-@keyframes header-scan
-    0%, 100%
-        transform: translateX(-100%)
-    50%
-        transform: translateX(100%)
+            padding: 0.85rem

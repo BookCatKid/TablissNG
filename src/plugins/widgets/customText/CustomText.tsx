@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 
-import { defaultData, Props } from "./types";
 import { sanitizeRichText } from "../../../utils/richText";
+import { defaultData, Props } from "./types";
 
 const CustomText: FC<Props> = ({ data = defaultData }) => {
   const [currentText, setCurrentText] = useState<string>("");
@@ -28,7 +28,9 @@ const CustomText: FC<Props> = ({ data = defaultData }) => {
 
   const updateText = () => {
     const texts = getEntries();
-    const cleanedList = texts.filter((entry) => entry !== undefined && entry !== null);
+    const cleanedList = texts.filter(
+      (entry) => entry !== undefined && entry !== null,
+    );
     if (cleanedList.length === 0) {
       setCurrentText("");
       return;

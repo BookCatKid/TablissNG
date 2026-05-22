@@ -1,10 +1,12 @@
+import "./WidgetSettings.sass";
+
+import { Icon } from "@iconify/react";
 import React from "react";
 import { createPortal } from "react-dom";
-import { Icon } from "@iconify/react";
+
 import { WidgetPosition } from "../../db/state";
 import type { API } from "../../plugins";
 import PluginContainer from "../shared/Plugin";
-import "./WidgetSettings.sass";
 
 interface WidgetSettingsProps {
   widgetName: string;
@@ -20,6 +22,7 @@ interface WidgetSettingsProps {
   mode: "layout" | "widget";
   settingsComponent?: React.ComponentType<API<unknown, unknown>>;
   pluginId?: string;
+  defaultData?: unknown;
   onPositionChange: (coords: { x: number; y: number }) => void;
 }
 
@@ -49,16 +52,19 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
   mode,
   settingsComponent,
   pluginId,
+  defaultData = {},
   onPositionChange,
 }) => {
-  if (!isOpen || typeof document === "undefined") {
-    return null;
-  }
-
+  const canUseDocument = typeof document !== "undefined";
   const isWidgetMode = mode === "widget";
-  const canRenderPluginSettings = Boolean(isWidgetMode && settingsComponent && pluginId);
+  const canRenderPluginSettings = Boolean(
+    isWidgetMode && settingsComponent && pluginId,
+  );
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const dragOffsetRef = React.useRef<{ offsetX: number; offsetY: number } | null>(null);
+  const dragOffsetRef = React.useRef<{
+    offsetX: number;
+    offsetY: number;
+  } | null>(null);
   const positionRef = React.useRef(position);
   const [isDragging, setIsDragging] = React.useState(false);
 
@@ -105,20 +111,20 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
   );
 
   React.useLayoutEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !canUseDocument) {
       return;
     }
     applyClampedPosition(position);
-  }, [applyClampedPosition, isOpen, position]);
+  }, [applyClampedPosition, canUseDocument, isOpen, position]);
 
   React.useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !canUseDocument) {
       return undefined;
     }
     const handleResize = () => applyClampedPosition(position);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [applyClampedPosition, isOpen, position]);
+  }, [applyClampedPosition, canUseDocument, isOpen, position]);
 
   const handlePointerMove = React.useCallback(
     (event: PointerEvent) => {
@@ -127,7 +133,10 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
       }
       event.preventDefault();
       const { offsetX, offsetY } = dragOffsetRef.current;
-      applyClampedPosition({ x: event.clientX - offsetX, y: event.clientY - offsetY });
+      applyClampedPosition({
+        x: event.clientX - offsetX,
+        y: event.clientY - offsetY,
+      });
     },
     [applyClampedPosition],
   );
@@ -174,9 +183,12 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
     };
   }, [handlePointerMove, handlePointerUp]);
 
+  if (!isOpen || !canUseDocument) {
+    return null;
+  }
+
   return createPortal(
     <>
-      <div className="widget-settings-backdrop" onClick={onClose} />
       <div
         className={`WidgetSettings ${isWidgetMode ? "WidgetSettings--plugin" : ""} ${
           isDragging ? "is-dragging" : ""
@@ -199,7 +211,11 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
           {isWidgetMode ? (
             canRenderPluginSettings ? (
               <div className="widget-plugin-settings">
-                <PluginContainer id={pluginId!} component={settingsComponent!} />
+                <PluginContainer
+                  id={pluginId!}
+                  component={settingsComponent!}
+                  defaultData={defaultData}
+                />
               </div>
             ) : (
               <div className="widget-settings-empty">
@@ -229,7 +245,9 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
                 <div className="setting-label">
                   <Icon icon="feather:maximize-2" />
                   <span>Scale</span>
-                  <span className="setting-value">{Math.round(scale * 100)}%</span>
+                  <span className="setting-value">
+                    {Math.round(scale * 100)}%
+                  </span>
                 </div>
                 <input
                   type="range"
@@ -237,7 +255,9 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
                   max="1.8"
                   step="0.05"
                   value={scale}
-                  onChange={(event) => onScaleChange(parseFloat(event.target.value))}
+                  onChange={(event) =>
+                    onScaleChange(parseFloat(event.target.value))
+                  }
                 />
               </div>
 

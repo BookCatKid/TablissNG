@@ -375,7 +375,6 @@ const System: FC = () => {
           onChange={(e) => setAutoHideSettings(e.target.checked)}
         />
       </label>
-
     </div>
   );
 };

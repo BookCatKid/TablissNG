@@ -1,10 +1,11 @@
+import "./Background.sass";
+
 import type { FC } from "react";
 
 import { db } from "../../db/state";
 import { useValue } from "../../lib/db/react";
 import { getConfig } from "../../plugins";
 import Plugin from "../shared/Plugin";
-import "./Background.sass";
 
 const Background: FC = () => {
   const background = useValue(db, "background");

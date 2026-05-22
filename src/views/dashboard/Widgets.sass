@@ -31,8 +31,11 @@
         background: color-mix(in srgb, var(--accent-color) 12%, transparent)
         z-index: 1000
 
-        & > *
+        & > :not(.widget-controls)
             pointer-events: none
+
+        & > .widget-controls
+            pointer-events: auto
 
     .Widget
         position: relative
@@ -49,7 +52,7 @@
             opacity: 0
             transition: opacity 0.18s ease, transform 0.18s ease
             pointer-events: none
-            z-index: 120
+            z-index: 1300
 
         .widget-settings-trigger
             width: 28px
@@ -195,3 +198,43 @@
 
 body.no-highlight .Widgets
     user-select: none
+
+.widget-controls--floating
+    position: fixed
+    display: flex
+    gap: 0.25rem
+    padding: 0.35rem 0.5rem
+    border-radius: 0.5rem
+    background: var(--bg-main)
+    border: 1px solid var(--border-main)
+    box-shadow: 0 0.5rem 1rem var(--shadow-main)
+    opacity: 1
+    pointer-events: auto
+    z-index: 1300
+
+    .widget-settings-trigger
+        width: 28px
+        height: 28px
+        border-radius: 0.4rem
+        border: none
+        background: var(--bg-button)
+        color: var(--text-main)
+        display: flex
+        align-items: center
+        justify-content: center
+        cursor: pointer
+        transition: background 0.12s ease, transform 0.12s ease
+        pointer-events: auto
+
+        svg
+            font-size: 13px
+
+        &:hover
+            transform: scale(1.03)
+            background: var(--border-main)
+
+        &.danger
+            color: #dc2626
+
+            &:hover
+                background: color-mix(in srgb, #dc2626 12%, var(--bg-button))

@@ -1,8 +1,10 @@
+import "./WidgetFontSettings.sass";
+
+import { Icon } from "@iconify/react";
 import React from "react";
 import { createPortal } from "react-dom";
-import { Icon } from "@iconify/react";
+
 import { WidgetDisplay } from "../../db/state";
-import "./WidgetFontSettings.sass";
 
 interface WidgetFontSettingsProps {
   widgetName: string;
@@ -36,7 +38,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
   const italicFieldId = React.useId();
   const underlineFieldId = React.useId();
   const outlineFieldId = React.useId();
-  const [localDisplay, setLocalDisplay] = React.useState<Partial<WidgetDisplay>>({
+  const [localDisplay, setLocalDisplay] = React.useState<
+    Partial<WidgetDisplay>
+  >({
     colour: defaultColour,
     fontFamily: "",
     fontSize: 24,
@@ -89,24 +93,26 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
     textDecoration: localDisplay.textDecoration,
   };
 
-  const outlineStyle = localDisplay.textOutline ? localDisplay.textOutlineStyle ?? "basic" : null;
+  const outlineStyle = localDisplay.textOutline
+    ? (localDisplay.textOutlineStyle ?? "basic")
+    : null;
   const fontColourLabel = (localDisplay.colour ?? defaultColour).toUpperCase();
-  const outlineColourLabel = (localDisplay.textOutlineColor ?? defaultOutlineColour).toUpperCase();
+  const outlineColourLabel = (
+    localDisplay.textOutlineColor ?? defaultOutlineColour
+  ).toUpperCase();
 
   return createPortal(
     <>
-      <div className="widget-font-settings-backdrop" onClick={onClose} />
       <div
         className="WidgetFontSettings"
         role="dialog"
-        aria-modal="true"
         aria-labelledby={titleId}
       >
         <div className="settings-header">
           <div className="header-glow" aria-hidden="true" />
           <h3 id={titleId}>
             <Icon icon="feather:type" aria-hidden="true" />
-            <span>{widgetName} · Font Settings</span>
+            <span>{widgetName} - Font Settings</span>
           </h3>
           <button
             type="button"
@@ -126,7 +132,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                 <input
                   type="text"
                   value={localDisplay.fontFamily ?? ""}
-                  onChange={(event) => updateDisplay({ fontFamily: event.target.value })}
+                  onChange={(event) =>
+                    updateDisplay({ fontFamily: event.target.value })
+                  }
                 />
               </label>
 
@@ -137,7 +145,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   min={8}
                   max={160}
                   value={localDisplay.fontSize ?? 24}
-                  onChange={(event) => updateDisplay({ fontSize: Number(event.target.value) })}
+                  onChange={(event) =>
+                    updateDisplay({ fontSize: Number(event.target.value) })
+                  }
                 />
               </label>
 
@@ -147,7 +157,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   value={localDisplay.fontWeight?.toString() ?? ""}
                   onChange={(event) =>
                     updateDisplay({
-                      fontWeight: event.target.value ? Number(event.target.value) : undefined,
+                      fontWeight: event.target.value
+                        ? Number(event.target.value)
+                        : undefined,
                     })
                   }
                 >
@@ -165,7 +177,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   <input
                     type="color"
                     value={localDisplay.colour ?? defaultColour}
-                    onChange={(event) => updateDisplay({ colour: event.target.value })}
+                    onChange={(event) =>
+                      updateDisplay({ colour: event.target.value })
+                    }
                   />
                   <span className="colour-value" aria-live="polite">
                     {fontColourLabel}
@@ -175,12 +189,17 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
 
               <div className="stacked-input toggle-field">
                 <span id={italicFieldId}>Italic</span>
-                <label className="slider-toggle" aria-labelledby={italicFieldId}>
+                <label
+                  className="slider-toggle"
+                  aria-labelledby={italicFieldId}
+                >
                   <input
                     type="checkbox"
                     checked={localDisplay.fontStyle === "italic"}
                     onChange={(event) =>
-                      updateDisplay({ fontStyle: event.target.checked ? "italic" : "normal" })
+                      updateDisplay({
+                        fontStyle: event.target.checked ? "italic" : "normal",
+                      })
                     }
                   />
                   <span className="slider-track">
@@ -194,12 +213,19 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
 
               <div className="stacked-input toggle-field">
                 <span id={underlineFieldId}>Underline</span>
-                <label className="slider-toggle" aria-labelledby={underlineFieldId}>
+                <label
+                  className="slider-toggle"
+                  aria-labelledby={underlineFieldId}
+                >
                   <input
                     type="checkbox"
                     checked={localDisplay.textDecoration === "underline"}
                     onChange={(event) =>
-                      updateDisplay({ textDecoration: event.target.checked ? "underline" : "none" })
+                      updateDisplay({
+                        textDecoration: event.target.checked
+                          ? "underline"
+                          : "none",
+                      })
                     }
                   />
                   <span className="slider-track">
@@ -213,11 +239,16 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
 
               <div className="stacked-input toggle-field">
                 <span id={outlineFieldId}>Outline</span>
-                <label className="slider-toggle" aria-labelledby={outlineFieldId}>
+                <label
+                  className="slider-toggle"
+                  aria-labelledby={outlineFieldId}
+                >
                   <input
                     type="checkbox"
                     checked={Boolean(localDisplay.textOutline)}
-                    onChange={(event) => updateDisplay({ textOutline: event.target.checked })}
+                    onChange={(event) =>
+                      updateDisplay({ textOutline: event.target.checked })
+                    }
                   />
                   <span className="slider-track">
                     <span className="slider-thumb" />
@@ -238,7 +269,11 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   <select
                     value={localDisplay.textOutlineStyle ?? "basic"}
                     onChange={(event) =>
-                      updateDisplay({ textOutlineStyle: event.target.value as "basic" | "advanced" })
+                      updateDisplay({
+                        textOutlineStyle: event.target.value as
+                          | "basic"
+                          | "advanced",
+                      })
                     }
                   >
                     <option value="basic">Basic (Shadow)</option>
@@ -251,8 +286,12 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   <div className="colour-field">
                     <input
                       type="color"
-                      value={localDisplay.textOutlineColor ?? defaultOutlineColour}
-                      onChange={(event) => updateDisplay({ textOutlineColor: event.target.value })}
+                      value={
+                        localDisplay.textOutlineColor ?? defaultOutlineColour
+                      }
+                      onChange={(event) =>
+                        updateDisplay({ textOutlineColor: event.target.value })
+                      }
                     />
                     <span className="colour-value" aria-live="polite">
                       {outlineColourLabel}
@@ -269,7 +308,9 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                       max={20}
                       value={localDisplay.textOutlineSize ?? 1}
                       onChange={(event) =>
-                        updateDisplay({ textOutlineSize: Number(event.target.value) })
+                        updateDisplay({
+                          textOutlineSize: Number(event.target.value),
+                        })
                       }
                     />
                   </label>
@@ -300,7 +341,8 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                     className="preview-outline"
                     style={{
                       ...previewStyle,
-                      color: localDisplay.textOutlineColor ?? defaultOutlineColour,
+                      color:
+                        localDisplay.textOutlineColor ?? defaultOutlineColour,
                       WebkitTextStroke: `${(localDisplay.textOutlineSize ?? 1) * 2}px ${
                         localDisplay.textOutlineColor ?? defaultOutlineColour
                       }`,

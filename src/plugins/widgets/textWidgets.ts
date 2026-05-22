@@ -1,4 +1,8 @@
-const textWidgetKeys = ["widget/notes", "widget/message", "widget/customText"] as const;
+const textWidgetKeys = [
+  "widget/notes",
+  "widget/message",
+  "widget/customText",
+] as const;
 
 export type TextWidgetKey = (typeof textWidgetKeys)[number];
 

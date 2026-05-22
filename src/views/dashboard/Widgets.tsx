@@ -41,18 +41,10 @@ const Widgets: FC = () => {
       <div className="container">
         {!focus &&
           slots.map(([position, widgets]) => (
-            <Slot
-              key={position}
-              position={position}
-              widgets={widgets}
-            />
+            <Slot key={position} position={position} widgets={widgets} />
           ))}
         {cssSlots.map(([position, widgets]) => (
-          <Slot
-            key={`css-${position}`}
-            position={position}
-            widgets={widgets}
-          />
+          <Slot key={`css-${position}`} position={position} widgets={widgets} />
         ))}
       </div>
     </div>

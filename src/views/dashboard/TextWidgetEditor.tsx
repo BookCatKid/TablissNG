@@ -1,32 +1,37 @@
+import "./TextWidgetEditor.sass";
+
+import { Icon } from "@iconify/react";
 import React from "react";
 import { createPortal } from "react-dom";
-import { Icon } from "@iconify/react";
 import { useIntl } from "react-intl";
+
 import { UiContext } from "../../contexts/ui";
-import { getConfig } from "../../plugins";
 import { useApi } from "../../hooks";
-import { sanitizeRichText, stripRichText } from "../../utils/richText";
-import {
-  MessageData,
-  defaultData as defaultMessageData,
-} from "../../plugins/widgets/message/types";
+import { getConfig } from "../../plugins";
 import {
   CustomTextData,
   defaultData as defaultCustomTextData,
 } from "../../plugins/widgets/customText/types";
 import {
+  defaultData as defaultMessageData,
+  MessageData,
+} from "../../plugins/widgets/message/types";
+import {
   Data as NotesData,
   defaultData as defaultNotesData,
 } from "../../plugins/widgets/notes/data";
+import { sanitizeRichText, stripRichText } from "../../utils/richText";
 import RichTextEditor from "./RichTextEditor";
-import "./TextWidgetEditor.sass";
 
 const TextWidgetEditor: React.FC = () => {
   const { textEditorTarget } = React.useContext(UiContext);
   if (!textEditorTarget || typeof document === "undefined") {
     return null;
   }
-  return createPortal(<EditorSurface target={textEditorTarget} />, document.body);
+  return createPortal(
+    <EditorSurface target={textEditorTarget} />,
+    document.body,
+  );
 };
 
 type EditorSurfaceProps = {
@@ -42,15 +47,11 @@ const TextWidgetKeys = {
 const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
   const intl = useIntl();
   const { closeTextEditor, setHotkeysPaused } = React.useContext(UiContext);
-  const { data, setData } = useApi(target.widgetId);
-
-  if (
+  const { data, setData } = useApi(target.widgetId, {});
+  const isUnsupportedTextWidget =
     target.widgetKey !== TextWidgetKeys.MESSAGE &&
     target.widgetKey !== TextWidgetKeys.NOTES &&
-    target.widgetKey !== TextWidgetKeys.CUSTOM_TEXT
-  ) {
-    return null;
-  }
+    target.widgetKey !== TextWidgetKeys.CUSTOM_TEXT;
   const config = getConfig(target.widgetKey);
   const widgetName = intl.formatMessage(config.name);
 
@@ -62,16 +63,23 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
   const [isReady, setIsReady] = React.useState(false);
 
   React.useEffect(() => {
+    if (isUnsupportedTextWidget) {
+      return;
+    }
     setIsReady(false);
-  }, [target.widgetKey]);
+  }, [isUnsupportedTextWidget, target.widgetKey]);
 
   React.useEffect(() => {
+    if (isUnsupportedTextWidget) {
+      return;
+    }
+
     const ensureMessageData = (): MessageData =>
-      ((data as MessageData | undefined) ?? defaultMessageData);
+      (data as MessageData | undefined) ?? defaultMessageData;
     const ensureNotesData = (): NotesData =>
-      ((data as NotesData | undefined) ?? defaultNotesData);
+      (data as NotesData | undefined) ?? defaultNotesData;
     const ensureCustomTextData = (): CustomTextData =>
-      ((data as CustomTextData | undefined) ?? defaultCustomTextData);
+      (data as CustomTextData | undefined) ?? defaultCustomTextData;
 
     if (target.widgetKey === TextWidgetKeys.MESSAGE) {
       const messageData = ensureMessageData();
@@ -91,20 +99,21 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
 
     if (target.widgetKey === TextWidgetKeys.CUSTOM_TEXT) {
       const dataset = ensureCustomTextData();
-      let entries: string[] = [];
-      if (Array.isArray(dataset?.strings) && dataset.strings.length > 0) {
-        entries = [...dataset.strings];
-      } else if (dataset?.text) {
-        const sep = dataset.atNewline ? "\n" : dataset.separator || "\n";
-        entries = dataset.text.split(sep).filter(Boolean);
-      } else {
-        entries = [""];
-      }
+      const entries = (() => {
+        if (Array.isArray(dataset?.strings) && dataset.strings.length > 0) {
+          return [...dataset.strings];
+        }
+        if (dataset?.text) {
+          const sep = dataset.atNewline ? "\n" : dataset.separator || "\n";
+          return dataset.text.split(sep).filter(Boolean);
+        }
+        return [""];
+      })();
       setCustomEntries(entries.length ? entries : [""]);
       setActiveEntry(0);
       setIsReady(true);
     }
-  }, [data, target.widgetKey]);
+  }, [data, isUnsupportedTextWidget, target.widgetKey]);
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -124,7 +133,8 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
   const handleSave = () => {
     const asMessage = (data as MessageData | undefined) ?? defaultMessageData;
     const asNotes = (data as NotesData | undefined) ?? defaultNotesData;
-    const asCustom = (data as CustomTextData | undefined) ?? defaultCustomTextData;
+    const asCustom =
+      (data as CustomTextData | undefined) ?? defaultCustomTextData;
     if (target.widgetKey === TextWidgetKeys.MESSAGE) {
       const sanitized = sanitizeRichText(messageValue);
       setData({
@@ -141,7 +151,9 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
         markdownEnabled: false,
       });
     } else if (target.widgetKey === TextWidgetKeys.CUSTOM_TEXT) {
-      const sanitizedEntries = customEntries.map((entry) => sanitizeRichText(entry));
+      const sanitizedEntries = customEntries.map((entry) =>
+        sanitizeRichText(entry),
+      );
       setData({
         ...asCustom,
         strings: sanitizedEntries,
@@ -156,8 +168,14 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
 
   const renderMessageEditor = () => (
     <div className="editor-section">
-      <p className="helper-text">Add emphasis, lists, and emojis to your widget text.</p>
-      <RichTextEditor value={messageValue} onChange={setMessageValue} placeholder="Start typing..." />
+      <p className="helper-text">
+        Add emphasis, lists, and emojis to your widget text.
+      </p>
+      <RichTextEditor
+        value={messageValue}
+        onChange={setMessageValue}
+        placeholder="Start typing..."
+      />
     </div>
   );
 
@@ -167,17 +185,23 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
         <div className="warning-card">
           <Icon icon="feather:info" />
           <span>
-            Rich text editing will disable Markdown formatting for this note. Saving will convert it to
-            rich text automatically.
+            Rich text editing will disable Markdown formatting for this note.
+            Saving will convert it to rich text automatically.
           </span>
         </div>
       ) : null}
-      <RichTextEditor value={notesValue} onChange={setNotesValue} placeholder="Document your thoughts..." />
+      <RichTextEditor
+        value={notesValue}
+        onChange={setNotesValue}
+        placeholder="Document your thoughts..."
+      />
     </div>
   );
 
   const updateEntry = (index: number, value: string) => {
-    setCustomEntries((prev) => prev.map((entry, idx) => (idx === index ? value : entry)));
+    setCustomEntries((prev) =>
+      prev.map((entry, idx) => (idx === index ? value : entry)),
+    );
   };
 
   const addEntry = () => {
@@ -196,7 +220,9 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
       }
       const next = prev.filter((_, idx) => idx !== index);
       const ensured = next.length ? next : [""];
-      setActiveEntry((current) => Math.max(0, Math.min(current, ensured.length - 1)));
+      setActiveEntry((current) =>
+        Math.max(0, Math.min(current, ensured.length - 1)),
+      );
       return ensured;
     });
   };
@@ -254,6 +280,10 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
     return null;
   };
 
+  if (isUnsupportedTextWidget) {
+    return null;
+  }
+
   return (
     <>
       <div className="text-widget-editor-backdrop" onClick={closeTextEditor} />
@@ -274,14 +304,23 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
         </div>
 
         <div className="editor-content" data-scroll>
-          {isReady ? renderBody() : <p className="helper-text">Loading widget data…</p>}
+          {isReady ? (
+            renderBody()
+          ) : (
+            <p className="helper-text">Loading widget data…</p>
+          )}
         </div>
 
         <div className="editor-footer">
           <button type="button" className="ghost" onClick={closeTextEditor}>
             Cancel
           </button>
-          <button type="button" className="primary" onClick={handleSave} disabled={!isReady}>
+          <button
+            type="button"
+            className="primary"
+            onClick={handleSave}
+            disabled={!isReady}
+          >
             Save changes
           </button>
         </div>

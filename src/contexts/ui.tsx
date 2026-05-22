@@ -49,13 +49,19 @@ const UiProvider: FC<PropsWithChildren> = ({ children }) => {
       pushLoader: () =>
         setState((state) => ({ ...state, pending: state.pending + 1 })),
       popLoader: () =>
-        setState((state) => ({ ...state, pending: Math.max(0, state.pending - 1) })),
+        setState((state) => ({
+          ...state,
+          pending: Math.max(0, state.pending - 1),
+        })),
       toggleErrors: () =>
         setState((state) => ({ ...state, errors: !state.errors })),
       toggleSettings: () =>
         setState((state) => ({ ...state, settings: !state.settings })),
       toggleAddWidget: () =>
-        setState((state) => ({ ...state, addWidgetOpen: !state.addWidgetOpen })),
+        setState((state) => ({
+          ...state,
+          addWidgetOpen: !state.addWidgetOpen,
+        })),
       openAddWidget: () =>
         setState((state) => ({ ...state, addWidgetOpen: true })),
       closeAddWidget: () =>

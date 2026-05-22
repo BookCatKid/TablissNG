@@ -41,6 +41,13 @@ const allowedStyles = [
 
 let purifierConfigured = false;
 
+const richTextSanitizeConfig = {
+  ALLOWED_TAGS: allowedTags,
+  ALLOWED_ATTR: ["style", "title"],
+  ALLOW_DATA_ATTR: false,
+  KEEP_CONTENT: true,
+};
+
 const sanitizeStyle = (styleValue: string) => {
   const declarations = styleValue
     .split(";")
@@ -67,6 +74,38 @@ const configurePurifier = () => {
   purifierConfigured = true;
 };
 
+const escapeText = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const escapeAttribute = (value: string) =>
+  escapeText(value).replace(/"/g, "&quot;");
+
+const serializeNode = (node: ChildNode): string => {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return escapeText(node.textContent ?? "");
+  }
+
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return "";
+  }
+
+  const element = node as Element;
+  const tagName = element.tagName.toLowerCase();
+  const attributes = Array.from(element.attributes)
+    .map(({ name, value }) => ` ${name}="${escapeAttribute(value)}"`)
+    .join("");
+
+  if (tagName === "br") {
+    return `<${tagName}${attributes}>`;
+  }
+
+  const children = Array.from(element.childNodes).map(serializeNode).join("");
+  return `<${tagName}${attributes}>${children}</${tagName}>`;
+};
+
+const serializeChildren = (node: ParentNode): string =>
+  Array.from(node.childNodes).map(serializeNode).join("");
+
 export const sanitizeRichText = (value?: string): string => {
   if (typeof window === "undefined") {
     return value ?? "";
@@ -74,12 +113,22 @@ export const sanitizeRichText = (value?: string): string => {
 
   configurePurifier();
 
-  return DOMPurify.sanitize(value ?? "", {
-    ALLOWED_TAGS: allowedTags,
-    ALLOWED_ATTR: ["style", "title"],
-    ALLOW_DATA_ATTR: false,
-    KEEP_CONTENT: true,
-  });
+  return DOMPurify.sanitize(value ?? "", richTextSanitizeConfig);
+};
+
+export const sanitizeRichTextNode = (value?: Node | null): string => {
+  if (typeof window === "undefined" || !value) {
+    return "";
+  }
+
+  configurePurifier();
+
+  const fragment = DOMPurify.sanitize(value, {
+    ...richTextSanitizeConfig,
+    RETURN_DOM_FRAGMENT: true,
+  }) as DocumentFragment;
+
+  return serializeChildren(fragment);
 };
 
 export const stripRichText = (value?: string): string => {

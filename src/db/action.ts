@@ -83,7 +83,10 @@ export const setBackground = (key: string): void => {
 // Widget actions
 
 /** Add a new widget */
-export const addWidget = (key: string, displayOverride?: Partial<WidgetDisplay>): string => {
+export const addWidget = (
+  key: string,
+  displayOverride?: Partial<WidgetDisplay>,
+): string => {
   const id = createId();
   const widgets = selectWidgets();
   const order = widgets.length > 0 ? widgets[widgets.length - 1].order + 1 : 0;
@@ -94,6 +97,58 @@ export const addWidget = (key: string, displayOverride?: Partial<WidgetDisplay>)
     display: { position: "middleCentre", ...displayOverride },
   });
   return id;
+};
+
+const cloneValue = <T>(value: T): T => {
+  if (typeof structuredClone === "function") {
+    return structuredClone(value);
+  }
+
+  return JSON.parse(JSON.stringify(value)) as T;
+};
+
+/** Duplicate an existing widget with its display settings and saved data */
+export const duplicateWidget = (id: string): string | null => {
+  const widget = DB.get(db, `widget/${id}`);
+  if (!widget) {
+    console.error(`Widget ${id} not found`);
+    return null;
+  }
+
+  const display = cloneValue(widget.display);
+  const duplicateDisplay: Partial<WidgetDisplay> = {
+    ...display,
+    isEditingPosition: false,
+  };
+
+  if (display.position === "free") {
+    duplicateDisplay.x =
+      typeof display.x === "number" ? display.x + 24 : display.x;
+    duplicateDisplay.y =
+      typeof display.y === "number" ? display.y + 24 : display.y;
+    duplicateDisplay.xPercent =
+      typeof display.xPercent === "number"
+        ? Math.min(display.xPercent + 3, 100)
+        : display.xPercent;
+    duplicateDisplay.yPercent =
+      typeof display.yPercent === "number"
+        ? Math.min(display.yPercent + 3, 100)
+        : display.yPercent;
+  }
+
+  const duplicateId = addWidget(widget.key, duplicateDisplay);
+  const data = DB.get(db, `data/${id}`);
+  const cached = DB.get(cache, id);
+
+  if (typeof data !== "undefined") {
+    DB.put(db, `data/${duplicateId}`, cloneValue(data));
+  }
+
+  if (typeof cached !== "undefined") {
+    DB.put(cache, duplicateId, cloneValue(cached));
+  }
+
+  return duplicateId;
 };
 
 /** Remove a widget */

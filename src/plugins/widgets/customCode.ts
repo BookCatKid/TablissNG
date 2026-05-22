@@ -6,10 +6,12 @@ const widgetLanguageMap: Record<string, CodeLanguage> = {
   "widget/js": "javascript",
 };
 
-export const isCustomCodeWidget = (key: string): key is keyof typeof widgetLanguageMap =>
-  key in widgetLanguageMap;
+export const isCustomCodeWidget = (
+  key: string,
+): key is keyof typeof widgetLanguageMap => key in widgetLanguageMap;
 
-export const getCodeLanguageForWidget = (key: string): CodeLanguage | undefined =>
-  widgetLanguageMap[key];
+export const getCodeLanguageForWidget = (
+  key: string,
+): CodeLanguage | undefined => widgetLanguageMap[key];
 
 export const customCodeWidgetKeys = Object.keys(widgetLanguageMap);

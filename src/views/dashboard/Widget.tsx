@@ -10,18 +10,26 @@ import {
   useRef,
   useState,
 } from "react";
-import { FormattedMessage } from "react-intl";
+import { createPortal } from "react-dom";
+import { FormattedMessage, useIntl } from "react-intl";
 
 import { UiContext } from "../../contexts/ui";
-import { setWidgetDisplay } from "../../db/action";
-import { db, WidgetDisplay } from "../../db/state";
+import {
+  duplicateWidget,
+  removeWidget,
+  setWidgetDisplay,
+} from "../../db/action";
+import { db, WidgetDisplay, WidgetPosition } from "../../db/state";
 import { useKey } from "../../lib/db/react";
 import { pluginMessages } from "../../locales/messages";
+import { getConfig } from "../../plugins";
 import { isCustomCodeWidget } from "../../plugins/widgets/customCode";
 import { isTextWidget } from "../../plugins/widgets/textWidgets";
 import { parseFontFamilyAndFeatures } from "../../utils";
 import FloatingButton from "../shared/FloatingButton";
 import MoveableWrapper from "./MoveableWrapper";
+import WidgetFontSettings from "./WidgetFontSettings";
+import WidgetSettings from "./WidgetSettings";
 
 interface WidgetProps extends WidgetDisplay {
   id: string;
@@ -55,11 +63,20 @@ const Widget: FC<WidgetProps> = ({
   useAccentColor,
 }) => {
   const widgetRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const hideControlsTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [accent] = useKey(db, "accent") || ["#3498db"];
   const { openCodeEditor, openTextEditor } = useContext(UiContext);
+  const intl = useIntl();
+  const config = getConfig(widgetKey);
+  const widgetName = intl.formatMessage(config.name);
 
   const canOpenTextEditor = isTextWidget(widgetKey);
   const canOpenCodeEditor = isCustomCodeWidget(widgetKey);
+  const canOpenWidgetSettings = Boolean(config.settingsComponent);
+  const hasExpandedControls = true;
 
   const getPixelPosition = useCallback(() => {
     if (xPercent !== undefined && yPercent !== undefined && widgetRef.current) {
@@ -74,6 +91,68 @@ const Widget: FC<WidgetProps> = ({
   }, [x, y, xPercent, yPercent]);
 
   const [offset, setOffset] = useState(() => ({ x: x || 0, y: y || 0 }));
+  const [isWidgetHovered, setIsWidgetHovered] = useState(false);
+  const [isControlsHovered, setIsControlsHovered] = useState(false);
+  const [isControlsExpanded, setIsControlsExpanded] = useState(false);
+  const [settingsMode, setSettingsMode] = useState<"layout" | "widget" | null>(
+    null,
+  );
+  const [isFontSettingsOpen, setIsFontSettingsOpen] = useState(false);
+  const [controlsPosition, setControlsPosition] =
+    useState<CSSProperties | null>(null);
+  const [widgetSettingsPosition, setWidgetSettingsPosition] = useState({
+    x: 24,
+    y: 24,
+  });
+  const isControlsVisible =
+    isEditingPosition ||
+    isWidgetHovered ||
+    isControlsHovered ||
+    isControlsExpanded ||
+    settingsMode !== null ||
+    isFontSettingsOpen;
+
+  const clearHideControlsTimer = useCallback(() => {
+    if (hideControlsTimerRef.current) {
+      clearTimeout(hideControlsTimerRef.current);
+      hideControlsTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleHideControls = useCallback(() => {
+    clearHideControlsTimer();
+    hideControlsTimerRef.current = setTimeout(() => {
+      setIsWidgetHovered(false);
+      setIsControlsHovered(false);
+      setIsControlsExpanded(false);
+    }, 350);
+  }, [clearHideControlsTimer]);
+
+  const updateControlsPosition = useCallback(() => {
+    if (!widgetRef.current) {
+      return;
+    }
+
+    const widgetRect = widgetRef.current.getBoundingClientRect();
+    const controlsRect = controlsRef.current?.getBoundingClientRect();
+    const controlsWidth = controlsRect?.width ?? 104;
+    const controlsHeight = controlsRect?.height ?? 40;
+    const padding = 8;
+    const gap = 8;
+
+    const preferredTop = widgetRect.top - controlsHeight - gap;
+    const top = preferredTop < padding ? widgetRect.bottom + gap : preferredTop;
+    const left = widgetRect.right - controlsWidth;
+    const maxLeft = window.innerWidth - controlsWidth - padding;
+    const maxTop = window.innerHeight - controlsHeight - padding;
+
+    setControlsPosition({
+      position: "fixed",
+      top: `${Math.min(Math.max(top, padding), maxTop)}px`,
+      left: `${Math.min(Math.max(left, padding), maxLeft)}px`,
+      right: "auto",
+    });
+  }, []);
 
   useEffect(() => {
     if (
@@ -95,6 +174,27 @@ const Widget: FC<WidgetProps> = ({
       }
     }
   }, [position, x, y, xPercent, yPercent, id]);
+
+  useEffect(() => {
+    updateControlsPosition();
+  }, [
+    isControlsExpanded,
+    isControlsVisible,
+    offset,
+    rotation,
+    scale,
+    updateControlsPosition,
+  ]);
+
+  useEffect(() => {
+    const handleResize = () => updateControlsPosition();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [updateControlsPosition]);
+
+  useEffect(() => {
+    return () => clearHideControlsTimer();
+  }, [clearHideControlsTimer]);
 
   useEffect(() => {
     if (position === "free") {
@@ -164,8 +264,13 @@ const Widget: FC<WidgetProps> = ({
     }
   };
 
-  const handleStartReposition = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleToggleReposition = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
+    if (isEditingPosition) {
+      handleSave();
+      return;
+    }
+
     setWidgetDisplay(id, {
       position: "free",
       isEditingPosition: true,
@@ -180,6 +285,76 @@ const Widget: FC<WidgetProps> = ({
   const handleOpenCodeEditor = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
     openCodeEditor(id, widgetKey);
+  };
+
+  const handleToggleControlsExpanded = (
+    event: MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+    clearHideControlsTimer();
+    setIsControlsExpanded((current) => !current);
+  };
+
+  const setSettingsPositionFromControls = () => {
+    clearHideControlsTimer();
+    const rect = controlsRef.current?.getBoundingClientRect();
+    setWidgetSettingsPosition({
+      x: rect ? rect.left : 24,
+      y: rect ? rect.bottom + 8 : 24,
+    });
+  };
+
+  const handleOpenWidgetSettings = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setSettingsPositionFromControls();
+    setIsControlsExpanded(false);
+    setSettingsMode("widget");
+  };
+
+  const handleOpenFontSettings = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    clearHideControlsTimer();
+    setIsControlsExpanded(false);
+    setIsFontSettingsOpen(true);
+  };
+
+  const handleRemoveWidget = () => {
+    const shouldRemove = window.confirm(`Remove ${widgetName}?`);
+    if (!shouldRemove) {
+      return;
+    }
+
+    removeWidget(id);
+  };
+
+  const handleRemoveWidgetClick = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    handleRemoveWidget();
+  };
+
+  const handleDuplicateWidget = (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    duplicateWidget(id);
+    setIsControlsExpanded(false);
+  };
+
+  const handleStartRepositionFromSettings = () => {
+    setSettingsMode(null);
+    setWidgetDisplay(id, {
+      position: "free",
+      isEditingPosition: true,
+    });
+  };
+
+  const handleScaleChange = (value: number) => {
+    setWidgetDisplay(id, { scale: value });
+  };
+
+  const handleQuickAlign = (nextPosition: WidgetPosition) => {
+    setWidgetDisplay(id, {
+      position: nextPosition,
+      isEditingPosition: false,
+    });
   };
 
   const transformOriginMap: Record<string, string> = {
@@ -216,6 +391,29 @@ const Widget: FC<WidgetProps> = ({
     }),
   };
 
+  const display: WidgetDisplay = {
+    colour,
+    fontFamily,
+    fontSize,
+    scale,
+    rotation,
+    textOutline,
+    textOutlineStyle,
+    textOutlineSize,
+    textOutlineColor,
+    fontWeight,
+    fontStyle,
+    textDecoration,
+    position,
+    x,
+    y,
+    xPercent,
+    yPercent,
+    isEditingPosition,
+    customClass,
+    useAccentColor,
+  };
+
   let classNames = `Widget ${fontWeight ? "weight-override" : ""}`;
 
   if (customClass) {
@@ -227,23 +425,82 @@ const Widget: FC<WidgetProps> = ({
   }
 
   const renderControls = () => {
-    if (isEditingPosition) {
+    if (!isControlsVisible || typeof document === "undefined") {
       return null;
     }
 
-    return (
-      <div className="widget-controls" style={{ top: "-2.5rem", right: 0 }}>
+    return createPortal(
+      <div
+        ref={controlsRef}
+        className="widget-controls widget-controls--floating is-visible"
+        style={controlsPosition ?? { top: "-2.5rem", right: 0 }}
+        onMouseEnter={updateControlsPosition}
+        onPointerEnter={() => {
+          clearHideControlsTimer();
+          setIsControlsHovered(true);
+        }}
+        onPointerLeave={scheduleHideControls}
+      >
         <button
           type="button"
           className="widget-settings-trigger"
-          aria-label="Reposition widget"
-          title="Reposition"
-          onClick={handleStartReposition}
+          aria-label={isEditingPosition ? "Place widget" : "Reposition widget"}
+          title={isEditingPosition ? "Place widget" : "Reposition"}
+          onClick={handleToggleReposition}
         >
-          <Icon icon="feather:crosshair" />
+          <Icon
+            icon={isEditingPosition ? "feather:check" : "feather:crosshair"}
+          />
         </button>
 
-        {canOpenTextEditor && (
+        {hasExpandedControls && (
+          <button
+            type="button"
+            className="widget-settings-trigger"
+            aria-label={
+              isControlsExpanded
+                ? "Collapse widget controls"
+                : "Expand widget controls"
+            }
+            title={isControlsExpanded ? "Collapse controls" : "More controls"}
+            aria-expanded={isControlsExpanded}
+            onClick={handleToggleControlsExpanded}
+          >
+            <Icon
+              icon={
+                isControlsExpanded
+                  ? "feather:chevron-left"
+                  : "feather:chevron-right"
+              }
+            />
+          </button>
+        )}
+
+        {isControlsExpanded && canOpenWidgetSettings && (
+          <button
+            type="button"
+            className="widget-settings-trigger"
+            aria-label="Open widget settings"
+            title="Widget settings"
+            onClick={handleOpenWidgetSettings}
+          >
+            <Icon icon="feather:settings" />
+          </button>
+        )}
+
+        {isControlsExpanded && (
+          <button
+            type="button"
+            className="widget-settings-trigger"
+            aria-label="Open font settings"
+            title="Font settings"
+            onClick={handleOpenFontSettings}
+          >
+            <Icon icon="feather:type" />
+          </button>
+        )}
+
+        {isControlsExpanded && canOpenTextEditor && (
           <button
             type="button"
             className="widget-settings-trigger"
@@ -255,7 +512,7 @@ const Widget: FC<WidgetProps> = ({
           </button>
         )}
 
-        {canOpenCodeEditor && (
+        {isControlsExpanded && canOpenCodeEditor && (
           <button
             type="button"
             className="widget-settings-trigger"
@@ -266,7 +523,32 @@ const Widget: FC<WidgetProps> = ({
             <Icon icon="feather:code" />
           </button>
         )}
-      </div>
+
+        {isControlsExpanded && (
+          <button
+            type="button"
+            className="widget-settings-trigger"
+            aria-label="Duplicate widget"
+            title="Duplicate"
+            onClick={handleDuplicateWidget}
+          >
+            <Icon icon="feather:copy" />
+          </button>
+        )}
+
+        {isControlsExpanded && (
+          <button
+            type="button"
+            className="widget-settings-trigger danger"
+            aria-label="Remove widget"
+            title="Remove"
+            onClick={handleRemoveWidgetClick}
+          >
+            <Icon icon="feather:trash-2" />
+          </button>
+        )}
+      </div>,
+      document.body,
     );
   };
 
@@ -274,9 +556,16 @@ const Widget: FC<WidgetProps> = ({
     const outlineStyle = textOutline ? (textOutlineStyle ?? "basic") : null;
 
     return (
-      <div ref={widgetRef} className={classNames} style={styles}>
-        {renderControls()}
-
+      <div
+        ref={widgetRef}
+        className={classNames}
+        style={styles}
+        onPointerEnter={() => {
+          clearHideControlsTimer();
+          setIsWidgetHovered(true);
+        }}
+        onPointerLeave={scheduleHideControls}
+      >
         {textOutline && outlineStyle === "basic" ? (
           <div
             style={{
@@ -318,6 +607,31 @@ const Widget: FC<WidgetProps> = ({
   return (
     <>
       {renderContent()}
+      {renderControls()}
+      <WidgetSettings
+        widgetName={widgetName}
+        isOpen={settingsMode !== null}
+        onClose={() => setSettingsMode(null)}
+        onDelete={handleRemoveWidget}
+        onStartReposition={handleStartRepositionFromSettings}
+        onScaleChange={handleScaleChange}
+        onQuickAlign={handleQuickAlign}
+        scale={scale}
+        currentPosition={position}
+        position={widgetSettingsPosition}
+        mode={settingsMode ?? "layout"}
+        settingsComponent={config.settingsComponent}
+        pluginId={id}
+        defaultData={config.defaultData}
+        onPositionChange={setWidgetSettingsPosition}
+      />
+      <WidgetFontSettings
+        widgetName={widgetName}
+        isOpen={isFontSettingsOpen}
+        display={display}
+        onClose={() => setIsFontSettingsOpen(false)}
+        onSave={(next) => setWidgetDisplay(id, next)}
+      />
       {position === "free" && isEditingPosition && (
         <MoveableWrapper
           targetRef={widgetRef}
