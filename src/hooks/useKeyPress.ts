@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
+import { UiContext } from "../contexts/ui";
 
 function isInputEvent(event: KeyboardEvent) {
   return (
@@ -14,11 +15,13 @@ export function useKeyPress(
   detectKeys: string[],
   ignoreInputEvents = true,
 ) {
+  const { hotkeysPaused } = useContext(UiContext);
   const handler = (event: KeyboardEvent) => {
     if (
       detectKeys.includes(event.key) &&
       !(ignoreInputEvents && isInputEvent(event)) &&
-      !(event.ctrlKey || event.metaKey || event.altKey)
+      !(event.ctrlKey || event.metaKey || event.altKey) &&
+      !hotkeysPaused
     ) {
       callback(event);
     }
@@ -30,5 +33,5 @@ export function useKeyPress(
     return () => {
       window.removeEventListener("keydown", handler);
     };
-  }, [ignoreInputEvents, callback]);
+  }, [ignoreInputEvents, callback, hotkeysPaused, detectKeys.join("|")]);
 }

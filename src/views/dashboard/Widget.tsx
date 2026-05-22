@@ -134,50 +134,67 @@ const Widget: React.FC<WidgetProps> = ({
     ],
   );
 
-  const recalcSettingsPosition = React.useCallback(() => {
-    if (typeof window === "undefined") {
-      return;
-    }
+  const computePanelDimensions = React.useCallback((modeValue: "layout" | "widget") => {
     const padding = 16;
+    if (typeof window === "undefined") {
+      return { padding, width: modeValue === "widget" ? 520 : 460, height: modeValue === "widget" ? 560 : 520 };
+    }
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
-    const panelWidth = Math.min(460, viewportWidth - padding * 2);
-    const panelHeight = Math.min(520, viewportHeight - padding * 2);
-    const clamp = (value: number, min: number, max: number) =>
-      Math.min(max, Math.max(min, value));
-    if (!widgetRef.current) {
-      setSettingsPosition({
-        x: clamp(
-          viewportWidth / 2 - panelWidth / 2,
-          padding,
-          viewportWidth - panelWidth - padding,
-        ),
-        y: clamp(
-          viewportHeight / 2 - panelHeight / 2,
-          padding,
-          viewportHeight - panelHeight - padding,
-        ),
-      });
-      return;
-    }
-    const rect = widgetRef.current.getBoundingClientRect();
-    let nextX = rect.left;
-    if (nextX + panelWidth > viewportWidth - padding) {
-      nextX = rect.right - panelWidth;
-    }
-    nextX = clamp(nextX, padding, viewportWidth - panelWidth - padding);
-
-    let preferredY = rect.bottom + padding;
-    if (preferredY + panelHeight > viewportHeight - padding) {
-      preferredY = rect.top - panelHeight - padding;
-    }
-    const nextY = clamp(preferredY, padding, viewportHeight - panelHeight - padding);
-
-    setSettingsPosition({
-      x: nextX,
-      y: nextY,
-    });
+    const baseWidth = modeValue === "widget" ? 520 : 460;
+    const baseHeight = modeValue === "widget" ? 560 : 520;
+    return {
+      padding,
+      width: Math.min(baseWidth, viewportWidth - padding * 2),
+      height: Math.min(baseHeight, viewportHeight - padding * 2),
+      viewportWidth,
+      viewportHeight,
+    };
   }, []);
+
+  const centerSettingsPanel = React.useCallback(
+    (modeValue: "layout" | "widget") => {
+      if (typeof window === "undefined") {
+        setSettingsPosition({ x: 0, y: 0 });
+        return;
+      }
+      const { padding, width, height, viewportWidth = window.innerWidth, viewportHeight = window.innerHeight } =
+        computePanelDimensions(modeValue);
+      const nextX = Math.max(padding, Math.round((viewportWidth - width) / 2));
+      const nextY = Math.max(padding, Math.round((viewportHeight - height) / 2));
+      setSettingsPosition({ x: nextX, y: nextY });
+    },
+    [computePanelDimensions, setSettingsPosition],
+  );
+
+  const recalcSettingsPosition = React.useCallback(
+    (modeOverride?: "layout" | "widget") => {
+      if (typeof window === "undefined") {
+        return;
+      }
+      const modeValue = modeOverride ?? settingsMode;
+      const {
+        padding,
+        width,
+        height,
+        viewportWidth = window.innerWidth,
+        viewportHeight = window.innerHeight,
+      } = computePanelDimensions(modeValue);
+      const clamp = (value: number, min: number, max: number) =>
+        Math.min(Math.max(value, min), max);
+      setSettingsPosition((current) => {
+        const fallbackX = clamp((viewportWidth - width) / 2, padding, Math.max(padding, viewportWidth - width - padding));
+        const fallbackY = clamp((viewportHeight - height) / 2, padding, Math.max(padding, viewportHeight - height - padding));
+        const baseX = current?.x ?? fallbackX;
+        const baseY = current?.y ?? fallbackY;
+        return {
+          x: clamp(baseX, padding, Math.max(padding, viewportWidth - width - padding)),
+          y: clamp(baseY, padding, Math.max(padding, viewportHeight - height - padding)),
+        };
+      });
+    },
+    [computePanelDimensions, settingsMode, setSettingsPosition],
+  );
 
   React.useEffect(() => {
     setLocalScale(scale ?? 1);
@@ -533,8 +550,9 @@ const Widget: React.FC<WidgetProps> = ({
     }
     const hasWidgetSpecificSettings =
       !isCodeWidget && !isTextWidgetKey && Boolean(config.settingsComponent);
-    setSettingsMode(hasWidgetSpecificSettings ? "widget" : "layout");
-    recalcSettingsPosition();
+    const nextMode = hasWidgetSpecificSettings ? "widget" : "layout";
+    setSettingsMode(nextMode);
+    centerSettingsPanel(nextMode);
     setSettingsOpen(true);
   };
 
@@ -921,6 +939,7 @@ const Widget: React.FC<WidgetProps> = ({
         mode={settingsMode}
         settingsComponent={config.settingsComponent}
         pluginId={id}
+        onPositionChange={setSettingsPosition}
       />
       <WidgetFontSettings
         widgetName={widgetName}

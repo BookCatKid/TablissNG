@@ -3,17 +3,21 @@
     position: absolute
     margin: 0.5rem
     padding: 0.5rem
-    border-radius: 1.25rem
+    border-radius: 8px
     transition: all 0.25s ease-out
     font-size: 1.1rem
     z-index: 2000
+    background: #ffffff
+    border: 1px solid #e6eaf0
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25)
+    color: #334155
 
     .on-hover
         opacity: 0
         transition: all 0.25s ease-out
 
     &:hover
-        background-color: rgba(0, 0, 0, 0.65)
+        background-color: rgba(0,0,0,0.04)
 
         .on-hover
             opacity: 1
@@ -41,32 +45,44 @@
         transition: stroke 0.25s ease-out
 
 .light .Overlay:hover
-    background-color: rgba(255, 255, 255, 0.65)
+    background-color: rgba(255, 255, 255, 0.95)
+
+// Dark mode variant matching Settings.sass .plane dark tokens
+.dark .Overlay
+    background: #1a1a1a
+    border: 1px solid #444
+    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5)
+    color: #ffffff
+
+    &:hover
+        background: rgba(255,255,255,0.02)
+
+    a, span, button
+        color: #ffffff
+
+    .on-hover
+        opacity: 0.9
 
 // HUD Mode Styling for Overlay
 .Dashboard.hud-mode .Overlay
-    background: linear-gradient(135deg, rgba(0, 40, 60, 0.7) 0%, rgba(0, 20, 40, 0.9) 100%)
-    border: 1px solid rgba(0, 255, 245, 0.5)
+    background: rgba(255,255,255,0.02)
+    border: 1px solid rgba(52,152,219,0.08)
     border-radius: 8px
-    backdrop-filter: blur(10px)
-    box-shadow: 0 0 20px rgba(0, 255, 245, 0.4), inset 0 0 15px rgba(0, 255, 245, 0.1)
-    padding: 0.75rem
+    backdrop-filter: none
+    box-shadow: 0 6px 18px rgba(17,24,39,0.06)
+    padding: 0.5rem
 
     &:hover
-        background: linear-gradient(135deg, rgba(0, 40, 60, 0.85) 0%, rgba(0, 20, 40, 1) 100%)
-        border-color: rgba(0, 255, 245, 0.8)
-        box-shadow: 0 0 30px rgba(0, 255, 245, 0.6), inset 0 0 20px rgba(0, 255, 245, 0.2)
+        background: rgba(255,255,255,0.03)
+        border-color: rgba(52,152,219,0.12)
 
     a, span, button
-        color: #00fff5
-        text-shadow: 0 0 8px rgba(0, 255, 245, 0.6)
+        color: #334155
+        text-shadow: none
 
         svg
-            color: #00fff5
-            filter: drop-shadow(0 0 5px rgba(0, 255, 245, 0.8))
+            color: inherit
+            filter: none
 
     .on-hover
-        opacity: 0.7
-        
-        &:hover
-            opacity: 1important
+        opacity: 0.9

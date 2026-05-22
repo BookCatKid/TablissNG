@@ -7,6 +7,7 @@ type UiState = {
   addWidgetOpen: boolean;
   codeEditorTarget: { widgetId: string; widgetKey: string } | null;
   textEditorTarget: { widgetId: string; widgetKey: string } | null;
+  hotkeysPaused: boolean;
 };
 
 type UiContext = UiState & {
@@ -21,6 +22,7 @@ type UiContext = UiState & {
   closeCodeEditor: () => void;
   openTextEditor: (widgetId: string, widgetKey: string) => void;
   closeTextEditor: () => void;
+  setHotkeysPaused: (value: boolean) => void;
 };
 
 export const UiContext = React.createContext({} as unknown as UiContext);
@@ -33,6 +35,7 @@ const UiProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
     addWidgetOpen: false,
     codeEditorTarget: null,
     textEditorTarget: null,
+    hotkeysPaused: false,
   });
 
   const methods = React.useMemo(
@@ -65,6 +68,8 @@ const UiProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
         })),
       closeTextEditor: () =>
         setState((state) => ({ ...state, textEditorTarget: null })),
+      setHotkeysPaused: (value: boolean) =>
+        setState((state) => ({ ...state, hotkeysPaused: value })),
     }),
     [],
   );

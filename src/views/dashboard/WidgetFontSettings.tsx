@@ -32,6 +32,10 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
   onClose,
   onSave,
 }) => {
+  const titleId = React.useId();
+  const italicFieldId = React.useId();
+  const underlineFieldId = React.useId();
+  const outlineFieldId = React.useId();
   const [localDisplay, setLocalDisplay] = React.useState<Partial<WidgetDisplay>>({
     colour: defaultColour,
     fontFamily: "",
@@ -86,106 +90,150 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
   };
 
   const outlineStyle = localDisplay.textOutline ? localDisplay.textOutlineStyle ?? "basic" : null;
+  const fontColourLabel = (localDisplay.colour ?? defaultColour).toUpperCase();
+  const outlineColourLabel = (localDisplay.textOutlineColor ?? defaultOutlineColour).toUpperCase();
 
   return createPortal(
     <>
       <div className="widget-font-settings-backdrop" onClick={onClose} />
-      <div className="WidgetFontSettings" role="dialog" aria-modal="true">
+      <div
+        className="WidgetFontSettings"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+      >
         <div className="settings-header">
-          <h3>
+          <div className="header-glow" aria-hidden="true" />
+          <h3 id={titleId}>
             <Icon icon="feather:type" aria-hidden="true" />
             <span>{widgetName} · Font Settings</span>
           </h3>
-          <button className="close-btn" onClick={onClose} aria-label="Close font settings">
+          <button
+            type="button"
+            className="close-btn"
+            onClick={onClose}
+            aria-label="Close font settings"
+          >
             <Icon icon="feather:x" />
           </button>
         </div>
 
-        <div className="settings-body">
-          <div className="settings-grid">
-            <label>
-              <span>Font Family</span>
-              <input
-                type="text"
-                value={localDisplay.fontFamily ?? ""}
-                onChange={(event) => updateDisplay({ fontFamily: event.target.value })}
-              />
-            </label>
+        <div className="settings-content">
+          <div className="setting-group holo-card font-settings-card">
+            <div className="settings-grid">
+              <label className="stacked-input">
+                <span>Font Family</span>
+                <input
+                  type="text"
+                  value={localDisplay.fontFamily ?? ""}
+                  onChange={(event) => updateDisplay({ fontFamily: event.target.value })}
+                />
+              </label>
 
-            <label>
-              <span>Font Size</span>
-              <input
-                type="number"
-                min={8}
-                max={160}
-                value={localDisplay.fontSize ?? 24}
-                onChange={(event) => updateDisplay({ fontSize: Number(event.target.value) })}
-              />
-            </label>
+              <label className="stacked-input compact">
+                <span>Font Size</span>
+                <input
+                  type="number"
+                  min={8}
+                  max={160}
+                  value={localDisplay.fontSize ?? 24}
+                  onChange={(event) => updateDisplay({ fontSize: Number(event.target.value) })}
+                />
+              </label>
 
-            <label>
-              <span>Font Weight</span>
-              <select
-                value={localDisplay.fontWeight?.toString() ?? ""}
-                onChange={(event) =>
-                  updateDisplay({
-                    fontWeight: event.target.value ? Number(event.target.value) : undefined,
-                  })
-                }
-              >
-                {fontWeightOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <label className="stacked-input compact">
+                <span>Font Weight</span>
+                <select
+                  value={localDisplay.fontWeight?.toString() ?? ""}
+                  onChange={(event) =>
+                    updateDisplay({
+                      fontWeight: event.target.value ? Number(event.target.value) : undefined,
+                    })
+                  }
+                >
+                  {fontWeightOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={localDisplay.fontStyle === "italic"}
-                onChange={(event) =>
-                  updateDisplay({ fontStyle: event.target.checked ? "italic" : "normal" })
-                }
-              />
-              <span>Italic</span>
-            </label>
+              <label className="stacked-input compact colour-input">
+                <span>Colour</span>
+                <div className="colour-field">
+                  <input
+                    type="color"
+                    value={localDisplay.colour ?? defaultColour}
+                    onChange={(event) => updateDisplay({ colour: event.target.value })}
+                  />
+                  <span className="colour-value" aria-live="polite">
+                    {fontColourLabel}
+                  </span>
+                </div>
+              </label>
 
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={localDisplay.textDecoration === "underline"}
-                onChange={(event) =>
-                  updateDisplay({ textDecoration: event.target.checked ? "underline" : "none" })
-                }
-              />
-              <span>Underline</span>
-            </label>
+              <div className="stacked-input toggle-field">
+                <span id={italicFieldId}>Italic</span>
+                <label className="slider-toggle" aria-labelledby={italicFieldId}>
+                  <input
+                    type="checkbox"
+                    checked={localDisplay.fontStyle === "italic"}
+                    onChange={(event) =>
+                      updateDisplay({ fontStyle: event.target.checked ? "italic" : "normal" })
+                    }
+                  />
+                  <span className="slider-track">
+                    <span className="slider-thumb" />
+                  </span>
+                  <span className="slider-status">
+                    {localDisplay.fontStyle === "italic" ? "On" : "Off"}
+                  </span>
+                </label>
+              </div>
 
-            <label>
-              <span>Colour</span>
-              <input
-                type="color"
-                value={localDisplay.colour ?? defaultColour}
-                onChange={(event) => updateDisplay({ colour: event.target.value })}
-              />
-            </label>
+              <div className="stacked-input toggle-field">
+                <span id={underlineFieldId}>Underline</span>
+                <label className="slider-toggle" aria-labelledby={underlineFieldId}>
+                  <input
+                    type="checkbox"
+                    checked={localDisplay.textDecoration === "underline"}
+                    onChange={(event) =>
+                      updateDisplay({ textDecoration: event.target.checked ? "underline" : "none" })
+                    }
+                  />
+                  <span className="slider-track">
+                    <span className="slider-thumb" />
+                  </span>
+                  <span className="slider-status">
+                    {localDisplay.textDecoration === "underline" ? "On" : "Off"}
+                  </span>
+                </label>
+              </div>
+
+              <div className="stacked-input toggle-field">
+                <span id={outlineFieldId}>Outline</span>
+                <label className="slider-toggle" aria-labelledby={outlineFieldId}>
+                  <input
+                    type="checkbox"
+                    checked={Boolean(localDisplay.textOutline)}
+                    onChange={(event) => updateDisplay({ textOutline: event.target.checked })}
+                  />
+                  <span className="slider-track">
+                    <span className="slider-thumb" />
+                  </span>
+                  <span className="slider-status">
+                    {localDisplay.textOutline ? "On" : "Off"}
+                  </span>
+                </label>
+              </div>
+            </div>
           </div>
 
-          <div className="outline-section">
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={Boolean(localDisplay.textOutline)}
-                onChange={(event) => updateDisplay({ textOutline: event.target.checked })}
-              />
-              <span>Enable Outline</span>
-            </label>
-
-            {localDisplay.textOutline ? (
+          {localDisplay.textOutline ? (
+            <div className="setting-group holo-card outline-card">
               <div className="outline-grid">
-                <label>
+                <label className="stacked-input compact">
                   <span>Outline Style</span>
                   <select
                     value={localDisplay.textOutlineStyle ?? "basic"}
@@ -198,17 +246,22 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   </select>
                 </label>
 
-                <label>
+                <label className="stacked-input compact colour-input">
                   <span>Outline Colour</span>
-                  <input
-                    type="color"
-                    value={localDisplay.textOutlineColor ?? defaultOutlineColour}
-                    onChange={(event) => updateDisplay({ textOutlineColor: event.target.value })}
-                  />
+                  <div className="colour-field">
+                    <input
+                      type="color"
+                      value={localDisplay.textOutlineColor ?? defaultOutlineColour}
+                      onChange={(event) => updateDisplay({ textOutlineColor: event.target.value })}
+                    />
+                    <span className="colour-value" aria-live="polite">
+                      {outlineColourLabel}
+                    </span>
+                  </div>
                 </label>
 
                 {localDisplay.textOutlineStyle === "advanced" ? (
-                  <label>
+                  <label className="stacked-input compact">
                     <span>Outline Size</span>
                     <input
                       type="number"
@@ -222,12 +275,12 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
                   </label>
                 ) : null}
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
 
-          <div className="preview-block">
+          <div className="setting-group holo-card preview-card-wrapper">
             <span className="preview-label">Live Preview</span>
-            <div className="preview-card">
+            <div className="preview-card" aria-live="polite">
               {outlineStyle && outlineStyle === "basic" ? (
                 <div
                   style={{
@@ -274,6 +327,11 @@ const WidgetFontSettings: React.FC<WidgetFontSettingsProps> = ({
             Save Changes
           </button>
         </div>
+
+        <div className="corner-decoration top-left" />
+        <div className="corner-decoration top-right" />
+        <div className="corner-decoration bottom-left" />
+        <div className="corner-decoration bottom-right" />
       </div>
     </>,
     document.body,

@@ -20,6 +20,7 @@ interface WidgetSettingsProps {
   mode: "layout" | "widget";
   settingsComponent?: React.ComponentType<API<unknown, unknown>>;
   pluginId?: string;
+  onPositionChange: (coords: { x: number; y: number }) => void;
 }
 
 const quickAlignOptions: { label: string; value: WidgetPosition }[] = [
@@ -48,6 +49,7 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
   mode,
   settingsComponent,
   pluginId,
+  onPositionChange,
 }) => {
   if (!isOpen || typeof document === "undefined") {
     return null;
@@ -55,18 +57,137 @@ const WidgetSettings: React.FC<WidgetSettingsProps> = ({
 
   const isWidgetMode = mode === "widget";
   const canRenderPluginSettings = Boolean(isWidgetMode && settingsComponent && pluginId);
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const dragOffsetRef = React.useRef<{ offsetX: number; offsetY: number } | null>(null);
+  const positionRef = React.useRef(position);
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  React.useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+
+  const clampCoords = React.useCallback(
+    (coords: { x: number; y: number }) => {
+      if (typeof window === "undefined") {
+        return coords;
+      }
+
+      const padding = 24;
+      const modal = containerRef.current;
+      const rect = modal?.getBoundingClientRect();
+      const fallbackWidth = isWidgetMode ? 520 : 460;
+      const fallbackHeight = isWidgetMode ? 560 : 520;
+      const width = rect?.width ?? fallbackWidth;
+      const height = rect?.height ?? fallbackHeight;
+
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const maxLeft = Math.max(padding, viewportWidth - width - padding);
+      const maxTop = Math.max(padding, viewportHeight - height - padding);
+
+      return {
+        x: Math.min(Math.max(coords.x, padding), maxLeft),
+        y: Math.min(Math.max(coords.y, padding), maxTop),
+      };
+    },
+    [isWidgetMode],
+  );
+
+  const applyClampedPosition = React.useCallback(
+    (coords: { x: number; y: number }) => {
+      const clamped = clampCoords(coords);
+      const current = positionRef.current;
+      if (clamped.x !== current.x || clamped.y !== current.y) {
+        onPositionChange(clamped);
+      }
+    },
+    [clampCoords, onPositionChange],
+  );
+
+  React.useLayoutEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    applyClampedPosition(position);
+  }, [applyClampedPosition, isOpen, position]);
+
+  React.useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+    const handleResize = () => applyClampedPosition(position);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [applyClampedPosition, isOpen, position]);
+
+  const handlePointerMove = React.useCallback(
+    (event: PointerEvent) => {
+      if (!dragOffsetRef.current) {
+        return;
+      }
+      event.preventDefault();
+      const { offsetX, offsetY } = dragOffsetRef.current;
+      applyClampedPosition({ x: event.clientX - offsetX, y: event.clientY - offsetY });
+    },
+    [applyClampedPosition],
+  );
+
+  const handlePointerUp = React.useCallback(() => {
+    dragOffsetRef.current = null;
+    setIsDragging(false);
+    window.removeEventListener("pointermove", handlePointerMove);
+    window.removeEventListener("pointerup", handlePointerUp);
+  }, [handlePointerMove]);
+
+  const startDragging = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0) {
+        return;
+      }
+      const target = event.target as HTMLElement;
+      if (target.closest("button")) {
+        return;
+      }
+      const modal = containerRef.current;
+      if (!modal) {
+        return;
+      }
+      event.preventDefault();
+      const rect = modal.getBoundingClientRect();
+      dragOffsetRef.current = {
+        offsetX: event.clientX - rect.left,
+        offsetY: event.clientY - rect.top,
+      };
+      setIsDragging(true);
+      window.addEventListener("pointermove", handlePointerMove);
+      window.addEventListener("pointerup", handlePointerUp);
+    },
+    [handlePointerMove, handlePointerUp],
+  );
+
+  React.useEffect(() => {
+    return () => {
+      dragOffsetRef.current = null;
+      setIsDragging(false);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [handlePointerMove, handlePointerUp]);
 
   return createPortal(
     <>
       <div className="widget-settings-backdrop" onClick={onClose} />
       <div
-        className={`WidgetSettings ${isWidgetMode ? "WidgetSettings--plugin" : ""}`.trim()}
+        className={`WidgetSettings ${isWidgetMode ? "WidgetSettings--plugin" : ""} ${
+          isDragging ? "is-dragging" : ""
+        }`.trim()}
+        ref={containerRef}
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
         }}
       >
-        <div className="settings-header">
+        <div className="settings-header" onPointerDown={startDragging}>
           <div className="header-glow" />
           <h3>{widgetName}</h3>
           <button className="close-btn" onClick={onClose}>

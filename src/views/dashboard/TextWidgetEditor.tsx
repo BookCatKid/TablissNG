@@ -6,9 +6,18 @@ import { UiContext } from "../../contexts/ui";
 import { getConfig } from "../../plugins";
 import { useApi } from "../../hooks";
 import { sanitizeRichText, stripRichText } from "../../utils/richText";
-import { MessageData } from "../../plugins/widgets/message/types";
-import { CustomTextData } from "../../plugins/widgets/customText/types";
-import { Data as NotesData } from "../../plugins/widgets/notes/data";
+import {
+  MessageData,
+  defaultData as defaultMessageData,
+} from "../../plugins/widgets/message/types";
+import {
+  CustomTextData,
+  defaultData as defaultCustomTextData,
+} from "../../plugins/widgets/customText/types";
+import {
+  Data as NotesData,
+  defaultData as defaultNotesData,
+} from "../../plugins/widgets/notes/data";
 import RichTextEditor from "./RichTextEditor";
 import "./TextWidgetEditor.sass";
 
@@ -32,7 +41,7 @@ const TextWidgetKeys = {
 
 const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
   const intl = useIntl();
-  const { closeTextEditor } = React.useContext(UiContext);
+  const { closeTextEditor, setHotkeysPaused } = React.useContext(UiContext);
   const { data, setData } = useApi(target.widgetId);
 
   if (
@@ -57,19 +66,22 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
   }, [target.widgetKey]);
 
   React.useEffect(() => {
-    if (!data) {
-      return;
-    }
+    const ensureMessageData = (): MessageData =>
+      ((data as MessageData | undefined) ?? defaultMessageData);
+    const ensureNotesData = (): NotesData =>
+      ((data as NotesData | undefined) ?? defaultNotesData);
+    const ensureCustomTextData = (): CustomTextData =>
+      ((data as CustomTextData | undefined) ?? defaultCustomTextData);
 
     if (target.widgetKey === TextWidgetKeys.MESSAGE) {
-      const messageData = data as MessageData;
+      const messageData = ensureMessageData();
       setMessageValue(messageData?.messages?.[0] ?? "");
       setIsReady(true);
       return;
     }
 
     if (target.widgetKey === TextWidgetKeys.NOTES) {
-      const notesData = data as NotesData;
+      const notesData = ensureNotesData();
       const current = notesData?.notes?.[0]?.contents ?? "";
       setNotesValue(current);
       setNotesMarkdown(Boolean(notesData?.markdownEnabled));
@@ -78,7 +90,7 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
     }
 
     if (target.widgetKey === TextWidgetKeys.CUSTOM_TEXT) {
-      const dataset = data as CustomTextData;
+      const dataset = ensureCustomTextData();
       let entries: string[] = [];
       if (Array.isArray(dataset?.strings) && dataset.strings.length > 0) {
         entries = [...dataset.strings];
@@ -104,21 +116,26 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [closeTextEditor]);
 
+  React.useEffect(() => {
+    setHotkeysPaused(true);
+    return () => setHotkeysPaused(false);
+  }, [setHotkeysPaused]);
+
   const handleSave = () => {
-    if (!data) {
-      return;
-    }
+    const asMessage = (data as MessageData | undefined) ?? defaultMessageData;
+    const asNotes = (data as NotesData | undefined) ?? defaultNotesData;
+    const asCustom = (data as CustomTextData | undefined) ?? defaultCustomTextData;
     if (target.widgetKey === TextWidgetKeys.MESSAGE) {
       const sanitized = sanitizeRichText(messageValue);
       setData({
-        ...(data as MessageData),
+        ...asMessage,
         messages: [sanitized],
         richTextEnabled: true,
       });
     } else if (target.widgetKey === TextWidgetKeys.NOTES) {
       const sanitized = sanitizeRichText(notesValue);
       setData({
-        ...(data as NotesData),
+        ...asNotes,
         notes: [{ contents: sanitized }],
         richTextEnabled: true,
         markdownEnabled: false,
@@ -126,7 +143,7 @@ const EditorSurface: React.FC<EditorSurfaceProps> = ({ target }) => {
     } else if (target.widgetKey === TextWidgetKeys.CUSTOM_TEXT) {
       const sanitizedEntries = customEntries.map((entry) => sanitizeRichText(entry));
       setData({
-        ...(data as CustomTextData),
+        ...asCustom,
         strings: sanitizedEntries,
         richTextEnabled: true,
         text: sanitizedEntries.map((entry) => stripRichText(entry)).join("\n"),

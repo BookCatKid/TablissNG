@@ -86,9 +86,6 @@ const Notes: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
             className={data.markdownEnabled ? "markdown-content" : ""}
           >
             {renderContent()}
-            {data.richTextEnabled ? (
-              <p className="notes-rich-hint">Use the text editor panel to edit rich text.</p>
-            ) : null}
           </div>
         )}
       </div>
