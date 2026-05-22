@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import { FC } from "react";
 
 import IntlTime from "./IntlTime";
 
 type Props = {
   hour12: boolean;
+  showHours: boolean;
   showMinutes: boolean;
   showSeconds: boolean;
   showDayPeriod: boolean;

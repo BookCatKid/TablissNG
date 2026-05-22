@@ -1,16 +1,47 @@
-import React, { FC } from "react";
-import GitHubCalendar from "react-github-calendar";
+import "./GitHub.sass";
+
+import { FC } from "react";
+import { GitHubCalendar } from "react-github-calendar";
 import { useIntl } from "react-intl";
-import { useFormatMessages } from "../../../hooks/useFormatMessages";
+
 import { useTheme } from "../../../hooks/useTheme";
-import { monthMessages, weekdayMessages, legendMessages, messages } from "./messages";
-import { Props, defaultData } from "./types";
+import {
+  calendarLegendMessages,
+  monthMessages,
+  weekdayMessages,
+} from "../../../locales/messages";
+import { messages, tooltipMessages } from "./messages";
+import { defaultData, Props } from "./types";
 
 const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
   const intl = useIntl();
-  const months = useFormatMessages(monthMessages);
-  const weekdays = useFormatMessages(weekdayMessages);
-  const legend = useFormatMessages(legendMessages);
+  const months = {
+    jan: intl.formatMessage(monthMessages.jan),
+    feb: intl.formatMessage(monthMessages.feb),
+    mar: intl.formatMessage(monthMessages.mar),
+    apr: intl.formatMessage(monthMessages.apr),
+    may: intl.formatMessage(monthMessages.may),
+    jun: intl.formatMessage(monthMessages.jun),
+    jul: intl.formatMessage(monthMessages.jul),
+    aug: intl.formatMessage(monthMessages.aug),
+    sep: intl.formatMessage(monthMessages.sep),
+    oct: intl.formatMessage(monthMessages.oct),
+    nov: intl.formatMessage(monthMessages.nov),
+    dec: intl.formatMessage(monthMessages.dec),
+  };
+  const weekdays = {
+    sun: intl.formatMessage(weekdayMessages.sun),
+    mon: intl.formatMessage(weekdayMessages.mon),
+    tue: intl.formatMessage(weekdayMessages.tue),
+    wed: intl.formatMessage(weekdayMessages.wed),
+    thu: intl.formatMessage(weekdayMessages.thu),
+    fri: intl.formatMessage(weekdayMessages.fri),
+    sat: intl.formatMessage(weekdayMessages.sat),
+  };
+  const legend = {
+    less: intl.formatMessage(calendarLegendMessages.less),
+    more: intl.formatMessage(calendarLegendMessages.more),
+  };
   const { isDark } = useTheme();
 
   if (!data.username) return null;
@@ -18,43 +49,84 @@ const GitHubCalendarWidget: FC<Props> = ({ data = defaultData }) => {
   // Localization for the calendar
   const labels = {
     months: [
-      months.jan, months.feb, months.mar, months.apr,
-      months.may, months.jun, months.jul, months.aug,
-      months.sep, months.oct, months.nov, months.dec
+      months.jan,
+      months.feb,
+      months.mar,
+      months.apr,
+      months.may,
+      months.jun,
+      months.jul,
+      months.aug,
+      months.sep,
+      months.oct,
+      months.nov,
+      months.dec,
     ],
     weekdays: [
-      weekdays.sun, weekdays.mon, weekdays.tue, weekdays.wed,
-      weekdays.thu, weekdays.fri, weekdays.sat
+      weekdays.sun,
+      weekdays.mon,
+      weekdays.tue,
+      weekdays.wed,
+      weekdays.thu,
+      weekdays.fri,
+      weekdays.sat,
     ],
-    totalCount: intl.formatMessage(messages.totalCount).replace('[count]', '{{count}}').replace('[year]', '{{year}}'),
+    totalCount: intl
+      .formatMessage(messages.totalCount)
+      .replace("[count]", "{{count}}")
+      .replace("[year]", "{{year}}"),
     legend: {
       less: legend.less,
-      more: legend.more
-    }
+      more: legend.more,
+    },
   };
 
   return (
     <a
       className="GitHub"
-      href={data.clickAction !== 'none' ? `https://github.com/${data.clickAction === 'profile' ? data.username : ''}` : undefined}
+      href={
+        data.clickAction !== "none"
+          ? `https://github.com/${data.clickAction === "profile" ? data.username : ""}`
+          : undefined
+      }
       target="_blank"
       rel="noopener noreferrer"
       style={{
-        cursor: data.clickAction === 'none' ? 'default' : 'pointer',
-        textDecoration: 'none'
+        cursor: data.clickAction === "none" ? "default" : "pointer",
+        textDecoration: "none",
       }}
     >
       <GitHubCalendar
-        hideColorLegend={!data.showColorLegend}
-        hideMonthLabels={!data.showMonthLabels}
-        hideTotalCount={!data.showTotalCount}
+        showColorLegend={data.showColorLegend}
+        showMonthLabels={data.showMonthLabels}
+        showTotalCount={data.showTotalCount}
         username={data.username}
         labels={labels}
         colorScheme={isDark ? "dark" : "light"}
         theme={{
-          light: ['#ebedf0', '#9be9a8', '#40c463', '#30a14e', '#216e39'],
-          dark: ['#161b22', '#0e4429', '#006d32', '#26a641', '#39d353'],
+          light: ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"],
+          dark: ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"],
         }}
+        tooltips={
+          data.showTooltips
+            ? {
+                activity: {
+                  text: (activity) => {
+                    if (activity.count === 0) {
+                      return intl.formatMessage(tooltipMessages.noActivity, {
+                        date: activity.date,
+                      });
+                    }
+
+                    return intl.formatMessage(tooltipMessages.activity, {
+                      count: activity.count,
+                      date: activity.date,
+                    });
+                  },
+                },
+              }
+            : undefined
+        }
       />
     </a>
   );

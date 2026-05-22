@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Media from "./Media";
 import ImageSettings from "./MediaSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +25,7 @@ const config: Config = {
   dashboardComponent: Media,
   settingsComponent: ImageSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

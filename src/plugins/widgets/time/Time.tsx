@@ -1,11 +1,13 @@
-import React, { FC, useRef } from "react";
+import "./Time.sass";
+
+import { toZonedTime } from "date-fns-tz";
+import { FC, useRef } from "react";
 import { FormattedDate } from "react-intl";
+
 import { useTime } from "../../../hooks";
 import Analogue from "./Analogue";
 import Digital from "./Digital";
-import { Props, defaultData } from "./types";
-import "./Time.sass";
-import { toZonedTime } from "date-fns-tz";
+import { defaultData, Props } from "./types";
 
 const Time: FC<Props> = ({ data = defaultData }) => {
   const {
@@ -15,15 +17,18 @@ const Time: FC<Props> = ({ data = defaultData }) => {
     colorCircles,
     showDate,
     hideTime,
+    showHours = true,
     showMinutes,
     showSeconds,
     timeZone,
     showDayPeriod = true,
+    showSeparator,
   } = data;
   let time = useTime(timeZone ? "absolute" : "zoned");
 
   const h3Ref = useRef<HTMLHeadingElement | null>(null);
-  const color = h3Ref.current && window.getComputedStyle(h3Ref.current).color || "white";
+  const color =
+    (h3Ref.current && window.getComputedStyle(h3Ref.current).color) || "white";
 
   if (timeZone) {
     time = toZonedTime(time, timeZone);
@@ -36,6 +41,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
           {mode === "analogue" ? (
             <Analogue
               time={time}
+              showHours={showHours}
               showMinutes={showMinutes}
               showSeconds={showSeconds}
               color={color}
@@ -45,6 +51,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
             <Digital
               time={time}
               hour12={hour12}
+              showHours={showHours}
               showMinutes={showMinutes}
               showSeconds={showSeconds}
               showDayPeriod={showDayPeriod}
@@ -53,13 +60,11 @@ const Time: FC<Props> = ({ data = defaultData }) => {
         </>
       )}
 
-      {name && (
-        <h2>{name}</h2>
-      )}
+      {name && <h2>{name}</h2>}
 
       {showDate && (
         <>
-          {(!hideTime || name) && (
+          {(!hideTime || name) && showSeparator && (
             <hr
               style={{
                 borderColor: color,

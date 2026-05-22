@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Links from "./Links";
 import LinksSettings from "./LinksSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -22,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Links,
   settingsComponent: LinksSettings,
+  defaultData,
 };
 
 export default config;

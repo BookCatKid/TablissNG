@@ -1,8 +1,10 @@
-import React from "react";
+import "./PositionInput.sass";
+
+import type { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { WidgetPosition } from "../../db/state";
 import { Icon, IconButton } from "../shared";
-import "./PositionInput.css";
 
 const positions = [
   {
@@ -52,7 +54,7 @@ type Props = {
   onChange: (value: WidgetPosition) => void;
 };
 
-const PositionInput: React.FC<Props> = ({ value, onChange }) => (
+const PositionInput: FC<Props> = ({ value, onChange }) => (
   <div className="PositionInput">
     <label>
       <FormattedMessage
@@ -64,16 +66,13 @@ const PositionInput: React.FC<Props> = ({ value, onChange }) => (
 
     <div className="grid">
       {positions.map((position) => (
-        <div key={position.value} className="position-button-container">
+        <div key={position.value} className="PositionInput-buttonContainer">
           <IconButton
             onClick={() => onChange(position.value)}
             primary={value === position.value}
           >
             <Icon name={position.icon} />
           </IconButton>
-          {position.value === "free" && (
-            <span className="beta-badge">BETA</span>
-          )}
         </div>
       ))}
     </div>

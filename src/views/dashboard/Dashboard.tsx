@@ -1,21 +1,24 @@
-import React from "react";
-import { useTheme } from "../../hooks";
-import Background from "./Background";
 import "./Dashboard.sass";
-import Overlay from "./Overlay";
-import Widgets from "./Widgets";
+
+import { type FC, memo } from "react";
+
+import { db } from "../../db/state";
+import { useTheme } from "../../hooks";
+import { useKey } from "../../lib/db/react";
 import AddWidgetButton from "./AddWidgetButton";
+import Background from "./Background";
 import CustomCodeEditor from "./CustomCodeEditor";
+import Overlay from "./Overlay";
 import TextWidgetEditor from "./TextWidgetEditor";
+import Widgets from "./Widgets";
 
-const baseClasses = ["Dashboard", "fullscreen"];
-
-const Dashboard: React.FC = () => {
+const Dashboard: FC = () => {
   const { isDark } = useTheme();
-  const className = [...baseClasses, isDark ? "dark" : null].filter(Boolean).join(" ");
+  const theme = isDark ? "dark" : "";
+  const [settingsIconPosition] = useKey(db, "settingsIconPosition");
 
   return (
-    <div className={className}>
+    <div className={`Dashboard fullscreen ${theme} ${settingsIconPosition}`}>
       <Background />
       <Widgets />
       <AddWidgetButton />
@@ -26,4 +29,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default React.memo(Dashboard);
+export default memo(Dashboard);

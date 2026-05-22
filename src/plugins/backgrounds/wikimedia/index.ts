@@ -1,5 +1,7 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
+import { defaultData } from "./types";
 import Wikimedia from "./Wikimedia";
 import WikimediaSettings from "./WikimediaSettings";
 
@@ -23,6 +25,7 @@ const config: Config = {
   dashboardComponent: Wikimedia,
   settingsComponent: WikimediaSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

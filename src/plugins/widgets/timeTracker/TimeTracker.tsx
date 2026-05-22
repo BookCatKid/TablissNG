@@ -1,19 +1,21 @@
-import React, { FC, useState, useEffect } from "react";
-import { FormattedRelativeTime, FormattedMessage } from "react-intl";
+import "./TimeTracker.sass";
+
+import { toZonedTime } from "date-fns-tz";
+import { FC, useEffect, useState } from "react";
+import { FormattedMessage, FormattedRelativeTime } from "react-intl";
+
 import { useTime } from "../../../hooks";
 import { selectUnit } from "../../../utils";
-import { Props, defaultData } from "./types";
 import { messages } from "./messages";
-import { toZonedTime } from "date-fns-tz";
-import "./TimeTracker.sass";
+import { defaultData, Props } from "./types";
 
 const TimeTracker: FC<Props> = ({ data = defaultData }) => {
   let time = useTime(data.timeZone ? "absolute" : "zoned");
-  
+
   if (data.timeZone) {
     time = toZonedTime(time, data.timeZone);
   }
-  
+
   const now = time.getTime();
   const targetTime = data.time;
   const isPast = now >= targetTime;
@@ -21,7 +23,12 @@ const TimeTracker: FC<Props> = ({ data = defaultData }) => {
   const timeDiff = targetTime - now;
   const { value, unit } = selectUnit(targetTime, now);
 
-  const [timeComponents, setTimeComponents] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [timeComponents, setTimeComponents] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
 
   useEffect(() => {
     const updateDetailedTime = () => {
@@ -56,26 +63,34 @@ const TimeTracker: FC<Props> = ({ data = defaultData }) => {
           <span className="time-component">
             <span className="value">{days}</span>
             <span className={`unit ${data.italicizeTime ? "italic-time" : ""}`}>
-              <FormattedMessage {...(days === 1 ? messages.day : messages.days)} />
+              <FormattedMessage
+                {...(days === 1 ? messages.day : messages.days)}
+              />
             </span>
           </span>
         )}
         <span className="time-component">
           <span className="value">{hours}</span>
           <span className={`unit ${data.italicizeTime ? "italic-time" : ""}`}>
-            <FormattedMessage {...(hours === 1 ? messages.hour : messages.hours)} />
+            <FormattedMessage
+              {...(hours === 1 ? messages.hour : messages.hours)}
+            />
           </span>
         </span>
         <span className="time-component">
           <span className="value">{minutes}</span>
           <span className={`unit ${data.italicizeTime ? "italic-time" : ""}`}>
-            <FormattedMessage {...(minutes === 1 ? messages.minute : messages.minutes)} />
+            <FormattedMessage
+              {...(minutes === 1 ? messages.minute : messages.minutes)}
+            />
           </span>
         </span>
         <span className="time-component">
           <span className="value">{seconds}</span>
           <span className={`unit ${data.italicizeTime ? "italic-time" : ""}`}>
-            <FormattedMessage {...(seconds === 1 ? messages.second : messages.seconds)} />
+            <FormattedMessage
+              {...(seconds === 1 ? messages.second : messages.seconds)}
+            />
           </span>
         </span>
       </div>
@@ -86,39 +101,43 @@ const TimeTracker: FC<Props> = ({ data = defaultData }) => {
     <div className="TimeTracker">
       {isPast && data.showCompletedMessage ? (
         <div className="completed">
-          {data.completedMessage ||
+          {data.completedMessage || (
             <FormattedMessage {...messages.eventHasArrived} />
-          }
+          )}
         </div>
+      ) : data.displayMode === "compact" ? (
+        <h3>
+          {data.title && <span className="title">{data.title}</span>}
+          &nbsp;
+          {isPast ? (
+            <span>
+              <FormattedMessage
+                id="plugins.timeTracker.was"
+                defaultMessage="was"
+                description="Text indicating the tracked event occurred in the past"
+              />{" "}
+              <span className={data.italicizeTime ? "italic-time" : ""}>
+                <FormattedRelativeTime value={value} unit={unit} />
+              </span>
+            </span>
+          ) : (
+            <span>
+              <FormattedMessage
+                id="plugins.timeTracker.isIn"
+                defaultMessage="is"
+                description="Text indicating the tracked event will occur in the future"
+              />{" "}
+              <span className={data.italicizeTime ? "italic-time" : ""}>
+                <FormattedRelativeTime value={value} unit={unit} />
+              </span>
+            </span>
+          )}
+        </h3>
       ) : (
-        data.displayMode === "compact" ? (
-          <h3>
-            {data.title && <span className="title">{data.title}</span>}
-            &nbsp;
-            {isPast ?
-              <span>
-                <FormattedMessage id="plugins.timeTracker.was" defaultMessage="was" />{' '}
-                <span className={data.italicizeTime ? "italic-time" : ""}>
-                  <FormattedRelativeTime value={value} unit={unit} />
-                </span>
-              </span>
-              :
-              <span>
-                <FormattedMessage id="plugins.timeTracker.isIn" defaultMessage="is" />{' '}
-                <span className={data.italicizeTime ? "italic-time" : ""}>
-                  <FormattedRelativeTime value={value} unit={unit} />
-                </span>
-              </span>
-            }
-          </h3>
-        ) : (
-          <div className="detailed">
-            {data.title && <h3 className="title">{data.title}</h3>}
-            <div className="time-info">
-              {renderDetailedTime()}
-            </div>
-          </div>
-        )
+        <div className="detailed">
+          {data.title && <h3 className="title">{data.title}</h3>}
+          <div className="time-info">{renderDetailedTime()}</div>
+        </div>
       )}
     </div>
   );

@@ -1,9 +1,9 @@
-import React from "react";
+import { type FC, useLayoutEffect } from "react";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
-const Css: React.FC<Props> = ({ data = defaultData }) => {
-  React.useLayoutEffect(() => {
+const Css: FC<Props> = ({ data = defaultData }) => {
+  useLayoutEffect(() => {
     const style = document.createElement("style");
 
     style.id = "CustomCss";

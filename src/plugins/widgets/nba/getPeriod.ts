@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+
 import { Game } from "./types";
 
 export function getPeriod(game: Game, timeZone: string | null) {

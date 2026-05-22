@@ -2,6 +2,8 @@
     // Some weird element size bug
     white-space: nowrap
     direction: rtl
+    border-top: 2px solid transparent
+    border-bottom: 2px solid transparent
 
     a
         display: inline-block
@@ -14,6 +16,36 @@
 
     a.delete
         display: none
+
+    a.drag-handle
+        direction: ltr
+        cursor: grab
+        opacity: 0
+        margin: 0.25em 0
+
+        i
+            display: flex
+            align-items: center
+
+        svg
+            width: 14px
+            height: 14px
+
+    &:hover
+        a.drag-handle
+            opacity: 0.5
+
+            &:hover
+                opacity: 1
+
+    &.dragging
+        opacity: 0.3
+
+    &.drop-above
+        border-top-color: currentColor
+
+    &.drop-below
+        border-bottom-color: currentColor
 
     span:focus
         & ~ a.delete

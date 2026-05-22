@@ -1,27 +1,68 @@
-import React, { useState, useEffect } from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import "./Settings.sass";
+
+import { Icon } from "@iconify/react";
+import { useEffect, useRef, useState } from "react";
+import { type FC, memo, useContext, useMemo } from "react";
+import GitHubButton from "react-github-btn";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { UiContext } from "../../contexts/ui";
 import { exportStore, importStore, resetStore } from "../../db/action";
+import { db } from "../../db/state";
 import { useKeyPress } from "../../hooks";
-import { Icon } from "@iconify/react";
+import { useTheme } from "../../hooks";
+import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
 import Background from "./Background";
 import Persist from "./Persist";
-import "./Settings.sass";
 import System from "./System";
 import Widgets from "./Widgets";
-import GitHubButton from "react-github-btn";
-import { db } from "../../db/state";
-import { useKey } from "../../lib/db/react";
-import { useTheme } from "../../hooks";
 
-const Settings: React.FC = () => {
-  const { toggleSettings } = React.useContext(UiContext);
+const messages = defineMessages({
+  scrollToTop: {
+    id: "settings.scrollToTop",
+    defaultMessage: "Scroll to top",
+    description: "Tooltip for scroll to top button",
+  },
+  resetConfirm: {
+    id: "settings.reset.confirm",
+    defaultMessage:
+      "Are you sure you want to delete all of your TablissNG settings? This cannot be undone.",
+    description: "Confirmation message when resetting settings",
+  },
+  ariaRepo: {
+    id: "settings.aria.repository",
+    defaultMessage: "Open repository BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub repository link",
+  },
+  ariaWatch: {
+    id: "settings.aria.watch",
+    defaultMessage: "Watch BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub watch button",
+  },
+  ariaStar: {
+    id: "settings.aria.star",
+    defaultMessage: "Star BookCatKid/tablissNG on GitHub",
+    description: "ARIA label for the GitHub star button",
+  },
+  settingsImportExportReset: {
+    id: "settings.importExportReset",
+    defaultMessage:
+      "<import>Import</import>, <export>export</export> or <reset>reset</reset> your settings",
+    description:
+      "Links for import/export/reset at the bottom of settings. Uses XML-like tags to style each action word as a clickable link.",
+  },
+});
+
+const Settings: FC = () => {
+  const { toggleSettings } = useContext(UiContext);
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
   const [autoHideSettings] = useKey(db, "autoHideSettings");
   const { isDark } = useTheme();
   const intl = useIntl();
   const [isHovered, setIsHovered] = useState(true);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const planeRef = useRef<HTMLDivElement>(null);
 
   const settingsOnRight =
     settingsIconPosition === "bottomRight" ||
@@ -31,18 +72,20 @@ const Settings: React.FC = () => {
     setIsHovered(true);
   }, [toggleSettings]);
 
+  const handleScroll = () => {
+    if (planeRef.current) {
+      setShowScrollTop(planeRef.current.scrollTop > 200);
+    }
+  };
+
+  const scrollToTop = () => {
+    if (planeRef.current) {
+      planeRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
   const handleReset = () => {
-    if (
-      confirm(
-        intl.formatMessage({
-          id: "settings.reset.confirm",
-          defaultMessage:
-            "Are you sure you want to delete all of your TablissNG settings? This cannot be undone.",
-          description: "Confirmation message when resetting settings",
-        }),
-      )
-    )
-      resetStore();
+    if (confirm(intl.formatMessage(messages.resetConfirm))) resetStore();
   };
 
   const handleExport = () => {
@@ -119,6 +162,7 @@ const Settings: React.FC = () => {
       )}
 
       <div
+        ref={planeRef}
         className="plane"
         style={{
           left: settingsOnRight ? "auto" : 0,
@@ -129,6 +173,7 @@ const Settings: React.FC = () => {
           transition: "opacity 0.3s ease, visibility 0.3s ease",
         }}
         onMouseEnter={() => setIsHovered(true)}
+        onScroll={handleScroll}
         onMouseLeave={() => setIsHovered(false)}
       >
         <Logo />
@@ -144,11 +189,11 @@ const Settings: React.FC = () => {
         >
           <span
             style={{
-              background: isDark ? "#2d2d2d" : "#f0f0f0",
+              background: "var(--bg-input)",
               padding: "0.3rem 0.8rem",
               borderRadius: "1rem",
               fontSize: "0.9rem",
-              color: isDark ? "#e0e0e0" : "#666",
+              color: "var(--text-main)",
               fontWeight: 500,
               display: "inline-flex",
               alignItems: "center",
@@ -163,37 +208,13 @@ const Settings: React.FC = () => {
         <Widgets />
         <System />
         <p style={{ marginBottom: "2rem" }}>
-          <a onClick={handleImport}>
-            <FormattedMessage
-              id="settings.import"
-              defaultMessage="Import"
-              description="Import title"
-            />
-          </a>
-          ,{" "}
-          <a onClick={handleExport}>
-            <FormattedMessage
-              id="settings.export"
-              defaultMessage="export"
-              description="Export title"
-            />
-          </a>{" "}
           <FormattedMessage
-            id="settings.or"
-            defaultMessage="or"
-            description="your settings title"
-          />{" "}
-          <a onClick={handleReset}>
-            <FormattedMessage
-              id="settings.reset"
-              defaultMessage="reset"
-              description="Reset title"
-            />
-          </a>{" "}
-          <FormattedMessage
-            id="settings.description"
-            defaultMessage="your settings"
-            description="your settings title"
+            {...messages.settingsImportExportReset}
+            values={{
+              import: (chunks) => <a onClick={handleImport}>{chunks}</a>,
+              export: (chunks) => <a onClick={handleExport}>{chunks}</a>,
+              reset: (chunks) => <a onClick={handleReset}>{chunks}</a>,
+            }}
           />
         </p>
         {/* Only relevant for the web build where IndexedDB may be evicted. Hide for extension builds to avoid confusing prompts in Firefox/Chromium. */}
@@ -208,7 +229,7 @@ const Settings: React.FC = () => {
             />
           </h4>
 
-          {React.useMemo(
+          {useMemo(
             () => (
               <div
                 style={{
@@ -226,7 +247,7 @@ const Settings: React.FC = () => {
                     data-size="large"
                     data-show-count="false"
                     data-color-scheme={isDark ? "dark" : "light"}
-                    aria-label="Open repository BookCatKid/tablissNG on GitHub"
+                    aria-label={intl.formatMessage(messages.ariaRepo)}
                   >
                     <span
                       style={{
@@ -261,7 +282,7 @@ const Settings: React.FC = () => {
                       data-size="large"
                       data-show-count="true"
                       data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label="Watch BookCatKid/tablissNG on GitHub"
+                      aria-label={intl.formatMessage(messages.ariaWatch)}
                     >
                       <FormattedMessage
                         id="settings.github.watch"
@@ -278,7 +299,7 @@ const Settings: React.FC = () => {
                       data-size="large"
                       data-show-count="true"
                       data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label="Star BookCatKid/tablissNG on GitHub"
+                      aria-label={intl.formatMessage(messages.ariaStar)}
                     >
                       <FormattedMessage
                         id="settings.github.star"
@@ -301,8 +322,18 @@ const Settings: React.FC = () => {
           tagName="p"
         />
       </div>
+
+      {showScrollTop && (
+        <button
+          className={`button button--primary scroll-to-top ${settingsOnRight ? "scroll-to-top--right" : "scroll-to-top--left"}`}
+          onClick={scrollToTop}
+          title={intl.formatMessage(messages.scrollToTop)}
+        >
+          <Icon icon="feather:arrow-up" />
+        </button>
+      )}
     </div>
   );
 };
 
-export default React.memo(Settings);
+export default memo(Settings);

@@ -13,7 +13,6 @@
   "plugins.weather.apparent",
   "plugins.weather.humidity",
   "plugins.search.placeholder",
-  "plugins.links.shortcutHint",
   "plugins.links.standardHint",
   "plugins.unsplash.photoLink"
 ]

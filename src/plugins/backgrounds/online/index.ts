@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Online from "./Online";
 import OnlineSettings from "./OnlineSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +25,7 @@ const config: Config = {
   dashboardComponent: Online,
   settingsComponent: OnlineSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

@@ -1,8 +1,9 @@
-import React, { FC } from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
-import { Props, defaultData } from "./types";
-import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+import { FC } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
 import { pluginMessages } from "../../../locales/messages";
+import TimeZoneInput from "../../../views/shared/timeZone/TimeZoneInput";
+import { defaultData, Props } from "./types";
 
 const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
@@ -10,9 +11,7 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
   return (
     <div className="TimeSettings">
       <label>
-        <FormattedMessage
-          {...pluginMessages.yourName}
-        />
+        <FormattedMessage {...pluginMessages.yourName} />
         <input
           type="text"
           value={data.name}
@@ -33,7 +32,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showSeconds}
-          onChange={() => setData({ ...data, showSeconds: !data.showSeconds })}
+          onChange={(event) =>
+            setData({ ...data, showSeconds: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showSeconds"
@@ -46,7 +47,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showMinutes}
-          onChange={() => setData({ ...data, showMinutes: !data.showMinutes })}
+          onChange={(event) =>
+            setData({ ...data, showMinutes: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showMinutes"
@@ -59,7 +62,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="checkbox"
           checked={data.showHours}
-          onChange={() => setData({ ...data, showHours: !data.showHours })}
+          onChange={(event) =>
+            setData({ ...data, showHours: event.target.checked })
+          }
         />{" "}
         <FormattedMessage
           id="plugins.binaryTime.showHours"
@@ -77,7 +82,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="color"
           value={data.onColor}
-          onChange={(event) => setData({ ...data, onColor: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, onColor: event.target.value })
+          }
         />
       </label>
 
@@ -90,7 +97,9 @@ const BinaryTimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         <input
           type="color"
           value={data.offColor}
-          onChange={(event) => setData({ ...data, offColor: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, offColor: event.target.value })
+          }
         />
       </label>
     </div>

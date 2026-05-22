@@ -1,0 +1,55 @@
+.card-content-container
+  overflow-wrap: anywhere
+  word-break: break-word
+  text-align: left
+  padding: 0.4rem 0.25rem
+
+  span
+    user-select: none
+
+  &:hover
+    background: rgba(255, 255, 255, 0.09)
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
+    border-radius: 0.25rem
+    backdrop-filter: blur(5px)
+    -webkit-backdrop-filter: blur(5px)
+
+.card-header
+  display: flex
+  justify-content: space-between
+
+.card-labels-container
+  display: flex
+  justify-content: space-between
+  gap: 0.25rem
+
+.card-label
+  margin-top: auto
+
+.edit-card-button
+  opacity: 0
+  transition: opacity 0.1s ease, max-height 0.1s ease
+
+  &.visible
+    &:hover
+      cursor: pointer
+      opacity: 1
+
+.card-name-editor
+  color: inherit
+  width: 100%
+  resize: none
+  border: none
+  background: transparent
+  scrollbar-width: none
+  -ms-overflow-style: none
+
+  &::-webkit-scrollbar
+    display: none
+    border: none
+
+  &:active,
+  &:focus
+    border: none
+    outline: none
+    box-shadow: none

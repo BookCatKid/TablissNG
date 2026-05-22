@@ -1,14 +1,17 @@
-import React from "react";
+import "./Widgets.sass";
+
+import type { FC } from "react";
+
 import { selectWidgets } from "../../db/select";
 import { db, WidgetPosition, WidgetState } from "../../db/state";
 import { useSelector, useValue } from "../../lib/db/react";
 import Slot from "./Slot";
-import "./Widgets.sass";
 
-const Widgets: React.FC = () => {
+const Widgets: FC = () => {
   const focus = useValue(db, "focus");
   const widgets = useSelector(db, selectWidgets);
-    // NOTE: old todo: (probobly no longer relevent though) (from original maintainer) one day we'll have `Array.groupBy` accepted by tc39
+
+  // NOTE: old todo: (probobly no longer relevent though) (from original maintainer) one day we'll have `Array.groupBy` accepted by tc39
 
   const grouped: Partial<Record<WidgetPosition, WidgetState[]>> = {};
   const cssWidgets: Partial<Record<WidgetPosition, WidgetState[]>> = {};
@@ -28,7 +31,10 @@ const Widgets: React.FC = () => {
   });
 
   const slots = Object.entries(grouped) as [WidgetPosition, WidgetState[]][];
-  const cssSlots = Object.entries(cssWidgets) as [WidgetPosition, WidgetState[]][];
+  const cssSlots = Object.entries(cssWidgets) as [
+    WidgetPosition,
+    WidgetState[],
+  ][];
 
   return (
     <div className="Widgets fullscreen">

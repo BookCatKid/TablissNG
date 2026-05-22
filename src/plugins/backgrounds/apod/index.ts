@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Apod from "./Apod";
 import ApodSettings from "./ApodSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -23,6 +25,7 @@ const config: Config = {
   dashboardComponent: Apod,
   settingsComponent: ApodSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

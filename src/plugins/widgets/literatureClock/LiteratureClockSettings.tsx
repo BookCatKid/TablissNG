@@ -1,6 +1,7 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
-import { Props, defaultData } from "./types";
+
+import { defaultData, Props } from "./types";
 
 const LiteratureClockSettings: FC<Props> = ({
   data = defaultData,
@@ -16,10 +17,10 @@ const LiteratureClockSettings: FC<Props> = ({
         }
       />{" "}
       <FormattedMessage
-          id="plugins.literatureClock.displayBookAndAuthor"
-          defaultMessage="Display book and author"
-          description="Display book and author title"
-        />
+        id="plugins.literatureClock.displayBookAndAuthor"
+        defaultMessage="Display book and author"
+        description="Display book and author title"
+      />
     </label>
 
     <label>
@@ -29,10 +30,10 @@ const LiteratureClockSettings: FC<Props> = ({
         onChange={() => setData({ ...data, centerText: !data.centerText })}
       />{" "}
       <FormattedMessage
-          id="plugins.literatureClock.alignTextAtCenter"
-          defaultMessage="Align text at center"
-          description="Align text at center title"
-        />
+        id="plugins.literatureClock.alignTextAtCenter"
+        defaultMessage="Align text at center"
+        description="Align text at center title"
+      />
     </label>
 
     <label>
@@ -42,10 +43,10 @@ const LiteratureClockSettings: FC<Props> = ({
         onChange={() => setData({ ...data, sfw: !data.sfw })}
       />{" "}
       <FormattedMessage
-          id="plugins.literatureClock.safeForWork"
-          defaultMessage="Safe for work only"
-          description="Show only safe for work quotes"
-        />
+        id="plugins.literatureClock.safeForWork"
+        defaultMessage="Safe for work only"
+        description="Show only safe for work quotes"
+      />
     </label>
   </div>
 );

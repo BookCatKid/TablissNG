@@ -1,106 +1,119 @@
 # Building TablissNG
 
-This document provides detailed instructions for building TablissNG from its source code.
+This guide provides step-by-step instructions for setting up your development environment and building TablissNG from source for various platforms.
 
-## System Requirements
+## Prerequisites
 
-### Required Software
+Before you begin, ensure you have the following installed on your system:
 
-- Node.js Version: 22.x or higher
+- **Node.js**: Version 22.x or higher is recommended.
+- **pnpm**: You can install pnpm globally using npm: (you can also install it with other package managers, see https://pnpm.io/installation)
 
-## Build Script
+  ```bash
+  npm install -g pnpm
+  ```
 
-A convenience build script is provided to automate the build process for Firefox. Save this as `build.sh` (Linux/macOS) or `build.bat` (Windows) in the project root:
+- **Git**: To clone the repository.
 
-### Windows (build.bat)
+## Setup
 
-```batch
-@echo off
+1. **Clone the repository**:
 
-echo Building Tabliss Extension...
+   ```bash
+   git clone https://github.com/BookCatKid/TablissNG.git
+   cd TablissNG
+   ```
 
-:: Check Node.js installation
-node --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Error: Node.js is not installed
-    exit /b 1
-)
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
 
-:: Install dependencies
-echo Installing dependencies...
-call npm install || (
-    echo Error: Failed to install dependencies
-    exit /b 1
-)
+## Development
 
-:: Build Firefox extension
-echo Building Firefox extension...
-call npm run build:firefox || (
-    echo Error: Build failed
-    exit /b 1
-)
+To run TablissNG in development mode with hot reloading:
 
-:: Zip the build output
-echo Zipping build output...
-powershell Compress-Archive -Path dist/firefox/* -DestinationPath dist/firefox.zip || (
-    echo Error: Failed to zip build output
-    exit /b 1
-)
+### Web Version (Browser Preview)
 
-echo Build completed successfully!
-echo Firefox extension is available in dist/firefox/
-echo Zipped archive available at dist/firefox.zip
-```
-
-### Linux/macOS (build.sh)
+This will start a local development server and open the web version in your browser.
 
 ```bash
-#!/bin/bash
-
-set -e
-
-echo "Building Tabliss Extension..."
-
-# Check Node.js installation
-if ! command -v node &> /dev/null; then
-    echo "Error: Node.js is not installed"
-    exit 1
-fi
-
-# Install dependencies
-echo "Installing dependencies..."
-npm install
-
-# Build Firefox extension
-echo "Building Firefox extension..."
-npm run build:firefox
-
-# Ensure the output directory exists
-if [ ! -d "dist/firefox" ]; then
-    echo "Error: Build output directory does not exist!"
-    exit 1
-fi
-
-# Zip the build output while preserving directory structure
-echo "Zipping build output..."
-cd dist/firefox
-zip -r ../firefox.zip ./*
-cd ../..
-
-echo "Build completed successfully!"
-echo "Firefox extension is available in dist/firefox/"
-echo "Zipped archive available at dist/firefox.zip"
+pnpm run dev
 ```
 
-Make the script executable on Linux/macOS:
+### Browser Extensions
+
+To develop for specific browsers with auto-rebuild on file changes:
 
 ```bash
-chmod +x build.sh
+# Chromium (Chrome, Edge, Brave, etc.)
+pnpm run dev:chromium
+
+# Firefox
+pnpm run dev:firefox
+
+# Safari
+pnpm run dev:safari
 ```
 
-## Support
+The output will be in the `dist/` directory.
 
-If you encounter any issues during the build process, please:
+### Loading the extension
 
-1. Check the [GitHub Issues](https://github.com/BookCatKid/TablissNG/issues) page
-2. Create a new issue if your problem hasn't been reported
+- **Chromium**
+  1.  Go to [chrome://extensions](chrome://extensions).
+  2.  Enable Developer Mode (top right).
+  3.  Click "Load unpacked".
+  4.  Select the `dist/chromium` folder.
+
+- **Firefox**
+  1.  Go to [about:debugging#/runtime/this-firefox](about:debugging#/runtime/this-firefox).
+  2.  Click "Load Temporary Add-on".
+  3.  Select the `manifest.json` inside the `dist/firefox` folder.
+
+**Warning: Data Persistence Notice**
+
+Installing manual or nightly builds alongside the store version can cause configuration conflicts. Switching back from a manual build to a store version often requires a full re-installation, which **will erase your settings and data** unless you have exported them. Always [export your settings](https://tablissng.smrff.dev/guides/backup-and-export) before switching versions.
+
+## Building for Production
+
+To create a production-ready build for a specific platform:
+
+### Extension Builds
+
+```bash
+# Chromium (Chrome, Edge, Brave, etc.)
+pnpm run build:chromium
+
+# Firefox
+pnpm run build:firefox
+
+# Safari
+pnpm run build:safari
+```
+
+### Web Build
+
+```bash
+pnpm run build
+```
+
+All production builds are located in the `dist/` directory, organized by platform (e.g., `dist/firefox/`, `dist/chromium/`).
+
+## Other Scripts
+
+- `pnpm test`: Run the test suite.
+- `pnpm run lint`: Check for code style and potential errors.
+- `pnpm run lint:fix`: Automatically fix linting errors.
+- `pnpm run prettier`: Format the codebase using Prettier.
+- `pnpm run prettier:check`: Check if the codebase follows Prettier formatting rules.
+- `pnpm run typecheck`: Run TypeScript type checking.
+- `pnpm run translations`: Extract and sync translation files.
+- `pnpm run translations status`: Show translation status (`pnpm run translations status fr`).
+- `pnpm run translations create`: Create a new locale file (`pnpm run translations create de-AT`) and add the locale to `src/locales/registry.ts`.
+- `pnpm run translations compile`: Build production locale artifacts in `src/locales/lang.compiled`.
+- `pnpm run translations migrate`: Migrate renamed translation keys (`pnpm run translations migrate --map old.id=new.id`).
+- `pnpm run sign:firefox`: Manually sign the Firefox extension (requires credentials, mostly for gh workflows).
+- `pnpm run deps:check`: Check for outdated dependencies using `npm-check`.
+- `pnpm run deps:update`: Interactively update dependencies.
+- `pnpm run prepare`: Set up Husky git hooks.

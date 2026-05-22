@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Message from "./Message";
 import MessageSettings from "./MessageSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -22,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Message,
   settingsComponent: MessageSettings,
+  defaultData,
 };
 
 export default config;

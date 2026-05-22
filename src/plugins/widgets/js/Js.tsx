@@ -1,6 +1,6 @@
 import { FC, useEffect } from "react";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const Js: FC<Props> = ({ data = defaultData }) => {
   useEffect(() => {

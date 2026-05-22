@@ -42,6 +42,7 @@ export type Config = {
   readonly key: string;
   readonly name: MessageDescriptor;
   readonly description: MessageDescriptor;
+  readonly defaultData: unknown;
   readonly dashboardComponent: ComponentType<API<any, any>>;
   readonly settingsComponent?: ComponentType<API<any, any>>;
   readonly supportsBackdrop?: boolean;

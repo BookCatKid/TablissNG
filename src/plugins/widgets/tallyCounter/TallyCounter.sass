@@ -1,0 +1,39 @@
+.TallyCounter
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+
+  .label
+    font-size: 1.4rem
+
+  .count-container
+    display: flex
+    align-items: center
+    gap: 2rem
+    font-weight: bold
+
+    .count
+      font-size: 4rem
+
+    .control-btn
+      padding: 0
+      width: 40px
+      height: 40px
+      display: flex
+      align-items: center
+      justify-content: center
+
+      &:active
+        transform: scale(0.9)
+
+  .reset-btn
+    font-size: 0.9rem
+    opacity: 0
+    transition: opacity 0.4s
+    visibility: hidden
+
+  &:hover
+    .reset-btn
+      opacity: 1
+      visibility: visible

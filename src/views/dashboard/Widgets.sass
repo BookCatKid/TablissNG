@@ -2,6 +2,7 @@
     padding: 0
     text-align: center
     pointer-events: none
+    user-select: auto
     position: relative
     z-index: 50
 
@@ -14,6 +15,9 @@
             margin: 1rem
             pointer-events: all
 
+        .Slot.free > *
+            margin: 0
+
     h1, h2, h3, h4
         line-height: 1
         margin: 0
@@ -23,10 +27,12 @@
             font-weight: inherit
 
     .drag-selected
-        outline: 2px solid #3498db
-        background: rgba(52, 152, 219, 0.5)
+        outline: 2px solid var(--accent-color)
+        background: color-mix(in srgb, var(--accent-color) 12%, transparent)
         z-index: 1000
-        box-shadow: 0 0 12px 2px rgba(52,152,219,0.15)
+
+        & > *
+            pointer-events: none
 
     .Widget
         position: relative
@@ -36,14 +42,11 @@
             display: flex
             gap: 0.25rem
             padding: 0.35rem 0.5rem
-            border-radius: 8px
-            background: #ffffff
-            border: 1px solid #e6eaf0
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25)
+            border-radius: 0.5rem
+            background: var(--bg-main)
+            border: 1px solid var(--border-main)
+            box-shadow: 0 0.5rem 1rem var(--shadow-main)
             opacity: 0
-            top: -12px
-            left: 50%
-            transform: translate(-50%, -8px)
             transition: opacity 0.18s ease, transform 0.18s ease
             pointer-events: none
             z-index: 120
@@ -51,10 +54,10 @@
         .widget-settings-trigger
             width: 28px
             height: 28px
-            border-radius: 6px
+            border-radius: 0.4rem
             border: none
-            background: #ecf0f1
-            color: #334155
+            background: var(--bg-button)
+            color: var(--text-main)
             display: flex
             align-items: center
             justify-content: center
@@ -67,14 +70,12 @@
 
             &:hover
                 transform: scale(1.03)
-                background: #eef3f8
+                background: var(--border-main)
 
             &.danger
-                border-color: rgba(239,68,68,0.12)
                 color: #9b2c2c
 
                 &:hover
-                    border-color: rgba(239,68,68,0.18)
                     background: #fff5f5
 
         .widget-control-popover
@@ -85,12 +86,11 @@
             left: auto
             right: auto
             padding: 0.75rem
-            border-radius: 10px
-            background: #ffffff
-            border: 1px solid #e6eaf0
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25)
+            border-radius: 0.6rem
+            background: var(--bg-main)
+            border: 1px solid var(--border-main)
+            box-shadow: 0 0.5rem 1rem var(--shadow-main)
             z-index: 130
-            animation: widget-popover-fade 0.12s ease-out
 
             .popover-header
                 display: flex
@@ -98,46 +98,40 @@
                 justify-content: space-between
                 margin-bottom: 0.5rem
                 font-size: 0.85rem
-                color: #334155
-                text-transform: none
-                letter-spacing: 0
-
+                color: var(--text-main)
 
                 .popover-value-button
                     background: transparent
-                    border: 1px solid rgba(0,0,0,0.04)
-                    color: #334155
-                    border-radius: 6px
+                    border: 1px solid var(--border-main)
+                    color: var(--text-main)
+                    border-radius: 0.4rem
                     padding: 0.1rem 0.5rem
                     font-size: 0.8rem
                     cursor: pointer
-                    transition: all 0.12s ease
 
                     &:hover,
                     &:focus-visible
-                        border-color: rgba(52,152,219,0.12)
-                        color: #2b6cb0
-                        box-shadow: none
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
                         outline: none
 
                 .popover-value-input
                     width: 70px
-                    border-radius: 6px
-                    border: 1px solid #d6dbe2
-                    background: #ffffff
-                    color: #222
+                    border-radius: 0.4rem
+                    border: 1px solid var(--border-main)
+                    background: var(--bg-input)
+                    color: var(--text-main)
                     padding: 0.15rem 0.4rem
                     font-size: 0.8rem
                     text-align: center
                     outline: none
 
                     &:focus-visible
-                        border-color: rgba(52,152,219,0.12)
-                        box-shadow: 0 0 6px rgba(52,152,219,0.06)
+                        border-color: var(--accent-color)
 
             input[type="range"]
                 width: 100%
-                accent-color: #3498db
+                accent-color: var(--accent-color)
 
             .quick-align-grid
                 display: grid
@@ -149,16 +143,15 @@
                     width: 42px
                     height: 42px
                     border-radius: 50%
-                    border: 1px solid #e9edf2
-                    background: #ffffff
-                    color: #334155
+                    border: 1px solid var(--border-main)
+                    background: var(--bg-main)
+                    color: var(--text-main)
                     display: flex
                     align-items: center
                     justify-content: center
                     cursor: pointer
                     position: relative
-                    box-shadow: 0 2px 8px rgba(17,24,39,0.04)
-                    transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease
+                    transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, color 0.12s ease
 
                     svg
                         font-size: 1rem
@@ -175,19 +168,17 @@
                         border: 0
 
                     &.active
-                        border-color: rgba(52,152,219,0.18)
-                        color: #2b6cb0
-                        box-shadow: 0 4px 12px rgba(52,152,219,0.06)
-                        background: #eef6ff
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
+                        background: var(--bg-secondary)
 
                     &:hover
                         transform: translateY(-1px) scale(1.03)
-                        border-color: rgba(52,152,219,0.12)
-                        color: #2b6cb0
-                        box-shadow: 0 4px 12px rgba(52,152,219,0.06)
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
 
                     &:focus-visible
-                        outline: 2px solid rgba(52,152,219,0.12)
+                        outline: 2px solid var(--accent-color)
                         outline-offset: 2px
 
         &:hover .widget-controls,
@@ -202,98 +193,5 @@
             position: relative
             transform-origin: center
 
-// HUD Mode Styling for Widgets (muted)
-.Dashboard.hud-mode .Widgets
-    .container .Slot > *
-        position: relative
-        background: #ffffff
-        border: 1px solid #e6eaf0
-        border-radius: 4px
-        padding: 1.25rem
-        box-shadow: 0 6px 18px rgba(17,24,39,0.06)
-        transition: all 0.18s ease
-        overflow: visible
-        opacity: 1
-        transform: none
-
-        &::before,
-        &::after
-            display: none
-
-        &:hover
-            border-color: rgba(52,152,219,0.08)
-            box-shadow: 0 10px 28px rgba(17,24,39,0.08)
-            transform: translateY(-4px)
-
-    .container .Slot > * .Widget
-        position: relative
-
-        &::before,
-        &::after
-            display: none
-
-    .drag-selected
-        outline: 2px solid rgba(52,152,219,0.18)
-        background: rgba(238,246,255,0.6)
-        box-shadow: 0 6px 20px rgba(52,152,219,0.06)
-
-// Dark mode plane-style variants for widget controls and popovers
-.dark .Widgets
-    .Widget
-        .widget-controls
-            background: #1a1a1a
-            border: 1px solid #444
-            color: #ffffff
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5)
-
-        .widget-control-popover
-            background: #1a1a1a
-            border: 1px solid #444
-            color: #ffffff
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5)
-
-            .popover-header
-                color: #ffffff
-
-                .popover-value-button
-                    background: transparent
-                    border: 1px solid rgba(255,255,255,0.04)
-                    color: #ffffff
-
-                .popover-value-input
-                    background: #2d2d2d
-                    border: 1px solid #444
-                    color: #ffffff
-
-// Widget Animations
-@keyframes widget-materialize
-    0%
-        opacity: 0
-        transform: scale(0.3) translateY(20px)
-        filter: brightness(3) blur(10px)
-    30%
-        opacity: 0.5
-        transform: scale(1.1) translateY(-5px)
-        filter: brightness(2) blur(5px)
-    60%
-        opacity: 0.9
-        transform: scale(0.95) translateY(2px)
-        filter: brightness(1.5) blur(2px)
-    100%
-        opacity: 1
-        transform: scale(1) translateY(0)
-        filter: brightness(1) blur(0)
-
-@keyframes shimmer
-    0%
-        transform: translateX(-100%) translateY(-100%) rotate(30deg)
-    100%
-        transform: translateX(100%) translateY(100%) rotate(30deg)
-
-@keyframes widget-popover-fade
-    from
-        opacity: 0
-        transform: translateY(-6px)
-    to
-        opacity: 1
-        transform: translateY(0)
+body.no-highlight .Widgets
+    user-select: none

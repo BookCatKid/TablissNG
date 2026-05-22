@@ -1,80 +1,55 @@
-@use "sass:color"
-
-// Dark mode variables
-$dark-bg: #1a1a1a
-$dark-input-bg: #2d2d2d
-$dark-border: #444
-$dark-text: #ffffff
-$dark-secondary-text: #dddddd
-
-// Scrollbar colors
-$scrollbar-track-light: #F2F2F2
-$scrollbar-thumb-light: #BDBDBD
-$scrollbar-thumb-hover-light: #6E6E6E
-$scrollbar-track-dark: #2d2d2d
-$scrollbar-thumb-dark: #444444
-$scrollbar-thumb-hover-dark: #555555
-
-::-webkit-scrollbar
-    width: 10px
-
-::-webkit-scrollbar-track
-    background: $scrollbar-track-light
-    .dark &
-        background: $scrollbar-track-dark
-
-::-webkit-scrollbar-thumb
-    background: $scrollbar-thumb-light
-    border-radius: 5px
-
-    .dark &
-        background: $scrollbar-thumb-dark
-
-::-webkit-scrollbar-thumb:hover
-    background: $scrollbar-thumb-hover-light
-
-    .dark &
-        background: $scrollbar-thumb-hover-dark
-
-::-webkit-resizer
-
-    .dark &
-        background-color: $dark-border
-
-*
-    scrollbar-width: thin
-    scrollbar-color: $scrollbar-thumb-light $scrollbar-track-light
-
-    .dark &
-        scrollbar-color: $scrollbar-thumb-dark $scrollbar-track-dark
-
 .Settings
-    z-index: 2000
-    
-    .react-dropdown-select
-        .dark &
-            border-color: $dark-border !important
-            .react-dropdown-select-dropdown
-                background: $dark-input-bg
-                border: none !important
-            .react-dropdown-select-item, .react-dropdown-select-item-selected
-                border: none !important
-
     h1
         margin: 2rem 0
         svg
-            fill: #3498db
+            fill: var(--accent-color)
             width: 100%
 
-    h2, h3, h4
-        color: #212121
+    h1, h2, h3, h4, h5
+        color: var(--text-heading)
+
+    h2
+        &.no-margin
+            margin: 0
 
     h2, h3
         margin-bottom: 0
 
+    p
+        &.large
+            font-size: 1.25em
+
+    .u-grid-2col
+        align-items: center
+        display: grid
+        grid-gap: 0 0.5rem
+        grid-template-columns: 1fr 1fr
+        width: 100%
+
+    .u-grid-2col-wide
+        align-items: center
+        display: grid
+        grid-gap: 0 0.5rem
+        grid-template-columns: 1fr 2fr
+        width: 100%
+        margin: 0
+
+    .u-grid-2col-icon-position
+        align-items: center
+        display: grid
+        grid-gap: 0 0.5rem
+        grid-template-columns: 1.33fr 1fr
+        width: 100%
+        margin: 1rem auto
+
+    .u-grid-3x2-compact
+        display: grid
+        grid-template-columns: repeat(3, 35px)
+        grid-template-rows: repeat(2, 35px)
+
     .plane
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.25)
-        background-color: white
+        box-shadow: 0 0.5rem 1rem var(--shadow-main)
+        background-color: var(--bg-main)
         max-width: 100%
         height: 100%
         overflow-y: auto
@@ -84,40 +59,18 @@ $scrollbar-thumb-hover-dark: #555555
         transition: transform 0.15s ease-out
         z-index: 2001
 
-        // Add dark mode styles for plane
-        .dark &
-            background-color: $dark-bg
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5)
-
-        // HUD mode styling
-        .hud-mode &
-            background: linear-gradient(135deg, rgba(0, 20, 40, 0.95) 0%, rgba(0, 30, 50, 0.98) 100%)
-            border: 1px solid rgba(0, 255, 245, 0.5)
-            box-shadow: 0 0 30px rgba(0, 255, 245, 0.4), inset 0 0 20px rgba(0, 255, 245, 0.1)
-            backdrop-filter: blur(15px)
-
     label
         display: block
         margin: 1rem 0
+        color: var(--text-main)
 
         &:last-child
             margin-bottom: 0
 
-        // Add dark mode styles for labels
-        .dark &
-            color: $dark-secondary-text
-
-        .hud-mode &
-            color: rgba(0, 255, 245, 0.9)
-            text-shadow: 0 0 5px rgba(0, 255, 245, 0.3)
-
     label + .info
         font-size: 0.9em
         margin-top: -0.75rem
-
-        // Add dark mode styles for info text
-        .dark &
-            color: $dark-secondary-text
+        color: var(--text-secondary)
 
     input[type=email],
     input[type=file],
@@ -129,7 +82,7 @@ $scrollbar-thumb-hover-dark: #555555
     input[type=url],
     textarea,
     select
-        border: 1px solid #bdc3c7
+        border: 1px solid var(--border-main)
         border-radius: 0.2em
         color: inherit
         display: block
@@ -137,167 +90,56 @@ $scrollbar-thumb-hover-dark: #555555
         padding: 0.5em
         width: 100%
         overflow: hidden
+        background-color: var(--bg-input)
 
-        // Add dark mode styles for inputs
-        .dark &
-            background-color: $dark-input-bg
-            border-color: $dark-border
-            color: $dark-text
-
-            &:focus
-                border-color: #3498db
-                outline: none
-
-        // HUD mode styling
-        .hud-mode &
-            background: rgba(0, 40, 60, 0.6)
-            border: 1px solid rgba(0, 255, 245, 0.4)
-            color: #00fff5
-            box-shadow: inset 0 0 10px rgba(0, 255, 245, 0.1)
-
-            &:focus
-                border-color: #00fff5
-                outline: none
-                box-shadow: 0 0 10px rgba(0, 255, 245, 0.5), inset 0 0 15px rgba(0, 255, 245, 0.2)
-
-            &::placeholder
-                color: rgba(0, 255, 245, 0.5)
+        &:focus
+            border-color: var(--accent-color)
+            outline: none
 
         &.primary
-            background-color: #ecf0f1
-            border: 0.25em solid #ecf0f1
-
-            // Add dark mode styles for primary inputs
-            .dark &
-                background-color: $dark-input-bg
-                border: 0.25em solid #2d2d2d
-
-    h2, h3, h4
-        .dark &
-            color: $dark-text
-
-        .hud-mode &
-            color: #00fff5
-            text-shadow: 0 0 10px rgba(0, 255, 245, 0.6)
+            background-color: var(--bg-secondary)
+            border: 0.25em solid var(--bg-secondary)
 
     input[type=radio],
     input[type=checkbox]
         margin-right: 0.5rem
-
-        .dark &
-            accent-color: #3498db
+        accent-color: var(--accent-color)
 
     input[type=color]
         display: block
-        border: 1px solid #bdc3c7
-
-        .dark &
-            background-color: #313738
-            border: 1px solid #2b2d2f
+        border: 1px solid var(--border-main)
+        background-color: var(--bg-input)
 
     input[type=file]::file-selector-button
-        background-color: #d6d8d9
+        background-color: var(--bg-button)
         border: none
         border-radius: 0.2em
         padding: 0.45em 1em
         transition: background-color 0.25s ease-out
         cursor: pointer
         margin-right: 0.5em
+        color: var(--text-main)
 
         &:hover
-            background-color: #bdc3c7
-
-        .dark &
-            background-color: color.adjust($dark-input-bg, $lightness: 15%)
-            color: $dark-text
-
-            &:hover
-                background-color: color.adjust($dark-input-bg, $lightness: 25%)
-
-    .button
-        border: 0
-        border-radius: 2em
-        color: white
-        cursor: pointer
-        display: inline-block
-        padding: 0.5em 1em
-        text-decoration: none
-        transition: background 0.25s ease-out
-        text-align: center
-        font-weight: 500
-
-        &:disabled
-            background-color: #bdc3c7
-            cursor: default
-
-            .dark &
-                background-color: $dark-border
-
-        &--primary
-            background-color: #3498db
-            &:hover
-                background: color.adjust(#3498db, $lightness: -10%)
-            &:active
-                background: color.adjust(#3498db, $lightness: -20%)
-
-            .hud-mode &
-                background: linear-gradient(135deg, rgba(0, 180, 200, 0.8), rgba(0, 140, 180, 0.9))
-                border: 1px solid rgba(0, 255, 245, 0.6)
-                box-shadow: 0 0 15px rgba(0, 255, 245, 0.5), inset 0 0 10px rgba(0, 255, 245, 0.2)
-                text-shadow: 0 0 5px rgba(0, 255, 245, 0.8)
-
-                &:hover
-                    background: linear-gradient(135deg, rgba(0, 200, 220, 0.9), rgba(0, 160, 200, 1))
-                    box-shadow: 0 0 20px rgba(0, 255, 245, 0.8), inset 0 0 15px rgba(0, 255, 245, 0.3)
-
-        &--secondary
-            background: color.adjust(#bdc3c7, $lightness: -20%)
-            &:hover
-                background: color.adjust(#bdc3c7, $lightness: -30%)
-            &:active
-                background: color.adjust(#bdc3c7, $lightness: -40%)
-
-            .dark &
-                background: color.adjust($dark-border, $lightness: 10%)
-                &:hover
-                    background: color.adjust($dark-border, $lightness: 20%)
-                &:active
-                    background: color.adjust($dark-border, $lightness: 30%)
+            background-color: var(--border-main)
 
     hr
-        border: 1px solid #ecf0f1
+        border: 1px solid var(--border-light)
         margin: 1rem 0
 
-        .dark &
-            border-color: $dark-border
+    .scroll-to-top
+        position: absolute
+        bottom: 0.5rem
+        width: 40px
+        height: 40px
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        z-index: 1000
 
-.button--icon
-    background-color: #ecf0f1
-    border: none
-    border-radius: 1em
-    display: inline-block
-    padding: 0.5em
-    line-height: 1
-    height: 2em
-    width: 2em
-    color: black
-    cursor: pointer
-    transition: background-color 0.25s ease-out
+        &--right
+            right: 338px
 
-    .dark &
-        background-color: $dark-input-bg
-        color: $dark-text
-
-    &:hover
-        background-color: #bdc3c7 !important
-
-        .dark &
-            background-color: color.adjust($dark-input-bg, $lightness: 10%) !important
-
-    &.button--primary
-        background-color: #3498db !important
-        color: white
-        padding: 0.5em
-
-        &:hover
-            background-color: color.adjust(#3498db, $lightness: -20%) !important
+        &--left
+            left: 338px

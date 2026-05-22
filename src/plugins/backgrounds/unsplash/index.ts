@@ -1,5 +1,7 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
+import { defaultData } from "./types";
 import Unsplash from "./Unsplash";
 import UnsplashSettings from "./UnsplashSettings";
 
@@ -23,6 +25,7 @@ const config: Config = {
   dashboardComponent: Unsplash,
   settingsComponent: UnsplashSettings,
   supportsBackdrop: true,
+  defaultData,
 };
 
 export default config;

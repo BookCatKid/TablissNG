@@ -1,9 +1,11 @@
-import React from "react";
+import "./Notes.sass";
+
+import type { FC } from "react";
 import { FormattedMessage } from "react-intl";
+
+import { Icon, IconButton } from "../../../views/shared";
 import { API } from "../../types";
 import { Data, defaultData } from "./data";
-import { Icon, IconButton } from "../../../views/shared";
-import "./Notes.sass";
 
 const alignments = [
   {
@@ -20,26 +22,32 @@ const alignments = [
   },
 ] as const;
 
-const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => {
+const NotesSettings: FC<API<Data>> = ({ data = defaultData, setData }) => {
   return (
     <div className="NotesSettings">
       <label>
         <input
           type="checkbox"
           checked={data.markdownEnabled}
-          onChange={(e) => setData({ ...data, markdownEnabled: e.target.checked })}
-        />{" "}
+          onChange={(e) =>
+            setData({ ...data, markdownEnabled: e.target.checked })
+          }
+        />
         <FormattedMessage
           id="plugins.notes.enableMarkdown"
           defaultMessage="Enable Markdown formatting"
+          description="Checkbox label to enable Markdown formatting in notes"
         />
       </label>
 
       <div>
-        <label><FormattedMessage
-          id="plugins.notes.textAlignment"
-          defaultMessage="Text Alignment"
-        /></label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.textAlignment"
+            defaultMessage="Text Alignment"
+            description="Label for the note text alignment setting"
+          />
+        </label>
         <div className="alignment">
           {alignments.map((alignment) => (
             <IconButton
@@ -54,7 +62,13 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
       </div>
 
       <div>
-        <label>Icon Alignment</label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.iconAlignment"
+            defaultMessage="Icon Alignment"
+            description="Label for the note icon alignment setting"
+          />
+        </label>
         <div className="alignment">
           {alignments.map((alignment) => (
             <IconButton
@@ -69,7 +83,13 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
       </div>
 
       <div>
-        <label>Placeholder Style</label>
+        <label>
+          <FormattedMessage
+            id="plugins.notes.placeholderStyle"
+            defaultMessage="Placeholder Style"
+            description="Label for the note placeholder style setting"
+          />
+        </label>
         <div className="alignment">
           <IconButton
             onClick={() => setData({ ...data, placeholderStyle: "icon" })}
@@ -90,12 +110,14 @@ const NotesSettings: React.FC<API<Data>> = ({ data = defaultData, setData }) => 
         <FormattedMessage
           id="plugins.notes.keybind"
           defaultMessage="Notes keybind"
-          description="Notes keybind title"
+          description="Label for setting the keyboard shortcut to open notes"
         />
         <input
           type="text"
           maxLength={1}
-          onChange={(event) => setData({ ...data, keyBind: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, keyBind: event.target.value })
+          }
           value={data.keyBind}
         />
       </label>

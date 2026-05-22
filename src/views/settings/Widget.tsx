@@ -1,14 +1,16 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import "./Widget.sass";
+
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { setWidgetDisplay } from "../../db/action";
 import { WidgetState } from "../../db/state";
 import { useToggle } from "../../hooks";
-import { getConfig } from "../../plugins";
 import { sectionMessages } from "../../locales/messages";
+import { getConfig } from "../../plugins";
 import { DownIcon, Icon, IconButton, RemoveIcon, UpIcon } from "../shared";
 import PluginContainer from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
-import "./Widget.sass";
 import WidgetDisplay from "./WidgetDisplay";
 
 // Define messages used in props/attributes
@@ -37,14 +39,8 @@ const messages = defineMessages({
     id: "settings.actions.moveUp",
     defaultMessage: "Move widget up",
     description: "Button title for moving widget up",
-  }
+  },
 });
-
-interface Config {
-  name: { id: string; defaultMessage: string };
-  description: { id: string; defaultMessage: string };
-  settingsComponent?: React.ComponentType<any>;
-}
 
 interface Props {
   plugin: WidgetState;
@@ -53,16 +49,13 @@ interface Props {
   onRemove: () => void;
 }
 
-const Widget: React.FC<Props> = ({
-  plugin,
-  onMoveDown,
-  onMoveUp,
-  onRemove,
-}) => {
+const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
   const [isOpen, toggleIsOpen] = useToggle(onRemove === undefined);
   const intl = useIntl();
 
-  const { description, name, settingsComponent } = getConfig(plugin.key);
+  const { defaultData, description, name, settingsComponent } = getConfig(
+    plugin.key,
+  );
 
   const setDisplay = setWidgetDisplay.bind(null, plugin.id);
 
@@ -78,7 +71,9 @@ const Widget: React.FC<Props> = ({
 
         <IconButton
           onClick={toggleIsOpen}
-          title={intl.formatMessage(isOpen ? messages.closeSettings : messages.editSettings)}
+          title={intl.formatMessage(
+            isOpen ? messages.closeSettings : messages.editSettings,
+          )}
         >
           <Icon name="settings" />
         </IconButton>
@@ -115,7 +110,11 @@ const Widget: React.FC<Props> = ({
         <div>
           {settingsComponent && (
             <div className="settings">
-              <PluginContainer id={plugin.id} component={settingsComponent} />
+              <PluginContainer
+                id={plugin.id}
+                component={settingsComponent}
+                defaultData={defaultData}
+              />
             </div>
           )}
 
@@ -219,7 +218,9 @@ const Widget: React.FC<Props> = ({
                   type="checkbox"
                   checked={plugin.display.fontStyle === "italic"}
                   onChange={(event) =>
-                    setDisplay({ fontStyle: event.target.checked ? "italic" : "normal" })
+                    setDisplay({
+                      fontStyle: event.target.checked ? "italic" : "normal",
+                    })
                   }
                 />{" "}
                 <FormattedMessage
@@ -234,7 +235,11 @@ const Widget: React.FC<Props> = ({
                   type="checkbox"
                   checked={plugin.display.textDecoration === "underline"}
                   onChange={(event) =>
-                    setDisplay({ textDecoration: event.target.checked ? "underline" : "none" })
+                    setDisplay({
+                      textDecoration: event.target.checked
+                        ? "underline"
+                        : "none",
+                    })
                   }
                 />{" "}
                 <FormattedMessage
@@ -245,18 +250,50 @@ const Widget: React.FC<Props> = ({
               </label>
 
               <label>
-              <FormattedMessage
-          id="colour"
-          defaultMessage="Colour"
-          description="Colour title"
-        /> <br />
-                <input
-                  type="color"
-                  value={plugin.display.colour ?? "#ffffff"}
-                  onChange={(event) =>
-                    setDisplay({ colour: event.target.value })
-                  }
-                />
+                <FormattedMessage
+                  id="colour"
+                  defaultMessage="Colour"
+                  description="Colour title"
+                />{" "}
+                <br />
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <input
+                    type="color"
+                    value={plugin.display.colour ?? "#ffffff"}
+                    onChange={(event) =>
+                      setDisplay({ colour: event.target.value })
+                    }
+                    disabled={plugin.display.useAccentColor}
+                    style={{ opacity: plugin.display.useAccentColor ? 0.5 : 1 }}
+                  />
+                  <label
+                    style={{
+                      margin: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.25rem",
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={plugin.display.useAccentColor ?? false}
+                      onChange={(event) =>
+                        setDisplay({ useAccentColor: event.target.checked })
+                      }
+                    />
+                    <FormattedMessage
+                      id="settings.useAccentColor"
+                      defaultMessage="Use Accent Color"
+                      description="Use global accent color for widget text"
+                    />
+                  </label>
+                </div>
               </label>
 
               <label>
@@ -270,6 +307,7 @@ const Widget: React.FC<Props> = ({
                 <FormattedMessage
                   id="settings.textOutline"
                   defaultMessage="Text outline"
+                  description="Checkbox label to enable a text outline around the widget"
                 />
               </label>
 
@@ -279,6 +317,7 @@ const Widget: React.FC<Props> = ({
                     <FormattedMessage
                       id="settings.outlineStyle"
                       defaultMessage="Outline Style"
+                      description="Dropdown label for the outline style"
                     />
                     <select
                       value={plugin.display.textOutlineStyle ?? "basic"}
@@ -294,12 +333,14 @@ const Widget: React.FC<Props> = ({
                         <FormattedMessage
                           id="settings.basicOutline"
                           defaultMessage="Basic (Text Shadow)"
+                          description="Dropdown option for basic text shadow outline"
                         />
                       </option>
                       <option value="advanced">
                         <FormattedMessage
                           id="settings.advancedOutline"
                           defaultMessage="Advanced (Stroke)"
+                          description="Dropdown option for advanced text stroke outline"
                         />
                       </option>
                     </select>
@@ -309,12 +350,14 @@ const Widget: React.FC<Props> = ({
                     <FormattedMessage
                       id="settings.basicModeDescription"
                       defaultMessage="Basic mode uses a text shadow that can only have one size."
+                      description="Description text explaining the basic outline mode"
                     />
                   </p>
                   <p>
                     <FormattedMessage
                       id="settings.advancedModeDescription"
                       defaultMessage="Advanced mode uses a second element with a text stroke and allows any size."
+                      description="Description text explaining the advanced outline mode"
                     />
                   </p>
 
@@ -322,6 +365,7 @@ const Widget: React.FC<Props> = ({
                     <FormattedMessage
                       id="settings.outlineColor"
                       defaultMessage="Outline Color"
+                      description="Color picker label for the outline color"
                     />
                     <input
                       type="color"
@@ -337,6 +381,7 @@ const Widget: React.FC<Props> = ({
                       <FormattedMessage
                         id="settings.outlineSize"
                         defaultMessage="Outline Size"
+                        description="Input label for the outline size"
                       />
                       <input
                         type="number"

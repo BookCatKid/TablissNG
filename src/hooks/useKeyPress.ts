@@ -11,23 +11,28 @@ function isInputEvent(event: KeyboardEvent) {
 }
 
 export function useKeyPress(
-  callback: (event: KeyboardEvent) => void,
+  callback: ((event: KeyboardEvent) => void) | null | undefined,
   detectKeys: string[],
   ignoreInputEvents = true,
 ) {
   const { hotkeysPaused } = useContext(UiContext);
-  const handler = (event: KeyboardEvent) => {
-    if (
-      detectKeys.includes(event.key) &&
-      !(ignoreInputEvents && isInputEvent(event)) &&
-      !(event.ctrlKey || event.metaKey || event.altKey) &&
-      !hotkeysPaused
-    ) {
-      callback(event);
-    }
-  };
 
   useEffect(() => {
+    if (!callback) return;
+
+    const activeCallback = callback;
+
+    const handler = (event: KeyboardEvent) => {
+      if (
+        detectKeys.includes(event.key) &&
+        !(ignoreInputEvents && isInputEvent(event)) &&
+        !(event.ctrlKey || event.metaKey || event.altKey) &&
+        !hotkeysPaused
+      ) {
+        activeCallback(event);
+      }
+    };
+
     window.addEventListener("keydown", handler);
 
     return () => {

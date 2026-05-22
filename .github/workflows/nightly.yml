@@ -1,0 +1,111 @@
+name: Nightly Build
+
+on:
+  schedule:
+    # Run every day at 2:00 AM UTC
+    - cron: "0 2 * * *"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+    with:
+      artifact_suffix: "-nightly"
+    secrets: inherit
+
+  release:
+    name: Create Nightly Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v7
+        with:
+          path: artifacts
+
+      - name: Create ZIP files for release
+        run: |
+          mkdir -p nightly-zips
+          count=0
+          for dir in artifacts/tabliss-*-nightly; do
+            if [ -d "$dir" ]; then
+              target=$(basename "$dir")
+              echo "Zipping $target..."
+              (cd "$dir" && zip -r "../../nightly-zips/$target.zip" .)
+              count=$((count + 1))
+            fi
+          done
+
+          if [ $count -eq 0 ]; then
+            echo "Error: No nightly artifact directories found in artifacts/ matching 'tabliss-*-nightly'"
+            ls -R artifacts/
+            exit 1
+          fi
+
+          echo "Successfully created $count ZIP files in nightly-zips/."
+
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_OUTPUT
+
+      - name: Delete old artifacts from nightly release
+        run: |
+          # Get the release ID for nightly-auto
+          RELEASE_ID=$(gh release view nightly-auto --json id -q .id 2>/dev/null || echo "")
+
+          if [ -n "$RELEASE_ID" ]; then
+            # Delete all existing artifacts from the release
+            gh release delete-asset nightly-auto tabliss-chromium-nightly.zip || true
+            gh release delete-asset nightly-auto tabliss-firefox-nightly.zip || true
+            gh release delete-asset nightly-auto tabliss-safari-nightly.zip || true
+            gh release delete-asset nightly-auto tabliss-web-nightly.zip || true
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update or create nightly release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: nightly-auto
+          name: "TablissNG Nightly Build"
+          body: |
+            # Welcome to TablissNG Nightly Builds!
+
+            **Build Date:** ${{ steps.date.outputs.date }}
+            **Latest Commit:** ${{ github.sha }}
+
+            ### What is a Nightly Build?
+
+            Nightly builds are the latest versions of TablissNG, automatically compiled every night at 2:00 AM UTC. This means they contain the most recent changes and improvements from the main branch. While these builds offer a glimpse into the ongoing development of TablissNG, keep in mind that they are still works in progress and may contain bugs or unstable features.
+
+            ### Download Instructions:
+
+            1. Download the version that corresponds to your browser
+            2. Follow the installation instructions (while skipping download steps) in our [Documentation](https://tablissng.smrff.dev/category/installation/)
+            3. Dive into the newest features and improvements!
+
+            ### Please Note:
+
+            - Nightly builds are developmental and may contain bugs
+            - Your feedback is valuable! Please report any issues or suggestions on our GitHub page
+
+            ### Available Builds:
+
+            - **Chromium** - For Chrome, Edge, Brave, Opera, and other Chromium-based browsers
+            - **Firefox** - For Firefox browser
+            - **Safari** - For Safari browser
+            - **Web** - Progressive Web App version
+
+            ---
+
+            **Thank you for supporting TablissNG!**
+
+            Your active participation and feedback are key to continuous improvement. Enjoy exploring the latest features!
+          files: nightly-zips/tabliss-*-nightly.zip
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

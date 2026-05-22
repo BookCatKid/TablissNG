@@ -8,6 +8,264 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+### Translations
+
+- Added toki pona translation.
+
+## [1.6.6] - 4/4/2026 | LeetCode widget, APOD improvements, and important bugfixes
+
+Adds a new LeetCode calendar widget, APOD video support and cache improvements, a backgrounds controls visibility toggle, configurable quote refresh timeout, and a critical quick link upload bugfix. Also includes translation updates and A LOT OF INTERNAL REFACTORS.
+
+### Added
+
+- feat(leetcode): add Leetcode calendar widget (#121). [a9e6eed3](https://github.com/BookCatKid/TablissNG/commit/a9e6eed3)
+
+- feat(apod): add video support and background handling. [62d202f5](https://github.com/BookCatKid/TablissNG/commit/62d202f5)
+
+- feat(apod): add cache freshness check for data retrieval. [dbf0f0ef](https://github.com/BookCatKid/TablissNG/commit/dbf0f0ef)
+
+- feat(backgrounds): add controls visibility toggle setting. [1d00b432](https://github.com/BookCatKid/TablissNG/commit/1d00b432)
+
+- feat(quote): add configurable timeout for quote refresh. [cfebaf2e](https://github.com/BookCatKid/TablissNG/commit/cfebaf2e)
+
+### Changed
+
+- feat(cache): change image caching strategy to NetworkFirst. [cfacda40](https://github.com/BookCatKid/TablissNG/commit/cfacda40)
+
+- style: add inline-flex display to summary and link elements to correctly center them vertically. [21fcf026](https://github.com/BookCatKid/TablissNG/commit/21fcf026)
+
+### Fixed
+
+- fix: critical issue with quick link upload bug. [fdefc435](https://github.com/BookCatKid/TablissNG/commit/fdefc435)
+
+### Translations
+
+- Update Spanish and Catalan translations (#120). [ce357784](https://github.com/BookCatKid/TablissNG/commit/ce357784)
+
+- Update fr.json (#131). [9ec671e1](https://github.com/BookCatKid/TablissNG/commit/9ec671e1)
+
+### Internal
+
+- refactor(tsconfig): modernization updates and cool stuff. [f5a7e3f2](https://github.com/BookCatKid/TablissNG/commit/f5a7e3f2)
+
+- refactor(plugins): consolidate unknown widget configuration and remove unused exports. [62cf0a07](https://github.com/BookCatKid/TablissNG/commit/62cf0a07)
+
+- chore: react-codemod auto fix react imports. [cf362ef2](https://github.com/BookCatKid/TablissNG/commit/cf362ef2)
+
+- fix(hooks): fix lint by handling nullish callback in useKeyPress hook. [d26742f3](https://github.com/BookCatKid/TablissNG/commit/d26742f3)
+
+- fix(ts): clean up unused variables and improve checkbox handlers. [fb776682](https://github.com/BookCatKid/TablissNG/commit/fb776682)
+
+- fix: eslint trello auth lint error. [56150650](https://github.com/BookCatKid/TablissNG/commit/56150650)
+
+- deps go brrrrrrrr. [ef9824aa](https://github.com/BookCatKid/TablissNG/commit/ef9824aa)
+
+- chore(deps): yay more dep updates. [638fb288](https://github.com/BookCatKid/TablissNG/commit/638fb288)
+
+- chore: pin serialize-javascript to ^7.0.4. [175a5fcc](https://github.com/BookCatKid/TablissNG/commit/175a5fcc)
+
+- feat(docs): add google site verification metadata. [57cf7578](https://github.com/BookCatKid/TablissNG/commit/57cf7578)
+
+- refactor: convert React namespace imports to named imports across codebase. [a9921099](https://github.com/BookCatKid/TablissNG/commit/a9921099)
+
+- style: sort imports across codebase. [4835fd8b](https://github.com/BookCatKid/TablissNG/commit/4835fd8b)
+
+- chore: docs deps override again. [e0a1162d](https://github.com/BookCatKid/TablissNG/commit/e0a1162d)
+
+## [1.6.5] - 2/20/2026 | Error logging, new widgets, and quality-of-life improvements
+
+A solid release featuring a comprehensive error logging system, a new random color palette widget, drag-and-drop todo reordering, weather auto-update, and several UI improvements and fixes.
+
+### Added
+
+- feat: improve error logging and user feedback with comprehensive error log management, global error capture, and sharing functionality. [41d25f9a](https://github.com/BookCatKid/TablissNG/commit/41d25f9a)
+
+- feat(palette): add random color palette widget. [82fb9df6](https://github.com/BookCatKid/TablissNG/commit/82fb9df6)
+
+- feat(todo): add drag-and-drop reordering for todo items. [f19e15e1](https://github.com/BookCatKid/TablissNG/commit/f19e15e1)
+
+- feat(weather): add auto-update location feature. [52476cfa](https://github.com/BookCatKid/TablissNG/commit/52476cfa)
+
+- feat(search): add special URL handling. [5e14bcda](https://github.com/BookCatKid/TablissNG/commit/5e14bcda)
+
+- feat: add scroll-to-top button in Settings panel. [3fd010e3](https://github.com/BookCatKid/TablissNG/commit/3fd010e3)
+
+- feat(github): add tooltips to calendar widget. [f70eeb1b](https://github.com/BookCatKid/TablissNG/commit/f70eeb1b)
+
+### Changed
+
+- feat(ip-info): more robust fallbacking and parsing. [70d071da](https://github.com/BookCatKid/TablissNG/commit/70d071da)
+
+- Updated ES & IT files (#114). [762e4f48](https://github.com/BookCatKid/TablissNG/commit/762e4f48)
+
+- Update Vietnamese (vi) translation (#110). [9d6cb68e](https://github.com/BookCatKid/TablissNG/commit/9d6cb68e)
+
+### Fixed
+
+- fix: less gimmicky scroll to top button. [decec927](https://github.com/BookCatKid/TablissNG/commit/decec927)
+
+- fix(search): missing/broken translation. [f54a423a](https://github.com/BookCatKid/TablissNG/commit/f54a423a)
+
+- fix: remove whole background on chromium dev. [fb9dbb52](https://github.com/BookCatKid/TablissNG/commit/fb9dbb52)
+
+### Chore / Cleanup
+
+- chore: run translations. [bed18d2e](https://github.com/BookCatKid/TablissNG/commit/bed18d2e)
+
+- ci: update actions to latest versions in workflows. [3add9da4](https://github.com/BookCatKid/TablissNG/commit/3add9da4)
+
+## [1.6.4] - 2/13/2026 | Theming, search customization, tally counter, and online documentation
+
+A feature-packed release with centralized theming via CSS variables, search widget customization, a new tally counter widget, and full online documentation! Additionally, the since and countdown widgets are now deprecated in favor of TimeTracker, and a lot of development work has been done under the hood to prepare for future updates and make contributions easier.
+
+### Added
+
+- feat(ui): add customizable global accent color. [b8ffd6fb](https://github.com/BookCatKid/TablissNG/commit/b8ffd6fb)
+
+- feat(time): indent settings and add showHours. [e08dcb35](https://github.com/BookCatKid/TablissNG/commit/e08dcb35)
+
+- feat: add tally counter widget. [5a79bf13](https://github.com/BookCatKid/TablissNG/commit/5a79bf13)
+
+- feat(search): add custom width settings. [cb8aa009](https://github.com/BookCatKid/TablissNG/commit/cb8aa009)
+
+- feat(search): add style customization to search widget. [48b0706e](https://github.com/BookCatKid/TablissNG/commit/48b0706e)
+
+- feat(docs): add full online documentation! (#98). [b4570ef7](https://github.com/BookCatKid/TablissNG/commit/b4570ef7)
+
+### Changed
+
+- refactor: implement centralized CSS variables for theming (#109). [d170e10f](https://github.com/BookCatKid/TablissNG/commit/d170e10f)
+
+- change: expand the default rows for custom css/js/html widgets. [e289d4ea](https://github.com/BookCatKid/TablissNG/commit/e289d4ea)
+
+- feat: add deprecation warning to since and countdown widgets. [a52d6e65](https://github.com/BookCatKid/TablissNG/commit/a52d6e65)
+
+- Updated ES & IT files (#108). [c2c80b6b](https://github.com/BookCatKid/TablissNG/commit/c2c80b6b)
+
+### Fixed
+
+- fix: visible instead of auto (oops...). [62e87b4d](https://github.com/BookCatKid/TablissNG/commit/62e87b4d)
+
+### Chore / Cleanup
+
+- chore: improve lint-staged configuration. [1743f601](https://github.com/BookCatKid/TablissNG/commit/1743f601)
+
+- ci: refactor workflows to use reusable templates. [8f81b721](https://github.com/BookCatKid/TablissNG/commit/8f81b721)
+
+- build: remove service worker from manifest in dev. [41e6e6e2](https://github.com/BookCatKid/TablissNG/commit/41e6e6e2)
+
+- chore: migrate some project styles from CSS to SASS. [4fa02de2](https://github.com/BookCatKid/TablissNG/commit/4fa02de2)
+
+- chore: deps. [e3269c8f](https://github.com/BookCatKid/TablissNG/commit/e3269c8f)
+
+## [1.6.3] - 2/5/2026 | Bugfixes and minor improvements
+
+Very small release with a few fixes and minor improvements.
+
+### Added
+
+- feat(release): add closed issues summary to release body. [d9c56024](https://github.com/BookCatKid/TablissNG/commit/d9c56024)
+
+- feat(links): add URL normalization and extension tab option. [bd53b7ab](https://github.com/BookCatKid/TablissNG/commit/bd53b7ab)
+
+- feat(media): hide controls with 1 or less images. [8d92f1aa](https://github.com/BookCatKid/TablissNG/commit/8d92f1aa)
+
+### Fixed
+
+- fix: translations. [3434f6c0](https://github.com/BookCatKid/TablissNG/commit/3434f6c0)
+
+- fix(dates): date parsing causing incorrect days. [40d6c942](https://github.com/BookCatKid/TablissNG/commit/40d6c942)
+
+- fix(bookmarks): properly set iconSize to 24 by default. [378fdc72](https://github.com/BookCatKid/TablissNG/commit/378fdc72)
+
+- fix: don't include unused service-worker on firefox. [505525ac](https://github.com/BookCatKid/TablissNG/commit/505525ac)
+
+- fix(trello): minor fixes (#97). [4ccd112d](https://github.com/BookCatKid/TablissNG/commit/4ccd112d)
+
+## [1.6.2] - 1/28/2026 | Better positioning, unified (and improved) backgrounds, Giphy modernization, and signed firefox nightly builds
+
+A major update to the positioning system and internal background structure, along with modernization of the Giphy plugin, signed Firefox nightly/beta builds, and several important bug fixes.
+
+### Added
+
+- feat(positioning): switch to react-movable and enhance moveable system (#93). [b30a753f](https://github.com/BookCatKid/TablissNG/commit/b30a753f)
+
+- feat: show widget config in unknown widget. [53706bd1](https://github.com/BookCatKid/TablissNG/commit/53706bd1)
+
+- feat(giphy): modernize giphy background plugin. [3de6e521](https://github.com/BookCatKid/TablissNG/commit/3de6e521)
+
+- feat(Backgrounds): unify backgrounds to BaseBackgrounds (#91). [ee152a45](https://github.com/BookCatKid/TablissNG/commit/ee152a45)
+
+- ci: signed firefox nightly/beta builds. [0b1d6ec64](https://github.com/BookCatKid/TablissNG/commit/0b1d6ec64)
+
+### Fixed
+
+- fix: handle empty URL string in unsplash buildLink function. [516dabb7](https://github.com/BookCatKid/TablissNG/commit/516dabb7)
+
+- fix(translations): incorrect parameter for shortcut key. [329ac9f3](https://github.com/BookCatKid/TablissNG/commit/329ac9f3)
+
+- fix(useCache): URGENT fix cache refetching infinitely. [b1d2cae8](https://github.com/BookCatKid/TablissNG/commit/b1d2cae8)
+
+### Changed
+
+- Update Spanish translation (#95). [807770b4](https://github.com/BookCatKid/TablissNG/commit/807770b4)
+
+### Chore / Cleanup
+
+- chore: run prettier and cleanup. [0f691c0c](https://github.com/BookCatKid/TablissNG/commit/0f691c0c), [f1169338](https://github.com/BookCatKid/TablissNG/commit/f1169338), [ac73f35a](https://github.com/BookCatKid/TablissNG/commit/ac73f35a)
+
+- chore: run translations. [60327620](https://github.com/BookCatKid/TablissNG/commit/60327620)
+
+- chore: fix node definitions and eslint. [19a195f2](https://github.com/BookCatKid/TablissNG/commit/19a195f2)
+
+## [1.6.1] - 1/15/2026 | New logos, better caching, a Trello widget, Bing wallpapers and more!
+
+Finally changed the logo to something different from Tabliss's logo! This release includes a lot of community contributions, so thanks a ton to everyone who helped out!
+
+### Added
+
+- feat: implement favicon changing (#85). [44bc62ce](https://github.com/BookCatKid/TablissNG/commit/44bc62ce)
+
+- feat: add bing daily wallpaper. [ce9dadb4](https://github.com/BookCatKid/TablissNG/commit/ce9dadb4)
+
+- feat: add opentype font features parsing support. [2f34128d](https://github.com/BookCatKid/TablissNG/commit/2f34128d)
+
+- Enable better offline support with workbox (#66). [b4c5f165](https://github.com/BookCatKid/TablissNG/commit/b4c5f165)
+
+- feat(trello): added Trello integration (#73). [7e3c9b9](https://github.com/John-Ling/TablissNG/commit/7e3c9b9968dd6639a3f985e73f1d236b30c39916), [62e8b5f5](https://github.com/BookCatKid/TablissNG/commit/62e8b5f5)
+
+### Fixed
+
+- fix(Search): use correct search engine even on default. [a059570f](https://github.com/BookCatKid/TablissNG/commit/a059570f)
+
+- fix: maybe fix extension dev builds on non-web. [d4589fef](https://github.com/BookCatKid/TablissNG/commit/d4589fef)
+
+### Changed
+
+- feat: small improvements to custom settings icons position. [57316369](https://github.com/BookCatKid/TablissNG/commit/57316369)
+
+- feat: fix workbox on chrome (and safari). [49cfd0ec](https://github.com/BookCatKid/TablissNG/commit/49cfd0ec)
+
+- feat(Prettier): fix glob pattern (#84). [2e809d72](https://github.com/BookCatKid/TablissNG/commit/2e809d72)
+
+- feat: new logos!. [12bee649](https://github.com/BookCatKid/TablissNG/commit/12bee649), [0506376d](https://github.com/BookCatKid/TablissNG/commit/0506376d), [44432f2f](https://github.com/BookCatKid/TablissNG/commit/44432f2f)
+
+- feat(Chromium): include key to preserve extension id on dev. [e2a19a81](https://github.com/BookCatKid/TablissNG/commit/e2a19a81)
+
+### Chore / Cleanup
+
+- Fix ESLint errors (#83). [92921bfc](https://github.com/BookCatKid/TablissNG/commit/92921bfc)
+
+- chore: run prettier to fix tests. [ca41f40e](https://github.com/BookCatKid/TablissNG/commit/ca41f40e)
+
+- Add Husky hooks (#68). [4c12b606](https://github.com/BookCatKid/TablissNG/commit/4c12b606)
+
+- ci: add safari to releases. [e141c006](https://github.com/BookCatKid/TablissNG/commit/e141c006)
+
+- ci: auto nightly releases. [35d782ba](https://github.com/BookCatKid/TablissNG/commit/35d782ba), [25f30991](https://github.com/BookCatKid/TablissNG/commit/25f30991)
+
+## [1.6.0] - 1/1/2026 | Large Feature and Bugfix Update (FINALLY)
+
 ### Added
 
 - feat(widgets): introduce the Text Widget Editor overlay with a rich text toolbar, sanitization, and snippet management for Notes, Message, and Custom Text widgets. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
@@ -28,6 +286,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - feat: beta safari support (simple). [b0d63a8](https://github.com/BookCatKid/TablissNG/commit/b0d63a8)
 
+- feat(links): add keyboard shortcut input. [8a936582](https://github.com/BookCatKid/TablissNG/commit/8a936582d96df2945f0419393fb147b3010c579a)
+
+- feat: state persistence when switching backgrounds. [840ad259](https://github.com/BookCatKid/TablissNG/commit/840ad259b732ff0566c4b0b05ff5e9e1a2ca8eca)
+
 ### Changed
 
 - feat(WidgetSettings): restyle widget settings/font settings windows, streamline plugin-specific content, and auto-clamp the flyout within the viewport. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
@@ -46,6 +308,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - feat: clean up settings, remove ads. [7201357](https://github.com/BookCatKid/TablissNG/commit/7201357)
 
+- feat: use browser default sans-serif font. [a331ad0](https://github.com/BookCatKid/TablissNG/commit/a331ad036ec0ad8cb27dc80f6e0f11c6b2771632)
+
+- fix(Jokes): retry API call for long jokes. [8ff8a93](https://github.com/BookCatKid/TablissNG/commit/8ff8a933822b5f715785762eb2390f60a6a34e7f)
+
 ### Fixed
 
 - fix(WidgetSettings): prevent the settings flyout from rendering partially off-screen when a widget is near the viewport edge. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
@@ -56,11 +322,13 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - fix(QuickLinks): text underline not appearing. [b2f8883](https://github.com/BookCatKid/TablissNG/commit/b2f8883)
 
-- fix: replace {{}} with [] for github-calendar translations. [0bf9d9e](https://github.com/BookCatKid/TablissNG/commit/0bf9d9e)
+- fix: replace `{{}}` with `[]` for github-calendar translations. [0bf9d9e](https://github.com/BookCatKid/TablissNG/commit/0bf9d9e)
 
 - fix: remove drop-shadow from github-calendar. [aa6fd7e](https://github.com/BookCatKid/TablissNG/commit/aa6fd7e)
 
 - fix: unloaded github calendar now has correct colors dependent on theme. [04abb8a](https://github.com/BookCatKid/TablissNG/commit/04abb8a)
+
+- fix(baseBackground): some translation stuff. [611a9156](https://github.com/BookCatKid/TablissNG/commit/611a915634de90c3756b8c723b9f6343ffb7fe40)
 
 ### Translations
 
@@ -69,6 +337,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 - add: Albanian translation. [98084fb](https://github.com/BookCatKid/TablissNG/commit/98084fb)
 
 - feat: clean up a few translations. [6198093](https://github.com/BookCatKid/TablissNG/commit/6198093)
+
+- i18n: Update German translations (#80). [5413ce65](https://github.com/BookCatKid/TablissNG/commit/5413ce655d83d9b28423a9e0b8168dcdab186859)
+
+- i18n: Updated Spanish translation (#76). [d143156c](https://github.com/BookCatKid/TablissNG/commit/d143156cf7a428b425d380fffdda75c69b897675)
 
 ### Chore / Cleanup
 
@@ -80,6 +352,11 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - Add .gitattributes and workspace settings: normalize EOL to LF. [119945b](https://github.com/BookCatKid/TablissNG/commit/119945b)
 
+- chore: update deps. [8a7fc7fd](https://github.com/BookCatKid/TablissNG/commit/8a7fc7fd3f9bcbf63ce3a40d422a97cea55b036b)
+
+- ci: add build to pr ci. [96fb4c4f](https://github.com/BookCatKid/TablissNG/commit/96fb4c4f408e8cbf8a1189accf4dcee26ece12aa)
+
+- ci: add pr tests. [7e0a3025](https://github.com/BookCatKid/TablissNG/commit/7e0a3025d68dc38f68ab2b992289c56f9d9158a8)
 
 ## [1.5.1] - 8/4/2025 | Minor Feature and Bugfix Update
 

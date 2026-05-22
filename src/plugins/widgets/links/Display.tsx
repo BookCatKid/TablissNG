@@ -1,16 +1,9 @@
-import React, { FC, useMemo } from "react";
-import { defineMessages, useIntl } from "react-intl";
 import { Icon } from "@iconify/react";
-import { Link, Cache } from "./types";
+import { type FC, type MouseEvent, useMemo } from "react";
+import { defineMessages, useIntl } from "react-intl";
 
-const displayUrl = (url: string): string => {
-  try {
-    const parsed = new URL(url);
-    return parsed.hostname + (parsed.pathname !== "/" ? parsed.pathname : "");
-  } catch (e) {
-    return url;
-  }
-};
+import { isSpecialUrl, normalizeUrl } from "../../../utils";
+import { Cache, Link } from "./types";
 
 const getDomain = (url: string): string | null => {
   try {
@@ -39,7 +32,7 @@ const messages = defineMessages({
   shortcutHint: {
     id: "plugins.links.shortcutHint",
     description: "Hover hint text for links with a keyboard shortcut",
-    defaultMessage: "Press {number} or click to visit",
+    defaultMessage: "Press {key} or click to visit",
   },
   standardHint: {
     id: "plugins.links.standardHint",
@@ -56,7 +49,7 @@ type Props = Link & {
   onLinkClick?: () => void;
 };
 
-const Display: FC<Props> = ({
+export const Display: FC<Props> = ({
   icon,
   iconSize,
   IconString,
@@ -74,45 +67,56 @@ const Display: FC<Props> = ({
   customWidth,
   customHeight,
   conserveAspectRatio,
+  keyboardShortcut,
+  useExtensionTabs,
   onLinkClick,
 }) => {
   const intl = useIntl();
-  const title = useMemo(
-    () =>
-      number < 10
-        ? intl.formatMessage(messages.shortcutHint, { number })
-        : intl.formatMessage(messages.standardHint),
-    [intl, number],
+  const normalizedUrl = useMemo(() => normalizeUrl(url), [url]);
+  const title = useMemo(() => {
+    const fallback =
+      typeof number !== "undefined" && number < 10 ? String(number) : undefined;
+    const label =
+      keyboardShortcut && keyboardShortcut.length > 0
+        ? keyboardShortcut
+        : fallback;
+    if (label && label.length > 0)
+      return intl.formatMessage(messages.shortcutHint, { key: label });
+    return intl.formatMessage(messages.standardHint);
+  }, [intl, number, keyboardShortcut]);
+  const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
+  const parsedSvg = useMemo(
+    () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
+    [SvgString, customWidth, customHeight],
   );
-  const domain = useMemo(() => getDomain(url), [url]);
-  const parsedSvg = useMemo(() => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null), [SvgString, customWidth, customHeight]);
 
-  const handleClick = (e: React.MouseEvent) => {
-    // Prevent default behavior for special URLs
-    if (url.startsWith('about:') ||           // Browser internal pages (about:blank, about:config)
-      url.startsWith('chrome:') ||          // Chrome browser internal pages (chrome:settings)
-      url.startsWith('edge:') ||            // Edge browser internal pages (edge:settings)
-      url.startsWith('file:') ||            // Local file system URLs (file:///path)
-      url.startsWith('chrome-extension:') || // Chrome extension pages (chrome-extension://id)
-      url.startsWith('moz-extension:') ||    // Firefox extension pages (moz-extension://id)
-      url.startsWith('ms-settings:') ||      // Windows system settings (ms-settings:display)
-      url.startsWith('view-source:')) {      // View page source (view-source:https://example.com)
+  const handleClick = async (e: MouseEvent) => {
+    if (
+      BUILD_TARGET !== "web" &&
+      (useExtensionTabs || isSpecialUrl(normalizedUrl))
+    ) {
       e.preventDefault();
 
-      if (BUILD_TARGET === 'firefox') {
-        alert('Sorry, Firefox restricts access to this type of URL. This is completely out of my control. Please copy and paste the URL into your address bar manually.');
+      if (BUILD_TARGET === "firefox" && isSpecialUrl(normalizedUrl)) {
+        alert(
+          "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
+        );
         return;
       }
 
-      if (linkOpenStyle) {
-        browser.tabs.create({
-          url: url,
-          active: true
-        }).catch(console.error);
-      } else {
-        browser.tabs.update({
-          url: url
-        }).catch(console.error);
+      try {
+        if (linkOpenStyle) {
+          await browser.tabs.create({
+            url: normalizedUrl,
+            active: true,
+          });
+        } else {
+          await browser.tabs.update({
+            url: normalizedUrl,
+          });
+        }
+      } catch (error) {
+        console.error(error);
       }
     }
 
@@ -122,7 +126,7 @@ const Display: FC<Props> = ({
   return (
     <a
       className={`Link ${linkOpenStyle ? "Link--open" : ""}`}
-      href={url}
+      href={normalizedUrl}
       onClick={handleClick}
       rel="noopener noreferrer"
       target={linkOpenStyle ? "_blank" : "_self"}
@@ -131,15 +135,28 @@ const Display: FC<Props> = ({
       {linksNumbered ? <span className="LinkNumber">{number} </span> : null}
       {icon === "_favicon_duckduckgo" && domain ? (
         <i>
-          <img alt={domain} src={`https://icons.duckduckgo.com/ip3/${domain}.ico`} />
+          <img
+            alt={domain}
+            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
+            style={{ width: iconSize, height: iconSize }}
+          />
         </i>
-      ) : icon === "_favicon_google" && domain || icon === "_favicon" && domain ? (
+      ) : (icon === "_favicon_google" && domain) ||
+        (icon === "_favicon" && domain) ? (
         <i>
-          <img alt={domain} src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`} />
+          <img
+            alt={domain}
+            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`}
+            style={{ width: iconSize, height: iconSize }}
+          />
         </i>
       ) : icon === "_favicon_favicone" && domain ? (
         <i>
-          <img alt={domain} src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`} />
+          <img
+            alt={domain}
+            src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`}
+            style={{ width: iconSize, height: iconSize }}
+          />
         </i>
       ) : icon === "_custom_iconify" && IconString ? (
         <i>
@@ -153,7 +170,9 @@ const Display: FC<Props> = ({
             src={IconStringIco}
             alt={name}
             style={{
-              width: conserveAspectRatio ? `${customWidth}px` : `${customWidth}px`,
+              width: conserveAspectRatio
+                ? `${customWidth}px`
+                : `${customWidth}px`,
               height: conserveAspectRatio ? "auto" : `${customHeight}px`,
               display: "inline-block",
             }}
@@ -168,7 +187,9 @@ const Display: FC<Props> = ({
               alt={name}
               src={cache[iconCacheKey].data}
               style={{
-                width: conserveAspectRatio ? `${customWidth}px` : `${customWidth}px`,
+                width: conserveAspectRatio
+                  ? `${customWidth}px`
+                  : `${customWidth}px`,
                 height: conserveAspectRatio ? "auto" : `${customHeight}px`,
                 display: "inline-block",
               }}
@@ -177,16 +198,22 @@ const Display: FC<Props> = ({
         </i>
       ) : icon === "_feather" ? (
         <i>
-          <Icon icon={iconifyValue ? iconifyIdentifier + iconifyValue : "feather:bookmark"} width={customWidth} height={customHeight} />
+          <Icon
+            icon={
+              iconifyValue
+                ? iconifyIdentifier + iconifyValue
+                : "feather:bookmark"
+            }
+            width={customWidth || iconSize}
+            height={customHeight || iconSize}
+          />
         </i>
       ) : icon ? (
         <i>
-          <Icon icon={"feather:" + icon} />
+          <Icon icon={"feather:" + icon} width={iconSize} height={iconSize} />
         </i>
       ) : null}
       {name}
     </a>
   );
 };
-
-export default Display;

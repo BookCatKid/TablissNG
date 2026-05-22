@@ -17,15 +17,18 @@ export async function getForecast(
     "https://api.open-meteo.com/v1/forecast?" +
     `latitude=${latitude}&` +
     `longitude=${longitude}&` +
-    "hourly=temperature_2m&" +
-    "hourly=apparent_temperature&" +
-    "hourly=relativehumidity_2m&" +
-    "hourly=weathercode&" +
+    "hourly=temperature_2m,apparent_temperature,relativehumidity_2m,weathercode&" +
+    "daily=weathercode,temperature_2m_max,temperature_2m_min&" +
     "timeformat=unixtime&" +
+    "timezone=auto&" +
     `temperature_unit=${units === "us" ? "fahrenheit" : "celsius"}`;
-  const res = await fetch(url);
-  const body = await res.json();
-  loader.pop();
+  let body;
+  try {
+    const res = await fetch(url);
+    body = await res.json();
+  } finally {
+    loader.pop();
+  }
 
   // Process results
   // TODO: validate response
@@ -37,6 +40,12 @@ export async function getForecast(
       apparentTemperature: body.hourly.apparent_temperature[i],
       humidity: body.hourly.relativehumidity_2m[i],
       weatherCode: body.hourly.weathercode[i],
+    })),
+    dailyConditions: body.daily.time.map((time: number, i: number) => ({
+      timestamp: time * 1000, // convert to ms
+      temperatureMax: body.daily.temperature_2m_max[i],
+      temperatureMin: body.daily.temperature_2m_min[i],
+      weatherCode: body.daily.weathercode[i],
     })),
   };
 }

@@ -1,0 +1,23 @@
+# Dependencies
+/node_modules
+
+# Production
+/build
+
+# Generated files
+.docusaurus
+.cache-loader
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Synced from root
+/docs/changelog.md
+/docs/community/contributing.md
+/docs/community/translating.md
+/docs/developing/building.md
+/static/img/

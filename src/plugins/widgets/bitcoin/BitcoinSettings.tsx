@@ -1,29 +1,30 @@
-import React from "react";
-import { FormattedMessage, defineMessages, useIntl } from "react-intl";
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { capitalize } from "../../../utils";
-import { defaultData, Data, Props } from "./types";
+import { Data, defaultData, Props } from "./types";
 
 const messages = defineMessages({
   colorMempool: {
     id: "plugins.bitcoin.colorMempool",
     defaultMessage: "Mempool",
-    description: "Mempool color label"
+    description: "Mempool color label",
   },
   colorMonochrome: {
     id: "plugins.bitcoin.colorMonochrome",
     defaultMessage: "Monochrome",
-    description: "Monochrome color label"
+    description: "Monochrome color label",
   },
   colorTransparent: {
     id: "plugins.bitcoin.colorTransparent",
     defaultMessage: "Transparent",
-    description: "Transparent color label"
-  }
+    description: "Transparent color label",
+  },
 });
 
 const colors = ["mempool", "monochrome", "transparent"];
 
-const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
+const BitcoinSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
 
   return (
@@ -44,7 +45,9 @@ const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
               setData({ ...data, color: color as Data["color"] });
             }}
           />
-          {intl.formatMessage(messages[`color${capitalize(color)}` as keyof typeof messages])}
+          {intl.formatMessage(
+            messages[`color${capitalize(color)}` as keyof typeof messages],
+          )}
         </label>
       ))}
 
@@ -54,7 +57,8 @@ const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           id="plugins.bitcoin.blocksLabel"
           defaultMessage="Number of Blocks"
           description="Label for number of blocks slider"
-        /> <br />
+        />{" "}
+        <br />
         <input
           type="range"
           list="numberOfBlocks-markers"
@@ -72,11 +76,11 @@ const BitcoinSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
           }}
         />
         <datalist id="numberOfBlocks-markers">
-          <option value="1" label="1" />
-          <option value="2" label="2" />
-          <option value="3" label="3" />
-          <option value="4" label="4" />
-          <option value="5" label="5" />
+          <option value="1" />
+          <option value="2" />
+          <option value="3" />
+          <option value="4" />
+          <option value="5" />
         </datalist>
       </label>
     </div>

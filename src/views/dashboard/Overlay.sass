@@ -3,86 +3,81 @@
     position: absolute
     margin: 0.5rem
     padding: 0.5rem
-    border-radius: 8px
-    transition: all 0.25s ease-out
+    border-radius: 1.25rem
+    transition: opacity 0.25s ease-out, background-color 0.25s ease-out
     font-size: 1.1rem
     z-index: 2000
-    background: #ffffff
-    border: 1px solid #e6eaf0
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.25)
-    color: #334155
 
-    .on-hover
+    &.topLeft, &.topRight, &.topCentre
+        top: 0
+
+    &.bottomLeft, &.bottomRight, &.bottomCentre
+        bottom: 0
+
+    &.topLeft, &.bottomLeft
+        left: 0
+
+    &.topRight, &.bottomRight
+        right: 0
+        flex-direction: row-reverse
+
+    &.topCentre, &.bottomCentre
+        left: 50%
+        transform: translateX(-50%)
+        margin-left: 0
+        margin-right: 0
+        justify-content: center
+
+    &__group
+        display: flex
+        align-items: center
+
+        &--side
+            flex: 1
+            min-width: 1.5rem
+
+        &--left
+            justify-content: flex-end
+
+        &--right
+            justify-content: flex-start
+
+        &--center
+            justify-content: center
+            flex-shrink: 0
+
+    &.hidden
         opacity: 0
-        transition: all 0.25s ease-out
+
+    &__group--side, .on-hover
+        opacity: 0
+        transition: opacity 0.25s ease-out
 
     &:hover
-        background-color: rgba(0,0,0,0.04)
+        opacity: 1
+        background-color: var(--bg-overlay)
 
-        .on-hover
+        .on-hover, .Overlay__group--side
             opacity: 1
 
         svg
-            color: #3498db
+            color: var(--accent-color)
             filter: none
 
-    a, span, button
+    button, span
         margin: 0 0.25em
+        display: inline-flex
 
     button
+        cursor: pointer
         background: none
         border: none
-        color: inherit
-        font: inherit
         padding: 0
-        cursor: pointer
+        color: inherit
 
         &.active svg
-            color: #00fff5
-            filter: drop-shadow(0 0 6px rgba(0, 255, 245, 0.4))
+            color: var(--accent-color)
+            filter: none
 
     svg, i
         transition: stroke 0.25s ease-out
-
-.light .Overlay:hover
-    background-color: rgba(255, 255, 255, 0.95)
-
-// Dark mode variant matching Settings.sass .plane dark tokens
-.dark .Overlay
-    background: #1a1a1a
-    border: 1px solid #444
-    box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.5)
-    color: #ffffff
-
-    &:hover
-        background: rgba(255,255,255,0.02)
-
-    a, span, button
-        color: #ffffff
-
-    .on-hover
-        opacity: 0.9
-
-// HUD Mode Styling for Overlay
-.Dashboard.hud-mode .Overlay
-    background: rgba(255,255,255,0.02)
-    border: 1px solid rgba(52,152,219,0.08)
-    border-radius: 8px
-    backdrop-filter: none
-    box-shadow: 0 6px 18px rgba(17,24,39,0.06)
-    padding: 0.5rem
-
-    &:hover
-        background: rgba(255,255,255,0.03)
-        border-color: rgba(52,152,219,0.12)
-
-    a, span, button
-        color: #334155
-        text-shadow: none
-
-        svg
-            color: inherit
-            filter: none
-
-    .on-hover
-        opacity: 0.9

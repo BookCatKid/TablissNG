@@ -1,7 +1,8 @@
-import React, { FC, useState } from "react";
+import { FC, useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Props, defaultData } from "./types";
+
 import { pluginMessages } from "../../../locales/messages";
+import { defaultData, Props } from "./types";
 
 const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const [input, setInput] = useState(data.input);
@@ -16,7 +17,7 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
           description="Label for HTML input field"
         />
         <textarea
-          rows={3}
+          rows={20}
           style={{ resize: "vertical", fontFamily: "monospace" }}
           value={input}
           onChange={(event) => setInput(event.target.value)}
@@ -42,9 +43,7 @@ const HtmlSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </p>
 
       <button className="button button--primary" onClick={handleSave}>
-        <FormattedMessage
-          {...pluginMessages.apply}
-        />
+        <FormattedMessage {...pluginMessages.apply} />
       </button>
     </div>
   );

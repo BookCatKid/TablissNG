@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+
+import { pluginMessages } from "../../../locales/messages";
 import LocationInput from "./LocationInput";
 import { defaultData, Props } from "./types";
-import { pluginMessages } from "../../../locales/messages";
 
 const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
@@ -14,15 +15,29 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
         onChange={(location) => setData({ ...data, ...location })}
       />
 
-      {data.latitude && data.latitude ? (
+      <label>
+        <input
+          type="checkbox"
+          checked={data.autoUpdate || false}
+          onChange={(event) =>
+            setData({ ...data, autoUpdate: event.target.checked })
+          }
+        />
+        <FormattedMessage
+          id="plugins.weather.autoUpdate"
+          defaultMessage="Follow location"
+          description="Follow location automatically title"
+        />
+      </label>
+
+      {data.latitude && data.longitude && (
         <>
           <label>
-
-          <FormattedMessage
-            id="plugins.weather.locationName"
-            defaultMessage="Location display name"
-            description="Location name title"
-          />
+            <FormattedMessage
+              id="plugins.weather.locationName"
+              defaultMessage="Location display name"
+              description="Location name title"
+            />
 
             <input
               type="text"
@@ -39,47 +54,78 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
           <label>
             <input
               type="checkbox"
-              checked={data.showDetails}
-              onChange={() =>
-                setData({ ...data, showDetails: !data.showDetails })
+              checked={data.showSummary}
+              onChange={(event) =>
+                setData({ ...data, showSummary: event.target.checked })
               }
-            />{" "}
+            />
+            <FormattedMessage
+              id="plugins.weather.showSummary"
+              defaultMessage="Show summary"
+              description="Show weather summary title"
+            />
+          </label>
+
+          {data.showSummary && (
+            <div style={{ marginLeft: "1em" }}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={data.showCity}
+                  onChange={(event) =>
+                    setData({ ...data, showCity: event.target.checked })
+                  }
+                />
+                <FormattedMessage
+                  id="plugins.weather.showCity"
+                  defaultMessage="Show city display name"
+                  description="Show city display name title"
+                />
+              </label>
+            </div>
+          )}
+
+          <label>
+            <input
+              type="checkbox"
+              checked={data.showDetails}
+              onChange={(event) =>
+                setData({ ...data, showDetails: event.target.checked })
+              }
+            />
             <FormattedMessage
               id="plugins.weather.showDetails"
               defaultMessage="Show extended details"
               description="Show extended details title"
             />
-
           </label>
 
           <label>
             <input
               type="checkbox"
-              checked={data.showCity}
-              onChange={() =>
-                setData({ ...data, showCity: !data.showCity })
+              checked={data.showForecast}
+              onChange={(event) =>
+                setData({ ...data, showForecast: event.target.checked })
               }
-            />{" "}
+            />
             <FormattedMessage
-              id="plugins.weather.showCity"
-              defaultMessage="Show city display name"
-              description="Show city display name title"
+              id="plugins.weather.showForecast"
+              defaultMessage="Show 5-day forecast"
+              description="Show 5-day forecast title"
             />
           </label>
-
 
           <label>
             <input
               type="radio"
               checked={data.units === "si"}
               onChange={() => setData({ ...data, units: "si" })}
-            />{" "}
+            />
             <FormattedMessage
-            id="plugins.weather.metricUnits"
-            defaultMessage="Metric units"
-            description="Metric units title"
-          />
-
+              id="plugins.weather.metricUnits"
+              defaultMessage="Metric units"
+              description="Metric units title"
+            />
           </label>
 
           <label>
@@ -87,12 +133,12 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               type="radio"
               checked={data.units === "us"}
               onChange={() => setData({ ...data, units: "us" })}
-            />{" "}
+            />
             <FormattedMessage
-            id="plugins.weather.imperialUnits"
-            defaultMessage="Imperial units"
-            description="Imperial units title"
-          />
+              id="plugins.weather.imperialUnits"
+              defaultMessage="Imperial units"
+              description="Imperial units title"
+            />
           </label>
 
           <p>
@@ -102,14 +148,14 @@ const WeatherSettings: FC<Props> = ({ data = defaultData, setData }) => {
               target="_blank"
             >
               <FormattedMessage
-            id="plugins.weather.dataBy"
-            defaultMessage="Weather data by Open-Meteo.com"
-            description="Weather data title"
-          />
+                id="plugins.weather.dataBy"
+                defaultMessage="Weather data by Open-Meteo.com"
+                description="Weather data title"
+              />
             </a>
           </p>
         </>
-      ) : null}
+      )}
     </div>
   );
 };

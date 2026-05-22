@@ -1,5 +1,5 @@
-import { useValue } from "../lib/db/react";
 import { db } from "../db/state";
+import { useValue } from "../lib/db/react";
 import { useSystemTheme } from "./";
 
 export function useTheme() {

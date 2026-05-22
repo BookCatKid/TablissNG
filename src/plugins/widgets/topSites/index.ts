@@ -6,10 +6,12 @@
  * This widget requires an optional permission that is requested only if users choose to add this Widget to their dashboard.
  * @url https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/topSites
  */
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import { TopSites } from "./TopSites";
 import TopSitesSettings from "./TopSitesSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -30,6 +32,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: TopSites,
   settingsComponent: TopSitesSettings,
+  defaultData,
 };
 
 export default config;

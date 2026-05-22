@@ -1,14 +1,22 @@
-import React from "react";
-import { defineMessages, useIntl } from "react-intl";
-import { useCachedEffect, useTime } from "../../../hooks";
-import { HOURS } from "../../../utils";
-import { Icon } from "@iconify/react";
-import { getForecast } from "./api";
-import { findCurrent, weatherCodes } from "./conditions";
-import { defaultData, Props } from "./types";
 import "./Weather.sass";
 
+import { Icon } from "@iconify/react";
+import type { FC } from "react";
+import { useEffect } from "react";
+import { defineMessages, useIntl } from "react-intl";
+
+import { useCachedEffect, useTime } from "../../../hooks";
+import { HOURS } from "../../../utils";
+import { getForecast, requestLocation } from "./api";
+import { findCurrent, weatherCodes } from "./conditions";
+import { defaultData, Props } from "./types";
+
 const messages = defineMessages({
+  forecast: {
+    id: "plugins.weather.forecast",
+    description: "5 day weather forecast title",
+    defaultMessage: "5-day forecast",
+  },
   high: {
     id: "plugins.weather.high",
     description: "High for temperature high",
@@ -36,7 +44,7 @@ const messages = defineMessages({
   },
 });
 
-const Weather: React.FC<Props> = ({
+const Weather: FC<Props> = ({
   cache,
   data = defaultData,
   loader,
@@ -46,13 +54,30 @@ const Weather: React.FC<Props> = ({
   const time = useTime("absolute");
   const intl = useIntl();
 
+  useEffect(() => {
+    if (data.autoUpdate) {
+      requestLocation()
+        .then((coords) => {
+          if (
+            coords.latitude !== data.latitude ||
+            coords.longitude !== data.longitude
+          ) {
+            setData({ ...data, ...coords });
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    }
+  }, [data.autoUpdate, data.latitude, data.longitude]);
+
   // Cache weather data for 6 hours
   useCachedEffect(
     () => {
       getForecast(data, loader).then(setCache);
     },
     cache ? cache.timestamp + 6 * HOURS : 0,
-    [data.latitude, data.latitude, data.units],
+    [data.latitude, data.longitude, data.units],
   );
 
   const conditions =
@@ -60,27 +85,29 @@ const Weather: React.FC<Props> = ({
       ? findCurrent(cache.conditions, time.getTime())
       : null;
 
+  const dailyConditions =
+    cache && cache.dailyConditions ? cache.dailyConditions.slice(0, 5) : [];
+
   // Blank or loading state
   if (!conditions) return <div className="Weather">-</div>;
 
   return (
     <div className="Weather">
-      <div
-        className="summary"
-        onClick={() => setData({ ...data, showDetails: !data.showDetails })}
-        title={intl.formatMessage(messages.toggleDetails)}
-      >
-        {data.name && data.showCity ? <span>{data.name}</span> : null}
-        <Icon
-          icon={`feather:` + weatherCodes[conditions.weatherCode]}
-          style={{ marginLeft: 10, marginRight: 10 }}
-        />
-        <span className="temperature">
-          {Math.round(conditions.temperature)}˚
-        </span>
-      </div>
+      {data.showSummary && (
+        <div
+          className="summary"
+          onClick={() => setData({ ...data, showDetails: !data.showDetails })}
+          title={intl.formatMessage(messages.toggleDetails)}
+        >
+          {data.name && data.showCity ? <span>{data.name}</span> : null}
+          <Icon icon={`feather:` + weatherCodes[conditions.weatherCode]} />
+          <span className="temperature">
+            {Math.round(conditions.temperature)}˚
+          </span>
+        </div>
+      )}
 
-      {data.showDetails ? (
+      {data.showDetails && (
         <div className="details">
           <dl>
             <dt>{Math.round(conditions.apparentTemperature)}˚</dt>
@@ -91,11 +118,37 @@ const Weather: React.FC<Props> = ({
             <dd>{intl.formatMessage(messages.humidity)}</dd>
           </dl>
         </div>
-      ) : null}
+      )}
+
+      {data.showForecast && (
+        <div
+          className="forecast"
+          aria-label={intl.formatMessage(messages.forecast)}
+        >
+          {dailyConditions.map((daily) => (
+            <dl className="day" key={daily.timestamp}>
+              <dt>
+                {intl.formatDate(daily.timestamp, {
+                  weekday: "short",
+                })}
+              </dt>
+              <dd className="condition">
+                <Icon icon={`feather:${weatherCodes[daily.weatherCode]}`} />
+              </dd>
+              <dd className="temperatures">
+                <span title={intl.formatMessage(messages.high)}>
+                  {Math.round(daily.temperatureMax)}˚
+                </span>
+                <span className="low" title={intl.formatMessage(messages.low)}>
+                  {Math.round(daily.temperatureMin)}˚
+                </span>
+              </dd>
+            </dl>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
-
- 
 
 export default Weather;

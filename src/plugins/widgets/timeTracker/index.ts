@@ -1,9 +1,11 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import TimeTracker from "./TimeTracker";
 import TimeTrackerSettings from "./TimeTrackerSettings";
+import { defaultData } from "./types";
 
-const messages = defineMessages({
+export const messages = defineMessages({
   name: {
     id: "plugins.timeTracker.name",
     defaultMessage: "Time Tracker",
@@ -22,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: TimeTracker,
   settingsComponent: TimeTrackerSettings,
+  defaultData,
 };
 
 export default config;

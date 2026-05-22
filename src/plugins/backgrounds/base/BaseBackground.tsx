@@ -1,111 +1,157 @@
-import React from "react";
-import { FormattedMessage } from "react-intl";
-import { Icon } from "@iconify/react";
-import Backdrop from "../../../views/shared/Backdrop";
 import "./BaseBackground.sass";
 
-export const UTM =
-  "?utm_source=Start&utm_medium=referral&utm_campaign=api-credit";
+import { Icon } from "@iconify/react";
+import {
+  type CSSProperties,
+  type FC,
+  Fragment,
+  memo,
+  type ReactNode,
+} from "react";
+import { CrossFade } from "react-crossfade-simple";
 
-type Credit = {
-  imageLink: string;
-  userLink: string;
-  userName: string;
-  location?: string;
-};
+import { db } from "../../../db/state";
+import { useIsNight } from "../../../hooks";
+import { useValue } from "../../../lib/db/react";
+
+interface CreditLink {
+  label: ReactNode;
+  url?: string;
+}
 
 interface Props {
   containerClassName?: string;
   url: string | null;
-  ready?: boolean;
-  title?: React.ReactNode;
   paused?: boolean;
   onPause?: () => void;
   onPrev?: (() => void) | null;
   onNext?: (() => void) | null;
-  credit?: Credit | null;
-  locationSource?: string | undefined;
-  children?: React.ReactNode;
+  showControls?: boolean;
+  controlsOnHover?: boolean;
+  showInfo?: boolean;
+  leftInfo?: CreditLink[];
+  rightInfo?: CreditLink | null;
+  children?: ReactNode;
 }
 
-const getLocationUrl = (location: string | undefined, locationSource: string | undefined) => {
-  if (!location || !locationSource) return "#";
-  const urls = {
-    "google-maps": `https://www.google.com/maps/search/?api=1&query=${location}`,
-    "google": `https://www.google.com/search?tbm=isch&q=${location}`,
-    "duckduckgo": `https://duckduckgo.com/?q=${location}&iax=images&ia=images`,
-    "unsplash": `https://unsplash.com/s/photos/${encodeURIComponent(location.replace(/\s+/g, '-').toLowerCase())}`,
-  } as const;
-  return urls[locationSource as keyof typeof urls];
-};
-
-const BaseBackground: React.FC<Props> = ({
+const BaseBackground: FC<Props> = ({
   containerClassName = "Unsplash fullscreen",
   url,
-  ready = false,
-  title,
   paused = false,
   onPause = () => {},
   onPrev = null,
   onNext = null,
-  credit = null,
-  locationSource,
+  showControls = true,
+  controlsOnHover = false,
+  showInfo = true,
+  leftInfo = [],
+  rightInfo = null,
   children,
-}) => (
-  <div className={`${containerClassName} bg-base`}>
-    <Backdrop className="image fullscreen" ready={ready} url={url} />
+}) => {
+  // TODO: Consider passing display in via prop
+  const focus = useValue(db, "focus");
+  const background = useValue(db, "background");
+  const {
+    blur,
+    luminosity = 0,
+    nightDim,
+    scale = true,
+    position,
+  } = background.display;
+  const isNight = useIsNight();
 
-    {title ? <div className="background-title">{title}</div> : null}
+  const backdropStyle: CSSProperties = {};
 
-    {children}
+  if (blur && !focus) {
+    backdropStyle.filter = `blur(${blur}px)`;
+    backdropStyle.transform = `scale(${blur / 500 + 1})`;
+  }
 
-    <div className="credit">
-      {credit ? (
-        <div className="photo">
-          <a href={credit.imageLink + UTM} rel="noopener noreferrer">
-            <FormattedMessage
-              id="plugins.unsplash.photoLink"
-              description="Photo link text"
-              defaultMessage="Photo"
-            />
-          </a>
-          {", "}
-          <a href={credit.userLink + UTM} rel="noopener noreferrer">
-            {credit.userName}
-          </a>
-          {", "}
-          <a href={"https://unsplash.com/" + UTM} rel="noopener noreferrer">
-            Unsplash
-          </a>
-        </div>
-      ) : null}
+  if (!focus) {
+    if (nightDim && isNight) {
+      backdropStyle.opacity = (luminosity + 1) / 2;
+    } else {
+      backdropStyle.opacity = 1 - Math.abs(luminosity);
+    }
+  }
 
-      <div className="controls">
-        <a className={onPrev ? "" : "hidden"} onClick={onPrev ?? undefined}>
-          <Icon icon="feather:arrow-left" />
-        </a>{" "}
-        <a onClick={onPause}>
-          <Icon icon={paused ? "feather:play" : "feather:pause"} />
-        </a>{" "}
-        <a className={onNext ? "" : "hidden"} onClick={onNext ?? undefined}>
-          <Icon icon="feather:arrow-right" />
-        </a>
+  if (scale) {
+    backdropStyle.backgroundSize = "cover";
+  } else {
+    backdropStyle.backgroundSize = "contain";
+    backdropStyle.backgroundRepeat = "no-repeat";
+  }
+
+  if (position) {
+    backdropStyle.backgroundPosition = position;
+  }
+
+  return (
+    <div className={`${containerClassName} bg-base`}>
+      <div
+        className="fullscreen"
+        style={{ backgroundColor: luminosity > 0 ? "white" : "black" }}
+      >
+        <CrossFade contentKey={url || ""} timeout={2500}>
+          <div
+            className="image fullscreen"
+            style={{
+              ...backdropStyle,
+              backgroundImage: url ? `url(${url})` : undefined,
+            }}
+          >
+            {children}
+          </div>
+        </CrossFade>
       </div>
 
-      {credit && credit.location && (
-        <span className="location-wrapper">
-          <a
-            className="location"
-            href={getLocationUrl(credit.location, locationSource)}
-            target="_self"
-            rel="noopener noreferrer"
-          >
-            {credit.location}
-          </a>
-        </span>
-      )}
-    </div>
-  </div>
-);
+      <div className="info-bar">
+        <div className="left-info">
+          {showInfo &&
+            leftInfo.map((info, index) => (
+              <Fragment key={index}>
+                {index > 0 && ", "}
+                {info.url ? (
+                  <a href={info.url} rel="noopener noreferrer">
+                    {info.label}
+                  </a>
+                ) : (
+                  <span>{info.label}</span>
+                )}
+              </Fragment>
+            ))}
+        </div>
 
-export default React.memo(BaseBackground);
+        {showControls && (
+          <div className={`controls ${controlsOnHover ? "is-on-hover" : ""}`}>
+            <a className={onPrev ? "" : "hidden"} onClick={onPrev ?? undefined}>
+              <Icon icon="feather:arrow-left" />
+            </a>{" "}
+            <a onClick={onPause}>
+              <Icon icon={paused ? "feather:play" : "feather:pause"} />
+            </a>{" "}
+            <a className={onNext ? "" : "hidden"} onClick={onNext ?? undefined}>
+              <Icon icon="feather:arrow-right" />
+            </a>
+          </div>
+        )}
+
+        <div className="right-info">
+          {showInfo && rightInfo && (
+            <>
+              {rightInfo.url ? (
+                <a href={rightInfo.url} rel="noopener noreferrer">
+                  {rightInfo.label}
+                </a>
+              ) : (
+                <span>{rightInfo.label}</span>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default memo(BaseBackground);

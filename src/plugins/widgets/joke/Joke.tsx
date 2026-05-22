@@ -1,24 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { useCachedEffect, useKeyPress } from "../../../hooks";
+import "./Joke.sass";
+
+import { type FC, useEffect, useState } from "react";
+
 import { db } from "../../../db/state";
+import { useCachedEffect, useKeyPress } from "../../../hooks";
 import { useValue } from "../../../lib/db/react";
 import { getJoke } from "./api";
-import "./Joke.sass";
 import {
   defaultData,
-  Props,
+  isJokeError,
   isSingleJoke,
   isTwoPartJoke,
+  Props,
   TwoPartJokeAPIResponse,
-  isJokeError,
 } from "./types";
 
-const Joke: React.FC<Props> = ({
-  cache,
-  data = defaultData,
-  setCache,
-  loader,
-}) => {
+const Joke: FC<Props> = ({ cache, data = defaultData, setCache, loader }) => {
   // Grab the user's locale
   const locale = useValue(db, "locale");
 
@@ -33,8 +30,31 @@ const Joke: React.FC<Props> = ({
   useCachedEffect(
     () => {
       loader.push();
+
       const apiLocale = mapLocaleToJokeAPILang(locale);
-      getJoke(data.categories, apiLocale).then(setCache).finally(loader.pop);
+
+      getJoke(data.categories, apiLocale)
+        .then((joke) => {
+          const text = isTwoPartJoke(joke)
+            ? joke.setup
+            : isSingleJoke(joke)
+              ? joke.joke
+              : "";
+
+          // if joke is too long, retry
+          if (text.length > data.maxPreviewLength) {
+            console.log("Joke too long, retrying...");
+            return getJoke(data.categories, apiLocale);
+          }
+
+          return joke;
+        })
+        .then((finalJoke) => {
+          setCache(finalJoke);
+        })
+        .finally(() => {
+          loader.pop();
+        });
     },
     cache?.timestamp ? cache.timestamp + data.timeout : 0,
     [data.categories],
@@ -58,12 +78,17 @@ const Joke: React.FC<Props> = ({
     <div className="joke-container">
       {isSingleJoke(cache) && <h5>{cache.joke}</h5>}
 
-      {isTwoPartJoke(cache) && <TwoPartJoke joke={cache} keyBind={data.keyBind} />}
+      {isTwoPartJoke(cache) && (
+        <TwoPartJoke joke={cache} keyBind={data.keyBind} />
+      )}
     </div>
   );
 };
 
-const TwoPartJoke: React.FC<{ joke: TwoPartJokeAPIResponse; keyBind?: string }> = ({ joke, keyBind = "J" }) => {
+const TwoPartJoke: FC<{
+  joke: TwoPartJokeAPIResponse;
+  keyBind?: string;
+}> = ({ joke, keyBind = "J" }) => {
   const isJokeAQuestion = joke.setup.slice(-1) === "?";
   const [showAnswer, setShowAnswer] = useState(false);
 

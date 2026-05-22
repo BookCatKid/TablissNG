@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
+
 import { engines } from "./engines";
-import { Props, defaultData, SEARCH_ENGINE_CUSTOM } from "./types";
 import { messages } from "./Search";
+import { defaultData, Props, SEARCH_ENGINE_CUSTOM, SearchStyle } from "./types";
 
 const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
@@ -11,24 +12,24 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
     <div className="SearchSettings">
       <label>
         <FormattedMessage
-            id="plugins.search.provider"
-            defaultMessage="Search Provider"
-            description="Search Provider title"
-          />
+          id="plugins.search.provider"
+          defaultMessage="Search Provider"
+          description="Search Provider title"
+        />
         <select
           onChange={(event) =>
             setData({ ...data, searchEngine: event.target.value })
           }
           value={data.searchEngine}
         >
-          { BUILD_TARGET != "web" && (
+          {BUILD_TARGET != "web" && (
             <option key="default" value="default">
               <FormattedMessage
                 id="plugins.search.default"
                 defaultMessage="Browser Default"
                 description="Default search engine option"
               />
-          </option>
+            </option>
           )}
           {engines.map(({ key, name }) => (
             <option key={key} value={key}>
@@ -68,7 +69,7 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
           <p className="info">
             <FormattedMessage
               id="plugins.search.customWarning"
-              defaultMessage="Warning: This functionality is intended for advanced users. {searchTerms} is replaced by the entered search term."
+              defaultMessage="Warning: This functionality is intended for advanced users. '{searchTerms}' is replaced by the entered search term."
               description="Warning about using custom search providers"
             />
           </p>
@@ -77,7 +78,7 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
 
       <label>
         <FormattedMessage
-          id="plugins.search.placeholder"
+          id="plugins.search.placeholderLabel"
           defaultMessage="Placeholder Text"
           description="Search placeholder text input label"
         />
@@ -94,19 +95,92 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-    <label>
-      <FormattedMessage
-        id="plugins.search.keybind"
-        defaultMessage="Search keybind"
-        description="Search keybind title"
-      />
-      <input
-        type="text"
-        maxLength={1}
-        onChange={(event) => setData({ ...data, keyBind: event.target.value })}
-        value={data.keyBind}
-      />
-    </label>
+      <label>
+        <FormattedMessage
+          id="plugins.search.style"
+          defaultMessage="Search Style"
+          description="Search Style title"
+        />
+        <select
+          onChange={(event) =>
+            setData({ ...data, style: event.target.value as SearchStyle })
+          }
+          value={data.style ?? "default"}
+        >
+          <option value="default">
+            <FormattedMessage
+              id="plugins.search.style.default"
+              defaultMessage="Default"
+              description="Label for the default search style"
+            />
+          </option>
+          <option value="transparent-rounded">
+            <FormattedMessage
+              id="plugins.search.style.transparentRounded"
+              defaultMessage="Transparent Rounded"
+              description="Label for the transparent rounded search style"
+            />
+          </option>
+          <option value="minimal-outlined">
+            <FormattedMessage
+              id="plugins.search.style.minimalOutlined"
+              defaultMessage="Minimal Outlined"
+              description="Label for the minimal outlined search style"
+            />
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <FormattedMessage
+          id="plugins.search.keybind"
+          defaultMessage="Search keybind"
+          description="Search keybind title"
+        />
+        <input
+          type="text"
+          maxLength={1}
+          onChange={(event) =>
+            setData({ ...data, keyBind: event.target.value })
+          }
+          value={data.keyBind}
+        />
+      </label>
+
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={data.overrideWidth}
+          onChange={(event) =>
+            setData({ ...data, overrideWidth: event.target.checked })
+          }
+        />
+        <FormattedMessage
+          id="plugins.search.overrideWidth"
+          defaultMessage="Override search bar width"
+          description="Checkbox label to override search bar width"
+        />
+      </label>
+
+      {data.overrideWidth && (
+        <label>
+          <FormattedMessage
+            id="plugins.search.customWidth"
+            defaultMessage="Custom Width (px)"
+            description="Input label for custom search bar width"
+          />
+          <input
+            type="number"
+            value={data.customWidth ?? 400}
+            onChange={(event) =>
+              setData({
+                ...data,
+                customWidth: Number(event.target.value),
+              })
+            }
+          />
+        </label>
+      )}
 
       <label>
         <FormattedMessage
@@ -146,14 +220,14 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
       {data.suggestionsEngine && (
         <label>
           <FormattedMessage
-            id="plugins.search.suggestionsQuanitity"
-            defaultMessage="Suggestion Quanitity"
-            description="Suggestion Quanitity title"
+            id="plugins.search.suggestionsQuantity"
+            defaultMessage="Suggestion Quantity"
+            description="Number of search suggestions to show"
           />
           <input
             type="number"
-            min="1"
-            max="10"
+            min={1}
+            max={10}
             value={data.suggestionsQuantity}
             onChange={(event) =>
               setData({

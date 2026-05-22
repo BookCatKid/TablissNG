@@ -1,7 +1,9 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
 import Since from "./Since";
 import SinceSettings from "./SinceSettings";
+import { defaultData } from "./types";
 
 const messages = defineMessages({
   name: {
@@ -22,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: Since,
   settingsComponent: SinceSettings,
+  defaultData,
 };
 
 export default config;

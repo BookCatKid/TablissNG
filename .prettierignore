@@ -1,0 +1,8 @@
+src/locales/lang/
+target/
+pnpm-lock.yaml
+pnpm-workspace.yaml
+screenshots/
+updates.json
+docs/.docusaurus/
+docs/build/

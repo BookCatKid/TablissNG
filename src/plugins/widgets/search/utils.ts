@@ -1,9 +1,16 @@
 import tlds from "tlds";
+
+import { isSpecialUrl } from "../../../utils";
 import { engines } from "./engines";
 import { SEARCH_ENGINE_CUSTOM } from "./types";
 
 // TODO: Add unit tests
 export function buildUrl(query: string, engineUrl: string) {
+  // If it's a special URL (e.g. about:, chrome:, file:, etc.), return as-is
+  if (isSpecialUrl(query)) {
+    return query;
+  }
+
   // See if they have started with a web scheme
   if (/^https?:\/\/\w+/.test(query)) {
     return query;

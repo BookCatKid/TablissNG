@@ -1,16 +1,17 @@
-import React from "react";
+import { type FC } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { DebounceInput } from "../../shared";
 import { defaultData, Props } from "./types";
 
-const OnlineSettings: React.FC<Props> = ({ data = defaultData, setData }) => (
+const OnlineSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="OnlineSettings">
     <label>
       <FormattedMessage
-          id="backgrounds.online.url"
-          defaultMessage="Image URL"
-          description="Image URL title"
-        />
+        id="backgrounds.online.url"
+        defaultMessage="Image URL"
+        description="Image URL title"
+      />
       <DebounceInput
         type="text"
         value={data.url}

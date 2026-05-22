@@ -1,6 +1,8 @@
 import { getTimezoneOffset } from "date-fns-tz";
-import React from "react";
+import { type FC, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
+
+import { commonMessages } from "../../../locales/messages";
 import zones from "./zones.json";
 
 type Props = {
@@ -16,10 +18,10 @@ type ZoneOption = {
 
 let cachedZoneOptions: ZoneOption[] | null = null;
 
-const TimeZoneInput: React.FC<Props> = ({ timeZone, onChange }) => {
-  const [zoneOptions, setZoneOptions] = React.useState(cachedZoneOptions);
+const TimeZoneInput: FC<Props> = ({ timeZone, onChange }) => {
+  const [zoneOptions, setZoneOptions] = useState(cachedZoneOptions);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (zoneOptions !== null) return;
 
     const date = new Date();
@@ -50,11 +52,13 @@ const TimeZoneInput: React.FC<Props> = ({ timeZone, onChange }) => {
       value={timeZone || ""}
       onChange={(event) => onChange(event.target.value || null)}
     >
-      <option value=""><FormattedMessage
+      <option value="">
+        <FormattedMessage
           id="timeZone.automatic"
           defaultMessage="Automatic"
           description="Automatic title"
-        /></option>
+        />
+      </option>
       {zoneOptions ? (
         zoneOptions.map((option) => (
           <option key={option.id} value={option.id}>
@@ -62,7 +66,9 @@ const TimeZoneInput: React.FC<Props> = ({ timeZone, onChange }) => {
           </option>
         ))
       ) : (
-        <option disabled>Loading...</option>
+        <option value="loading" disabled>
+          <FormattedMessage {...commonMessages.loading} />
+        </option>
       )}
     </select>
   );

@@ -5,6 +5,7 @@ type Data = {
   showColorLegend: boolean;
   showMonthLabels: boolean;
   showTotalCount: boolean;
+  showTooltips: boolean;
   clickAction: "none" | "github" | "profile";
 };
 
@@ -15,5 +16,6 @@ export const defaultData: Data = {
   showColorLegend: false,
   showMonthLabels: false,
   showTotalCount: false,
+  showTooltips: true,
   clickAction: "none",
 };

@@ -1,4 +1,6 @@
-# TablissNG
+<p align="left">
+  <img src="src/views/shared/tabliss.svg" alt="TablissNG logo" width="400" />
+</p>
 
 > A beautiful, customisable New Tab page for Firefox and Chrome.
 
@@ -53,10 +55,10 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 - Widgets
   - Time Tracker, Bitcoin Mempool, Top Sites, Binary Clock, Bookmarks, Custom HTML.
   - Enhancements: Daily Routine for Todos, Bible verses in Quotes, Markdown in Notes
-  - "Free Move" mode for dragging widgets (very beta, but functional)
+  - "Free Move" mode for dragging widgets
 
 - Backgrounds & Visuals
-  - Wikimedia Image of the Day, NASA APOD
+  - Wikimedia Image of the Day, NASA APOD, Giphy Image of the Day
   - Support for Videos, GIFs, and online image URLs
   - Automatic night dimming and random gradients
 
@@ -66,16 +68,21 @@ This list is by no means exhaustive. TablissNG includes many other tweaks, quali
 
 ## Installation
 
-<a href="https://addons.mozilla.org/en-US/firefox/addon/tablissng/"><img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" height="70"></a>
-<a href="https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk"><img src="https://developer.chrome.com/static/docs/webstore/branding/image/HRs9MPufa1J1h5glNhut.png" alt="Get the Extension on Chrome" height="70" style="border: 1px solid transparent; border-radius:6px;"></a>
-<a href="https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Get_it_from_Microsoft_Badge.svg/320px-Get_it_from_Microsoft_Badge.svg.png" alt="Get the Extension on Edge" height="70" style="border: 1px solid transparent; border-radius:4px;"></a>
+<a href="https://addons.mozilla.org/en-US/firefox/addon/tablissng/"><img src="assets/badges/firefox-badge.svg" height="70"></a>
+<a href="https://chromewebstore.google.com/detail/tablissng/dlaogejjiafeobgofajdlkkhjlignalk"><img src="assets/badges/chrome-badge.png" alt="Get the Extension on Chrome" height="70" style="border-radius:4px;"></a>
+<a href="https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm"><img src="assets/badges/edge-badge.png" alt="Get the Extension on Edge" height="70"></a>
 
-The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tabliss-a-beautiful-new-t/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tabliss-a-beautiful-new/mkaphhbkcccpgkfaifhhdfckagnkcmhm) (edge addon might be outdated, contact me if you are actually using it.). If you want to use safari, see [INSTALL.md](INSTALL.md).
+The extension is available in the [Firefox Add-ons Store](https://addons.mozilla.org/en-US/firefox/addon/tablissng/), in the [Chrome Web Store](https://chromewebstore.google.com/detail/tablissng/dlaogejjiafeobgofajdlkkhjlignalk), and in the [Edge Add-ons Store](https://microsoftedge.microsoft.com/addons/detail/tablissng/mkaphhbkcccpgkfaifhhdfckagnkcmhm). If you want to use Safari, see [INSTALL.md](INSTALL.md).
+
+**Nightly Builds (Firefox):**
+
+- **Nightly** (v1.6.5.0): [Install Nightly](https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.5.0.xpi)
+
 If you want to install the extension manually, or want nightly builds, see [INSTALL.md](INSTALL.md).
 
 ## Running Locally
 
-For local development, you'll need Node.js and NPM installed. Latest versions should work.
+For local development, you'll need Node.js and pnpm installed. Latest versions should work.
 
 First, clone the repo:
 
@@ -87,24 +94,27 @@ cd TablissNG
 Then install the dependencies:
 
 ```sh
-npm install
+pnpm install
 ```
 
 ### Available Commands
 
-- `npm run dev` — Start a local development server
-- `npm run build` — Build the project
-- `npm run test` — Run tests
-- `npm run translations` — Manage translation files (see TRANSLATING.md)
-- `npm run lint:fix` — Run ESLint with --fix (or just `npm run lint` for checking)
-- `npm run prettier` — Run Prettier with --write (or npm run `prettier:check` for checking)
-- `npm run deps:update` — Run interactive dependency update tool (or `npm run deps:check` to just check for updates and unused dependencies)
+- `pnpm run dev` — Start a local development server
+- `pnpm run build` — Build the project
+- `pnpm run test` — Run tests
+- `pnpm run translations` — Extract and sync translation files (see [TRANSLATING.md](TRANSLATING.md) for details)
+- `pnpm run translations status` — Show translation status (pass language, e.g. `pnpm run translations status fr`)
+- `pnpm run translations create` — Create a new locale file (pass language, e.g. `pnpm run translations create de-AT`)
+- `pnpm run translations migrate` — Migrate renamed translation keys (e.g. `pnpm run translations migrate --map old.id=new.id`)
+- `pnpm run lint:fix` — Run ESLint with --fix (or just `pnpm run lint` for checking)
+- `pnpm run prettier` — Run Prettier with --write (or `pnpm run prettier:check` for checking)
+- `pnpm run deps:update` — Run interactive dependency update tool (or `pnpm run deps:check` to just check for updates and unused dependencies)
 
 By default, build and dev will target the web version. To specify a platform (Chromium or Firefox), append `:chromium` or `:firefox` to the command. For example:
 
 ```sh
-npm run dev:chromium
-npm run build:firefox
+pnpm run dev:chromium
+pnpm run build:firefox
 ```
 
 <details>
@@ -131,6 +141,7 @@ Then, fill in your API keys:
 GIPHY_API_KEY=your_key_here
 UNSPLASH_API_KEY=your_key_here
 NASA_API_KEY=your_key_here
+TRELLO_API_KEY=your_key_here # this requires the correct redirect URI to be set up in your Trello app settings: https://53dad6be72180770ccc08f0a6e2fc8a64dcf7b42.extensions.allizom.org and https://dlaogejjiafeobgofajdlkkhjlignalk.chromiumapp.org should work for firefox and chromium respectively.
 ```
 
 ## Credits

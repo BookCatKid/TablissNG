@@ -1,0 +1,32 @@
+{
+  "addons": {
+    "extension@tabliss-maintained": {
+      "updates": [
+        {
+          "version": "1.6.1.0",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.0.xpi"
+        },
+        {
+          "version": "1.6.1.1",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.1.xpi"
+        },
+        {
+          "version": "1.6.1.2",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.2.xpi"
+        },
+        {
+          "version": "1.6.1.3",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.1.3.xpi"
+        },
+        {
+          "version": "1.6.3.0",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.3.0.xpi"
+        },
+        {
+          "version": "1.6.5.0",
+          "update_link": "https://github.com/BookCatKid/TablissNG/releases/download/nightly-auto/tablissng-1.6.5.0.xpi"
+        }
+      ]
+    }
+  }
+}

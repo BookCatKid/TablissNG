@@ -1,6 +1,6 @@
 import { API } from "../../types";
-import { Quote } from "./types";
 import { bibleVerses } from "./bibleVerses";
+import { Quote } from "./types";
 
 // Get developer excuse
 async function getDeveloperExcuse(): Promise<{ quote: string }> {
@@ -174,25 +174,31 @@ export async function getQuote(
 ): Promise<Quote> {
   loader.push();
 
-  const data =
-    category === "developerexcuses"
-      ? await getDeveloperExcuse()
-      : category === "randomBible"
-        ? await getRandomBibleVerse()
-        : category === "dwyl"
-          ? await getRandomDwylQuote()
-          : category === "quotable"
-            ? await getRandomQuotableQuote()
-            : {
-                quote:
-                  "Selected category is invalid, pease create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
-                author: "Simon",
-              };
-  // : category === "bible"
-  //   ? await getBibleVerse()
-  //   : await getQuoteOfTheDay(category);
+  let data;
+  try {
+    const categoryHandlers: Record<
+      string,
+      () => Promise<{ quote: string; author?: string }>
+    > = {
+      developerexcuses: getDeveloperExcuse,
+      randomBible: getRandomBibleVerse,
+      dwyl: getRandomDwylQuote,
+      quotable: getRandomQuotableQuote,
+    };
 
-  loader.pop();
+    const handler = categoryHandlers[category];
+
+    if (handler) {
+      data = await handler();
+    } else {
+      data = {
+        quote:
+          "Selected category is invalid, please create an issue on the <a href='https://github.com/bookcatkid/TablissNG/issues'>github repo</a>.",
+      };
+    }
+  } finally {
+    loader.pop();
+  }
 
   const quote = cleanQuote(data.quote);
 
@@ -230,7 +236,7 @@ function cleanQuote(quote: string) {
   quote = quote.replace(dash, "—");
 
   // We add a period at the end of the quote if need be.
-  const closingPunctuation = new RegExp(/[.\?!…’]$/);
+  const closingPunctuation = new RegExp(/[.?!…’]$/);
   if (!quote.match(closingPunctuation)) quote = quote + ".";
 
   return quote;

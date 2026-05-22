@@ -8,8 +8,12 @@
     input
         border-color: white
 
-    svg:not(.GitHub *)
+    svg
         filter: drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.25))
+
+    .GitHub svg,
+    .Leetcode svg
+        filter: none
 
     a
         color: inherit
@@ -20,75 +24,38 @@
             color: inherit
             opacity: 0.5
 
-    // HUD Theme (muted to match app style)
-    &.hud-mode
-        position: relative
-        background: transparent
+    // Offset background components and widgets when the settings icon is in the same corner
+    &.topLeft
+        .Slot.topLeft
+            top: 2rem
 
-        // Remove heavy decorations used by the original futuristic theme
-        &::before,
-        &::after
-            display: none
+    &.topCentre
+        .Slot.topCentre
+            top: 2rem
 
-        color: #334155
-        text-shadow: none
+    &.topRight
+        .Slot.topRight
+            top: 2rem
 
-        .theme-fill
-            fill: #3498db
+    &.bottomLeft
+        .Slot.bottomLeft,
+        .Slot.bottomCentre
+            bottom: 6rem
+        .info-bar .left-info
+            transform: translateY(-3rem)
 
-        .theme-stroke
-            stroke: #3498db
+    &.bottomCentre
+        .Overlay.bottomCentre
+            bottom: 2.5rem
+        .Slot.bottomCentre
+            bottom: 4.5rem
+        &:not(:has(.info-bar .controls))
+            .Overlay.bottomCentre
+                bottom: 0
 
-        a
-            color: #3498db
-            text-decoration: none
-            transition: color 0.18s ease
-            &:hover
-                color: #2b6cb0
-
-        input
-            background: transparent
-            border: 1px solid rgba(52, 152, 219, 0.12)
-            color: inherit
-            box-shadow: none
-            &:focus
-                outline: none
-                border-color: rgba(52, 152, 219, 0.22)
-
-@keyframes ambient-pulse
-    0%, 100%
-        opacity: 0.3
-        transform: translate(-50%, -50%) scale(1)
-    50%
-        opacity: 0.5
-        transform: translate(-50%, -50%) scale(1.1)
-
-@keyframes hud-pulse
-    0%, 100%
-        opacity: 0.7
-        box-shadow: 0 0 10px rgba(0, 217, 255, 0.4), inset 0 0 10px rgba(0, 217, 255, 0.2)
-    50%
-        opacity: 1
-        box-shadow: 0 0 25px rgba(0, 217, 255, 0.8), inset 0 0 20px rgba(0, 217, 255, 0.4)
-
-@keyframes hud-glow
-    0%, 100%
-        box-shadow: 0 0 10px rgba(0, 217, 255, 0.5), 0 0 20px rgba(0, 217, 255, 0.3), inset 0 0 10px rgba(0, 217, 255, 0.2)
-    50%
-        box-shadow: 0 0 20px rgba(0, 217, 255, 0.8), 0 0 35px rgba(0, 217, 255, 0.6), inset 0 0 20px rgba(0, 217, 255, 0.4)
-
-@keyframes corner-pulse
-    0%, 100%
-        opacity: 0.6
-    50%
-        opacity: 1
-
-@keyframes data-stream
-    0%
-        transform: translateY(-100%)
-        opacity: 0
-    50%
-        opacity: 1
-    100%
-        transform: translateY(100vh)
-        opacity: 0
+    &.bottomRight
+        .Slot.bottomRight,
+        .Slot.bottomCentre
+            bottom: 6rem
+        .info-bar .right-info
+            transform: translateY(-3rem)

@@ -1,5 +1,7 @@
-import { Config } from "../../types";
 import { defineMessages } from "react-intl";
+
+import { Config } from "../../types";
+import { defaultData } from "./types";
 import WorkHours from "./WorkHours";
 import WorkHoursSettings from "./WorkHoursSettings";
 
@@ -22,6 +24,7 @@ const config: Config = {
   description: messages.description,
   dashboardComponent: WorkHours,
   settingsComponent: WorkHoursSettings,
+  defaultData,
 };
 
 export default config;

@@ -1,16 +1,15 @@
-import React, { FC } from "react";
+import "./Since.sass";
+
+import { FC } from "react";
 import { FormattedRelativeTime } from "react-intl";
 
 import { useTime } from "../../../hooks";
-import { Props, defaultData } from "./types";
-import "./Since.sass";
+import { defaultData, Props } from "./types";
 
 const Since: FC<Props> = ({ data = defaultData }) => {
-
   const from = useTime().getTime();
   const to = data.time;
   const diff = ((to - from) / 1000) | 0;
-
 
   return (
     <div className="Since">

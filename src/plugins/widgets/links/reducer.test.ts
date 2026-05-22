@@ -1,4 +1,4 @@
-import { addLink, removeLink, updateLink, reorderLink } from "./actions";
+import { addLink, removeLink, reorderLink, updateLink } from "./actions";
 import { reducer } from "./reducer";
 
 describe("links/reducer()", () => {

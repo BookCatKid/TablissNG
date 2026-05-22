@@ -1,8 +1,19 @@
-import React, { FC, useEffect } from "react";
+import { FC, useEffect } from "react";
 
-import { useKeyPress, useSavedReducer, useToggle, useTime } from "../../../hooks";
-import { DownIcon, Icon, UpIcon, ExpandIcon } from "../../../views/shared";
-import { addTodo, removeTodo, toggleTodo, updateTodo } from "./actions";
+import {
+  useKeyPress,
+  useSavedReducer,
+  useTime,
+  useToggle,
+} from "../../../hooks";
+import { DownIcon, ExpandIcon, Icon, UpIcon } from "../../../views/shared";
+import {
+  addTodo,
+  removeTodo,
+  reorderTodo,
+  toggleTodo,
+  updateTodo,
+} from "./actions";
 import { reducer, State } from "./reducer";
 import TodoList from "./TodoList";
 import { defaultData, Props } from "./types";
@@ -45,9 +56,11 @@ const Todo: FC<Props> = ({ data = defaultData, setData }) => {
     <div className="Todo">
       <TodoList
         items={items}
+        allItems={data.items}
         onToggle={(...args) => dispatch(toggleTodo(...args))}
         onUpdate={(...args) => dispatch(updateTodo(...args))}
         onRemove={(...args) => dispatch(removeTodo(...args))}
+        onReorder={(...args) => dispatch(reorderTodo(...args))}
         show={show}
       />
 

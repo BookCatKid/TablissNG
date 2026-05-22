@@ -1,5 +1,5 @@
-import { Link } from "./types";
 import { Action } from "./actions";
+import { Link } from "./types";
 
 type State = Link[];
 
@@ -19,7 +19,7 @@ export function reducer(state: State, action: Action) {
         index === action.data.index ? action.data.link : link,
       );
 
-    case "REORDER_LINK":
+    case "REORDER_LINK": {
       const { index, to } = action.data;
       if (index < 0 || index >= state.length || to < 0 || to >= state.length) {
         return state;
@@ -27,6 +27,10 @@ export function reducer(state: State, action: Action) {
       const links = [...state];
       links.splice(to, 0, links.splice(index, 1)[0]);
       return links;
+    }
+
+    case "IMPORT_LINKS":
+      return state.concat(action.data.links);
 
     default:
       throw new Error("Unknown action");

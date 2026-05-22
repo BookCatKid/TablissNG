@@ -1,4 +1,5 @@
-import React from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+
 import * as DB from "./db";
 
 /** Use a value from the database. */
@@ -6,15 +7,15 @@ export const useValue = <T, K extends DB.Key<T>>(
   db: DB.Database<T>,
   key: K,
 ): T[K] => {
-  return React.useSyncExternalStore(
-    React.useCallback(
+  return useSyncExternalStore(
+    useCallback(
       (listener) =>
         DB.listen(db, ([changeKey]) => {
           if (changeKey === key) listener();
         }),
       [db, key],
     ),
-    React.useCallback(() => DB.get(db, key), [db, key]),
+    useCallback(() => DB.get(db, key), [db, key]),
   );
 };
 
@@ -27,8 +28,8 @@ export const useSelector = <T>(db: DB.Database, selector: () => T): T => {
   //   React.useCallback((listener) => DB.listen(db, listener), [db]),
   //   selector,
   // );
-  const [state, setState] = React.useState(selector);
-  React.useEffect(() => {
+  const [state, setState] = useState(selector);
+  useEffect(() => {
     setState(selector());
     return DB.listen(db, () => {
       setState(selector());

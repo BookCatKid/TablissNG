@@ -1,0 +1,77 @@
+name: Reusable Build
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref to build from"
+        required: false
+        type: string
+        default: ""
+      artifact_suffix:
+        description: "Suffix to add to the artifact name"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  build:
+    name: Build ${{ matrix.build_target }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        build_target:
+          - chromium
+          - firefox
+          - web
+          - safari
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build ${{ matrix.build_target }}
+        run: pnpm run build:${{ matrix.build_target }}
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
+          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+          TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: tabliss-${{ matrix.build_target }}${{ inputs.artifact_suffix }}
+          path: dist/${{ matrix.build_target }}
+
+  build_docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref }}
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build
+        run: pnpm run build
+        working-directory: docs
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: tabliss-docs${{ inputs.artifact_suffix }}
+          path: docs/build

@@ -1,5 +1,4 @@
 .Suggestions
-
     display: grid
     position: absolute
     margin-top: -1rem
@@ -23,14 +22,16 @@
         padding: 0.5em 1em
         cursor: pointer
         width: 100%
+        font-size: 1.1rem
         &:hover, &.active
             background: rgba(255,255,255,0.2)
 
         .suggestion-thumb
-            width: 70px
-            height: 70px
+            width: 30px
+            height: 30px
             object-fit: cover
             border-radius: 0.25em
+            align-self: center
 
         .suggestion-content
             display: flex
@@ -39,17 +40,28 @@
             padding: 0.2em 0
 
             .suggestion-title
-                font-weight: 600
-                font-size: 1.1em
-                color: #fff
-                text-overflow: ellipsis
-                white-space: nowrap
+                white-space: normal
+                word-break: break-word
 
             .suggestion-desc
                 font-size: 0.8em
                 color: #b0b0b0
-                text-overflow: ellipsis
-                white-space: nowrap
+                white-space: normal
+                word-break: break-word
 
     .active
         text-decoration: underline
+
+.Search.style-transparent-rounded
+    .Suggestions
+        margin-top: -0.5rem
+        top: 100%
+        border-radius: 1.5rem
+        backdrop-filter: blur(10px)
+
+.Search.style-minimal-outlined
+    .Suggestions
+        margin-top: -0.5rem
+        top: 100%
+        border-radius: 4px
+        background: rgba(20, 20, 20, 0.9)

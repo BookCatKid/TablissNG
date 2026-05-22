@@ -1,9 +1,9 @@
-import React from "react";
-import { FormattedMessage, defineMessages } from "react-intl";
+import type { FC } from "react";
+import { defineMessages, FormattedMessage, useIntl } from "react-intl";
+
 import { WidgetDisplay as WidgetDisplayType } from "../../db/state";
-import PositionInput from "./PositionInput";
-import "./WidgetDisplay.css";
 import { pluginMessages } from "../../locales/messages";
+import PositionInput from "./PositionInput";
 
 type Props = {
   display: WidgetDisplayType;
@@ -14,11 +14,18 @@ const messages = defineMessages({
   editPosition: {
     id: "settings.position.edit",
     defaultMessage: "Edit Position",
-    description: "Button text for editing widget position"
-  }
+    description: "Button text for editing widget position",
+  },
+  customClassPlaceholder: {
+    id: "settings.customClass.placeholder",
+    defaultMessage: "Enter a custom class for easier styling",
+    description: "Placeholder text for custom CSS class input",
+  },
 });
 
-const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
+const WidgetDisplay: FC<Props> = ({ display, onChange }) => {
+  const intl = useIntl();
+
   return (
     <div className="WidgetDisplay">
       <PositionInput
@@ -33,9 +40,11 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
 
       {display.position === "free" && (
         <div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
             <button
-              onClick={() => onChange({ isEditingPosition: !display.isEditingPosition })}
+              onClick={() =>
+                onChange({ isEditingPosition: !display.isEditingPosition })
+              }
               className={`button button--primary ${display.isEditingPosition ? "active" : ""}`}
             >
               <FormattedMessage
@@ -45,7 +54,14 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
               />
             </button>
             <button
-              onClick={() => {onChange({ x: window.innerWidth / 2, y: window.innerHeight / 2, xPercent: 50, yPercent: 50 }); window.location.reload();}}
+              onClick={() => {
+                onChange({
+                  x: window.innerWidth / 2,
+                  y: window.innerHeight / 2,
+                  xPercent: 50,
+                  yPercent: 50,
+                });
+              }}
               className="button button--primary"
             >
               <FormattedMessage
@@ -59,7 +75,7 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
             <p className="info">
               <FormattedMessage
                 id="settings.position.drag"
-                defaultMessage="Drag the widget to adjust its position"
+                defaultMessage="Drag the widget to move it freely (including off-screen). Use the corner handles to scale and the top handle to rotate. Hold Shift to disable snapping or rotate in 15° increments."
                 description="Help text shown when editing widget position"
               />
             </p>
@@ -95,19 +111,16 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
         <br />
         <input
           type="range"
-          value={display.scale}
+          value={display.scale ?? 1}
           list="scale-markers"
           min="0"
-          max="2"
+          max="3"
           step="0.1"
-          onChange={(event) =>
-            onChange({ scale: Number(event.target.value) })
-          }
+          onChange={(event) => onChange({ scale: Number(event.target.value) })}
         />
         <datalist id="scale-markers">
-          {/* <option value="0.5" label="-0.5" /> */}
-          <option value="1" label="Default" />
-          {/* <option value="1.5" label="+0.5" /> */}
+          <option value="1" />
+          <option value="2" />
         </datalist>
       </label>
 
@@ -139,15 +152,17 @@ const WidgetDisplay: React.FC<Props> = ({ display, onChange }) => {
       </label>
 
       <label>
-        Custom CSS Class
+        <FormattedMessage
+          id="settings.customClass.title"
+          defaultMessage="Custom CSS Class"
+          description="Label for the custom CSS class input field"
+        />
         <br />
         <input
           type="text"
           value={display.customClass}
-          placeholder="Enter a custom class for easier styling"
-          onChange={(event) =>
-            onChange({ customClass: event.target.value })
-          }
+          placeholder={intl.formatMessage(messages.customClassPlaceholder)}
+          onChange={(event) => onChange({ customClass: event.target.value })}
         />
       </label>
     </div>

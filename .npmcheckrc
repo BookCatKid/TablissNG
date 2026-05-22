@@ -2,11 +2,10 @@
   "depcheck": {
     "ignoreMatches": [
       "cross-env",
-      "webpack-cli",
-      "webpack-dev-server",
       "webextension-polyfill",
-      "eslint-plugin-react-hooks",
-      "eslint-plugin-react-refresh"
+      "normalize.css",
+      "sass",
+      "sass-loader"
     ]
   }
 }

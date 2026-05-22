@@ -1,6 +1,7 @@
-import React from "react";
 import { Icon } from "@iconify/react";
+import { type ChangeEvent, type ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
+
 import { timingMessages } from "../../../locales/messages";
 
 export interface BaseSettingsData {
@@ -11,15 +12,22 @@ export interface BaseSettingsData {
 interface Props<T extends BaseSettingsData> {
   data: T;
   setData: (data: T) => void;
-  title?: React.ReactNode;
+  title?: ReactNode;
 }
 
 const knownIntervals = [0, 300, 900, 3600, 86400, 604800];
 
-const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Props<T>) => {
-  const valueForSelect = data.timeout !== undefined && knownIntervals.includes(data.timeout) ? data.timeout : -1;
+const BaseSettings = <T extends BaseSettingsData>({
+  data,
+  setData,
+  title,
+}: Props<T>) => {
+  const valueForSelect =
+    data.timeout !== undefined && knownIntervals.includes(data.timeout)
+      ? data.timeout
+      : -1;
 
-  const handleTimeoutChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimeoutChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const value = Number(event.target.value);
     setData({ ...data, timeout: value === -1 ? data.timeout : value });
   };
@@ -30,7 +38,7 @@ const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Prop
         {data.paused ? (
           <span className="text--grey">
             <FormattedMessage
-              id="plugins.backgrounds.paused"
+              id="backgrounds.base.paused"
               defaultMessage="(Paused)"
               description="Text shown when rotation is paused"
             />{" "}
@@ -45,8 +53,9 @@ const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Prop
         title
       ) : (
         <FormattedMessage
-          id="plugins.backgrounds.showNew"
-          defaultMessage="Show a new item"
+          id="backgrounds.base.showNewPhoto"
+          defaultMessage="Show a new photo"
+          description="Label for the setting that controls how often a new background photo is shown"
         />
       )}
 
@@ -67,11 +76,7 @@ const BaseSettings = <T extends BaseSettingsData>({ data, setData, title }: Prop
           <FormattedMessage {...timingMessages.everyDay} />
         </option>
         <option value="604800">
-          <FormattedMessage
-            id="plugins.everyWeek"
-            defaultMessage="Every week"
-            description="Every week title"
-          />
+          <FormattedMessage {...timingMessages.everyWeek} />
         </option>
       </select>
     </label>

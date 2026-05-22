@@ -1,4 +1,5 @@
 import apod from "./apod";
+import bing from "./bing";
 import colour from "./colour";
 import giphy from "./giphy";
 import gradient from "./gradient";
@@ -15,5 +16,6 @@ export const backgroundConfigs = [
   media,
   online,
   unsplash,
+  bing,
   wikimedia,
 ];

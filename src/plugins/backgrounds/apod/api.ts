@@ -1,11 +1,13 @@
-import { API } from "../../types";
-import { Image, Data } from "./types";
 import { format } from "date-fns";
+
+import { parseLocalDate } from "../../../utils";
+import { API } from "../../types";
+import { Data, Image } from "./types";
 
 type Config = Data;
 
 const formatDateForApi = (date: string): string => {
-  return format(new Date(date), "yyyy-MM-dd");
+  return format(parseLocalDate(date), "yyyy-MM-dd");
 };
 
 export async function getPicture(
@@ -31,10 +33,11 @@ export async function getPicture(
   }
 
   loader.push();
-  const res = await fetch(`${url}?${params}`);
-  const json = await res.json();
-
-  loader.pop();
-
-  return json;
+  try {
+    const res = await fetch(`${url}?${params}`);
+    const json = await res.json();
+    return json;
+  } finally {
+    loader.pop();
+  }
 }

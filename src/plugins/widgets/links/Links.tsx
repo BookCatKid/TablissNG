@@ -1,11 +1,12 @@
-import React, { FC, useMemo, useEffect } from "react";
-
-import { defineMessages, useIntl } from "react-intl";
-import { useKeyPress, useToggle } from "../../../hooks";
-import { Icon } from "@iconify/react";
-import Display from "./Display";
-import { Props, defaultData, defaultCache } from "./types";
 import "./Links.sass";
+
+import { Icon } from "@iconify/react";
+import { FC, useEffect, useMemo } from "react";
+import { defineMessages, useIntl } from "react-intl";
+
+import { useKeyPress, useToggle } from "../../../hooks";
+import { Display } from "./Display";
+import { defaultCache, defaultData, Props } from "./types";
 
 const messages = defineMessages({
   showQuickLinks: {
@@ -15,7 +16,11 @@ const messages = defineMessages({
   },
 });
 
-const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache }) => {
+const Links: FC<Props> = ({
+  data = defaultData,
+  setData,
+  cache = defaultCache,
+}) => {
   const [visible, toggleVisible] = useToggle();
 
   const intl = useIntl();
@@ -23,10 +28,13 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
   // Ensure all links have unique IDs to prevent React key errors
   useEffect(() => {
     const linksWithIds = data.links.map((link, index) => {
-      if (!link.id || data.links.filter(l => l.id === link.id).length > 1) {
+      if (!link.id || data.links.filter((l) => l.id === link.id).length > 1) {
         return {
           ...link,
-          id: Date.now().toString(36) + Math.random().toString(36).slice(2) + index
+          id:
+            Date.now().toString(36) +
+            Math.random().toString(36).slice(2) +
+            index,
         };
       }
       return link;
@@ -40,47 +48,60 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
 
   const handleLinkClick = (id: string) => {
     const updatedLinks = [...data.links];
-    const originalIndex = updatedLinks.findIndex(link => link.id === id);
-    
+    const originalIndex = updatedLinks.findIndex((link) => link.id === id);
+
     if (originalIndex !== -1) {
       updatedLinks[originalIndex] = {
         ...updatedLinks[originalIndex],
-        lastUsed: Date.now()
+        lastUsed: Date.now(),
       };
       setData({ ...data, links: updatedLinks });
     }
   };
 
   const sortedLinks = useMemo(() => {
-    if (data.sortBy === 'none') return data.links;
-    
+    if (data.sortBy === "none") return data.links;
+
     return [...data.links].sort((a, b) => {
       switch (data.sortBy) {
-        case 'name':
-          return (a.name || '').localeCompare(b.name || '');
-        case 'icon':
-          return (a.icon || '').localeCompare(b.icon || '');
-        case 'lastUsed':
+        case "name":
+          return (a.name || "").localeCompare(b.name || "");
+        case "icon":
+          return (a.icon || "").localeCompare(b.icon || "");
+        case "lastUsed": {
           const bTime = b.lastUsed || 0;
           const aTime = a.lastUsed || 0;
           return bTime - aTime; // Most recent first
+        }
         default:
           return 0;
       }
     });
   }, [data.links, data.sortBy]);
 
-  useKeyPress(
-    ({ key }) => {
-      const index = Number(key) - 1;
-      if (sortedLinks[index]) {
-        data.linkOpenStyle
-          ? window.open(sortedLinks[index].url, "_blank")
-          : window.location.assign(sortedLinks[index].url);
+  const keyToIndex = useMemo(() => {
+    const map = new Map<string, number>();
+    sortedLinks.forEach((link, idx) => {
+      if (link.keyboardShortcut && link.keyboardShortcut.length > 0) {
+        map.set(link.keyboardShortcut, idx);
+      } else {
+        map.set(String(idx + 1), idx);
       }
-    },
-    ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
-  );
+    });
+    return map;
+  }, [sortedLinks]);
+
+  useKeyPress(({ key }) => {
+    const index = keyToIndex.get(key);
+
+    if (index !== undefined && sortedLinks[index]) {
+      if (data.linkOpenStyle) {
+        window.open(sortedLinks[index].url, "_blank");
+      } else {
+        window.location.assign(sortedLinks[index].url);
+      }
+    }
+  }, Array.from(keyToIndex.keys()));
 
   return (
     <div
@@ -106,7 +127,10 @@ const Links: FC<Props> = ({ data = defaultData, setData, cache = defaultCache })
           />
         ))
       ) : (
-        <a onClick={toggleVisible} title={intl.formatMessage(messages.showQuickLinks)}>
+        <a
+          onClick={toggleVisible}
+          title={intl.formatMessage(messages.showQuickLinks)}
+        >
           <Icon icon="fe:insert-link" />
         </a>
       )}

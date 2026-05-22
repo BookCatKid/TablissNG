@@ -1,12 +1,11 @@
-import React from "react";
-import { FormattedMessage, useIntl } from "react-intl";
+import type { FC } from "react";
+import { FormattedMessage } from "react-intl";
+
 import { DebounceInput } from "../../shared";
 import { defaultData, Props } from "./types";
 
-const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
-  const intl = useIntl();
-  return (
-  <div className="MessageSettings">
+const GitHubSettings: FC<Props> = ({ data = defaultData, setData }) => (
+  <div className="GitHubSettings">
     <label>
       <FormattedMessage
         id="plugins.github.username"
@@ -25,7 +24,7 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         type="checkbox"
         checked={data.showColorLegend}
         onChange={(event) =>
-          setData({ ...data, showColorLegend: !data.showColorLegend })
+          setData({ ...data, showColorLegend: event.target.checked })
         }
       />{" "}
       <FormattedMessage
@@ -40,7 +39,7 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         type="checkbox"
         checked={data.showMonthLabels}
         onChange={(event) =>
-          setData({ ...data, showMonthLabels: !data.showMonthLabels })
+          setData({ ...data, showMonthLabels: event.target.checked })
         }
       />{" "}
       <FormattedMessage
@@ -55,7 +54,7 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
         type="checkbox"
         checked={data.showTotalCount}
         onChange={(event) =>
-          setData({ ...data, showTotalCount: !data.showTotalCount })
+          setData({ ...data, showTotalCount: event.target.checked })
         }
       />{" "}
       <FormattedMessage
@@ -66,16 +65,33 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
     </label>
 
     <label>
+      <input
+        type="checkbox"
+        checked={data.showTooltips}
+        onChange={(event) =>
+          setData({ ...data, showTooltips: event.target.checked })
+        }
+      />{" "}
+      <FormattedMessage
+        id="plugins.github.showTooltips"
+        defaultMessage="Show tooltips"
+        description="Option to show tooltips on hover"
+      />
+    </label>
+
+    <label>
       <FormattedMessage
         id="plugins.github.clickAction"
         defaultMessage="Click Action"
         description="Label for click action dropdown"
       />
       <select
-        title={intl.formatMessage({ id: "plugins.github.clickAction" })}
         value={data.clickAction}
         onChange={(event) =>
-          setData({ ...data, clickAction: event.target.value as 'none' | 'github' | 'profile' })
+          setData({
+            ...data,
+            clickAction: event.target.value as "none" | "github" | "profile",
+          })
         }
       >
         <option value="none">
@@ -102,7 +118,5 @@ const GitHubSettings: React.FC<Props> = ({ data = defaultData, setData }) => {
       </select>
     </label>
   </div>
-  );
-};
-
+);
 export default GitHubSettings;

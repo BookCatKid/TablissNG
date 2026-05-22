@@ -2,3 +2,6 @@
 /node_modules
 .env
 .DS_Store
+tsconfig.tsbuildinfo
+src/locales/lang.compiled
+.eslintcache

@@ -1,16 +1,16 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
 
-import { Props, defaultData } from "./types";
+import { defaultData, Props } from "./types";
 
 const ColourSettings: FC<Props> = ({ data = defaultData, setData }) => (
   <div className="ColourSettings">
     <label>
       <FormattedMessage
-          id="backgrounds.colour.colour"
-          defaultMessage="Colour"
-          description="Colour title"
-        />
+        id="backgrounds.colour.colour"
+        defaultMessage="Colour"
+        description="Colour title"
+      />
       <input
         type="color"
         value={data.colour}

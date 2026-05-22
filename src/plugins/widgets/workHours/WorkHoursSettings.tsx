@@ -1,11 +1,20 @@
-import React, { FC } from "react";
-import { FormattedMessage } from "react-intl";
-import { useFormatMessages } from "../../../hooks/useFormatMessages";
-import { days } from "./messages";
-import { Props, defaultData } from "./types";
+import { FC } from "react";
+import { FormattedMessage, useIntl } from "react-intl";
+
+import { weekdayFullMessages } from "../../../locales/messages";
+import { defaultData, Props } from "./types";
 
 const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
-  const dayNames = useFormatMessages(days);
+  const intl = useIntl();
+  const dayNames = {
+    sunday: intl.formatMessage(weekdayFullMessages.sunday),
+    monday: intl.formatMessage(weekdayFullMessages.monday),
+    tuesday: intl.formatMessage(weekdayFullMessages.tuesday),
+    wednesday: intl.formatMessage(weekdayFullMessages.wednesday),
+    thursday: intl.formatMessage(weekdayFullMessages.thursday),
+    friday: intl.formatMessage(weekdayFullMessages.friday),
+    saturday: intl.formatMessage(weekdayFullMessages.saturday),
+  };
   const daysArray = [
     { index: 0, name: dayNames.sunday },
     { index: 1, name: dayNames.monday },
@@ -19,10 +28,10 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
     <div className="WorkHoursSettings">
       <label>
         <FormattedMessage
-            id="plugins.workHours.startTime"
-            defaultMessage="Start time"
-            description="Start time title"
-          />
+          id="plugins.workHours.startTime"
+          defaultMessage="Start time"
+          description="Start time title"
+        />
         <input
           type="time"
           value={data.startTime}
@@ -33,24 +42,26 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
       </label>
       <label>
         <FormattedMessage
-            id="plugins.workHours.endTime"
-            defaultMessage="End time"
-            description="End time title"
-          />
+          id="plugins.workHours.endTime"
+          defaultMessage="End time"
+          description="End time title"
+        />
         <input
           type="time"
           value={data.endTime}
-          onChange={(event) => setData({ ...data, endTime: event.target.value })}
+          onChange={(event) =>
+            setData({ ...data, endTime: event.target.value })
+          }
         />
       </label>
       <label>
         <FormattedMessage
-            id="plugins.workHours.flipPercentage"
-            defaultMessage="Flip percentage?"
-            description="Option to flip the percentage calculation"
-          />
+          id="plugins.workHours.flipPercentage"
+          defaultMessage="Flip percentage?"
+          description="Option to flip the percentage calculation"
+        />
         <input
-          style = {{marginLeft: "10px"}}
+          style={{ marginLeft: "10px" }}
           type="checkbox"
           checked={data.flipPercentage}
           onChange={(event) =>
@@ -59,7 +70,7 @@ const WorkHoursSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-      {daysArray.map(day => (
+      {daysArray.map((day) => (
         <div key={day.index}>
           <label>
             <input

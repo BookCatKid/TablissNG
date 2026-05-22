@@ -106,8 +106,10 @@ export const fetchImages = async ({
  * TODO: allow quality to be adjustable, possibly in combination with size
  */
 export const buildLink = (src: string): string => {
+  if (!src) return "";
   const url = new URL(src);
-  url.searchParams.set("q", "85");
+  url.searchParams.set("q", "75");
+  url.searchParams.set("auto", "format");
   url.searchParams.set(
     "w",
     String(calculateWidth(window.innerWidth, window.devicePixelRatio)),

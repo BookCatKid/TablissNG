@@ -1,5 +1,5 @@
-import { reducer } from "./reducer";
 import { addTodo, removeTodo, toggleTodo, updateTodo } from "./actions";
+import { reducer } from "./reducer";
 
 describe("todo/reducer", () => {
   it("should add todo", () => {
