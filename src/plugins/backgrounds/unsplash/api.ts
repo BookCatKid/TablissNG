@@ -26,7 +26,7 @@ export const fetchImages = async ({
     // Consumers should show fallback UI when no images are returned.
     // This avoids crashing the entire app if the env var is missing locally.
     // If you want strict behavior, set `UNSPLASH_API_KEY` in your environment or .env file.
-     
+
     console.warn(
       "UNSPLASH_API_KEY is not set — Unsplash backgrounds will be disabled.",
     );

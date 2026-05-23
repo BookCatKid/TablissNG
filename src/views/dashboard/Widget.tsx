@@ -622,7 +622,6 @@ const Widget: FC<WidgetProps> = ({
         mode={settingsMode ?? "layout"}
         settingsComponent={config.settingsComponent}
         pluginId={id}
-        defaultData={config.defaultData}
         onPositionChange={setWidgetSettingsPosition}
       />
       <WidgetFontSettings

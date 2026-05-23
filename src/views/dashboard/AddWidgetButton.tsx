@@ -6,6 +6,7 @@ import { useIntl } from "react-intl";
 
 import { UiContext } from "../../contexts/ui";
 import { addWidget } from "../../db/action";
+import { sectionMessages } from "../../locales/messages";
 import { widgetConfigs } from "../../plugins/plugins";
 import { isCustomCodeWidget } from "../../plugins/widgets/customCode";
 import { isTextWidget } from "../../plugins/widgets/textWidgets";
@@ -57,14 +58,24 @@ const AddWidgetButton: React.FC = () => {
         className="widget-menu"
         role="dialog"
         aria-modal="true"
-        aria-label="Add Widget"
+        aria-label={intl.formatMessage({
+          id: "add.new.widget",
+          defaultMessage: "Add a new widget",
+          description: "Add a new widget button text",
+        })}
       >
         <div className="widget-menu-header">
-          <h3>Add Widget</h3>
+          <h3>
+            {intl.formatMessage({
+              id: "add.new.widget",
+              defaultMessage: "Add a new widget",
+              description: "Add a new widget button text",
+            })}
+          </h3>
           <button
             className="close-btn"
             onClick={closeAddWidget}
-            aria-label="Close"
+            aria-label={intl.formatMessage(sectionMessages.close)}
           >
             <Icon icon="feather:x" />
           </button>
