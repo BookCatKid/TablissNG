@@ -1,6 +1,14 @@
 ---
 title: Introduction
 sidebar_position: 1
+description: Learn about TablissNG, a beautiful, customizable New Tab page for Firefox, Chrome, and Edge. Discover features, installation, and how to contribute.
+keywords:
+  - TablissNG
+  - new tab page
+  - browser extension
+  - getting started
+  - firefox extension
+  - chrome extension
 ---
 
 # Introduction

@@ -1,6 +1,7 @@
 ---
 title: Microsoft Edge Installation
 sidebar_position: 4
+description: Install TablissNG on Microsoft Edge via Add-ons store or manual installation. Includes developer mode setup and nightly builds.
 ---
 
 import DataLossWarning from '../../\_data-loss-warning.mdx';

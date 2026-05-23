@@ -1,7 +1,13 @@
 packages:
   - "docs"
+
 allowBuilds:
   '@parcel/watcher': true
   '@swc/core': true
   core-js: true
   unrs-resolver: true
+
+overrides:
+  follow-redirects: ">=1.16.0"
+  serialize-javascript: ">=7.0.5"
+  uuid: ">=11.1.1"

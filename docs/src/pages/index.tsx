@@ -47,10 +47,7 @@ function HomepageHeader() {
 
 export default function Home(): ReactNode {
   return (
-    <Layout
-      title="Home"
-      description="TablissNG - A beautiful, private, and customizable new tab page for your browser."
-    >
+    <Layout description="A beautiful, private, and customizable new tab page for your browser.">
       <HomepageHeader />
       <main>
         <HomepageFeatures />

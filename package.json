@@ -46,30 +46,30 @@
   "dependencies": {
     "@iconify/react": "^6.0.2",
     "core-js": "^3.49.0",
-    "date-fns": "^4.1.0",
+    "date-fns": "^4.2.1",
     "date-fns-tz": "^3.2.0",
     "dompurify": "^3.4.5",
     "feather-icons": "^4.29.2",
     "in-browser-language": "^1.0.3",
     "nanoid": "^5.1.11",
     "normalize.css": "^8.0.1",
-    "react": "^19.2.5",
+    "react": "^19.2.6",
     "react-activity-calendar": "^3.2.0",
     "react-crossfade-simple": "^1.0.7",
-    "react-dom": "^19.2.5",
+    "react-dom": "^19.2.6",
     "react-error-boundary": "^6.1.1",
     "react-github-btn": "^1.4.0",
     "react-github-calendar": "^5.0.6",
-    "react-intl": "^10.1.4",
+    "react-intl": "^10.1.9",
     "react-moveable": "^0.56.0",
     "tlds": "^1.261.0",
     "webextension-polyfill": "^0.12.0",
-    "zustand": "^5.0.12"
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
-    "@eslint-react/eslint-plugin": "^5.7.1",
+    "@eslint-react/eslint-plugin": "^5.8.4",
     "@eslint/js": "^10.0.1",
-    "@formatjs/cli": "^6.14.4",
+    "@formatjs/cli": "^6.16.3",
     "@rspack/cli": "2.0.1",
     "@rspack/core": "2.0.1",
     "@rspack/dev-server": "2.0.1",
@@ -78,27 +78,24 @@
     "@types/core-js": "~2.5.8",
     "@types/dompurify": "^3.2.0",
     "@types/feather-icons": "~4.29.4",
-    "@types/react": "^19.2.14",
+    "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "@types/webextension-polyfill": "^0.12.5",
     "cross-env": "^10.1.0",
-    "eslint": "^10.3.0",
-    "eslint-plugin-formatjs": "^6.4.7",
+    "eslint": "^10.4.0",
+    "eslint-plugin-formatjs": "^6.4.12",
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "globals": "^17.6.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "prettier": "^3.8.3",
-    "sass": "^1.99.0",
-    "sass-loader": "^16.0.7",
+    "sass": "^1.100.0",
+    "sass-loader": "^16.0.8",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1",
-    "workbox-build": "^7.4.0"
+    "typescript-eslint": "^8.59.4",
+    "workbox-build": "^7.4.1"
   },
-  "pnpm": {
-    "overrides": {
-      "serialize-javascript": ">=7.0.5",
-      "follow-redirects": ">=1.16.0"
-    }
+  "engines": {
+    "node": ">=24.0"
   }
 }

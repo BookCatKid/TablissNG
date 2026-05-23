@@ -1,6 +1,7 @@
 ---
 title: Firefox Installation
 sidebar_position: 2
+description: Install TablissNG on Firefox via Add-ons store or manual installation. Includes nightly builds and version switching instructions.
 ---
 
 import DataLossWarning from "../../\_data-loss-warning.mdx";

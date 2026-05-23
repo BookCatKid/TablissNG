@@ -7,20 +7,17 @@ import { themes as prismThemes } from "prism-react-renderer";
 const config: Config = {
   title: "TablissNG Docs",
   titleDelimiter: "·",
-  tagline: "A beautiful, customizable New Tab page",
+  tagline: "A beautiful, private, and customizable new tab page",
   favicon: "img/icons/icon.svg",
+
+  url: "https://tablissng.smrff.dev",
+  baseUrl: "/",
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
     v4: true,
     faster: true,
   },
-
-  // Set the production url of your site here
-  url: "https://tablissng.smrff.dev",
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // Docs are served at the site root; the web preview lives under /web/.
-  baseUrl: "/",
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -59,12 +56,61 @@ const config: Config = {
         theme: {
           customCss: "./src/css/custom.sass",
         },
+        sitemap: {
+          lastmod: "date",
+          ignorePatterns: ["/data-loss-warning"],
+          filename: "sitemap.xml",
+          createSitemapItems: async (params) => {
+            const items = await params.defaultCreateSitemapItems(params);
+            const priority: Record<string, number> = {
+              "/": 1.0,
+              "/gallery": 0.9,
+              "/intro": 0.9,
+              "/features": 0.9,
+            };
+            const byPrefix: [string, number][] = [
+              ["/getting-started", 0.7],
+              ["/community", 0.7],
+              ["/guides", 0.6],
+              ["/developing", 0.6],
+              ["/support", 0.5],
+              ["/category", 0.5],
+            ];
+            for (const item of items) {
+              const path = new URL(item.url).pathname;
+              item.priority =
+                priority[path] ??
+                byPrefix.find(([p]) => path.startsWith(p))?.[1] ??
+                0.5;
+            }
+            items.push({
+              url: `${params.siteConfig.url}/web/`,
+              priority: 0.8,
+            });
+            return items;
+          },
+        },
       } satisfies Preset.Options,
     ],
   ],
   plugins: ["docusaurus-plugin-sass"],
 
   themeConfig: {
+    image: "img/screenshots/screenshot_1.png",
+    metadata: [
+      { property: "og:title", content: "TablissNG" },
+      {
+        property: "og:description",
+        content: "A beautiful, private, and customizable new tab page",
+      },
+      {
+        property: "og:image",
+        content: "https://tablissng.smrff.dev/img/screenshots/screenshot_1.png",
+      },
+      { property: "og:url", content: "https://tablissng.smrff.dev" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "theme-color", content: "#3498db" },
+    ],
     navbar: {
       title: "TablissNG",
       logo: {
@@ -161,12 +207,6 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
-    metadata: [
-      {
-        name: "google-site-verification",
-        content: "-jqlgm-10aLbyq4UgXkXf0JTZW7tXeB18i2XTAO8QJQ",
-      },
-    ],
   } satisfies Preset.ThemeConfig,
 };
 

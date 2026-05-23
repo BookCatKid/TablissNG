@@ -1,6 +1,7 @@
 ---
 title: Web Stores (Recommended)
 sidebar_position: 1
+description: Install TablissNG from Firefox, Chrome, or Edge web stores for automatic updates and the most stable experience.
 ---
 
 import DataLossWarning from '../../\_data-loss-warning.mdx';

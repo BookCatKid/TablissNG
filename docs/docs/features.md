@@ -1,6 +1,14 @@
 ---
 title: Features Overview
 sidebar_position: 2
+description: Explore all the features of TablissNG including backgrounds, widgets, customization options, privacy settings, and more.
+keywords:
+  - TablissNG features
+  - backgrounds
+  - widgets
+  - customization
+  - privacy
+  - new tab widgets
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';

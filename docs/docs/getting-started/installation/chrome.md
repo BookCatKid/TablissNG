@@ -1,6 +1,7 @@
 ---
 title: Chrome & Chromium Installation
 sidebar_position: 3
+description: Install TablissNG on Chrome or Chromium-based browsers via Web Store or manually. Includes developer mode setup and nightly builds.
 ---
 
 import DataLossWarning from '../../\_data-loss-warning.mdx';
