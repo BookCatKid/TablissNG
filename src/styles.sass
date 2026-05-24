@@ -72,6 +72,11 @@ html, body
     line-height: 1.25
     color: var(--text-main)
 
+// HUD Mode Global Overrides
+.Dashboard.hud-mode
+    font-family: 'Courier New', 'Consolas', monospace
+    letter-spacing: 0.5px
+
 a
     color: var(--accent-color)
     cursor: pointer
@@ -79,6 +84,16 @@ a
 
     &:hover
         text-decoration: underline
+
+.Dashboard.hud-mode a
+    color: #00fff5
+    text-decoration: none
+    transition: all 0.3s ease
+    
+    &:hover
+        color: #00ffff
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.8)
+        text-decoration: none
 
 h1
     font-size: 4em

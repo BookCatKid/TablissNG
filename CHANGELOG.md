@@ -268,6 +268,10 @@ Finally changed the logo to something different from Tabliss's logo! This releas
 
 ### Added
 
+- feat(widgets): introduce the Text Widget Editor overlay with a rich text toolbar, sanitization, and snippet management for Notes, Message, and Custom Text widgets. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
+
+- feat(widgets): add a dedicated Widget Font Settings modal with outline controls, live preview, and shared typography management. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
+
 - feat(Persist): improve errors and remove on non-web builds. [98195e8](https://github.com/BookCatKid/TablissNG/commit/98195e8)
 
 - feat(storage): add SAVE_BATCH_TIMEOUT to prevent storage errors. [b587897](https://github.com/BookCatKid/TablissNG/commit/b587897)
@@ -288,6 +292,8 @@ Finally changed the logo to something different from Tabliss's logo! This releas
 
 ### Changed
 
+- feat(WidgetSettings): restyle widget settings/font settings windows, streamline plugin-specific content, and auto-clamp the flyout within the viewport. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
+
 - feat: change Unsplash "Tags" input to "Search Term". [8efe064](https://github.com/BookCatKid/TablissNG/commit/8efe064)
 
 - feat: attempt at making custom positioning relative. [a28115b](https://github.com/BookCatKid/TablissNG/commit/a28115b)
@@ -307,6 +313,8 @@ Finally changed the logo to something different from Tabliss's logo! This releas
 - fix(Jokes): retry API call for long jokes. [8ff8a93](https://github.com/BookCatKid/TablissNG/commit/8ff8a933822b5f715785762eb2390f60a6a34e7f)
 
 ### Fixed
+
+- fix(WidgetSettings): prevent the settings flyout from rendering partially off-screen when a widget is near the viewport edge. [efe6367](https://github.com/crustytaco/CrustyTabs/commit/efe63673f7e8912c40fdffbb6d2e3624150ea793)
 
 - fix(Import): set display.scale to true by default. [116df62](https://github.com/BookCatKid/TablissNG/commit/116df62a21c3eb83d8756c2d657ce01fa0a680b3)
 

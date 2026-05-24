@@ -100,8 +100,12 @@ function validateMessageObject(obj, filename) {
   return true;
 }
 
+function resolveFormatjsBin() {
+  return require.resolve("@formatjs/cli/bin/formatjs");
+}
+
 function runFormatjs(args) {
-  return execFileSync("pnpm", ["exec", "formatjs", ...args], {
+  return execFileSync(process.execPath, [resolveFormatjsBin(), ...args], {
     cwd: rootDir,
     stdio: "inherit",
   });
@@ -109,12 +113,12 @@ function runFormatjs(args) {
 
 function assertFormatjsInstalled() {
   try {
-    execFileSync("pnpm", ["exec", "formatjs", "--version"], {
+    execFileSync(process.execPath, [resolveFormatjsBin(), "--version"], {
       cwd: rootDir,
       stdio: "pipe",
     });
   } catch {
-    console.error("\n✗ Missing FormatJS CLI dependency: formatjs");
+    console.error("\n✗ Missing FormatJS CLI dependency: @formatjs/cli");
     console.error(
       "  Run `pnpm install` from the repository root, then try again.",
     );

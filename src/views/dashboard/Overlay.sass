@@ -6,6 +6,7 @@
     border-radius: 1.25rem
     transition: opacity 0.25s ease-out, background-color 0.25s ease-out
     font-size: 1.1rem
+    z-index: 2000
 
     &.topLeft, &.topRight, &.topCentre
         top: 0
@@ -73,6 +74,10 @@
         border: none
         padding: 0
         color: inherit
+
+        &.active svg
+            color: var(--accent-color)
+            filter: none
 
     svg, i
         transition: stroke 0.25s ease-out

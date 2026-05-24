@@ -12,6 +12,11 @@ import { useFullscreen, useKeyPress } from "../../hooks";
 import { useKey, useValue } from "../../lib/db/react";
 
 const messages = defineMessages({
+  addWidgetHint: {
+    id: "dashboard.addWidgetHint",
+    defaultMessage: "Add widget",
+    description: "Hover hint text for the add widget icon",
+  },
   settingsHint: {
     id: "dashboard.settingsHint",
     defaultMessage: "Customise Tabliss",
@@ -44,21 +49,40 @@ const Overlay: FC = () => {
   const intl = useIntl();
   const focus = useValue(db, "focus");
   const { errors } = useContext(ErrorContext);
-  const { pending, toggleErrors, toggleSettings } = useContext(UiContext);
+  const {
+    pending,
+    toggleErrors,
+    toggleSettings,
+    toggleAddWidget,
+    addWidgetOpen,
+  } = useContext(UiContext);
   const [hideSettingsIcon] = useKey(db, "hideSettingsIcon");
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
 
-  useKeyPress(toggleFocus, ["w"]);
-  useKeyPress(toggleSettings, ["s"]);
+  useKeyPress(toggleFocus, ["w", "W"]);
+  useKeyPress(toggleSettings, ["s", "S"]);
+  useKeyPress(toggleAddWidget, ["q", "Q"]);
 
   const [isFullscreen, handleToggleFullscreen] = useFullscreen();
-  useKeyPress(handleToggleFullscreen || null, ["f"]);
+  useKeyPress(handleToggleFullscreen || null, ["f", "F"]);
 
   const isCenter =
     settingsIconPosition === "topCentre" ||
     settingsIconPosition === "bottomCentre";
 
   const wrapperClass = `Overlay ${settingsIconPosition}${hideSettingsIcon ? " hidden" : ""}`;
+
+  const addWidgetBtn = (
+    <button
+      type="button"
+      className={addWidgetOpen ? "active" : ""}
+      onClick={toggleAddWidget}
+      title={`${intl.formatMessage(messages.addWidgetHint)} (Q)`}
+      aria-pressed={addWidgetOpen}
+    >
+      <Icon icon="feather:plus-circle" />
+    </button>
+  );
 
   const settingsBtn = (
     <button
@@ -115,6 +139,7 @@ const Overlay: FC = () => {
           {fullscreenBtn}
         </div>
         <div className="Overlay__group Overlay__group--center">
+          {addWidgetBtn}
           {settingsBtn}
           {errorBtn}
           {loadingBtn}
@@ -129,6 +154,7 @@ const Overlay: FC = () => {
 
   return (
     <div className={wrapperClass}>
+      {addWidgetBtn}
       {settingsBtn}
       {errorBtn}
       {loadingBtn}

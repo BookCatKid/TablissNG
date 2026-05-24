@@ -1,0 +1,155 @@
+
+.AddWidgetButton
+    position: fixed
+    inset: 0
+    z-index: 2100
+
+    .backdrop
+        position: fixed
+        top: 0
+        left: 0
+        width: 100%
+        height: 100%
+        background: rgba(0, 0, 0, 0.5)
+        z-index: 0
+        backdrop-filter: blur(4px)
+        pointer-events: auto
+
+    .widget-menu
+        position: absolute
+        top: 4.5rem
+        left: 1.25rem
+        width: min(380px, calc(100vw - 2rem))
+        max-height: min(70vh, 560px)
+        background: white
+        border-radius: 14px
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35)
+        border: 1px solid rgba(0, 0, 0, 0.1)
+        z-index: 1
+        overflow: hidden
+        display: flex
+        flex-direction: column
+        pointer-events: auto
+
+        .dark &
+            background: #1a1a1a
+            color: white
+
+        .widget-menu-header
+            display: flex
+            justify-content: space-between
+            align-items: center
+            padding: 1rem 1.5rem
+            border-bottom: 1px solid #e0e0e0
+
+            .dark &
+                border-bottom-color: #333
+
+            h3
+                margin: 0
+                font-size: 1.25rem
+                color: #212121
+
+                .dark &
+                    color: white
+
+            .close-btn
+                background: none
+                border: none
+                cursor: pointer
+                padding: 0.25rem
+                display: flex
+                align-items: center
+                justify-content: center
+                color: #666
+                transition: color 0.2s ease
+
+                &:hover
+                    color: #212121
+
+                    .dark &
+                        color: white
+
+                svg
+                    width: 24px
+                    height: 24px
+
+        .widget-list
+            overflow-y: auto
+            padding: 0.5rem
+
+            .widget-option
+                width: 100%
+                padding: 1rem
+                margin: 0.25rem 0
+                border: none
+                background: #f5f5f5
+                border-radius: 8px
+                cursor: pointer
+                text-align: left
+                transition: all 0.2s ease
+                color: inherit
+
+                .dark &
+                    background: #2d2d2d
+                    color: white
+
+                &:hover
+                    background: #e8f4fd
+                    transform: translateX(4px)
+
+                    .dark &
+                        background: #3a3a3a
+
+                .widget-name
+                    font-weight: 600
+                    font-size: 1rem
+                    margin-bottom: 0.25rem
+                    color: #212121
+
+                    .dark &
+                        color: white
+
+                .widget-desc
+                    font-size: 0.875rem
+                    color: #666
+                    line-height: 1.4
+
+                    .dark &
+                        color: #aaa
+
+// HUD Mode Styling
+.Dashboard.hud-mode .AddWidgetButton
+    .widget-menu
+        background: #ffffff
+        border: 1px solid rgba(52,152,219,0.08)
+        box-shadow: 0 20px 40px rgba(17,24,39,0.06)
+        backdrop-filter: none
+
+        .widget-menu-header
+            border-bottom-color: rgba(0,0,0,0.06)
+
+            h3
+                color: #212121
+                text-shadow: none
+
+            .close-btn
+                color: #666
+
+                &:hover
+                    color: #212121
+
+        .widget-list
+            .widget-option
+                background: #f5f5f5
+                border: 1px solid rgba(0,0,0,0.04)
+
+                &:hover
+                    background: #eef6ff
+                    border-color: rgba(52,152,219,0.08)
+
+                .widget-name
+                    color: #212121
+
+                .widget-desc
+                    color: #666

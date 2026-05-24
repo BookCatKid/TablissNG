@@ -21,7 +21,27 @@ export const fetchImages = async ({
   });
 
   if (!UNSPLASH_API_KEY) {
-    throw new Error("You must set the UNSPLASH_API_KEY environment variable.");
+    // In development environments it's possible the key is not set.
+    // Degrade gracefully: log a warning and return an empty image so the app can continue.
+    // Consumers should show fallback UI when no images are returned.
+    // This avoids crashing the entire app if the env var is missing locally.
+    // If you want strict behavior, set `UNSPLASH_API_KEY` in your environment or .env file.
+
+    console.warn(
+      "UNSPLASH_API_KEY is not set — Unsplash backgrounds will be disabled.",
+    );
+    const empty: Image[] = [
+      {
+        src: "",
+        credit: {
+          imageLink: "",
+          location: undefined,
+          userName: "",
+          userLink: "",
+        },
+      },
+    ];
+    return empty;
   }
 
   params.set("count", "10");

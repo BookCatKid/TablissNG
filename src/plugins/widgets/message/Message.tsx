@@ -1,11 +1,24 @@
-import { FC } from "react";
+import { type FC } from "react";
 
+import { sanitizeRichText } from "../../../utils/richText";
 import { defaultData, Props } from "./types";
 
-const Message: FC<Props> = ({ data = defaultData }) => (
-  <div className="Message">
-    <h3 style={{ whiteSpace: "pre" }}>{data.messages[0]}</h3>
-  </div>
-);
+const Message: FC<Props> = ({ data = defaultData }) => {
+  const content = data.messages?.[0] ?? "";
+  const useRich = Boolean(data.richTextEnabled);
+
+  return (
+    <div className="Message">
+      {useRich ? (
+        <div
+          className="message-rich"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichText(content) }}
+        />
+      ) : (
+        <h3 style={{ whiteSpace: "pre" }}>{content}</h3>
+      )}
+    </div>
+  );
+};
 
 export default Message;

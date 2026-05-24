@@ -1,0 +1,88 @@
+.LinksSettings
+  position: relative
+  display: flex
+  flex-direction: column
+  gap: 0.75rem
+  padding-top: 0.25rem
+
+  .links-settings-toolbar
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: 0.75rem
+
+  .links-toolbar-button,
+  .links-preferences summary
+    width: 32px
+    height: 32px
+    border: 1px solid var(--border-main)
+    border-radius: 6px
+    background: var(--bg-button)
+    color: var(--text-main)
+    display: flex
+    align-items: center
+    justify-content: center
+    cursor: pointer
+    list-style: none
+    transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease
+
+    svg
+      font-size: 16px
+
+    &:hover
+      border-color: var(--accent-color)
+      color: var(--accent-color)
+      background: var(--bg-main)
+
+    &::-webkit-details-marker
+      display: none
+
+  .links-preferences
+    position: relative
+
+  .links-preferences-menu
+    position: absolute
+    right: 0
+    top: calc(100% + 0.45rem)
+    z-index: 5
+    width: min(300px, calc(100vw - 64px))
+    padding: 0.75rem
+    border: 1px solid var(--border-main)
+    border-radius: 8px
+    background: var(--bg-main)
+    box-shadow: 0 10px 24px var(--shadow-main)
+
+    label
+      display: grid
+      grid-template-columns: minmax(0, 1fr) auto
+      align-items: center
+      gap: 0.55rem
+      margin: 0 0 0.55rem
+      color: var(--text-heading)
+      font-weight: 600
+
+      &:last-child
+        margin-bottom: 0
+
+    input:not([type="checkbox"]),
+    select
+      min-width: 0
+      border: 1px solid var(--border-main)
+      border-radius: 6px
+      background: var(--bg-input)
+      color: var(--text-heading)
+      padding: 0.4rem 0.5rem
+
+    input[type="checkbox"]
+      accent-color: var(--accent-color)
+
+  .links-list
+    display: flex
+    flex-direction: column
+    gap: 0.45rem
+
+@media (max-width: 640px)
+  .LinksSettings
+    .links-preferences-menu
+      right: 0
+      width: min(280px, calc(100vw - 48px))

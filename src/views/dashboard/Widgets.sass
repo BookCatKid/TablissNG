@@ -3,6 +3,8 @@
     text-align: center
     pointer-events: none
     user-select: auto
+    position: relative
+    z-index: 50
 
     .container
         position: relative
@@ -16,7 +18,6 @@
         .Slot.free > *
             margin: 0
 
-
     h1, h2, h3, h4
         line-height: 1
         margin: 0
@@ -26,10 +27,214 @@
             font-weight: inherit
 
     .drag-selected
+        outline: 2px solid var(--accent-color)
+        background: color-mix(in srgb, var(--accent-color) 12%, transparent)
         z-index: 1000
 
-        & > *
+        & > :not(.widget-controls)
             pointer-events: none
+
+        & > .widget-controls
+            pointer-events: auto
+
+    .Widget
+        position: relative
+
+        .widget-controls
+            position: absolute
+            display: flex
+            gap: 0.25rem
+            padding: 0.35rem 0.5rem
+            border-radius: 0.5rem
+            background: var(--bg-main)
+            border: 1px solid var(--border-main)
+            box-shadow: 0 0.5rem 1rem var(--shadow-main)
+            opacity: 0
+            transition: opacity 0.18s ease, transform 0.18s ease
+            pointer-events: none
+            z-index: 1300
+
+        .widget-settings-trigger
+            width: 28px
+            height: 28px
+            border-radius: 0.4rem
+            border: none
+            background: var(--bg-button)
+            color: var(--text-main)
+            display: flex
+            align-items: center
+            justify-content: center
+            cursor: pointer
+            transition: background 0.12s ease, transform 0.12s ease
+            pointer-events: auto
+
+            svg
+                font-size: 13px
+
+            &:hover
+                transform: scale(1.03)
+                background: var(--border-main)
+
+            &.danger
+                color: #9b2c2c
+
+                &:hover
+                    background: #fff5f5
+
+        .widget-control-popover
+            position: absolute
+            min-width: 200px
+            top: auto
+            bottom: auto
+            left: auto
+            right: auto
+            padding: 0.75rem
+            border-radius: 0.6rem
+            background: var(--bg-main)
+            border: 1px solid var(--border-main)
+            box-shadow: 0 0.5rem 1rem var(--shadow-main)
+            z-index: 130
+
+            .popover-header
+                display: flex
+                align-items: center
+                justify-content: space-between
+                margin-bottom: 0.5rem
+                font-size: 0.85rem
+                color: var(--text-main)
+
+                .popover-value-button
+                    background: transparent
+                    border: 1px solid var(--border-main)
+                    color: var(--text-main)
+                    border-radius: 0.4rem
+                    padding: 0.1rem 0.5rem
+                    font-size: 0.8rem
+                    cursor: pointer
+
+                    &:hover,
+                    &:focus-visible
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
+                        outline: none
+
+                .popover-value-input
+                    width: 70px
+                    border-radius: 0.4rem
+                    border: 1px solid var(--border-main)
+                    background: var(--bg-input)
+                    color: var(--text-main)
+                    padding: 0.15rem 0.4rem
+                    font-size: 0.8rem
+                    text-align: center
+                    outline: none
+
+                    &:focus-visible
+                        border-color: var(--accent-color)
+
+            input[type="range"]
+                width: 100%
+                accent-color: var(--accent-color)
+
+            .quick-align-grid
+                display: grid
+                grid-template-columns: repeat(3, 42px)
+                gap: 0.35rem
+                justify-content: center
+
+                .holo-chip
+                    width: 42px
+                    height: 42px
+                    border-radius: 50%
+                    border: 1px solid var(--border-main)
+                    background: var(--bg-main)
+                    color: var(--text-main)
+                    display: flex
+                    align-items: center
+                    justify-content: center
+                    cursor: pointer
+                    position: relative
+                    transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease, color 0.12s ease
+
+                    svg
+                        font-size: 1rem
+
+                    .sr-only
+                        position: absolute
+                        width: 1px
+                        height: 1px
+                        padding: 0
+                        margin: -1px
+                        overflow: hidden
+                        clip: rect(0, 0, 0, 0)
+                        white-space: nowrap
+                        border: 0
+
+                    &.active
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
+                        background: var(--bg-secondary)
+
+                    &:hover
+                        transform: translateY(-1px) scale(1.03)
+                        border-color: var(--accent-color)
+                        color: var(--accent-color)
+
+                    &:focus-visible
+                        outline: 2px solid var(--accent-color)
+                        outline-offset: 2px
+
+        &:hover .widget-controls,
+        &.drag-selected .widget-controls,
+        .widget-controls.menu-active
+            opacity: 1
+            transform: translate(0, 0)
+            pointer-events: auto
+
+        .widget-content
+            display: inline-block
+            position: relative
+            transform-origin: center
 
 body.no-highlight .Widgets
     user-select: none
+
+.widget-controls--floating
+    position: fixed
+    display: flex
+    gap: 0.25rem
+    padding: 0.35rem 0.5rem
+    border-radius: 0.5rem
+    background: var(--bg-main)
+    border: 1px solid var(--border-main)
+    box-shadow: 0 0.5rem 1rem var(--shadow-main)
+    opacity: 1
+    pointer-events: auto
+    z-index: 1300
+
+    .widget-settings-trigger
+        width: 28px
+        height: 28px
+        border-radius: 0.4rem
+        border: none
+        background: var(--bg-button)
+        color: var(--text-main)
+        display: flex
+        align-items: center
+        justify-content: center
+        cursor: pointer
+        transition: background 0.12s ease, transform 0.12s ease
+        pointer-events: auto
+
+        svg
+            font-size: 13px
+
+        &:hover
+            transform: scale(1.03)
+            background: var(--border-main)
+
+        &.danger
+            color: #dc2626
+
+            &:hover
+                background: color-mix(in srgb, #dc2626 12%, var(--bg-button))

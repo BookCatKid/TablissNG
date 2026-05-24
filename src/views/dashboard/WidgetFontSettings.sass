@@ -1,0 +1,262 @@
+.widget-font-settings-backdrop
+  position: fixed
+  inset: 0
+  background: color-mix(in srgb, var(--bg-overlay) 82%, transparent)
+  backdrop-filter: blur(2px)
+  z-index: 1900
+
+.WidgetFontSettings
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: min(640px, calc(100vw - 32px))
+  max-height: min(640px, calc(100vh - 32px))
+  display: flex
+  flex-direction: column
+  background: var(--bg-main)
+  border: 1px solid var(--border-light)
+  border-radius: 8px
+  color: var(--text-main)
+  box-shadow: 0 12px 32px var(--shadow-main)
+  pointer-events: auto
+  overflow: hidden
+  color-scheme: light
+  z-index: 1910
+
+  .dark &
+    color-scheme: dark
+
+  .corner-decoration,
+  .header-glow
+    display: none
+
+  .settings-header
+    padding: 1rem 1.25rem
+    border-bottom: 1px solid var(--border-light)
+    display: flex
+    align-items: center
+    justify-content: space-between
+    gap: 1rem
+
+    h3
+      margin: 0
+      color: var(--text-heading)
+      font-size: 1rem
+      font-weight: 700
+      letter-spacing: 0
+      text-transform: none
+      display: flex
+      align-items: center
+      gap: 0.45rem
+      min-width: 0
+
+      span
+        overflow: hidden
+        text-overflow: ellipsis
+        white-space: nowrap
+
+    .close-btn
+      flex: 0 0 auto
+      width: 32px
+      height: 32px
+      border-radius: 4px
+      border: 1px solid var(--border-main)
+      background: var(--bg-main)
+      color: var(--text-main)
+      display: flex
+      align-items: center
+      justify-content: center
+      cursor: pointer
+      transition: background 0.12s ease, transform 0.12s ease
+
+      &:hover
+        background: var(--bg-button)
+        transform: translateY(-1px)
+
+      &:focus-visible
+        outline: 2px solid var(--accent-color)
+        outline-offset: 2px
+
+  .settings-content
+    padding: 1rem
+    flex: 1 1 auto
+    overflow-y: auto
+    display: flex
+    flex-direction: column
+    gap: 0.85rem
+
+  .setting-group
+    margin: 0
+
+  .holo-card
+    padding: 0.9rem
+    border: 1px solid var(--border-light)
+    border-radius: 8px
+    background: var(--bg-secondary)
+
+  .settings-grid,
+  .outline-grid
+    display: grid
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))
+    gap: 0.85rem
+
+  .stacked-input
+    display: flex
+    flex-direction: column
+    gap: 0.35rem
+    color: var(--text-main)
+    font-size: 0.88rem
+
+    > span:first-child
+      color: var(--text-heading)
+      font-weight: 600
+
+  input:not([type="checkbox"]),
+  select
+    width: 100%
+    border: 1px solid var(--border-main)
+    border-radius: 6px
+    background: var(--bg-input)
+    color: var(--text-heading)
+    padding: 0.5rem 0.6rem
+    font-family: inherit
+    font-size: 0.9rem
+
+    &:focus
+      outline: 2px solid color-mix(in srgb, var(--accent-color) 35%, transparent)
+      border-color: var(--accent-color)
+
+  .colour-field
+    display: flex
+    align-items: center
+    gap: 0.55rem
+    border-radius: 999px
+    border: 1px solid var(--border-main)
+    padding: 0.2rem 0.7rem 0.2rem 0.25rem
+    background: var(--bg-main)
+
+    input
+      width: 36px
+      height: 36px
+      padding: 0
+      border: none
+      background: transparent
+      cursor: pointer
+
+    .colour-value
+      color: var(--text-secondary)
+      font-family: "JetBrains Mono", "Fira Mono", monospace
+      font-size: 0.78rem
+
+  .slider-toggle
+    align-self: flex-start
+    display: inline-flex
+    align-items: center
+    gap: 0.5rem
+    cursor: pointer
+    user-select: none
+
+    input
+      position: absolute
+      opacity: 0
+      pointer-events: none
+
+    .slider-track
+      width: 42px
+      height: 22px
+      border-radius: 999px
+      border: 1px solid var(--border-main)
+      background: var(--bg-button)
+      display: inline-flex
+      align-items: center
+      padding: 0 3px
+
+      .slider-thumb
+        width: 16px
+        height: 16px
+        border-radius: 50%
+        background: var(--bg-main)
+        transform: translateX(0)
+        transition: transform 0.16s ease, background 0.16s ease
+
+    input:checked + .slider-track
+      background: color-mix(in srgb, var(--accent-color) 28%, var(--bg-button))
+      border-color: var(--accent-color)
+
+      .slider-thumb
+        transform: translateX(18px)
+        background: var(--accent-color)
+
+    .slider-status
+      color: var(--text-secondary)
+      font-size: 0.78rem
+
+  .preview-label
+    display: block
+    color: var(--text-heading)
+    font-size: 0.78rem
+    font-weight: 700
+    margin-bottom: 0.65rem
+    text-transform: uppercase
+
+  .preview-card
+    min-height: 120px
+    border-radius: 8px
+    border: 1px solid var(--border-main)
+    background: var(--bg-main)
+    display: flex
+    align-items: center
+    justify-content: center
+    padding: 1rem
+
+  .preview-stack
+    position: relative
+    display: inline-block
+
+    .preview-outline
+      position: absolute
+      inset: 0
+      z-index: 0
+      pointer-events: none
+
+    .preview-top
+      position: relative
+      z-index: 1
+
+  .settings-footer
+    padding: 1rem 1.25rem
+    border-top: 1px solid var(--border-light)
+    display: flex
+    justify-content: flex-end
+    gap: 0.75rem
+    background: var(--bg-main)
+
+    button
+      border-radius: 999px
+      padding: 0.6rem 1.25rem
+      font-weight: 700
+      cursor: pointer
+      transition: background 0.12s ease, transform 0.12s ease
+
+      &.ghost
+        background: transparent
+        border: 1px solid var(--border-main)
+        color: var(--text-heading)
+
+      &.primary
+        border: 1px solid var(--accent-color)
+        background: var(--accent-color)
+        color: var(--text-on-primary)
+
+      &:hover
+        transform: translateY(-1px)
+
+      &:focus-visible
+        outline: 2px solid var(--accent-color)
+        outline-offset: 2px
+
+@media (max-width: 540px)
+  .WidgetFontSettings
+    width: calc(100vw - 24px)
+    max-height: calc(100vh - 24px)

@@ -1,7 +1,7 @@
 import { API } from "../../types";
 
-type Data = { messages: string[] };
+export type MessageData = { messages: string[]; richTextEnabled?: boolean };
 
-export type Props = API<Data>;
+export type Props = API<MessageData>;
 
-export const defaultData: Data = { messages: [""] };
+export const defaultData: MessageData = { messages: [""] };

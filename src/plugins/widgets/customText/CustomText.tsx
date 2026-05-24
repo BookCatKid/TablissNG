@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
+import { sanitizeRichText } from "../../../utils/richText";
 import { defaultData, Props } from "./types";
 
 const CustomText: FC<Props> = ({ data = defaultData }) => {
@@ -17,10 +18,24 @@ const CustomText: FC<Props> = ({ data = defaultData }) => {
     return x % range;
   };
 
+  const getEntries = () => {
+    if (data.richTextEnabled && data.strings && data.strings.length > 0) {
+      return data.strings;
+    }
+    const sep: string = data.atNewline ? "\n" : data.separator || "\n";
+    return data.text ? data.text.split(sep) : [""];
+  };
+
   const updateText = () => {
-    const sep: string = data.atNewline ? "\n" : data.separator;
-    const texts = data.text.split(sep);
-    const result = texts[unbiasedRand(texts.length)];
+    const texts = getEntries();
+    const cleanedList = texts.filter(
+      (entry) => entry !== undefined && entry !== null,
+    );
+    if (cleanedList.length === 0) {
+      setCurrentText("");
+      return;
+    }
+    const result = cleanedList[unbiasedRand(cleanedList.length)];
     setCurrentText(result);
     setLastUpdate(Date.now());
   };
@@ -43,9 +58,18 @@ const CustomText: FC<Props> = ({ data = defaultData }) => {
     return () => clearInterval(interval);
   }, [data.timeout, data.paused, lastUpdate]);
 
+  const useRich = Boolean(data.richTextEnabled);
+
   return (
     <div className="CustomText">
-      <h3>{currentText}</h3>
+      {useRich ? (
+        <div
+          className="custom-text-rich"
+          dangerouslySetInnerHTML={{ __html: sanitizeRichText(currentText) }}
+        />
+      ) : (
+        <h3>{currentText}</h3>
+      )}
     </div>
   );
 };

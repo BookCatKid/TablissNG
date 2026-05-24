@@ -1,0 +1,181 @@
+.custom-code-editor-backdrop
+  position: fixed
+  inset: 0
+  background: rgba(2, 4, 12, 0.85)
+  backdrop-filter: blur(6px)
+  z-index: 2900
+
+.CustomCodeEditor
+  position: fixed
+  top: 50%
+  left: 50%
+  transform: translate(-50%, -50%)
+  width: min(900px, 95vw)
+  max-height: 92vh
+  background: rgba(12, 14, 24, 0.96)
+  border-radius: 18px
+  border: 1px solid rgba(255, 255, 255, 0.12)
+  padding: 1.25rem 1.5rem
+  display: flex
+  flex-direction: column
+  gap: 1rem
+  color: #f6f7ff
+  z-index: 3000
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7)
+
+  .editor-header
+    display: flex
+    justify-content: space-between
+    gap: 1rem
+    flex-wrap: wrap
+    align-items: center
+
+    .title-block
+      display: flex
+      gap: 0.75rem
+      align-items: center
+
+      h3
+        margin: 0
+        font-size: 1.15rem
+
+      p
+        margin: 0
+        font-size: 0.85rem
+        color: rgba(255, 255, 255, 0.65)
+
+    .header-actions
+      display: flex
+      gap: 0.5rem
+
+      button
+        appearance: none
+        border: none
+        border-radius: 999px
+        padding: 0.55rem 1.4rem
+        font-weight: 600
+        cursor: pointer
+        transition: opacity 0.2s ease
+
+        &.ghost
+          background: transparent
+          border: 1px solid rgba(255, 255, 255, 0.35)
+          color: inherit
+
+        &.primary
+          background: linear-gradient(120deg, #57b1ff, #a855f7)
+          color: white
+
+        &:disabled
+          opacity: 0.35
+          cursor: default
+
+        &:not(:disabled):hover
+          opacity: 0.8
+
+  .editor-body
+    display: flex
+    flex-direction: column
+    gap: 0.75rem
+
+  .code-shell
+    display: flex
+    border-radius: 16px
+    overflow: hidden
+    border: 1px solid rgba(255, 255, 255, 0.15)
+    background: rgba(4, 6, 14, 0.9)
+    min-height: 360px
+
+    .line-numbers
+      width: 48px
+      padding: 0.75rem 0.5rem
+      background: rgba(255, 255, 255, 0.05)
+      font-family: "JetBrains Mono", "Fira Code", Consolas, monospace
+      font-size: 0.85rem
+      text-align: right
+      color: rgba(255, 255, 255, 0.4)
+      overflow-y: hidden
+
+      span
+        display: block
+        line-height: 1.5rem
+
+    .code-pane
+      position: relative
+      flex: 1
+
+      .highlight
+        position: absolute
+        inset: 0
+        margin: 0
+        padding: 0.75rem 1rem
+        font-family: "JetBrains Mono", "Fira Code", Consolas, monospace
+        font-size: 0.95rem
+        line-height: 1.5rem
+        white-space: pre-wrap
+        overflow: auto
+        color: rgba(255, 255, 255, 0.4)
+        pointer-events: none
+        z-index: 0
+
+      textarea
+        position: absolute
+        inset: 0
+        background: transparent
+        color: transparent
+        caret-color: #fdfdfd
+        border: none
+        resize: none
+        outline: none
+        padding: 0.75rem 1rem
+        font-family: "JetBrains Mono", "Fira Code", Consolas, monospace
+        font-size: 0.95rem
+        line-height: 1.5rem
+        white-space: pre
+        overflow: auto
+        z-index: 1
+
+      .highlight .token
+        color: #cfd3ff
+
+      .highlight .line-placeholder
+        display: block
+        height: 1.5rem
+        color: rgba(255, 255, 255, 0)
+
+      .highlight .token.selector,
+      .highlight .token.tag
+        color: #6be5ff
+
+      .highlight .token.property,
+      .highlight .token.attr-name
+        color: #f7a8ff
+
+      .highlight .token.value,
+      .highlight .token.attr-value,
+      .highlight .token.string
+        color: #f9dd72
+
+      .highlight .token.keyword
+        color: #7adabf
+
+      .highlight .token.number
+        color: #f28f8f
+
+      .highlight .token.comment
+        color: rgba(255, 255, 255, 0.35)
+        font-style: italic
+
+  .editor-hints
+    display: flex
+    gap: 0.5rem
+    align-items: flex-start
+    font-size: 0.85rem
+    color: rgba(255, 255, 255, 0.7)
+
+    kbd
+      background: rgba(255, 255, 255, 0.08)
+      border-radius: 4px
+      padding: 0.15rem 0.45rem
+      font-size: 0.8rem
+      border: 1px solid rgba(255, 255, 255, 0.15)

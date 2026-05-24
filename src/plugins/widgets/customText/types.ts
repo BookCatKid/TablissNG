@@ -1,19 +1,20 @@
 import { API } from "../../types";
 
-type Data = {
+export type CustomTextData = {
   text: string;
   separator: string;
   strings: string[];
   atNewline: boolean;
   timeout: number;
   paused: boolean;
+  richTextEnabled?: boolean;
 };
 
-export type Props = API<Data>;
+export type Props = API<CustomTextData>;
 
-export const defaultData: Data = {
+export const defaultData: CustomTextData = {
   text: "",
-  strings: [""],
+  strings: [],
   separator: "",
   atNewline: true,
   timeout: 0,

@@ -1,3 +1,5 @@
+import "./Background.sass";
+
 import type { FC } from "react";
 
 import { db } from "../../db/state";

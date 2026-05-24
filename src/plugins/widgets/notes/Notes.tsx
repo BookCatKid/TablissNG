@@ -3,12 +3,13 @@ import "./Notes.sass";
 import { Icon } from "@iconify/react";
 import { type FC, useState } from "react";
 import { FormattedMessage } from "react-intl";
+import ReactMarkdown from "react-markdown";
 
 import { useKeyPress } from "../../../hooks";
+import { sanitizeRichText } from "../../../utils/richText";
 import { API } from "../../types";
 import { Data, defaultData } from "./data";
 import Input from "./Input";
-import SimpleMarkdown from "./SimpleMarkdown";
 
 const Notes: FC<API<Data>> = ({ data = defaultData, setData }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,10 +23,56 @@ const Notes: FC<API<Data>> = ({ data = defaultData, setData }) => {
     [keyBind.toUpperCase(), keyBind.toLowerCase()],
   );
 
+  const allowInlineEditing = !data.richTextEnabled;
+  const renderPlaceholder = () => (
+    <div
+      className="placeholder"
+      style={{
+        display: "flex",
+        justifyContent: data.iconAlign || "flex-start",
+      }}
+    >
+      {data.placeholderStyle === "icon" ? (
+        <Icon icon="feather:edit" />
+      ) : (
+        <>
+          <Icon icon="feather:edit-3" />
+          <span>
+            <FormattedMessage
+              id="plugins.notes.clickToAdd"
+              defaultMessage="Click to add note"
+              description="Placeholder shown when the notes widget has no note content"
+            />
+          </span>
+        </>
+      )}
+    </div>
+  );
+
+  const renderContent = () => {
+    if (!data.notes[0].contents) {
+      return renderPlaceholder();
+    }
+    if (data.markdownEnabled && !data.richTextEnabled) {
+      return <ReactMarkdown>{data.notes[0].contents}</ReactMarkdown>;
+    }
+    if (data.richTextEnabled) {
+      return (
+        <div
+          className="notes-rich"
+          dangerouslySetInnerHTML={{
+            __html: sanitizeRichText(data.notes[0].contents),
+          }}
+        />
+      );
+    }
+    return data.notes[0].contents;
+  };
+
   return (
     <div className="Notes" style={{ textAlign: data.textAlign || "left" }}>
       <div>
-        {isEditing ? (
+        {allowInlineEditing && isEditing ? (
           <Input
             value={data.notes[0].contents}
             onChange={(contents) => {
@@ -35,40 +82,19 @@ const Notes: FC<API<Data>> = ({ data = defaultData, setData }) => {
           />
         ) : (
           <div
-            onClick={() => setIsEditing(true)}
-            style={{ cursor: "pointer" }}
-            className={data.markdownEnabled ? "markdown-content" : ""}
+            onClick={() => {
+              if (allowInlineEditing) {
+                setIsEditing(true);
+              }
+            }}
+            style={{ cursor: allowInlineEditing ? "pointer" : "default" }}
+            className={
+              data.markdownEnabled && !data.richTextEnabled
+                ? "markdown-content"
+                : ""
+            }
           >
-            {data.notes[0].contents ? (
-              data.markdownEnabled ? (
-                <SimpleMarkdown>{data.notes[0].contents}</SimpleMarkdown>
-              ) : (
-                data.notes[0].contents
-              )
-            ) : (
-              <div
-                className="placeholder"
-                style={{
-                  display: "flex",
-                  justifyContent: data.iconAlign || "flex-start",
-                }}
-              >
-                {data.placeholderStyle === "icon" ? (
-                  <Icon icon="feather:edit" />
-                ) : (
-                  <>
-                    <Icon icon="feather:edit-3" />
-                    <span>
-                      <FormattedMessage
-                        id="plugins.notes.clickToAdd"
-                        defaultMessage="Click to add note"
-                        description="Placeholder text prompting the user to click to add a new note"
-                      />
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
+            {renderContent()}
           </div>
         )}
       </div>

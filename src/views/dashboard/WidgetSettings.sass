@@ -1,0 +1,264 @@
+.widget-settings-backdrop
+    position: fixed
+    inset: 0
+    background: color-mix(in srgb, var(--bg-overlay) 80%, transparent)
+    backdrop-filter: blur(2px)
+    z-index: 1900
+
+.WidgetSettings
+    position: fixed
+    width: min(420px, calc(100vw - 32px))
+    max-height: min(520px, calc(100vh - 32px))
+    background: var(--bg-main)
+    border: 1px solid var(--border-light)
+    border-radius: 8px
+    color: var(--text-main)
+    box-shadow: 0 12px 32px var(--shadow-main)
+    z-index: 2000
+    transform-origin: top left
+    overflow: hidden
+    pointer-events: auto
+    display: flex
+    flex-direction: column
+    color-scheme: light
+
+    .dark &
+        color-scheme: dark
+
+    &.is-dragging
+        .settings-header
+            cursor: grabbing
+
+    &.WidgetSettings--plugin
+        width: min(560px, calc(100vw - 32px))
+        max-height: min(560px, calc(100vh - 32px))
+        overflow: visible
+
+        .settings-content,
+        .widget-plugin-settings
+            overflow: visible
+
+    .corner-decoration
+        display: none
+
+    .settings-header
+        position: relative
+        padding: 1rem 1.25rem
+        border-bottom: 1px solid var(--border-light)
+        display: flex
+        align-items: center
+        justify-content: space-between
+        gap: 1rem
+        cursor: grab
+        user-select: none
+
+        .header-glow
+            display: none
+
+        h3
+            margin: 0
+            color: var(--text-heading)
+            font-size: 1rem
+            font-weight: 700
+            letter-spacing: 0
+            text-transform: none
+            min-width: 0
+            overflow: hidden
+            text-overflow: ellipsis
+            white-space: nowrap
+
+        .close-btn
+            flex: 0 0 auto
+            width: 32px
+            height: 32px
+            border-radius: 4px
+            border: 1px solid var(--border-main)
+            background: var(--bg-main)
+            color: var(--text-main)
+            display: flex
+            align-items: center
+            justify-content: center
+            cursor: pointer
+            transition: background 0.12s ease, transform 0.12s ease
+
+            &:hover
+                background: var(--bg-button)
+                transform: translateY(-1px)
+
+            &:focus-visible
+                outline: 2px solid var(--accent-color)
+                outline-offset: 2px
+
+    .settings-content
+        padding: 1rem
+        flex: 1 1 auto
+        overflow-y: auto
+
+    .setting-group
+        margin-bottom: 0.85rem
+
+    .holo-card
+        padding: 0.85rem
+        border: 1px solid var(--border-light)
+        border-radius: 8px
+        background: var(--bg-secondary)
+
+    .setting-label
+        display: flex
+        align-items: center
+        gap: 0.5rem
+        margin-bottom: 0.55rem
+        color: var(--text-heading)
+        font-size: 0.9rem
+        font-weight: 700
+
+        svg
+            font-size: 16px
+
+        &.has-action
+            justify-content: space-between
+            margin-bottom: 0
+
+            .label-main
+                display: flex
+                align-items: center
+                gap: 0.5rem
+
+    .setting-value
+        margin-left: auto
+        color: var(--text-secondary)
+        font-size: 0.85rem
+        font-weight: 500
+
+    .holo-icon-btn
+        width: 36px
+        height: 36px
+        border-radius: 6px
+        border: 1px solid var(--border-main)
+        background: var(--bg-main)
+        color: var(--text-main)
+        display: flex
+        align-items: center
+        justify-content: center
+        cursor: pointer
+        transition: background 0.12s ease, transform 0.12s ease
+
+        &:hover
+            background: var(--bg-button)
+            transform: translateY(-1px)
+
+        &:focus-visible
+            outline: 2px solid var(--accent-color)
+            outline-offset: 2px
+
+    input[type="range"]
+        width: 100%
+        margin-top: 0.45rem
+        accent-color: var(--accent-color)
+
+    .quick-align-grid
+        display: grid
+        grid-template-columns: repeat(3, minmax(0, 1fr))
+        gap: 0.4rem
+
+        .holo-chip
+            min-height: 34px
+            padding: 0.35rem 0.3rem
+            border-radius: 4px
+            border: 1px solid var(--border-main)
+            background: var(--bg-main)
+            color: var(--text-main)
+            font-size: 0.78rem
+            cursor: pointer
+            transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease
+
+            &.active
+                border-color: var(--accent-color)
+                color: var(--accent-color)
+                background: color-mix(in srgb, var(--accent-color) 10%, var(--bg-main))
+
+            &:hover
+                border-color: var(--accent-color)
+                color: var(--accent-color)
+
+    .setting-divider
+        height: 1px
+        background: var(--border-light)
+        margin: 1rem 0
+
+    .delete-btn
+        width: 100%
+        padding: 0.7rem 1rem
+        background: color-mix(in srgb, #dc2626 8%, var(--bg-main))
+        border: 1px solid color-mix(in srgb, #dc2626 45%, var(--border-main))
+        border-radius: 6px
+        color: #dc2626
+        font-size: 0.9rem
+        font-weight: 700
+        cursor: pointer
+        display: flex
+        align-items: center
+        justify-content: center
+        gap: 0.55rem
+        transition: background 0.12s ease, transform 0.12s ease
+
+        &:hover
+            background: color-mix(in srgb, #dc2626 14%, var(--bg-main))
+            transform: translateY(-1px)
+
+    .widget-plugin-settings
+        display: flex
+        flex-direction: column
+        gap: 0.85rem
+
+        label
+            display: block
+            margin-bottom: 0.55rem
+            color: var(--text-main)
+            font-size: 0.92rem
+
+        input:not([type="checkbox"]):not([type="radio"]),
+        select,
+        textarea
+            width: 100%
+            margin-top: 0.35rem
+            border-radius: 6px
+            border: 1px solid var(--border-main)
+            background: var(--bg-input)
+            color: var(--text-heading)
+            padding: 0.5rem 0.6rem
+            font-size: 0.92rem
+            font-family: inherit
+
+            &:focus
+                outline: 2px solid color-mix(in srgb, var(--accent-color) 35%, transparent)
+                border-color: var(--accent-color)
+
+        textarea
+            min-height: 110px
+            resize: vertical
+
+        input[type="checkbox"],
+        input[type="radio"]
+            margin-right: 0.35rem
+            accent-color: var(--accent-color)
+
+        hr
+            border: 0
+            border-top: 1px solid var(--border-light)
+            margin: 0.85rem 0
+
+    .widget-settings-empty
+        border: 1px dashed var(--border-main)
+        border-radius: 8px
+        padding: 1rem
+        text-align: center
+        color: var(--text-secondary)
+
+@media (max-width: 640px)
+    .WidgetSettings
+        width: calc(100vw - 24px)
+        max-height: calc(100vh - 24px)
+
+        .settings-content
+            padding: 0.85rem

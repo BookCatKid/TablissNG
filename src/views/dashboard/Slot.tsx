@@ -16,8 +16,9 @@ const Slot: FC<Props> = ({ position, widgets }) => (
   <div className={`Slot ${position}`}>
     {widgets.map(({ display, id, key }) => {
       const config = getConfig(key);
+
       return (
-        <Widget key={id} id={id} {...display}>
+        <Widget key={id} id={id} widgetKey={key} {...display}>
           <Plugin
             id={id}
             component={config.dashboardComponent}
