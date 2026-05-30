@@ -65,7 +65,6 @@ const Trello: FC<Props> = ({
     [getSession],
   );
 
-  // Transform received data and render
   const receivedToListCards = useCallback(
     (received: FetchResult[]): void => {
       const updatedLists: List[] = [];
@@ -96,7 +95,6 @@ const Trello: FC<Props> = ({
     const controller = new AbortController();
 
     const fetchData = async () => {
-      console.log("TRELLO: fetching cards for lists");
       try {
         if (controller.signal.aborted) return;
 
@@ -137,7 +135,6 @@ const Trello: FC<Props> = ({
         return;
       }
 
-      // Parse source and target
       const sourceListId = dragSourceParts[0].replace("list-", "");
       const targetListId = dropSourceParts[0].replace("list-", "");
       const sourceIndex = parseInt(dragSourceParts[1], 10);
@@ -154,7 +151,6 @@ const Trello: FC<Props> = ({
 
       if (sourceListId === targetListId && sourceIndex === targetIndex) return;
 
-      // Update UI
       dispatchUI({
         type: "MOVE_CARD",
         sourceListId,
@@ -163,10 +159,8 @@ const Trello: FC<Props> = ({
         targetIndex,
       });
 
-      // Sync state with trello by applying the same move
       let adjustedTargetIndex = targetIndex;
 
-      // Handle cases where the card is moved lower in the same list
       if (sourceListId === targetListId && sourceIndex < targetIndex) {
         adjustedTargetIndex--;
       }
@@ -234,5 +228,4 @@ const Trello: FC<Props> = ({
     </div>
   );
 };
-
 export default Trello;

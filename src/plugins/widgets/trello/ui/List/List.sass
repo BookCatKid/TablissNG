@@ -1,0 +1,56 @@
+.list-loader-container
+  margin: 0 1vw 0 1vw
+  padding-top: 4rem
+  width: 30vh
+  height: 31vh
+  display: flex
+  justify-content: start
+  align-items: start
+
+.list
+  margin: 0 1vw 0 1vw
+  width: 30vh
+  text-align: left
+
+.list-header-container
+  display: flex
+  align-items: center
+  justify-content: start
+  gap: 5px
+
+.list-header
+  padding: 0.75rem 0
+  padding-right: 0.2rem
+  user-select: none
+
+.add-card-button
+  display: flex
+  font-size: 1.12rem
+  opacity: 0
+  transition: opacity 0.2s ease, max-height 0.2s ease
+
+  i
+    margin-top: 2.5px
+
+
+  &.visible
+    &:hover 
+      cursor: pointer
+    opacity: 1
+
+.list-card-container
+  width: 30vh
+  height: 30vh
+  overflow-y: auto
+  scrollbar-color: rgba(255, 255, 255, 0.09) transparent
+  scrollbar-width: thin !important
+  scrollbar-gutter: stable
+  padding-right: 16px
+  border-radius: 0.25rem
+  transition: background 0.2s ease
+
+  &::-webkit-scrollbar-button
+    display: none
+
+.hide-list-card
+  display: none

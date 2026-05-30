@@ -128,6 +128,10 @@ export interface TrelloSession extends Session {
  * Each list fetches their cards independently and indicates fetching using status = LOADING
  *
  * Selected: whether the list should be displayed in the homepage
+ * Represents the result of fetched trello cards in the plugin's UI
+ * Each list fetches their cards independently and indicates fetching using status = LOADING
+ *
+ * Selected: whether the list should be displayed in the homepage
  */
 export type List = {
   id: string;

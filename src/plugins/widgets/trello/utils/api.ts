@@ -14,6 +14,9 @@ import {
 // TODO add pagination for boards and list fetches
 // Potentially infinite scroll
 
+// TODO add pagination for boards and list fetches
+// Potentially infinite scroll
+
 /**
  * Make authenticated call to Trello's API
  * and transform the response into a TData array

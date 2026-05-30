@@ -1,6 +1,7 @@
 ---
 title: Storage & Cache Errors
 sidebar_position: 2
+description: Troubleshoot storage and cache errors in TablissNG. Learn how to fix issues caused by private browsing, disk space, or corrupt browser profiles.
 ---
 
 # Storage & Cache Errors
