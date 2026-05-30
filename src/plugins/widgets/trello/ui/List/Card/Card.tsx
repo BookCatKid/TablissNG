@@ -12,7 +12,12 @@ import {
 } from "../../../../../../views/shared";
 import { CacheReducerAction } from "../../../reducers";
 import { trelloAuthStore } from "../../../stores/trelloAuthStore";
-import { Card as CardType, colourPalette, TrelloSession } from "../../../types";
+import {
+  Card as CardType,
+  colourPalette,
+  Label,
+  TrelloSession,
+} from "../../../types";
 import { deleteCard, updateCardName } from "../../../utils/api";
 import { LabelsForm } from "../Labels/LabelsForm";
 
@@ -31,13 +36,14 @@ export function Card({
   position,
   dispatchUI,
 }: CardProps) {
+  const [labels, setLabels] = useState<Label[]>(card.labels);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
-  const [isEditingTags, setIsEditingTags] = useState<boolean>(false);
+  const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
 
-  const isSelected = isEditingContent || isEditingTags;
+  const isSelected = isEditingContent || isEditingLabels;
 
   const selfRef = useRef<HTMLDivElement>(null);
 
@@ -59,15 +65,15 @@ export function Card({
   }, [isEditingContent]);
 
   useEffect(() => {
-    if (isEditingTags && selfRef.current) {
+    if (isEditingLabels && selfRef.current) {
       const r = selfRef.current.getBoundingClientRect();
       setTagPosition({ top: r.top, left: r.right + 8 });
     }
-  }, [isEditingTags]);
+  }, [isEditingLabels]);
 
   // Reposition on scroll/resize
   useEffect(() => {
-    if (!isEditingTags) return;
+    if (!isEditingLabels) return;
     const update = () => {
       if (selfRef.current) {
         const r = selfRef.current.getBoundingClientRect();
@@ -80,14 +86,14 @@ export function Card({
       window.removeEventListener("scroll", update, true);
       window.removeEventListener("resize", update);
     };
-  }, [isEditingTags]);
+  }, [isEditingLabels]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditingContent(false);
         setEditValue(card.name);
-        setIsEditingTags(false);
+        setIsEditingLabels(false);
       }
     };
 
@@ -95,13 +101,25 @@ export function Card({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [card.name]);
 
+  const handleNewSelectedLabels = (updatedLabels: Label[]) => {
+    const originalLabels = [...labels];
+    setLabels([...updatedLabels]);
+
+    dispatchUI({
+      type: "UPDATE_CARD_LABELS",
+      cardId: card.id,
+      listId,
+      labels: updatedLabels,
+    });
+  };
+
   const handleEdit = () => {
     setIsEditingContent(true);
     setEditValue(card.name);
   };
 
-  const handleEditTags = () => {
-    setIsEditingTags(true);
+  const handleEditLabels = () => {
+    setIsEditingLabels(true);
   };
 
   const handleSave = async () => {
@@ -130,7 +148,7 @@ export function Card({
   };
 
   useEffect(() => {
-    if (!isEditingTags) return;
+    if (!isEditingLabels) return;
     const handler = (e: MouseEvent) => {
       if (
         portalRef.current &&
@@ -138,12 +156,12 @@ export function Card({
         selfRef.current &&
         !selfRef.current.contains(e.target as Node)
       ) {
-        setIsEditingTags(false);
+        setIsEditingLabels(false);
       }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [isEditingTags]);
+  }, [isEditingLabels]);
 
   const handleDelete = async () => {
     const session = await getSession();
@@ -182,16 +200,16 @@ export function Card({
     >
       <div className="card-header">
         <div className="card-labels-container">
-          {card.labels.map((label) => (
+          {labels.map((l) => (
             <div
-              key={label.colour}
+              key={l.colour}
               className="card-label"
               style={{
                 width: "2.5rem",
                 height: "0.26rem",
                 borderRadius: "0.5rem",
                 marginBottom: "0.5rem",
-                background: colourPalette[label.colour],
+                background: colourPalette[l.colour],
               }}
             />
           ))}
@@ -204,21 +222,21 @@ export function Card({
         >
           {isEditingContent ? (
             <span
-              onClick={isEditingTags ? undefined : handleDelete}
-              className={clsx("icon", isEditingTags ? "disabled" : "")}
+              onClick={isEditingLabels ? undefined : handleDelete}
+              className={clsx("icon", isEditingLabels ? "disabled" : "")}
             >
               <RemoveIcon />
             </span>
           ) : (
             <span
-              onClick={isEditingTags ? undefined : handleEdit}
-              className={clsx("icon", isEditingTags ? "disabled" : "")}
+              onClick={isEditingLabels ? undefined : handleEdit}
+              className={clsx("icon", isEditingLabels ? "disabled" : "")}
             >
               <EditIcon />
             </span>
           )}
           <span
-            onClick={isEditingContent ? undefined : handleEditTags}
+            onClick={isEditingContent ? undefined : handleEditLabels}
             className={clsx("icon", isEditingContent ? "disabled" : "")}
           >
             <LabelsIcon />
@@ -239,7 +257,7 @@ export function Card({
         />
       )}
 
-      {isEditingTags &&
+      {isEditingLabels &&
         tagEditorPosition &&
         createPortal(
           <div
@@ -251,7 +269,11 @@ export function Card({
               zIndex: 1000,
             }}
           >
-            <LabelsForm labelsOnCard={card.labels} boardId={boardId} />
+            <LabelsForm
+              onSelectedChange={handleNewSelectedLabels}
+              labelsOnCard={labels}
+              boardId={boardId}
+            />
           </div>,
           document.body,
         )}

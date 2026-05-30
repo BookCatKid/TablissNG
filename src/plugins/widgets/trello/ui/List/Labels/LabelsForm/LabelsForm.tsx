@@ -11,10 +11,15 @@ import { colourPalette, Label, TrelloColour } from "../../../../types";
 
 interface LabelsFormProps {
   labelsOnCard: Label[];
+  onSelectedChange: (updatedLabels: Label[]) => void;
   boardId: string;
 }
 
-export function LabelsForm({ labelsOnCard, boardId }: LabelsFormProps) {
+export function LabelsForm({
+  labelsOnCard,
+  onSelectedChange,
+  boardId,
+}: LabelsFormProps) {
   const { labels, isLoading } = useLabelsOnBoard(boardId);
   const [labelsSelected, setLabelsSelected] = useState<Record<string, boolean>>(
     {},
@@ -22,62 +27,66 @@ export function LabelsForm({ labelsOnCard, boardId }: LabelsFormProps) {
 
   useEffect(() => {
     const selected: Record<string, boolean> = {};
+    for (const label of labels) {
+      selected[label.id] = false;
+    }
+
     for (const label of labelsOnCard) {
       selected[label.id] = true;
     }
-    console.log(selected);
     setLabelsSelected(selected);
-  }, [labelsOnCard]);
+  }, [labelsOnCard, labels]);
 
-  console.log(labelsSelected);
+  const handleLabelToggled = (labelId: string) => {
+    const updated: Record<string, boolean> = { ...labelsSelected };
+    updated[labelId] = !labelsSelected[labelId];
+    setLabelsSelected(updated);
 
-  let view = (
-    <div className="select-labels-container-loader">
-      <FormattedMessage {...commonMessages.loading} /> <Spinner size={16} />
-    </div>
-  );
-
-  if (!isLoading) {
-    view = (
-      <div className="select-labels-label-container">
-        {labels.map((l, i) => {
-          const isDark = (c: TrelloColour) => c.endsWith("_dark");
-
-          const textColour = isDark(l.colour)
-            ? "rgba(255,255,255, 0.8)"
-            : "rgba(0, 0, 0, 0.8)";
-          return (
-            <div key={i} className="checkable-label">
-              <Checkbox
-                value={l.id}
-                label={""}
-                checked={labelsSelected[l.id] ?? false}
-                onChange={() => {}}
-              />
-              <p
-                style={{
-                  width: "100%",
-                  borderRadius: "2px",
-                  fontWeight: 200,
-                  margin: "0",
-                  color: `${textColour}`,
-                  background: colourPalette[l.colour],
-                  padding: "2px 8px",
-                }}
-              >
-                {l.name}
-              </p>
-            </div>
-          );
-        })}
-      </div>
-    );
-  }
+    const updatedSelectedLabels = labels.filter((label) => updated[label.id]);
+    onSelectedChange(updatedSelectedLabels);
+  };
 
   return (
     <div className="select-labels-form-container">
       <p className="select-labels-header">Labels</p>
-      {view}
+      {isLoading ? (
+        <div className="select-labels-container-loader">
+          <FormattedMessage {...commonMessages.loading} /> <Spinner size={16} />
+        </div>
+      ) : (
+        <div className="select-labels-label-container">
+          {labels.map((l, i) => {
+            const isDark = (c: TrelloColour) => c.endsWith("_dark");
+
+            const textColour = isDark(l.colour)
+              ? "rgba(255,255,255, 0.8)"
+              : "rgba(0, 0, 0, 0.8)";
+            return (
+              <div key={i} className="checkable-label">
+                <Checkbox
+                  value={l.id}
+                  label={""}
+                  checked={labelsSelected[l.id] ?? false}
+                  onChange={handleLabelToggled}
+                />
+                <p
+                  style={{
+                    width: "100%",
+                    borderRadius: "2px",
+                    fontWeight: 200,
+                    margin: "0",
+                    color: `${textColour}`,
+                    background: colourPalette[l.colour],
+                    padding: "2px 8px",
+                  }}
+                >
+                  {l.name}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

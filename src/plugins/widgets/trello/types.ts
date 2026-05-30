@@ -164,7 +164,7 @@ export type Card = {
 };
 
 export type Label = {
-  id: string; // format `label-${l.name}-${l.colour}`
+  id: string;
   name: string;
   colour: TrelloColour;
 };

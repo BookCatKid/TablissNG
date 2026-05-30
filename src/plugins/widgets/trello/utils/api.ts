@@ -87,7 +87,7 @@ export const getCards = async (
             labels: card.labels.map(
               (l) =>
                 ({
-                  id: `label-${l.name}-${l.color}`,
+                  id: l.id,
                   colour: l.color,
                   name: l.name,
                 }) as Label,
@@ -114,7 +114,7 @@ export const getLabels = async (
       data.map(
         (label) =>
           ({
-            id: `label-${label.name}-${label.color}`,
+            id: label.id,
             colour: label.color,
             name: label.name,
           }) as Label,
@@ -232,3 +232,29 @@ export const deleteCard = async (
   });
   return response.ok;
 };
+
+// const updateCardLabels = async (
+//   cardId: string,
+//   updatedSelected: Record<string, boolean>,
+//   session: TrelloSession
+// ) => {
+//   const currentIds = new Set(labelsOnCard.map(l => l.id));
+
+//   const toAdd = Object.keys(updatedSelected).filter(id => updatedSelected[id] && !currentIds.has(id));
+//   const toRemove = Object.keys(updatedSelected).filter(id => !updatedSelected[id] && currentIds.has(id));
+
+//   await Promise.all([
+//     // POST /cards/{cardId}/idLabels  — adds a label
+//     ...toAdd.map(id =>
+//       fetch(`https://api.trello.com/1/cards/${cardId}/idLabels?value=${id}&key=${API_KEY}&token=${TOKEN}`, {
+//         method: 'POST',
+//       })
+//     ),
+//     // DELETE /cards/{cardId}/idLabels/{labelId}  — removes a label
+//     ...toRemove.map(id =>
+//       fetch(`https://api.trello.com/1/cards/${cardId}/idLabels/${id}?key=${API_KEY}&token=${TOKEN}`, {
+//         method: 'DELETE',
+//       })
+//     ),
+//   ]);
+// };
