@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import useAuth from "../../../../hooks/useAuth";
 import { trelloAuthStore } from "../stores/trelloAuthStore";
-import { Data, Label, TrelloSession } from "../types";
+import { Label, TrelloSession } from "../types";
 import { getLabels } from "../utils/api";
 
 export function useLabelsOnBoard(boardId: string) {
