@@ -82,7 +82,12 @@ export const getCards = async (
             name: card.name,
             position: card.pos,
             labels: card.labels.map(
-              (l) => ({ colour: l.color, name: l.name }) as Label,
+              (l) =>
+                ({
+                  id: `label-${l.name}-${l.color}`,
+                  colour: l.color,
+                  name: l.name,
+                }) as Label,
             ),
           }) as Card,
       ),

@@ -1,11 +1,13 @@
 import "./style.sass";
 
 import { useEffect, useState } from "react";
+import { FormattedMessage } from "react-intl";
 
+import { commonMessages } from "../../../../../../../locales/messages";
 import { Spinner } from "../../../../../../shared";
 import { Checkbox } from "../../../../../../shared/Checkbox";
 import { useLabelsOnBoard } from "../../../../hooks/useLabelsOnBoard";
-import { colourPalette, Label } from "../../../../types";
+import { colourPalette, Label, TrelloColour } from "../../../../types";
 
 interface LabelsFormProps {
   labelsOnCard: Label[];
@@ -23,40 +25,51 @@ export function LabelsForm({ labelsOnCard, boardId }: LabelsFormProps) {
     for (const label of labelsOnCard) {
       selected[label.id] = true;
     }
+    console.log(selected);
     setLabelsSelected(selected);
   }, [labelsOnCard]);
 
+  console.log(labelsSelected);
+
   let view = (
     <div className="select-labels-container-loader">
-      <p>Loading...</p>
-      <Spinner size={16} />
+      <FormattedMessage {...commonMessages.loading} /> <Spinner size={16} />
     </div>
   );
 
   if (!isLoading) {
     view = (
       <div className="select-labels-label-container">
-        {labels.map((l, i) => (
-          <div key={i} className="checkable-label">
-            <Checkbox
-              value={l.id}
-              label={""}
-              checked={labelsSelected[l.id] ?? false}
-              onChange={() => {}}
-            />
-            <p
-              style={{
-                borderRadius: "2px",
-                margin: "0",
-                color: "rgba(0, 0, 0, 0.86)",
-                background: colourPalette[l.colour],
-                padding: "2px 8px",
-              }}
-            >
-              {l.name}
-            </p>
-          </div>
-        ))}
+        {labels.map((l, i) => {
+          const isDark = (c: TrelloColour) => c.endsWith("_dark");
+
+          const textColour = isDark(l.colour)
+            ? "rgba(255,255,255, 0.8)"
+            : "rgba(0, 0, 0, 0.8)";
+          return (
+            <div key={i} className="checkable-label">
+              <Checkbox
+                value={l.id}
+                label={""}
+                checked={labelsSelected[l.id] ?? false}
+                onChange={() => {}}
+              />
+              <p
+                style={{
+                  width: "100%",
+                  borderRadius: "2px",
+                  fontWeight: 200,
+                  margin: "0",
+                  color: `${textColour}`,
+                  background: colourPalette[l.colour],
+                  padding: "2px 8px",
+                }}
+              >
+                {l.name}
+              </p>
+            </div>
+          );
+        })}
       </div>
     );
   }

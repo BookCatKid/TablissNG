@@ -24,7 +24,7 @@ export function Checkbox<T>({
   return (
     <label>
       <input type="checkbox" checked={checked} onChange={handleChange} />{" "}
-      <span className="label">{label}</span>
+      <span>{label}</span>
     </label>
   );
 }

@@ -1,13 +1,16 @@
 .select-labels-form-container
     color: white // TODO change this if we need dynamic colours based on light and dark themes
     position: relative
-    padding: 0.12rem 0.25rem
+    padding: 0.5rem
     width: 10rem
     z-index: 30
     background: rgba(255, 255, 255, 0.09)
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
     border-radius: 0.25rem
-    backdrop-filter: blur(5px)
+    backdrop-filter: blur(15px)
+
+.select-labels-form-container-content
+    padding: 0.25rem    
 
 .select-labels-container-loader
     display: flex
@@ -21,5 +24,10 @@
 
 .checkable-label
     display: flex
-    align-items: center
+    align-items: end
     gap: 0.5rem
+
+.select-labels-header
+    font-weight: bold
+    margin: 0
+    margin-bottom: 0.5rem
