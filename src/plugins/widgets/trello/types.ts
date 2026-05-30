@@ -26,7 +26,15 @@ export type TrelloCardsResponse = {
   id: string;
   name: string;
   pos: number;
-  labels: TrelloListCardLabel[];
+  labels: TrelloLabelsResponse[];
+};
+
+export type TrelloLabelsResponse = {
+  id: string;
+  idBoard: string;
+  name: string;
+  color: TrelloColour;
+  uses: number;
 };
 
 export type TrelloColour =
@@ -148,12 +156,18 @@ export type Card = {
   id: string;
   name: string;
   position: number;
-  labels: TrelloListCardLabel[];
+  labels: Label[];
+};
+
+export type Label = {
+  id: string; // format `label-${l.name}-${l.colour}`
+  name: string;
+  colour: TrelloColour;
 };
 
 export const createCard = (name: string): Card => {
   return {
-    id: nanoid(),
+    id: nanoid(), // Used only for uniquely identifying card when rendering, true id is derived from Trello
     name,
     position: 0, // in Trello's api 0 indicates at the top of the list
     labels: [],

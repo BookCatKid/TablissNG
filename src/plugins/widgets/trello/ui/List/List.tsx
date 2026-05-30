@@ -19,6 +19,7 @@ import { CardCreatorForm } from "./CardCreatorForm";
 
 interface ListComponentProps {
   header: string;
+  boardId: string;
   listId: string;
   cards: Card[];
   loading: boolean | undefined;
@@ -27,6 +28,7 @@ interface ListComponentProps {
 
 export function List({
   header,
+  boardId,
   listId,
   cards,
   loading,
@@ -112,6 +114,7 @@ export function List({
                   key={card.id}
                   card={card}
                   listId={listId}
+                  boardId={boardId}
                   dispatchUI={dispatchUI}
                 />
               </DraggableCard>

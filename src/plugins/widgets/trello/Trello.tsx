@@ -5,18 +5,32 @@ import { FormattedMessage } from "react-intl";
 
 import useAuth from "../../../hooks/useAuth";
 import { useFreshReducer } from "../../../hooks/useFreshReducer";
+import { useSelectedBoard } from "./hooks/useSelectedBoard";
 import { cacheReducer } from "./reducers";
 import { trelloAuthStore } from "./stores/trelloAuthStore";
-import { Card, defaultCache, List, Props, TrelloSession } from "./types";
+import {
+  Card,
+  defaultCache,
+  defaultData,
+  List,
+  Props,
+  TrelloSession,
+} from "./types";
 import { Drag, DropPayload } from "./ui/Drag";
 import { List as ListComponent } from "./ui/List";
 import { getCards, moveCardToList } from "./utils/api";
 
-const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
+const Trello: FC<Props> = ({
+  data = defaultData,
+  cache = defaultCache,
+  setCache,
+}) => {
   const { authStatus, getSession } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
   );
+
+  const { boardId: selectedBoardId } = useSelectedBoard(data);
 
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
 
@@ -76,7 +90,7 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [dispatchUI],
   );
 
-  // Fetch cards on first load and when a lists' state changes
+  // Fetch cards on first load and when a list's state changes
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     const controller = new AbortController();
@@ -175,40 +189,49 @@ const Trello: FC<Props> = ({ cache = defaultCache, setCache }) => {
     [getSession, dispatchUI],
   );
 
+  if (authStatus !== "authenticated") {
+    return (
+      <FormattedMessage
+        id="plugins.trello.unauthenticatedMessage"
+        defaultMessage="Sign into Trello to use me"
+        description="Sign into Trello to use me"
+      />
+    );
+  }
+
+  if (
+    !cache.order ||
+    (!!cache && cache.order.length === 0) ||
+    selectedBoardId == null
+  ) {
+    return (
+      <FormattedMessage
+        id="plugins.trello.noListsMessage"
+        defaultMessage="Add some lists to view"
+        description="Add some lists to view"
+      />
+    );
+  }
+
   return (
-    <>
-      {authStatus !== "authenticated" ? (
-        <FormattedMessage
-          id="plugins.trello.unauthenticatedMessage"
-          defaultMessage="Sign into Trello to use me"
-          description="Sign into Trello to use me"
-        />
-      ) : !cache.order || (!!cache && cache.order.length === 0) ? (
-        <FormattedMessage
-          id="plugins.trello.noListsMessage"
-          defaultMessage="Add some lists to view"
-          description="Add some lists to view"
-        />
-      ) : (
-        <div className="display-list-container">
-          <Drag handleDrop={handleDrop}>
-            {cache.order.map((listId) => {
-              const { cards, name, status } = cache.lists[listId];
-              return (
-                <ListComponent
-                  key={listId}
-                  header={name}
-                  listId={listId}
-                  cards={cards}
-                  loading={status === "LOADING"}
-                  dispatchUI={dispatchUI}
-                />
-              );
-            })}
-          </Drag>
-        </div>
-      )}
-    </>
+    <div className="display-list-container">
+      <Drag handleDrop={handleDrop}>
+        {cache.order.map((listId) => {
+          const { cards, name, status } = cache.lists[listId];
+          return (
+            <ListComponent
+              key={listId}
+              header={name}
+              listId={listId}
+              boardId={selectedBoardId}
+              cards={cards}
+              loading={status === "LOADING"}
+              dispatchUI={dispatchUI}
+            />
+          );
+        })}
+      </Drag>
+    </div>
   );
 };
 

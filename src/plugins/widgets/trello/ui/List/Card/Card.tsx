@@ -14,16 +14,23 @@ import { CacheReducerAction } from "../../../reducers";
 import { trelloAuthStore } from "../../../stores/trelloAuthStore";
 import { Card as CardType, colourPalette, TrelloSession } from "../../../types";
 import { deleteCard, updateCardName } from "../../../utils/api";
-import { SelectLabelsForm } from "../Labels/SelectLabelsForm";
+import { LabelsForm } from "../Labels/LabelsForm";
 
 interface CardProps {
   card: CardType;
   listId: string;
+  boardId: string;
   position: number; // 0-index to its position in the list
   dispatchUI: React.Dispatch<CacheReducerAction>;
 }
 
-export function Card({ card, listId, position, dispatchUI }: CardProps) {
+export function Card({
+  card,
+  listId,
+  boardId,
+  position,
+  dispatchUI,
+}: CardProps) {
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
@@ -177,14 +184,14 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
         <div className="card-labels-container">
           {card.labels.map((label) => (
             <div
-              key={label.color}
+              key={label.colour}
               className="card-label"
               style={{
                 width: "2.5rem",
                 height: "0.26rem",
                 borderRadius: "0.5rem",
                 marginBottom: "0.5rem",
-                background: colourPalette[label.color],
+                background: colourPalette[label.colour],
               }}
             />
           ))}
@@ -244,7 +251,7 @@ export function Card({ card, listId, position, dispatchUI }: CardProps) {
               zIndex: 1000,
             }}
           >
-            <SelectLabelsForm />
+            <LabelsForm labelsOnCard={card.labels} boardId={boardId} />
           </div>,
           document.body,
         )}

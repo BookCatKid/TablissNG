@@ -6,7 +6,7 @@ import { trelloAuthStore } from "../stores/trelloAuthStore";
 import { Board, Data, TrelloSession } from "../types";
 import { getBoards } from "../utils/api";
 
-export default function useBoards(
+export function useBoards(
   data: Data,
   dispatchData: React.Dispatch<DataReducerAction>,
 ) {

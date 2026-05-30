@@ -7,7 +7,7 @@ import { Data, List, TrelloSession } from "../types";
 import { getLists } from "../utils/api";
 import { applyPreferences } from "../utils/preferences";
 
-export default function useLists(
+export function useLists(
   data: Data,
   dispatchUI: React.Dispatch<CacheReducerAction>,
 ) {

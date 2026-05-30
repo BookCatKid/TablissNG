@@ -2,9 +2,11 @@ import {
   Board,
   Card,
   createList,
+  Label,
   List,
   TrelloBoardResponse,
   TrelloCardsResponse,
+  TrelloLabelsResponse,
   TrelloListResponse,
   TrelloSession,
 } from "../types";
@@ -79,8 +81,35 @@ export const getCards = async (
             id: card.id,
             name: card.name,
             position: card.pos,
-            labels: card.labels,
+            labels: card.labels.map(
+              (l) => ({ colour: l.color, name: l.name }) as Label,
+            ),
           }) as Card,
+      ),
+  );
+};
+
+/**
+ * Fetch labels under a board owned by the authenticated user
+ * @param boardId
+ * @param session
+ * @returns
+ */
+export const getLabels = async (
+  boardId: string,
+  session: TrelloSession,
+): Promise<Label[] | null> => {
+  return await trelloFetch<TrelloLabelsResponse[], Label[]>(
+    `boards/${boardId}/labels`,
+    session,
+    (data) =>
+      data.map(
+        (label) =>
+          ({
+            id: `label-${label.name}-${label.color}`,
+            colour: label.color,
+            name: label.name,
+          }) as Label,
       ),
   );
 };
