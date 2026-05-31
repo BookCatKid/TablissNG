@@ -90,7 +90,6 @@
     "prettier": "^3.8.3",
     "sass": "^1.100.0",
     "sass-loader": "^16.0.8",
-    "style-loader": "^4.0.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4",
     "workbox-build": "^7.4.1"
