@@ -31,7 +31,6 @@ const Trello: FC<Props> = ({
   );
 
   const { boardId: selectedBoardId } = useSelectedBoard(data);
-
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
 
   // Keep track of latest version of cache

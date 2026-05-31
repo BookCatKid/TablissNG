@@ -233,28 +233,29 @@ export const deleteCard = async (
   return response.ok;
 };
 
-// const updateCardLabels = async (
-//   cardId: string,
-//   updatedSelected: Record<string, boolean>,
-//   session: TrelloSession
-// ) => {
-//   const currentIds = new Set(labelsOnCard.map(l => l.id));
-
-//   const toAdd = Object.keys(updatedSelected).filter(id => updatedSelected[id] && !currentIds.has(id));
-//   const toRemove = Object.keys(updatedSelected).filter(id => !updatedSelected[id] && currentIds.has(id));
-
-//   await Promise.all([
-//     // POST /cards/{cardId}/idLabels  — adds a label
-//     ...toAdd.map(id =>
-//       fetch(`https://api.trello.com/1/cards/${cardId}/idLabels?value=${id}&key=${API_KEY}&token=${TOKEN}`, {
-//         method: 'POST',
-//       })
-//     ),
-//     // DELETE /cards/{cardId}/idLabels/{labelId}  — removes a label
-//     ...toRemove.map(id =>
-//       fetch(`https://api.trello.com/1/cards/${cardId}/idLabels/${id}?key=${API_KEY}&token=${TOKEN}`, {
-//         method: 'DELETE',
-//       })
-//     ),
-//   ]);
-// };
+export const addOrRemoveLabel = async (
+  cardId: string,
+  labelId: string,
+  operation: "ADD" | "REMOVE",
+  session: TrelloSession,
+): Promise<boolean> => {
+  let response;
+  switch (operation) {
+    case "ADD":
+      response = await fetch(
+        `https://api.trello.com/1/cards/${cardId}/idLabels?value=${labelId}&key=${TRELLO_API_KEY}&token=${session.accessToken}`,
+        {
+          method: "POST",
+        },
+      );
+      return response.ok;
+    case "REMOVE":
+      response = await fetch(
+        `https://api.trello.com/1/cards/${cardId}/idLabels/${labelId}?key=${TRELLO_API_KEY}&token=${session.accessToken}`,
+        {
+          method: "DELETE",
+        },
+      );
+      return response.ok;
+  }
+};

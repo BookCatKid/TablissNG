@@ -149,7 +149,8 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
       const updatedCardIndex = updatedList.cards.findIndex(
         (c) => c.id === cardId,
       );
-      if (!updatedCardIndex) return cache;
+
+      if (updatedCardIndex === -1) return cache;
 
       const updatedCard = updatedList.cards[updatedCardIndex];
       updatedCard.labels = [...labels];

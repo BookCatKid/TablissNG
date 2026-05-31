@@ -18,7 +18,11 @@ import {
   Label,
   TrelloSession,
 } from "../../../types";
-import { deleteCard, updateCardName } from "../../../utils/api";
+import {
+  addOrRemoveLabel,
+  deleteCard,
+  updateCardName,
+} from "../../../utils/api";
 import { LabelsForm } from "../Labels/LabelsForm";
 
 interface CardProps {
@@ -42,7 +46,6 @@ export function Card({
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
-
   const isSelected = isEditingContent || isEditingLabels;
 
   const selfRef = useRef<HTMLDivElement>(null);
@@ -101,16 +104,48 @@ export function Card({
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [card.name]);
 
-  const handleNewSelectedLabels = (updatedLabels: Label[]) => {
+  const handleNewSelectedLabels = async (
+    label: Label,
+    operation: "ADD" | "REMOVE",
+  ) => {
+    const session = await getSession();
+    if (!session) return;
     const originalLabels = [...labels];
-    setLabels([...updatedLabels]);
+    let updatedLabels = [...originalLabels];
 
+    switch (operation) {
+      case "ADD":
+        updatedLabels.push(label);
+        break;
+      case "REMOVE":
+        updatedLabels = updatedLabels.filter((l) => l.id !== label.id);
+        break;
+    }
+
+    setLabels(updatedLabels);
     dispatchUI({
       type: "UPDATE_CARD_LABELS",
       cardId: card.id,
       listId,
       labels: updatedLabels,
     });
+
+    const actionSuccessful = await addOrRemoveLabel(
+      card.id,
+      label.id,
+      operation,
+      session,
+    );
+    if (!actionSuccessful) {
+      console.log("FAILED TO UPDATE LABELS");
+      setLabels([...originalLabels]);
+      dispatchUI({
+        type: "UPDATE_CARD_LABELS",
+        cardId: card.id,
+        listId,
+        labels: originalLabels,
+      });
+    }
   };
 
   const handleEdit = () => {

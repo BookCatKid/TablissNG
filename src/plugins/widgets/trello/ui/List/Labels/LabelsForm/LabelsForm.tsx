@@ -1,6 +1,6 @@
 import "./style.sass";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef,useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { commonMessages } from "../../../../../../../locales/messages";
@@ -11,7 +11,7 @@ import { colourPalette, Label, TrelloColour } from "../../../../types";
 
 interface LabelsFormProps {
   labelsOnCard: Label[];
-  onSelectedChange: (updatedLabels: Label[]) => void;
+  onSelectedChange: (label: Label, operation: "ADD" | "REMOVE") => void;
   boardId: string;
 }
 
@@ -20,14 +20,14 @@ export function LabelsForm({
   onSelectedChange,
   boardId,
 }: LabelsFormProps) {
-  const { labels, isLoading } = useLabelsOnBoard(boardId);
+  const { labels: availableLabels, isLoading } = useLabelsOnBoard(boardId);
   const [labelsSelected, setLabelsSelected] = useState<Record<string, boolean>>(
     {},
   );
 
   useEffect(() => {
     const selected: Record<string, boolean> = {};
-    for (const label of labels) {
+    for (const label of availableLabels) {
       selected[label.id] = false;
     }
 
@@ -35,15 +35,17 @@ export function LabelsForm({
       selected[label.id] = true;
     }
     setLabelsSelected(selected);
-  }, [labelsOnCard, labels]);
+  }, [labelsOnCard, availableLabels]);
 
   const handleLabelToggled = (labelId: string) => {
     const updated: Record<string, boolean> = { ...labelsSelected };
+    const operation = !labelsSelected[labelId] ? "ADD" : "REMOVE";
     updated[labelId] = !labelsSelected[labelId];
     setLabelsSelected(updated);
-
-    const updatedSelectedLabels = labels.filter((label) => updated[label.id]);
-    onSelectedChange(updatedSelectedLabels);
+    const label = availableLabels.find((l) => l.id === labelId);
+    if (label) {
+      onSelectedChange(label, operation);
+    }
   };
 
   return (
@@ -55,7 +57,7 @@ export function LabelsForm({
         </div>
       ) : (
         <div className="select-labels-label-container">
-          {labels.map((l, i) => {
+          {availableLabels.map((l, i) => {
             const isDark = (c: TrelloColour) => c.endsWith("_dark");
 
             const textColour = isDark(l.colour)
