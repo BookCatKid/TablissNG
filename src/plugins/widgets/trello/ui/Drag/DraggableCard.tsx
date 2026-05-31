@@ -4,7 +4,7 @@ import { DragContext } from "./Drag";
 
 interface DraggableCardProps {
   dragId: string;
-  dragType: string; // Type category for matching with compatible DropZones
+  dragType: string;
   [key: string]: unknown;
 }
 
@@ -23,13 +23,14 @@ export function DraggableCard({
   const { draggable, dragStart, drag, dragEnd } = context;
 
   const onDragStart = (e: React.DragEvent) => {
-    dragStart(e, dragId, dragType, e.currentTarget as HTMLElement);
+    const el = e.currentTarget as HTMLElement;
+    dragStart(e, dragId, dragType, el);
   };
 
   return (
     <div
       onDragStart={onDragStart}
-      onDrag={(e: React.DragEvent) => drag(e)}
+      onDrag={drag}
       draggable={draggable}
       onDragEnd={dragEnd}
       {...props}

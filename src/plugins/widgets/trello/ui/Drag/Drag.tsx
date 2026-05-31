@@ -1,4 +1,6 @@
-import { createContext, useEffect, useState } from "react";
+import "./style.sass";
+
+import { createContext, useEffect, useRef, useState } from "react";
 
 import { DragCardStyle } from "../../types";
 import { DraggableCard } from "./DraggableCard";
@@ -61,6 +63,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [dragType, setDragType] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
+  const overlayRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     document.body.style.cursor = dragCardId ? "grabbing" : "default";
@@ -81,6 +84,25 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     const { width, height } = element.getBoundingClientRect();
     setDragCardStyle({ size: { width, height }, fontSize });
 
+    /**
+     * By default, dragging creates an image of the component
+     * but this image cannot be styled with css
+     * hence we remove it and replace it with a DOM element that can be
+     */
+
+    e.dataTransfer.setDragImage(new Image(), 0, 0);
+
+    // Attach styles to overlaid component
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.classList.add("dragging-card");
+    clone.style.left = `${e.clientX}px`;
+    clone.style.top = `${e.clientY}px`;
+    clone.style.width = `${element.offsetWidth}px`;
+    clone.style.fontSize = `${fontSize}px`;
+
+    document.body.appendChild(clone);
+    overlayRef.current = clone;
+
     setDragCardId(dragId);
     setDragType(dragType);
   };
@@ -89,10 +111,18 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   // Possibly optimise to prevent excessive rerenders
   const drag = function (e: React.DragEvent) {
     e.stopPropagation();
+    if (overlayRef.current) {
+      overlayRef.current.style.left = `${e.clientX}px`;
+      overlayRef.current.style.top = `${e.clientY}px`;
+    }
     setIsDragging(true);
   };
 
   const dragEnd = function () {
+    if (overlayRef.current) {
+      overlayRef.current.remove();
+      overlayRef.current = null;
+    }
     setDragCardId(null);
     setDragType(null);
     setIsDragging(false);
