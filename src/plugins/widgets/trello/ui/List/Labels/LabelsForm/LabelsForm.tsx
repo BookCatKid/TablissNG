@@ -1,6 +1,6 @@
 import "./style.sass";
 
-import { useEffect, useRef,useState } from "react";
+import { useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { commonMessages } from "../../../../../../../locales/messages";
