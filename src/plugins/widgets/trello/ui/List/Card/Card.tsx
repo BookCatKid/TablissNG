@@ -1,7 +1,7 @@
 import "./style.sass";
 
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import useAuth from "../../../../../../hooks/useAuth";
@@ -23,6 +23,7 @@ import {
   deleteCard,
   updateCardName,
 } from "../../../utils/api";
+import { DragContext } from "../../Drag";
 import { LabelsForm } from "../Labels/LabelsForm";
 
 interface CardProps {
@@ -47,6 +48,7 @@ export function Card({
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
+  const dragContext = useContext(DragContext);
 
   const selfRef = useRef<HTMLDivElement>(null);
 
@@ -229,7 +231,7 @@ export function Card({
   return (
     <div
       ref={selfRef}
-      className={clsx("card-content-container", isSelected ? "selected" : "")}
+      className={clsx("card-content-container", isSelected && "selected")}
       onMouseEnter={() => setHoveringOverHeader(true)}
       onMouseLeave={() => setHoveringOverHeader(false)}
     >

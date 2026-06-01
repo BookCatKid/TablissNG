@@ -119,10 +119,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   };
 
   const dragEnd = function () {
-    if (overlayRef.current) {
-      overlayRef.current.remove();
-      overlayRef.current = null;
-    }
     setDragCardId(null);
     setDragType(null);
     setIsDragging(false);
@@ -132,6 +128,12 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   // Called when a drop occurs on a DropZone
   const onDrop = function (e: React.DragEvent) {
     e.preventDefault();
+
+    if (overlayRef.current) {
+      overlayRef.current.remove();
+      overlayRef.current = null;
+    }
+
     handleDrop({ dragCardId, dragType, dropZoneId });
     setDragCardId(null);
     setDragType(null);
