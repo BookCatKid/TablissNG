@@ -1,7 +1,7 @@
 import "./style.sass";
 
 import clsx from "clsx";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 import useAuth from "../../../../../../hooks/useAuth";
@@ -23,7 +23,6 @@ import {
   deleteCard,
   updateCardName,
 } from "../../../utils/api";
-import { DragContext } from "../../Drag";
 import { LabelsForm } from "../Labels/LabelsForm";
 
 interface CardProps {
@@ -48,7 +47,6 @@ export function Card({
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
-  const dragContext = useContext(DragContext);
 
   const selfRef = useRef<HTMLDivElement>(null);
 
