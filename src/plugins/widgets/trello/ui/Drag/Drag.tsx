@@ -64,7 +64,30 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
   const overlayRef = useRef<HTMLElement | null>(null);
-  const currentFrameRef = useRef<number | null>(null);
+  const cursorPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const ghostRef = useRef<HTMLImageElement | null>(null);
+
+  useEffect(() => {
+    const img = new Image();
+    img.src =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+    ghostRef.current = img;
+  }, []);
+
+  useEffect(() => {
+    if (!dragCardId) return;
+
+    const handleDragOver = (e: DragEvent) => {
+      cursorPositionRef.current = { x: e.clientX, y: e.clientY };
+
+      if (overlayRef.current) {
+        overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
+      }
+    };
+
+    document.addEventListener("dragover", handleDragOver);
+    return () => document.removeEventListener("dragover", handleDragOver);
+  }, [dragCardId]);
 
   useEffect(() => {
     document.body.style.cursor = dragCardId ? "grabbing" : "default";
@@ -78,10 +101,10 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   ) => {
     e.stopPropagation();
     e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", dragId);
 
     // Extract styles
-    const style = element.computedStyleMap();
-    const fontSize = (style.get("font-size") as CSSUnitValue).value;
+    const fontSize = parseFloat(window.getComputedStyle(element).fontSize);
     const { width, height } = element.getBoundingClientRect();
     setDragCardStyle({ size: { width, height }, fontSize });
 
@@ -90,8 +113,9 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
      * but this image cannot be styled with css
      * hence we remove it and replace it with a DOM element that can be
      */
-
-    e.dataTransfer.setDragImage(new Image(), 0, 0);
+    if (ghostRef.current) {
+      e.dataTransfer.setDragImage(ghostRef.current, 0, 0);
+    }
 
     // Attach styles to overlaid component
     const clone = element.cloneNode(true) as HTMLElement;
@@ -110,16 +134,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   // Called continuously while a DragCard is being dragged
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
-    e.stopPropagation();
-    const x = e.clientX;
-    const y = e.clientY;
-
-    if (currentFrameRef.current) cancelAnimationFrame(currentFrameRef.current);
-    currentFrameRef.current = requestAnimationFrame(() => {
-      if (overlayRef.current) {
-        overlayRef.current.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
-      }
-    });
     setIsDragging(true);
   };
 
@@ -133,11 +147,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     setDragType(null);
     setIsDragging(false);
     setDropZoneId(null);
-
-    if (currentFrameRef.current) {
-      cancelAnimationFrame(currentFrameRef.current);
-      currentFrameRef.current = null;
-    }
   };
 
   // Called when a drop occurs on a DropZone
@@ -150,15 +159,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     }
 
     handleDrop({ dragCardId, dragType, dropZoneId });
-    setDragCardId(null);
-    setDragType(null);
-    setIsDragging(false);
-    setDropZoneId(null);
-
-    if (currentFrameRef.current) {
-      cancelAnimationFrame(currentFrameRef.current);
-      currentFrameRef.current = null;
-    }
+    dragEnd();
   };
 
   return (
