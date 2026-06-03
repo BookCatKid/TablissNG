@@ -64,17 +64,18 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
   const overlayRef = useRef<HTMLElement | null>(null);
+  const currentFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     document.body.style.cursor = dragCardId ? "grabbing" : "default";
   }, [dragCardId]);
 
-  const dragStart = function (
+  const dragStart = (
     e: React.DragEvent,
     dragId: string,
     dragType: string,
     element: HTMLElement,
-  ) {
+  ) => {
     e.stopPropagation();
     e.dataTransfer.effectAllowed = "move";
 
@@ -95,10 +96,9 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     // Attach styles to overlaid component
     const clone = element.cloneNode(true) as HTMLElement;
     clone.classList.add("dragging-card");
-    clone.style.left = `${e.clientX}px`;
-    clone.style.top = `${e.clientY}px`;
     clone.style.width = `${element.offsetWidth}px`;
     clone.style.fontSize = `${fontSize}px`;
+    clone.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
 
     document.body.appendChild(clone);
     overlayRef.current = clone;
@@ -109,20 +109,36 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
 
   // Called continuously while a DragCard is being dragged
   // Possibly optimise to prevent excessive rerenders
-  const drag = function (e: React.DragEvent) {
+  const drag = (e: React.DragEvent) => {
     e.stopPropagation();
-    if (overlayRef.current) {
-      overlayRef.current.style.left = `${e.clientX}px`;
-      overlayRef.current.style.top = `${e.clientY}px`;
-    }
+    e.stopPropagation();
+    const x = e.clientX;
+    const y = e.clientY;
+
+    if (currentFrameRef.current) cancelAnimationFrame(currentFrameRef.current);
+    currentFrameRef.current = requestAnimationFrame(() => {
+      if (overlayRef.current) {
+        overlayRef.current.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
+      }
+    });
     setIsDragging(true);
   };
 
-  const dragEnd = function () {
+  const dragEnd = () => {
+    if (overlayRef.current) {
+      overlayRef.current.remove();
+      overlayRef.current = null;
+    }
+
     setDragCardId(null);
     setDragType(null);
     setIsDragging(false);
     setDropZoneId(null);
+
+    if (currentFrameRef.current) {
+      cancelAnimationFrame(currentFrameRef.current);
+      currentFrameRef.current = null;
+    }
   };
 
   // Called when a drop occurs on a DropZone
@@ -139,6 +155,11 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     setDragType(null);
     setIsDragging(false);
     setDropZoneId(null);
+
+    if (currentFrameRef.current) {
+      cancelAnimationFrame(currentFrameRef.current);
+      currentFrameRef.current = null;
+    }
   };
 
   return (
