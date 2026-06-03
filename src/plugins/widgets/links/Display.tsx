@@ -146,8 +146,9 @@ export const Display: FC<Props> = ({
 
         if (iconConfig.type === "custom_svg") {
           console.error(
-            `Expected cached icon ${iconConfig.cacheKey} to be svg, but found ${cachedItem.type}. Falling back to CustomImage.`,
+            `Expected cached icon ${iconConfig.cacheKey} to be svg, but found ${cachedItem.type}. Icon will not render.`,
           );
+          return null;
         }
 
         return (

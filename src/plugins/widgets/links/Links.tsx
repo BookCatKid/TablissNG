@@ -6,7 +6,7 @@ import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress, useToggle } from "../../../hooks";
 import { Display } from "./Display";
-import { migrateLinks } from "./migrate";
+import { cleanupCache, migrateLinks } from "./migrate";
 import { sortLinks } from "./sortLinks";
 import { defaultCache, defaultData, Props } from "./types";
 
@@ -28,23 +28,27 @@ const Links: FC<Props> = ({
 
   const intl = useIntl();
 
-  // Ensure all links have unique IDs and migrate legacy data
+  // Ensure all links have unique IDs, migrate legacy data, and clean orphaned cache
   useEffect(() => {
     const {
       data: migratedData,
       cache: migratedCache,
-      changed,
+      dataChanged,
       cacheChanged,
     } = migrateLinks(data, cache);
 
-    if (changed) {
-      setData(migratedData);
-    }
+    const dataToUse = dataChanged ? migratedData : data;
+    const cacheToUse = cacheChanged ? migratedCache : cache;
 
-    if (cacheChanged) {
-      setCache(migratedCache);
-    }
-  }, [data.links, setData, cache, setCache]);
+    const { cache: cleanedCache, changed: cacheCleaned } = cleanupCache(
+      dataToUse,
+      cacheToUse,
+    );
+
+    if (dataChanged) setData(migratedData);
+
+    if (cacheChanged || cacheCleaned) setCache(cleanedCache);
+  }, [data, setData, cache, setCache]);
 
   const handleLinkClick = (id: string) => {
     const updatedLinks = [...data.links];

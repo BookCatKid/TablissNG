@@ -196,12 +196,12 @@ export function migrateLinks(
 ): {
   data: Data;
   cache: Cache;
-  changed: boolean;
+  dataChanged: boolean;
   cacheChanged: boolean;
 } {
   let changed = false;
   let cacheChanged = false;
-  const newCache = { ...cache };
+  let newCache = { ...cache };
 
   const seenIds = new Set<string>();
 
@@ -221,7 +221,7 @@ export function migrateLinks(
       const migratedIcon = getMigratedIconConfig(updatedLink, newCache);
       if (migratedIcon.cacheChanged) {
         cacheChanged = true;
-        Object.assign(newCache, migratedIcon.cache);
+        newCache = migratedIcon.cache;
       }
 
       updatedLink.iconConfig = migratedIcon.iconConfig;
@@ -247,7 +247,39 @@ export function migrateLinks(
   return {
     data: { ...data, links: linksWithIds },
     cache: newCache,
-    changed,
+    dataChanged: changed,
     cacheChanged,
   };
+}
+
+/** Remove cache entries that are no longer referenced by any link. */
+export function cleanupCache(
+  data: Data,
+  cache: Cache,
+): {
+  cache: Cache;
+  changed: boolean;
+} {
+  const referencedKeys = new Set<string>();
+
+  for (const link of data.links) {
+    if (!link.iconConfig) continue;
+    if (
+      link.iconConfig.type === "custom_svg" ||
+      link.iconConfig.type === "custom_upload"
+    ) {
+      referencedKeys.add(link.iconConfig.cacheKey);
+    }
+  }
+
+  const cleanedCache = { ...cache };
+  let changed = false;
+  for (const key of Object.keys(cleanedCache)) {
+    if (!referencedKeys.has(key)) {
+      delete cleanedCache[key];
+      changed = true;
+    }
+  }
+
+  return { cache: cleanedCache, changed };
 }
