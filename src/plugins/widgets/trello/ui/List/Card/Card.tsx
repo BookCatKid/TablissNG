@@ -41,6 +41,10 @@ export function Card({
   dispatchUI,
 }: CardProps) {
   const [labels, setLabels] = useState<Label[]>(card.labels);
+  const labelsRef = useRef<Label[]>(card.labels);
+  useEffect(() => {
+    labelsRef.current = labels;
+  }, [labels]);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
@@ -110,25 +114,21 @@ export function Card({
   ) => {
     const session = await getSession();
     if (!session) return;
-    const originalLabels = [...labels];
-    let updatedLabels = [...originalLabels];
+
+    const snapshot = labelsRef.current;
+    let updatedLabels: Label[];
 
     switch (operation) {
       case "ADD":
-        updatedLabels.push(label);
+        updatedLabels = [...snapshot, label];
         break;
       case "REMOVE":
-        updatedLabels = updatedLabels.filter((l) => l.id !== label.id);
+        updatedLabels = snapshot.filter((l) => l.id !== label.id);
         break;
     }
 
+    labelsRef.current = updatedLabels;
     setLabels(updatedLabels);
-    dispatchUI({
-      type: "UPDATE_CARD_LABELS",
-      cardId: card.id,
-      listId,
-      labels: updatedLabels,
-    });
 
     const actionSuccessful = await addOrRemoveLabel(
       card.id,
@@ -136,14 +136,31 @@ export function Card({
       operation,
       session,
     );
+
     if (!actionSuccessful) {
-      console.log("FAILED TO UPDATE LABELS");
-      setLabels([...originalLabels]);
+      let correctedLabels: Label[];
+      switch (operation) {
+        case "ADD":
+          correctedLabels = labelsRef.current.filter((l) => l.id !== label.id);
+          break;
+        case "REMOVE":
+          correctedLabels = [...labelsRef.current, label];
+          break;
+      }
+      labelsRef.current = correctedLabels;
+      setLabels(correctedLabels);
       dispatchUI({
         type: "UPDATE_CARD_LABELS",
         cardId: card.id,
         listId,
-        labels: originalLabels,
+        labels: correctedLabels,
+      });
+    } else {
+      dispatchUI({
+        type: "UPDATE_CARD_LABELS",
+        cardId: card.id,
+        listId,
+        labels: labelsRef.current,
       });
     }
   };
@@ -164,6 +181,7 @@ export function Card({
     if (!session) return;
 
     const originalName = card.name;
+
     const cleaned = editValue.replace(/(\r\n|\n|\r)/gm, "");
     dispatchUI({
       type: "EDIT_CARD_NAME",
@@ -172,16 +190,20 @@ export function Card({
       name: cleaned,
     });
 
+    setIsEditingContent(false);
+
     const actionSuccessful = await updateCardName(card.id, cleaned, session);
+
     if (!actionSuccessful) {
+      setEditValue(originalName);
       dispatchUI({
         type: "EDIT_CARD_NAME",
         cardId: card.id,
         listId,
         name: originalName,
       });
+      setIsEditingContent(true);
     }
-    setIsEditingContent(false);
   };
 
   useEffect(() => {
