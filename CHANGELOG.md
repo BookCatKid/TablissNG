@@ -8,9 +8,103 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+## [1.7.0] - 6/2/2026 | Build system overhaul, Trello drag-and-drop, weather forecast, and major refactoring
+
+A massive release featuring a complete build system migration (webpack → rspack, npm → pnpm, Jest → rstest), a major Trello widget overhaul with drag-and-drop card management, a new 5-day weather forecast, an i18n pipeline rewrite, and the removal of two heavy dependencies (react-markdown and react-dropdown-select) replaced with custom lightweight implementations.
+
+### Added
+
+- Feature/Additional Trello Features (#152). [a00edf0a](https://github.com/BookCatKid/TablissNG/commit/a00edf0a)
+
+- feat(weather): add 5-day forecast with conditional visibility controls. [9026359e](https://github.com/BookCatKid/TablissNG/commit/9026359e)
+
+- feat(widgets/time): add showSeperator toggle for conditional separator display. [6616209e](https://github.com/BookCatKid/TablissNG/commit/6616209e)
+
+- feat(ui): add centre position options for settings icon. [2396d2fa](https://github.com/BookCatKid/TablissNG/commit/2396d2fa)
+
+- feat(backgrounds): add sort order option for background rotation. [125e44da](https://github.com/BookCatKid/TablissNG/commit/125e44da)
+
+- feat(dashboard): add transform origin based on widget position. [017ecf5d](https://github.com/BookCatKid/TablissNG/commit/017ecf5d)
+
+- feat(plugins): implement default data merging in useApi. [a3ac8a8c](https://github.com/BookCatKid/TablissNG/commit/a3ac8a8c)
+
+- feat(i18n): overhaul translations pipeline and locale loading (#141). [9af22332](https://github.com/BookCatKid/TablissNG/commit/9af22332)
+
+- feat(docs): add sitemap. [ef9de5f7](https://github.com/BookCatKid/TablissNG/commit/ef9de5f7)
+
+- docs: add doc for creating a new widget (#148). [25ccc3d9](https://github.com/BookCatKid/TablissNG/commit/25ccc3d9)
+
+- docs: clarify limitations of cache. [bf3777b0](https://github.com/BookCatKid/TablissNG/commit/bf3777b0)
+
+- feat: Github Issue Forms. [af5b0ebd](https://github.com/BookCatKid/TablissNG/commit/af5b0ebd)
+
+- ci(workflows): add auto-close workflow for fixed-not-released issues. [c940b83e](https://github.com/BookCatKid/TablissNG/commit/c940b83e)
+
+- feat(ui): change hide settings icon to toolbar and fix loader race conditions. [f10f1e8d](https://github.com/BookCatKid/TablissNG/commit/f10f1e8d)
+
+### Changed
+
+- Migrate build system to rspack and update package manager to pnpm (#140). [9771a4e8](https://github.com/BookCatKid/TablissNG/commit/9771a4e8)
+
+- build(test): migrate from Jest to rstest testing framework. [8418275e](https://github.com/BookCatKid/TablissNG/commit/8418275e)
+
+- refactor(notes): replace react-markdown with a custom SimpleMarkdown implementation. [5aee09b2](https://github.com/BookCatKid/TablissNG/commit/5aee09b2)
+
+- refactor(ui): replace react-dropdown-select with custom select component. [1c3c920e](https://github.com/BookCatKid/TablissNG/commit/1c3c920e)
+
+- refactor(ui): replace imperative highlighting with CSS-based user-select toggle. [8c19d5d1](https://github.com/BookCatKid/TablissNG/commit/8c19d5d1)
+
+- feat(ui): improve middle settings position and DRY overlay. [26ae8052](https://github.com/BookCatKid/TablissNG/commit/26ae8052)
+
+- style(dashboard): adjust bottomCentre overlay position conditionally. [25630731](https://github.com/BookCatKid/TablissNG/commit/25630731)
+
+- perf: tune Unsplash params (q=75, auto=format). [765d5177](https://github.com/BookCatKid/TablissNG/commit/765d5177)
+
+### Fixed
+
+- fix(plugins): fix north korean, weather error handling, slight suggestion fixes. [459d5320](https://github.com/BookCatKid/TablissNG/commit/459d532006afecc6b3ec757618f4f2476a7ed124)
+
+- fix: default scale input display. [f34ff054](https://github.com/BookCatKid/TablissNG/commit/f34ff054)
+
+- fix: change wording so github stops annoying me. [fef2540b](https://github.com/BookCatKid/TablissNG/commit/fef2540b)
+
+- fix(docs): base url update with new domain. [c0589965](https://github.com/BookCatKid/TablissNG/commit/c0589965)
+
+- fix(workflows): improve fixed-not-released close message clarity. [98540aa4](https://github.com/BookCatKid/TablissNG/commit/98540aa4)
+
 ### Translations
 
-- Added toki pona translation.
+- Added a toki pona translation (#137). [d0d00c26](https://github.com/BookCatKid/TablissNG/commit/d0d00c26)
+
+- Update fr.json (#147). [f96548ae](https://github.com/BookCatKid/TablissNG/commit/f96548ae)
+
+- chore: run translations. [66954c8a](https://github.com/BookCatKid/TablissNG/commit/66954c8a)
+
+- chore: update translations. [4a1fc36d](https://github.com/BookCatKid/TablissNG/commit/4a1fc36d)
+
+### Chore / Cleanup
+
+- Create CNAME. [baad5fd4](https://github.com/BookCatKid/TablissNG/commit/baad5fd4)
+
+- chore: finish smrff.dev migration, change docs to base and /web/ for web version. [7a09d6e5](https://github.com/BookCatKid/TablissNG/commit/7a09d6e5)
+
+- chore(docs): potentioally better embeds. [b9a23823](https://github.com/BookCatKid/TablissNG/commit/b9a23823)
+
+- chore(docs): better metadata. [ddbc3307](https://github.com/BookCatKid/TablissNG/commit/ddbc3307)
+
+- chore(docs): rename page to be distinct from extension. [a6b78c16](https://github.com/BookCatKid/TablissNG/commit/a6b78c16)
+
+- chore(docs): rename page to be distinct from extension =. [cb742843](https://github.com/BookCatKid/TablissNG/commit/cb742843)
+
+- chore(docs): add watch and serve modes to asset sync script. [16530af7](https://github.com/BookCatKid/TablissNG/commit/16530af7)
+
+- chore: remove old templates. [07b27003](https://github.com/BookCatKid/TablissNG/commit/07b27003)
+
+- Rename issue templates and add config. [47e4520d](https://github.com/BookCatKid/TablissNG/commit/47e4520d)
+
+- chore: remove colon from bug report title. [d215ede3](https://github.com/BookCatKid/TablissNG/commit/d215ede3)
+
+- ci: node 24, webpack cache, parallelise tests. [89dedd9d](https://github.com/BookCatKid/TablissNG/commit/89dedd9d)
 
 ## [1.6.6] - 4/4/2026 | LeetCode widget, APOD improvements, and important bugfixes
 

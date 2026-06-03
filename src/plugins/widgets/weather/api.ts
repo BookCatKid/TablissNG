@@ -22,32 +22,33 @@ export async function getForecast(
     "timeformat=unixtime&" +
     "timezone=auto&" +
     `temperature_unit=${units === "us" ? "fahrenheit" : "celsius"}`;
-  let body;
   try {
     const res = await fetch(url);
-    body = await res.json();
+    if (!res.ok) return;
+    const body = await res.json();
+    if (!body?.hourly?.time || !body?.daily?.time) return;
+
+    return {
+      timestamp: Date.now(),
+      conditions: body.hourly.time.map((time: number, i: number) => ({
+        timestamp: time * 1000,
+        temperature: body.hourly.temperature_2m[i],
+        apparentTemperature: body.hourly.apparent_temperature[i],
+        humidity: body.hourly.relativehumidity_2m[i],
+        weatherCode: body.hourly.weathercode[i],
+      })),
+      dailyConditions: body.daily.time.map((time: number, i: number) => ({
+        timestamp: time * 1000,
+        temperatureMax: body.daily.temperature_2m_max[i],
+        temperatureMin: body.daily.temperature_2m_min[i],
+        weatherCode: body.daily.weathercode[i],
+      })),
+    };
+  } catch {
+    return;
   } finally {
     loader.pop();
   }
-
-  // Process results
-  // TODO: validate response
-  return {
-    timestamp: Date.now(),
-    conditions: body.hourly.time.map((time: number, i: number) => ({
-      timestamp: time * 1000, // convert to ms
-      temperature: body.hourly.temperature_2m[i],
-      apparentTemperature: body.hourly.apparent_temperature[i],
-      humidity: body.hourly.relativehumidity_2m[i],
-      weatherCode: body.hourly.weathercode[i],
-    })),
-    dailyConditions: body.daily.time.map((time: number, i: number) => ({
-      timestamp: time * 1000, // convert to ms
-      temperatureMax: body.daily.temperature_2m_max[i],
-      temperatureMin: body.daily.temperature_2m_min[i],
-      weatherCode: body.daily.weathercode[i],
-    })),
-  };
 }
 
 /** Request current location from the browser */
@@ -60,20 +61,29 @@ export function requestLocation(): Promise<Coordinates> {
           longitude: round(coords.longitude),
         }),
       reject,
+      { timeout: 10000 },
     ),
   );
 }
 
 /** Perform geocoding lookup on query string */
-export async function geocodeLocation(query: string): Promise<Coordinates> {
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=1`;
-  const res = await fetch(url);
-  const data = await res.json();
+export async function geocodeLocation(
+  query: string,
+): Promise<Coordinates | undefined> {
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${query}&count=1`;
+    const res = await fetch(url);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data?.results?.[0]) return;
 
-  return {
-    latitude: round(data.results[0].latitude),
-    longitude: round(data.results[0].longitude),
-  };
+    return {
+      latitude: round(data.results[0].latitude),
+      longitude: round(data.results[0].longitude),
+    };
+  } catch {
+    return;
+  }
 }
 
 function round(x: number, precision = 4): number {

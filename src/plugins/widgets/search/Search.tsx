@@ -110,10 +110,11 @@ const Search: FC<Props> = ({ data = defaultData }) => {
       }
 
       case "Escape":
-        if (active) {
+        if (active !== undefined) {
           setActive(undefined);
           searchInput.current!.value = previousValue.current;
-        } else if (suggestions) {
+        }
+        if (suggestions) {
           setSuggestions(undefined);
         }
         break;
