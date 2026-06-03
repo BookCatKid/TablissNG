@@ -259,9 +259,9 @@ export function Card({
     >
       <div className="card-header">
         <div className="card-labels-container">
-          {labels.map((l) => (
+          {labels.map((l, i) => (
             <div
-              key={l.colour}
+              key={`${l.colour}-${i}`}
               className="card-label"
               style={{
                 width: "2.5rem",

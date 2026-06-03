@@ -57,14 +57,14 @@ export function LabelsForm({
         </div>
       ) : (
         <div className="select-labels-label-container">
-          {availableLabels.map((l, i) => {
+          {availableLabels.map((l) => {
             const isDark = (c: TrelloColour) => c.endsWith("_dark");
 
             const textColour = isDark(l.colour)
               ? "rgba(255,255,255, 0.8)"
               : "rgba(0, 0, 0, 0.8)";
             return (
-              <div key={i} className="checkable-label">
+              <div key={l.id} className="checkable-label">
                 <Checkbox
                   value={l.id}
                   label={""}
@@ -75,7 +75,7 @@ export function LabelsForm({
                   style={{
                     width: "100%",
                     borderRadius: "2px",
-                    fontWeight: 200,
+                    fontWeight: 400,
                     margin: "0",
                     color: `${textColour}`,
                     background: colourPalette[l.colour],

@@ -16,7 +16,7 @@ export function useLabelsOnBoard(boardId: string) {
 
   useEffect(() => {
     const effect = async () => {
-      console.log("TRELLO: Fetching boards");
+      console.log("TRELLO: Fetching labels");
       const session = await getSession();
       if (!session) return;
       const labels = await getLabels(boardId, session);
@@ -28,7 +28,7 @@ export function useLabelsOnBoard(boardId: string) {
     if (authStatus === "authenticated") {
       effect();
     }
-  }, [authStatus]);
+  }, [authStatus, boardId]);
 
   return { labels, isLoading };
 }

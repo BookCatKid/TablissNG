@@ -64,6 +64,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
   const overlayRef = useRef<HTMLElement | null>(null);
+  const currentFrameRef = useRef<number | null>(null);
   const cursorPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const ghostRef = useRef<HTMLImageElement | null>(null);
 
@@ -80,9 +81,15 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     const handleDragOver = (e: DragEvent) => {
       cursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
-      if (overlayRef.current) {
-        overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
+      if (currentFrameRef.current) {
+        cancelAnimationFrame(currentFrameRef.current);
       }
+
+      currentFrameRef.current = requestAnimationFrame(() => {
+        if (overlayRef.current) {
+          overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
+        }
+      });
     };
 
     document.addEventListener("dragover", handleDragOver);

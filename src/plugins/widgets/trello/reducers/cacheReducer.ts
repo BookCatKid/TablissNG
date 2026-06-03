@@ -153,8 +153,10 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
 
       if (updatedCardIndex === -1) return cache;
 
-      const updatedCard = updatedList.cards[updatedCardIndex];
-      updatedCard.labels = [...labels];
+      const updatedCard = {
+        ...updatedList.cards[updatedCardIndex],
+        labels: [...labels],
+      };
 
       const cardsWithUpdatedCard = updatedList.cards.with(
         updatedCardIndex,
