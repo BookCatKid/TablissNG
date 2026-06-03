@@ -124,7 +124,7 @@ export function List({
           <DropZone
             dropId={`list-${listId}-card-${cards.length}`}
             dropType="ITEM"
-            style={{ minHeight: cards.length === 0 ? "4rem" : undefined }}
+            style={{ minHeight: "4rem" }}
           >
             <DropGuide
               dropType="ITEM"
