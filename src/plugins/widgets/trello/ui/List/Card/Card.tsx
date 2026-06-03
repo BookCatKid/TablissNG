@@ -1,6 +1,5 @@
 import "./style.sass";
 
-import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -253,7 +252,7 @@ export function Card({
   return (
     <div
       ref={selfRef}
-      className={clsx("card-content-container", isSelected && "selected")}
+      className={`card-content-container ${isSelected ? "selected" : ""}`}
       onMouseEnter={() => setHoveringOverHeader(true)}
       onMouseLeave={() => setHoveringOverHeader(false)}
     >
@@ -274,29 +273,28 @@ export function Card({
           ))}
         </div>
         <span
-          className={clsx(
-            "edit-card-buttons",
-            hoveringOverHeader ? "visible" : "",
-          )}
+          className={`
+            edit-card-buttons
+            ${hoveringOverHeader ? "visible" : ""}`}
         >
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
-              className={clsx("icon", isEditingLabels ? "disabled" : "")}
+              className={`icon${isEditingLabels ? " disabled" : ""}`}
             >
               <RemoveIcon />
             </span>
           ) : (
             <span
               onClick={isEditingLabels ? undefined : handleEdit}
-              className={clsx("icon", isEditingLabels ? "disabled" : "")}
+              className={`icon${isEditingLabels ? " disabled" : ""}`}
             >
               <EditIcon />
             </span>
           )}
           <span
             onClick={isEditingContent ? undefined : handleEditLabels}
-            className={clsx("icon", isEditingContent ? "disabled" : "")}
+            className={`icon${isEditingContent ? " disabled" : ""}`}
           >
             <LabelsIcon />
           </span>
