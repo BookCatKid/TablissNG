@@ -108,7 +108,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   };
 
   // Called continuously while a DragCard is being dragged
-  // Possibly optimise to prevent excessive rerenders
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
     e.stopPropagation();
