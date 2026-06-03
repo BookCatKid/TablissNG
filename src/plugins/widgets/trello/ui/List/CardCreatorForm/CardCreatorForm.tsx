@@ -37,9 +37,16 @@ export function CardCreatorForm({
       const cleanedFormContent = formContent.replace(/(\r\n|\n|\r)/gm, "");
       const created = createCard(cleanedFormContent);
       dispatchUI({ type: "ADD_CARD", card: created, listId: listId });
-      const actionSuccessful = await addCardToList(created, listId, session);
+      const trelloCreatedId = await addCardToList(created, listId, session);
 
-      if (!actionSuccessful) {
+      if (trelloCreatedId !== null) {
+        dispatchUI({
+          type: "UPDATE_CARD_ID",
+          oldId: created.id,
+          newId: trelloCreatedId,
+          listId,
+        });
+      } else {
         dispatchUI({ type: "DELETE_CARD", listId: listId, cardId: created.id });
       }
     }

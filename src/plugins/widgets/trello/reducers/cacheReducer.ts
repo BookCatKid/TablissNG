@@ -19,7 +19,8 @@ export type CacheReducerAction =
       cardId: string;
       listId: string;
       labels: Label[];
-    };
+    }
+  | { type: "UPDATE_CARD_ID"; oldId: string; newId: string; listId: string };
 
 export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
   switch (action.type) {
@@ -166,6 +167,22 @@ export function cacheReducer(cache: Cache, action: CacheReducerAction): Cache {
       };
 
       return { ...cache, lists: listsAfterUpdate };
+    }
+    case "UPDATE_CARD_ID": {
+      const { oldId, newId, listId } = action;
+      const list = cache.lists[listId];
+      if (!list) return cache;
+
+      const updatedCards = list.cards.map((c) =>
+        c.id === oldId ? { ...c, id: newId } : c,
+      );
+
+      const updatedLists = {
+        ...cache.lists,
+        [listId]: { ...list, cards: updatedCards },
+      };
+
+      return { ...cache, lists: updatedLists };
     }
     default:
       return cache;

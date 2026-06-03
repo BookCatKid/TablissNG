@@ -186,7 +186,7 @@ export const addCardToList = async (
   card: Card,
   listId: string,
   session: TrelloSession,
-) => {
+): Promise<string | null> => {
   const response = await fetch(`https://api.trello.com/1/cards`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -198,7 +198,12 @@ export const addCardToList = async (
       token: session.accessToken,
     }),
   });
-  return response.ok;
+
+  if (response.ok) {
+    const data = await response.json();
+    return data.id;
+  }
+  return null;
 };
 
 export const updateCardName = async (

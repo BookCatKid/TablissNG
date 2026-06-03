@@ -74,7 +74,7 @@ export function Card({
     }
   }, [isEditingLabels]);
 
-  // Reposition on scroll/resize
+  // Reposition tag editor on scroll/resize
   useEffect(() => {
     if (!isEditingLabels) return;
     const update = () => {
@@ -156,6 +156,8 @@ export function Card({
   const handleEditLabels = () => {
     setIsEditingLabels(true);
   };
+
+  // Functions to to alter UI
 
   const handleSave = async () => {
     const session = await getSession();
