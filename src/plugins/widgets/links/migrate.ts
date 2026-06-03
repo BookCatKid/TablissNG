@@ -199,7 +199,7 @@ export function migrateLinks(
   dataChanged: boolean;
   cacheChanged: boolean;
 } {
-  let changed = false;
+  let dataChanged = false;
   let cacheChanged = false;
   let newCache = { ...cache };
 
@@ -238,7 +238,7 @@ export function migrateLinks(
     }
 
     if (linkModified) {
-      changed = true;
+      dataChanged = true;
       return updatedLink;
     }
     return link;
@@ -247,7 +247,7 @@ export function migrateLinks(
   return {
     data: { ...data, links: linksWithIds },
     cache: newCache,
-    dataChanged: changed,
+    dataChanged: dataChanged,
     cacheChanged,
   };
 }
