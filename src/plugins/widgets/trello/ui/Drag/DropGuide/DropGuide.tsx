@@ -22,6 +22,7 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
   }
 
   const { dropZoneId, dragCardStyle } = context;
+
   if (dropZoneId !== dropId) {
     return null;
   }

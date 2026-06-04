@@ -66,7 +66,12 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const overlayRef = useRef<HTMLElement | null>(null);
   const currentFrameRef = useRef<number | null>(null);
   const cursorPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const previousCursorPositionRef = useRef<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const ghostRef = useRef<HTMLImageElement | null>(null);
+  const dragOverListenerRef = useRef<(e: DragEvent) => void>(null);
 
   useEffect(() => {
     const img = new Image();
@@ -74,27 +79,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
       "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
     ghostRef.current = img;
   }, []);
-
-  useEffect(() => {
-    if (!dragCardId) return;
-
-    const handleDragOver = (e: DragEvent) => {
-      cursorPositionRef.current = { x: e.clientX, y: e.clientY };
-
-      if (currentFrameRef.current) {
-        cancelAnimationFrame(currentFrameRef.current);
-      }
-
-      currentFrameRef.current = requestAnimationFrame(() => {
-        if (overlayRef.current) {
-          overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
-        }
-      });
-    };
-
-    document.addEventListener("dragover", handleDragOver);
-    return () => document.removeEventListener("dragover", handleDragOver);
-  }, [dragCardId]);
 
   useEffect(() => {
     document.body.style.cursor = dragCardId ? "grabbing" : "default";
@@ -130,15 +114,50 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     clone.style.width = `${element.offsetWidth}px`;
     clone.style.fontSize = `${fontSize}px`;
     clone.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
+    clone.style.opacity = "0";
+
+    cursorPositionRef.current = { x: e.clientX, y: e.clientY };
+    previousCursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
     document.body.appendChild(clone);
     overlayRef.current = clone;
+
+    // Attach event listener
+    const handleDragOver = (e: DragEvent) => {
+      cursorPositionRef.current = { x: e.clientX, y: e.clientY };
+
+      const distance = Math.hypot(
+        previousCursorPositionRef.current.x - cursorPositionRef.current.x,
+        previousCursorPositionRef.current.y - cursorPositionRef.current.y,
+      );
+
+      // Fix visual glitch on chrome where overlay jumps to weird position
+      if (distance > 200) {
+        return;
+      }
+
+      if (currentFrameRef.current) {
+        cancelAnimationFrame(currentFrameRef.current);
+      }
+
+      currentFrameRef.current = requestAnimationFrame(() => {
+        if (overlayRef.current) {
+          overlayRef.current.style.opacity = "1";
+          overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
+          previousCursorPositionRef.current = cursorPositionRef.current;
+        }
+      });
+    };
+
+    document.addEventListener("dragover", handleDragOver);
+    dragOverListenerRef.current = handleDragOver;
 
     setDragCardId(dragId);
     setDragType(dragType);
   };
 
   // Called continuously while a DragCard is being dragged
+  // State setting allows the UI to update
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
     setIsDragging(true);
@@ -148,6 +167,11 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     if (overlayRef.current) {
       overlayRef.current.remove();
       overlayRef.current = null;
+    }
+
+    if (dragOverListenerRef.current) {
+      document.removeEventListener("dragover", dragOverListenerRef.current);
+      dragOverListenerRef.current = null;
     }
 
     setDragCardId(null);
