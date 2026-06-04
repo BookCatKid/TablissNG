@@ -49,13 +49,13 @@ export function DoubleDropZone({
         >
           <DropZone
             dropId={previousId}
-            style={{ width: "100%", height: "100%" }}
+            style={{ flex: 1 }}
             dropType={dropType}
             remember={remember}
           />
           <DropZone
             dropId={nextId}
-            style={{ width: "100%", height: "100%" }}
+            style={{ flex: 1 }}
             dropType={dropType}
             remember={remember}
           />

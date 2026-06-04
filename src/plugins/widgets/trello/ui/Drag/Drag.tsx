@@ -63,8 +63,11 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [dragType, setDragType] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
+
   const overlayRef = useRef<HTMLElement | null>(null);
   const currentFrameRef = useRef<number | null>(null);
+
+  const lastRenderTimeRef = useRef<DOMHighResTimeStamp>(0);
   const cursorPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const previousCursorPositionRef = useRef<{ x: number; y: number }>({
     x: 0,
@@ -73,6 +76,11 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const ghostRef = useRef<HTMLImageElement | null>(null);
   const dragOverListenerRef = useRef<(e: DragEvent) => void>(null);
 
+  /**
+   * We need an image to override the one used in default drag behaviour
+   * However firefox does not allow empty images to be used
+   * hence make this 1px gif instead
+   */
   useEffect(() => {
     const img = new Image();
     img.src =
@@ -114,7 +122,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     clone.style.width = `${element.offsetWidth}px`;
     clone.style.fontSize = `${fontSize}px`;
     clone.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
-    clone.style.opacity = "0";
 
     cursorPositionRef.current = { x: e.clientX, y: e.clientY };
     previousCursorPositionRef.current = { x: e.clientX, y: e.clientY };
@@ -131,7 +138,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
         previousCursorPositionRef.current.y - cursorPositionRef.current.y,
       );
 
-      // Fix visual glitch on chrome where overlay jumps to weird position
+      // Fix visual glitch on chrome where overlay jumps massively to weird positions
       if (distance > 200) {
         return;
       }
@@ -142,7 +149,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
 
       currentFrameRef.current = requestAnimationFrame(() => {
         if (overlayRef.current) {
-          overlayRef.current.style.opacity = "1";
           overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
           previousCursorPositionRef.current = cursorPositionRef.current;
         }
@@ -160,7 +166,11 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   // State setting allows the UI to update
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
-    setIsDragging(true);
+    // Throttle updates
+    if (performance.now() - lastRenderTimeRef.current > 100) {
+      lastRenderTimeRef.current = performance.now();
+      setIsDragging(true);
+    }
   };
 
   const dragEnd = () => {
