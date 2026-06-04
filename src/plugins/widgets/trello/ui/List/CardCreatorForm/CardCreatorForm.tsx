@@ -1,6 +1,6 @@
 import "./style.sass";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import useAuth from "../../../../../../hooks/useAuth";
 import { CacheReducerAction } from "../../../reducers";
