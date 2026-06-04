@@ -5,11 +5,17 @@
     z-index: 67676767
     pointer-events: none
     color: white
+    border-radius: 0.25rem
     background: rgba(255, 255, 255, 0.09)
     backdrop-filter: blur(15px)
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1)
-    border-radius: 0.25rem
     transition: none
     user-select: none
     will-change: transform
     touch-action: none
+
+    // unset doubly applied styles from Card's sass 
+    .selected
+        backdrop-filter: unset
+        box-shadow: unset
+        background: unset

@@ -44,13 +44,12 @@ export function Card({
   useEffect(() => {
     labelsRef.current = labels;
   }, [labels]);
-  const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
+  const [hovering, setHovering] = useState<boolean>(false);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
-
   const selfRef = useRef<HTMLDivElement>(null);
 
   // Portals are used to display the tag editor
@@ -249,18 +248,27 @@ export function Card({
     }
   };
 
+  let stateClasses = "";
+  if (isSelected || hovering) {
+    stateClasses += " selected ";
+  }
+
+  if (hovering && !isSelected) {
+    stateClasses += " hovered ";
+  }
+
   return (
     <div
       ref={selfRef}
-      className={`card-content-container ${isSelected ? "selected" : ""}`}
-      onMouseEnter={() => setHoveringOverHeader(true)}
-      onMouseLeave={() => setHoveringOverHeader(false)}
+      className={`card-content-container ${stateClasses}`}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
     >
       <div className="card-header">
         <div className="card-labels-container">
-          {labels.map((l, i) => (
+          {labels.map((l) => (
             <div
-              key={`${l.colour}-${i}`}
+              key={l.id}
               className="card-label"
               style={{
                 width: "2.5rem",
@@ -275,26 +283,26 @@ export function Card({
         <span
           className={`
             edit-card-buttons
-            ${hoveringOverHeader ? "visible" : ""}`}
+            ${hovering ? "visible" : ""}`}
         >
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
-              className={`icon${isEditingLabels ? " disabled" : ""}`}
+              className={`icon ${isEditingLabels ? " disabled" : ""}`}
             >
               <RemoveIcon />
             </span>
           ) : (
             <span
               onClick={isEditingLabels ? undefined : handleEdit}
-              className={`icon${isEditingLabels ? " disabled" : ""}`}
+              className={`icon ${isEditingLabels ? " disabled" : ""}`}
             >
               <EditIcon />
             </span>
           )}
           <span
             onClick={isEditingContent ? undefined : handleEditLabels}
-            className={`icon${isEditingContent ? " disabled" : ""}`}
+            className={`icon ${isEditingContent ? " disabled" : ""}`}
           >
             <LabelsIcon />
           </span>

@@ -118,7 +118,16 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
 
     // Attach styles to overlaid component
     const clone = element.cloneNode(true) as HTMLElement;
+
+    console.log("CLONE CLasses ", clone.classList);
+    console.log("CLONE style ", clone.style);
+
+    clone.style.removeProperty("background");
+    clone.style.removeProperty("backdrop-blur");
+    clone.style.removeProperty("box-shadow");
+
     clone.classList.add("dragging-card");
+
     clone.style.width = `${element.offsetWidth}px`;
     clone.style.fontSize = `${fontSize}px`;
     clone.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
@@ -126,6 +135,8 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     cursorPositionRef.current = { x: e.clientX, y: e.clientY };
     previousCursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
+    console.log("CLONE CLasses ", clone.classList);
+    console.log("CLONE style ", clone.style);
     document.body.appendChild(clone);
     overlayRef.current = clone;
 
@@ -163,10 +174,12 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   };
 
   // Called continuously while a DragCard is being dragged
-  // State setting allows the UI to update
+  // We set is dragging here rather than in at the start.
+  // Dragging state is used when rendering drop guides and hiding cards when needed
+  // Setting it too early will result in the original card being hidden before we can form an overlay
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
-    // Throttle updates
+    // Throttle updates to prevent visual glitches
     if (performance.now() - lastRenderTimeRef.current > 100) {
       lastRenderTimeRef.current = performance.now();
       setIsDragging(true);
