@@ -69,6 +69,7 @@ export function Card({
     }
   }, [isEditingContent]);
 
+  // Set tag position when opened to align next to card
   useEffect(() => {
     if (isEditingLabels && selfRef.current) {
       const r = selfRef.current.getBoundingClientRect();
@@ -94,6 +95,21 @@ export function Card({
   }, [isEditingLabels]);
 
   useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (
+        portalRef.current &&
+        !portalRef.current.contains(e.target as Node) &&
+        selfRef.current &&
+        !selfRef.current.contains(e.target as Node)
+      ) {
+        setIsEditingLabels(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isEditingLabels]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditingContent(false);
@@ -105,63 +121,6 @@ export function Card({
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [card.name]);
-
-  const handleNewSelectedLabels = async (
-    label: Label,
-    operation: "ADD" | "REMOVE",
-  ) => {
-    const session = await getSession();
-    if (!session) return;
-
-    const snapshot = labelsRef.current;
-    let updatedLabels: Label[];
-
-    switch (operation) {
-      case "ADD":
-        updatedLabels = [...snapshot, label];
-        break;
-      case "REMOVE":
-        updatedLabels = snapshot.filter((l) => l.id !== label.id);
-        break;
-    }
-
-    labelsRef.current = updatedLabels;
-    setLabels(updatedLabels);
-
-    const actionSuccessful = await addOrRemoveLabel(
-      card.id,
-      label.id,
-      operation,
-      session,
-    );
-
-    if (!actionSuccessful) {
-      let correctedLabels: Label[];
-      switch (operation) {
-        case "ADD":
-          correctedLabels = labelsRef.current.filter((l) => l.id !== label.id);
-          break;
-        case "REMOVE":
-          correctedLabels = [...labelsRef.current, label];
-          break;
-      }
-      labelsRef.current = correctedLabels;
-      setLabels(correctedLabels);
-      dispatchUI({
-        type: "UPDATE_CARD_LABELS",
-        cardId: card.id,
-        listId,
-        labels: correctedLabels,
-      });
-    } else {
-      dispatchUI({
-        type: "UPDATE_CARD_LABELS",
-        cardId: card.id,
-        listId,
-        labels: labelsRef.current,
-      });
-    }
-  };
 
   const handleEdit = () => {
     setIsEditingContent(true);
@@ -204,20 +163,50 @@ export function Card({
     }
   };
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        portalRef.current &&
-        !portalRef.current.contains(e.target as Node) &&
-        selfRef.current &&
-        !selfRef.current.contains(e.target as Node)
-      ) {
-        setIsEditingLabels(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [isEditingLabels]);
+  const handleNewSelectedLabels = async (
+    label: Label,
+    operation: "ADD" | "REMOVE",
+  ) => {
+    const session = await getSession();
+    if (!session) return;
+
+    const snapshot = labelsRef.current;
+    const updatedLabels: Label[] =
+      operation === "ADD"
+        ? [...snapshot, label]
+        : snapshot.filter((l) => l.id !== label.id);
+    labelsRef.current = updatedLabels;
+    setLabels(updatedLabels);
+
+    const actionSuccessful = await addOrRemoveLabel(
+      card.id,
+      label.id,
+      operation,
+      session,
+    );
+
+    if (!actionSuccessful) {
+      const correctedLabels: Label[] =
+        operation === "ADD"
+          ? labelsRef.current.filter((l) => l.id !== label.id)
+          : [...labelsRef.current, label];
+      labelsRef.current = correctedLabels;
+      setLabels(correctedLabels);
+      dispatchUI({
+        type: "UPDATE_CARD_LABELS",
+        cardId: card.id,
+        listId,
+        labels: correctedLabels,
+      });
+    } else {
+      dispatchUI({
+        type: "UPDATE_CARD_LABELS",
+        cardId: card.id,
+        listId,
+        labels: labelsRef.current,
+      });
+    }
+  };
 
   const handleDelete = async () => {
     const session = await getSession();
