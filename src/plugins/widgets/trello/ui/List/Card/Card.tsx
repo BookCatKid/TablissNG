@@ -205,7 +205,6 @@ export function Card({
   };
 
   useEffect(() => {
-    if (!isEditingLabels) return;
     const handler = (e: MouseEvent) => {
       if (
         portalRef.current &&

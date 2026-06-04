@@ -1,6 +1,6 @@
 import "./style.sass";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import useAuth from "../../../../../../hooks/useAuth";
 import { CacheReducerAction } from "../../../reducers";
@@ -10,16 +10,24 @@ import { addCardToList } from "../../../utils/api";
 
 interface CardCreatorFormProps {
   listId: string;
+  selfRef: React.RefObject<HTMLTextAreaElement | null>;
   dispatchUI: React.Dispatch<CacheReducerAction>;
   onFormSubmit: () => void;
 }
 export function CardCreatorForm({
   listId,
+  selfRef,
   dispatchUI,
   onFormSubmit,
 }: CardCreatorFormProps) {
   const [formContent, setFormContent] = useState<string>("");
   const { getSession } = useAuth<TrelloSession>("trello", trelloAuthStore);
+
+  useEffect(() => {
+    if (typeof selfRef !== "function" && selfRef.current) {
+      selfRef.current.focus();
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFormContent(e.target.value);
@@ -55,6 +63,7 @@ export function CardCreatorForm({
   return (
     <div className="card-creator-form-container">
       <textarea
+        ref={selfRef}
         className="card-creator-form-text-input"
         onChange={handleChange}
         onKeyDown={handleKeyDown}

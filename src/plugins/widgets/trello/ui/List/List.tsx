@@ -1,6 +1,6 @@
 import "./style.sass";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { ExpandIcon } from "../../../../../views/shared";
@@ -35,18 +35,32 @@ export function List({
   dispatchUI,
 }: ListComponentProps) {
   const context = useContext(DragContext);
+  const cardCreatorRef = useRef<HTMLTextAreaElement>(null);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
   const [cardCreatorOpen, setCardCreatorOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (
+        cardCreatorRef.current &&
+        !cardCreatorRef.current.contains(e.target as Node)
+      ) {
+        setCardCreatorOpen(false);
+      }
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setCardCreatorOpen(false);
       }
     };
 
+    document.addEventListener("mousedown", handleClick);
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   if (!context) {
@@ -87,6 +101,7 @@ export function List({
           {cardCreatorOpen && (
             <CardCreatorForm
               listId={listId}
+              selfRef={cardCreatorRef}
               dispatchUI={dispatchUI}
               onFormSubmit={() => setCardCreatorOpen(false)}
             />
