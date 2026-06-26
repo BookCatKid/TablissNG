@@ -75,6 +75,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   });
   const ghostRef = useRef<HTMLImageElement | null>(null);
   const dragOverListenerRef = useRef<(e: DragEvent) => void>(null);
+  const skipFirstDragOverRef = useRef<boolean>(false);
 
   /**
    * We need an image to override the one used in default drag behaviour
@@ -119,9 +120,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     // Attach styles to overlaid component
     const clone = element.cloneNode(true) as HTMLElement;
 
-    console.log("CLONE CLasses ", clone.classList);
-    console.log("CLONE style ", clone.style);
-
     clone.style.removeProperty("background");
     clone.style.removeProperty("backdrop-blur");
     clone.style.removeProperty("box-shadow");
@@ -135,24 +133,21 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
     cursorPositionRef.current = { x: e.clientX, y: e.clientY };
     previousCursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
-    console.log("CLONE CLasses ", clone.classList);
-    console.log("CLONE style ", clone.style);
     document.body.appendChild(clone);
     overlayRef.current = clone;
 
+    skipFirstDragOverRef.current = true;
+
     // Attach event listener
     const handleDragOver = (e: DragEvent) => {
-      cursorPositionRef.current = { x: e.clientX, y: e.clientY };
-
-      const distance = Math.hypot(
-        previousCursorPositionRef.current.x - cursorPositionRef.current.x,
-        previousCursorPositionRef.current.y - cursorPositionRef.current.y,
-      );
-
-      // Fix visual glitch on chrome where overlay jumps massively to weird positions
-      if (distance > 200) {
+      // Chrome fires the first dragover with wrong coordinates; skip it
+      // since dragStart already set the correct initial position.
+      if (skipFirstDragOverRef.current) {
+        skipFirstDragOverRef.current = false;
         return;
       }
+
+      cursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
       if (currentFrameRef.current) {
         cancelAnimationFrame(currentFrameRef.current);

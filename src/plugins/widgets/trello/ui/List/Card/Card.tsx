@@ -50,6 +50,16 @@ export function Card({
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
+
+  let stateClasses = "";
+  if (isSelected || hovering) {
+    stateClasses += " selected ";
+  }
+
+  if (hovering && !isSelected) {
+    stateClasses += " hovered ";
+  }
+
   const selfRef = useRef<HTMLDivElement>(null);
 
   // Portals are used to display the tag editor
@@ -235,15 +245,6 @@ export function Card({
       handleSave();
     }
   };
-
-  let stateClasses = "";
-  if (isSelected || hovering) {
-    stateClasses += " selected ";
-  }
-
-  if (hovering && !isSelected) {
-    stateClasses += " hovered ";
-  }
 
   return (
     <div
