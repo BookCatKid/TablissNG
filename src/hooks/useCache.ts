@@ -43,6 +43,7 @@ export function useRotatingCache<T>(
   { cache, setCache }: Cache<RotatingCache<T>>,
   timeout: number,
   deps: unknown[],
+  sortOrder?: "sequence" | "random",
 ): T | undefined {
   const isValidCache =
     !!cache &&
@@ -59,7 +60,10 @@ export function useRotatingCache<T>(
       (timeout === 0 && boot.current) ||
       (timeout !== 0 && time > cache.rotated + timeout)
     ) {
-      const cursor = cache.cursor + 1;
+      const cursor =
+        sortOrder === "random"
+          ? Math.floor(Math.random() * cache.items.length)
+          : cache.cursor + 1;
       setCache({ ...cache, cursor, rotated: Date.now() });
       boot.current = false;
       return cursor;

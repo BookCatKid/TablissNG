@@ -8,6 +8,24 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+## [1.7.1] - 6/4/2026 | Minor bugfix release
+
+Quick follow-up release fixing an issue where the new sortOrder setting didn't apply during auto-rotation, and adding Trello labels form support.
+
+### Added
+
+- feat(trello): Labels form and bug fixes (#158). [37a5dfa1](https://github.com/BookCatKid/TablissNG/commit/37a5dfa1)
+
+### Fixed
+
+- fix: respect sortOrder during auto-rotation, not just manual navigation. [aeae3113](https://github.com/BookCatKid/TablissNG/commit/aeae3113)
+
+- fix: correctly pass pnpm version to store publish workflow. [70e9c690](https://github.com/BookCatKid/TablissNG/commit/70e9c690)
+
+### Chore / Cleanup
+
+- chore: huge deps bump. [a027585b](https://github.com/BookCatKid/TablissNG/commit/a027585b)
+
 ## [1.7.0] - 6/2/2026 | Build system overhaul, Trello drag-and-drop, weather forecast, and major refactoring
 
 A massive release featuring a complete build system migration (webpack → rspack, npm → pnpm, Jest → rstest), a major Trello widget overhaul with drag-and-drop card management, a new 5-day weather forecast, an i18n pipeline rewrite, and the removal of two heavy dependencies (react-markdown and react-dropdown-select) replaced with custom lightweight implementations.

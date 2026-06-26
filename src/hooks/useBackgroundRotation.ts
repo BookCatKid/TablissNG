@@ -38,7 +38,13 @@ export function useBackgroundRotation<
       : (data.timeout ?? 0) * 1000
     : 0;
 
-  const item = useRotatingCache<T>(fetch, cacheObj, timeout, deps);
+  const item = useRotatingCache<T>(
+    fetch,
+    cacheObj,
+    timeout,
+    deps,
+    data?.sortOrder,
+  );
 
   // Preload next item when available
   useEffect(() => {

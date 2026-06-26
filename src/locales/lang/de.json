@@ -497,7 +497,6 @@
   "settings.favicon.mode.size48": "48x48 Icon",
   "settings.favicon.mode.size96": "96x96 Icon",
   "settings.favicon.mode.url": "Custom URL...",
-  "settings.favicon.placeholder": "https://example.com/favicon.ico",
   "settings.font.black": "Schwarz",
   "settings.font.bold": "Fett",
   "settings.font.default": "Standard",
