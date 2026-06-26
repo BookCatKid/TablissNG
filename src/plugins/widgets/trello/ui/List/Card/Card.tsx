@@ -30,6 +30,7 @@ interface CardProps {
   boardId: string;
   position: number; // 0-index to its position in the list
   dispatchUI: React.Dispatch<CacheReducerAction>;
+  forceFocus?: boolean;
 }
 
 export function Card({
@@ -38,13 +39,14 @@ export function Card({
   boardId,
   position,
   dispatchUI,
+  forceFocus = false,
 }: CardProps) {
   const [labels, setLabels] = useState<Label[]>(card.labels);
   const labelsRef = useRef<Label[]>(card.labels);
   useEffect(() => {
     labelsRef.current = labels;
   }, [labels]);
-  const [hovering, setHovering] = useState<boolean>(false);
+  const [hovering, setHovering] = useState<boolean>(forceFocus);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);

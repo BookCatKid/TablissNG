@@ -22,7 +22,6 @@ export function CardCreatorForm({
 }: CardCreatorFormProps) {
   const [formContent, setFormContent] = useState<string>("");
   const { getSession } = useAuth<TrelloSession>("trello", trelloAuthStore);
-  // const [newCardPosition, setNewCardPosition] = useState<number | null>(null); // Track position of newly created cards
 
   useEffect(() => {
     if (typeof selfRef !== "function" && selfRef.current) {
