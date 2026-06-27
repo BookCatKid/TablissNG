@@ -144,17 +144,19 @@ export function List({
               </DraggableCard>
             </DoubleDropZone>
           ))}
-          {/* allow placing cards at the end of the list */}
-          <DropZone
-            dropId={`list-${listId}-card-${cards.length}`}
-            dropType="ITEM"
-            style={{ minHeight: "4rem" }}
-          >
-            <DropGuide
-              dropType="ITEM"
+          {isDragging && (
+            /* allow placing cards at the end of the list */
+            <DropZone
               dropId={`list-${listId}-card-${cards.length}`}
-            />
-          </DropZone>
+              dropType="ITEM"
+              style={{ minHeight: "4rem" }}
+            >
+              <DropGuide
+                dropType="ITEM"
+                dropId={`list-${listId}-card-${cards.length}`}
+              />
+            </DropZone>
+          )}
         </div>
       )}
     </div>

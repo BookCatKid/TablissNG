@@ -22,7 +22,6 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
   }
 
   const { dropZoneId, dragCardStyle } = context;
-
   const isActive = dropZoneId === dropId;
   return (
     <div
