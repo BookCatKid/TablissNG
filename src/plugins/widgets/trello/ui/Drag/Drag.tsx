@@ -65,9 +65,6 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   const [dropZoneId, setDropZoneId] = useState<string | null>(null);
 
   const overlayRef = useRef<HTMLElement | null>(null);
-  const currentFrameRef = useRef<number | null>(null);
-
-  const lastRenderTimeRef = useRef<DOMHighResTimeStamp>(0);
   const cursorPositionRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const previousCursorPositionRef = useRef<{ x: number; y: number }>({
     x: 0,
@@ -149,16 +146,10 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
 
       cursorPositionRef.current = { x: e.clientX, y: e.clientY };
 
-      if (currentFrameRef.current) {
-        cancelAnimationFrame(currentFrameRef.current);
+      if (overlayRef.current) {
+        overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
+        previousCursorPositionRef.current = cursorPositionRef.current;
       }
-
-      currentFrameRef.current = requestAnimationFrame(() => {
-        if (overlayRef.current) {
-          overlayRef.current.style.transform = `translate(${cursorPositionRef.current.x}px, ${cursorPositionRef.current.y}px) translate(-50%, -50%)`;
-          previousCursorPositionRef.current = cursorPositionRef.current;
-        }
-      });
     };
 
     document.addEventListener("dragover", handleDragOver);
@@ -174,11 +165,7 @@ export function Drag({ draggable = true, handleDrop, children }: DragProps) {
   // Setting it too early will result in the original card being hidden before we can form an overlay
   const drag = (e: React.DragEvent) => {
     e.stopPropagation();
-    // Throttle updates to prevent visual glitches
-    if (performance.now() - lastRenderTimeRef.current > 100) {
-      lastRenderTimeRef.current = performance.now();
-      setIsDragging(true);
-    }
+    setIsDragging(true);
   };
 
   const dragEnd = () => {
