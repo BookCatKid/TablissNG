@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   description: {
     id: "plugins.html.description",
-    defaultMessage: "Add static HTML (advanced users).",
+    defaultMessage: "Add custom HTML (optional JavaScript).",
     description: "Description of the Custom HTML widget",
   },
 });
