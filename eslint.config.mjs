@@ -38,6 +38,27 @@ export default defineConfig(
     },
   },
   {
+    // Docusaurus docs use plain JSX strings (English-only site). formatjs rules are for the main extension UI.
+    files: ["docs/**/*.{ts,tsx,js,jsx}"],
+    rules: {
+      "formatjs/no-literal-string-in-jsx": "off",
+      "formatjs/no-literal-string-in-object": "off",
+      "formatjs/enforce-default-message": "off",
+      "formatjs/enforce-description": "off",
+      "formatjs/enforce-id": "off",
+      "formatjs/enforce-placeholders": "off",
+      "formatjs/no-multiple-plurals": "off",
+      "formatjs/no-multiple-whitespaces": "off",
+      "formatjs/no-offset": "off",
+      "formatjs/no-camel-case": "off",
+      "formatjs/no-emoji": "off",
+      "formatjs/no-complex-selectors": "off",
+      "formatjs/no-useless-message": "off",
+      "formatjs/prefer-formatted-message": "off",
+      "formatjs/prefer-pound-in-plural": "off",
+    },
+  },
+  {
     files: [
       "rspack.config.js",
       "scripts/**/*.js",
