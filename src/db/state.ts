@@ -1,4 +1,5 @@
 import { DB, Storage } from "../lib";
+import { defaultLocale } from "../locales";
 
 /**
  * Database state
@@ -152,9 +153,7 @@ const initData: State = {
     },
   },
   focus: false,
-  // Default to English. Auto-detection via browser language is disabled.
-  // Users can change the language in extension settings; the choice is persisted.
-  locale: "en",
+  locale: defaultLocale,
   timeZone: null,
   highlightingEnabled: true,
   hideSettingsIcon: false,
