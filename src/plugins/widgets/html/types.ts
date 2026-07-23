@@ -2,7 +2,6 @@ import { API } from "../../types";
 
 type Data = {
   input: string;
-  /** When true, `<script>` tags and JS in the snippet are executed (isolated iframe). */
   allowJavaScript: boolean;
 };
 
