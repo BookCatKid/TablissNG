@@ -7,6 +7,7 @@ const HEIGHT_MSG_TYPE = "tabliss-html-widget-height";
 /**
  * srcdoc document for JS mode. Runs in a sandboxed iframe (no same-origin)
  * so Chromium MV3 / Firefox extension CSP still allows user scripts.
+ * Used only on extension builds when allowJavaScript is enabled.
  */
 function buildSrcDoc(html: string): string {
   return `<!DOCTYPE html>
@@ -55,15 +56,17 @@ ${html}
 }
 
 const Html: FC<Props> = ({ data = defaultData }) => {
-  const allowJavaScript = Boolean(data.allowJavaScript);
   const input = data.input || "";
   const staticHtml = useMemo(() => ({ __html: input }), [input]);
+  // Web keeps the legacy in-page injection (not sandboxed). Sandboxed JS is
+  // an extension-only opt-in so we do not change existing web behavior.
+  const useSandbox = BUILD_TARGET !== "web" && Boolean(data.allowJavaScript);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [frameHeight, setFrameHeight] = useState(80);
 
   // Auto-height from sandboxed iframe (no same-origin access).
   useEffect(() => {
-    if (!allowJavaScript) return;
+    if (!useSandbox) return;
 
     const onMessage = (event: MessageEvent) => {
       const payload = event.data;
@@ -90,9 +93,9 @@ const Html: FC<Props> = ({ data = defaultData }) => {
 
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [allowJavaScript]);
+  }, [useSandbox]);
 
-  if (allowJavaScript) {
+  if (useSandbox) {
     return (
       <iframe
         ref={iframeRef}
