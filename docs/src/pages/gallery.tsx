@@ -47,7 +47,7 @@ export default function Gallery(): ReactNode {
             }}
           >
             {screenshots.map((src, index) => (
-              <ScreenshotImage key={index} src={src} index={index} />
+              <ScreenshotImage key={src} src={src} index={index} />
             ))}
           </div>
         </div>
