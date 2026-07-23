@@ -8,9 +8,8 @@ import { usePushError } from "../../../api";
 import { db } from "../../../db/state";
 import { useCachedEffect } from "../../../hooks";
 import { useValue } from "../../../lib/db/react";
-import { MINUTES } from "../../../utils";
-import { getRates, rateKey } from "./api";
-import { getAsset } from "./assets";
+import { getExpiry, getRates, rateKey } from "./api";
+import { isIconUrl, resolveAsset } from "./assets";
 import { defaultData, Props } from "./types";
 
 const messages = defineMessages({
@@ -25,6 +24,13 @@ const messages = defineMessages({
     description: "Empty state when no pairs are configured",
   },
 });
+
+const AssetIcon: FC<{ icon: string }> = ({ icon }) =>
+  isIconUrl(icon) ? (
+    <img className="currency-rate-icon" src={icon} alt="" />
+  ) : (
+    <Icon className="currency-rate-icon" icon={icon} />
+  );
 
 const CurrencyRates: FC<Props> = ({
   cache,
@@ -43,7 +49,7 @@ const CurrencyRates: FC<Props> = ({
         .then((rates) => setCache({ rates, timestamp: Date.now() }))
         .catch(pushError);
     },
-    cache ? cache.timestamp + data.refreshInterval * MINUTES : 0,
+    getExpiry(cache, data.refreshInterval),
     [pairsKey],
   );
 
@@ -71,27 +77,25 @@ const CurrencyRates: FC<Props> = ({
     <div className="CurrencyRates">
       {data.pairs.map((pair) => {
         const rate = cache.rates[rateKey(pair.from, pair.to)];
-        const fromAsset = getAsset(pair.from);
-        const toAsset = getAsset(pair.to);
+        const fromAsset = resolveAsset(pair, "from", locale);
+        const toAsset = resolveAsset(pair, "to", locale);
         const amount = pair.amount ?? 1;
+        const showIcons = pair.showIcons ?? false;
+        const showChange = pair.showChange ?? true;
 
         return (
           <div className="currency-rate-row" key={pair.id}>
             <span className="currency-rate-from">
-              {data.showIcons && fromAsset && (
-                <Icon className="currency-rate-icon" icon={fromAsset.icon} />
-              )}
+              {showIcons && fromAsset && <AssetIcon icon={fromAsset.icon} />}
               {amount} {fromAsset?.symbol ?? pair.from.toUpperCase()}
             </span>
             <span className="currency-rate-equals">=</span>
             {rate ? (
               <span className="currency-rate-value">
                 {formatter.format(rate.value * amount)}{" "}
-                {data.showIcons && toAsset && (
-                  <Icon className="currency-rate-icon" icon={toAsset.icon} />
-                )}
+                {showIcons && toAsset && <AssetIcon icon={toAsset.icon} />}
                 {toAsset?.symbol ?? pair.to.toUpperCase()}
-                {data.showChange && typeof rate.change24h === "number" && (
+                {showChange && typeof rate.change24h === "number" && (
                   <span
                     className={`currency-rate-change currency-rate-change--${
                       rate.change24h >= 0 ? "up" : "down"

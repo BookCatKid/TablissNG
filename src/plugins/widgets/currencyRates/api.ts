@@ -1,8 +1,10 @@
+import { SECONDS } from "../../../utils";
 import { API } from "../../types";
 import { getAsset, isFiat } from "./assets";
-import { Pair, Rate } from "./types";
+import { Cache, CustomAsset, Pair, Rate } from "./types";
 
 const COINGECKO_URL = "https://api.coingecko.com/api/v3/simple/price";
+const COINGECKO_SEARCH_URL = "https://api.coingecko.com/api/v3/search";
 const FIAT_RATES_URL = "https://open.er-api.com/v6/latest";
 
 export function rateKey(from: string, to: string): string {
@@ -60,6 +62,46 @@ async function fetchFiatRates(base: string): Promise<Record<string, number>> {
     throw new Error("Exchange rate request failed");
   }
   return data.rates;
+}
+
+type CoingeckoSearchResponse = {
+  coins: {
+    id: string;
+    name: string;
+    symbol: string;
+    thumb: string;
+  }[];
+};
+
+export async function searchCoins(query: string): Promise<CustomAsset[]> {
+  if (query.trim().length === 0) {
+    return [];
+  }
+
+  const res = await fetch(
+    `${COINGECKO_SEARCH_URL}?query=${encodeURIComponent(query)}`,
+  );
+  if (!res.ok) {
+    throw new Error(`CoinGecko search failed: ${res.status}`);
+  }
+
+  const data: CoingeckoSearchResponse = await res.json();
+  return data.coins.map((coin) => ({
+    id: coin.id,
+    label: `${coin.name} (${coin.symbol.toUpperCase()})`,
+    symbol: coin.symbol.toUpperCase(),
+    icon: coin.thumb,
+  }));
+}
+
+export function getExpiry(
+  cache: Cache | undefined,
+  refreshInterval: number,
+): number {
+  if (!cache || refreshInterval === 0) {
+    return 0;
+  }
+  return cache.timestamp + refreshInterval * SECONDS;
 }
 
 export async function getRates(

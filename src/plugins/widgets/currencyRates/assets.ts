@@ -1,20 +1,18 @@
+import type { Pair } from "./types";
+
 export type AssetCategory = "crypto" | "metal" | "fiat";
 
 export type Asset = {
-  /** CoinGecko coin id for crypto/metal assets, or a lowercase ISO 4217 code for fiat */
   id: string;
   category: AssetCategory;
   label: string;
   symbol: string;
-  /** Multiplies the raw API price to normalize the display unit (e.g. grams -> troy oz) */
   unitMultiplier?: number;
-  /** Iconify icon identifier, shown next to the symbol when "Show currency icons" is on */
   icon: string;
 };
 
 export const GRAMS_PER_TROY_OUNCE = 31.1034768;
 
-// Generic fallback for fiat currencies without a dedicated symbol icon (e.g. PLN).
 const FALLBACK_FIAT_ICON = "mdi:cash";
 
 export const CRYPTO_ASSETS: Asset[] = [
@@ -112,152 +110,417 @@ export const METAL_ASSETS: Asset[] = [
     label: "Silver (troy oz)",
     symbol: "XAG",
     unitMultiplier: GRAMS_PER_TROY_OUNCE,
-    // No dedicated token icon exists for Kinesis Silver, use a generic silver coin icon.
     icon: "memory:coin-silver",
   },
 ];
 
-export const FIAT_CURRENCIES: Asset[] = [
-  {
-    id: "usd",
-    category: "fiat",
-    label: "US Dollar (USD)",
-    symbol: "USD",
-    icon: "mdi:currency-usd",
-  },
-  {
-    id: "eur",
-    category: "fiat",
-    label: "Euro (EUR)",
-    symbol: "EUR",
-    icon: "mdi:currency-eur",
-  },
-  {
-    id: "rub",
-    category: "fiat",
-    label: "Russian Ruble (RUB)",
-    symbol: "RUB",
-    icon: "mdi:currency-rub",
-  },
-  {
-    id: "gbp",
-    category: "fiat",
-    label: "British Pound (GBP)",
-    symbol: "GBP",
-    icon: "mdi:currency-gbp",
-  },
-  {
-    id: "jpy",
-    category: "fiat",
-    label: "Japanese Yen (JPY)",
-    symbol: "JPY",
-    icon: "mdi:currency-jpy",
-  },
-  {
-    id: "cny",
-    category: "fiat",
-    label: "Chinese Yuan (CNY)",
-    symbol: "CNY",
-    icon: "mdi:currency-cny",
-  },
-  {
-    id: "uah",
-    category: "fiat",
-    label: "Ukrainian Hryvnia (UAH)",
-    symbol: "UAH",
-    icon: "mdi:currency-uah",
-  },
-  {
-    id: "kzt",
-    category: "fiat",
-    label: "Kazakhstani Tenge (KZT)",
-    symbol: "KZT",
-    icon: "mdi:currency-kzt",
-  },
-  {
-    id: "try",
-    category: "fiat",
-    label: "Turkish Lira (TRY)",
-    symbol: "TRY",
-    icon: "mdi:currency-try",
-  },
-  {
-    id: "inr",
-    category: "fiat",
-    label: "Indian Rupee (INR)",
-    symbol: "INR",
-    icon: "mdi:currency-inr",
-  },
-  // AUD/CAD use the same $ glyph as USD; MDI has no separate icon for them.
-  {
-    id: "aud",
-    category: "fiat",
-    label: "Australian Dollar (AUD)",
-    symbol: "AUD",
-    icon: "mdi:currency-usd",
-  },
-  {
-    id: "cad",
-    category: "fiat",
-    label: "Canadian Dollar (CAD)",
-    symbol: "CAD",
-    icon: "mdi:currency-usd",
-  },
-  {
-    id: "chf",
-    category: "fiat",
-    label: "Swiss Franc (CHF)",
-    symbol: "CHF",
-    icon: "mdi:currency-chf",
-  },
-  {
-    id: "pln",
-    category: "fiat",
-    label: "Polish Zloty (PLN)",
-    symbol: "PLN",
-    icon: FALLBACK_FIAT_ICON,
-  },
-  {
-    id: "brl",
-    category: "fiat",
-    label: "Brazilian Real (BRL)",
-    symbol: "BRL",
-    icon: "mdi:currency-brl",
-  },
+const CURATED_ASSETS: Asset[] = [...CRYPTO_ASSETS, ...METAL_ASSETS];
+
+// Every code open.er-api.com's /v6/latest endpoint returns rates for (confirmed live).
+export const FIAT_CODES = [
+  "aed",
+  "afn",
+  "all",
+  "amd",
+  "ang",
+  "aoa",
+  "ars",
+  "aud",
+  "awg",
+  "azn",
+  "bam",
+  "bbd",
+  "bdt",
+  "bgn",
+  "bhd",
+  "bif",
+  "bmd",
+  "bnd",
+  "bob",
+  "brl",
+  "bsd",
+  "btn",
+  "bwp",
+  "byn",
+  "bzd",
+  "cad",
+  "cdf",
+  "chf",
+  "clf",
+  "clp",
+  "cnh",
+  "cny",
+  "cop",
+  "crc",
+  "cup",
+  "cve",
+  "czk",
+  "djf",
+  "dkk",
+  "dop",
+  "dzd",
+  "egp",
+  "ern",
+  "etb",
+  "eur",
+  "fjd",
+  "fkp",
+  "fok",
+  "gbp",
+  "gel",
+  "ggp",
+  "ghs",
+  "gip",
+  "gmd",
+  "gnf",
+  "gtq",
+  "gyd",
+  "hkd",
+  "hnl",
+  "hrk",
+  "htg",
+  "huf",
+  "idr",
+  "ils",
+  "imp",
+  "inr",
+  "iqd",
+  "irr",
+  "isk",
+  "jep",
+  "jmd",
+  "jod",
+  "jpy",
+  "kes",
+  "kgs",
+  "khr",
+  "kid",
+  "kmf",
+  "krw",
+  "kwd",
+  "kyd",
+  "kzt",
+  "lak",
+  "lbp",
+  "lkr",
+  "lrd",
+  "lsl",
+  "lyd",
+  "mad",
+  "mdl",
+  "mga",
+  "mkd",
+  "mmk",
+  "mnt",
+  "mop",
+  "mru",
+  "mur",
+  "mvr",
+  "mwk",
+  "mxn",
+  "myr",
+  "mzn",
+  "nad",
+  "ngn",
+  "nio",
+  "nok",
+  "npr",
+  "nzd",
+  "omr",
+  "pab",
+  "pen",
+  "pgk",
+  "php",
+  "pkr",
+  "pln",
+  "pyg",
+  "qar",
+  "ron",
+  "rsd",
+  "rub",
+  "rwf",
+  "sar",
+  "sbd",
+  "scr",
+  "sdg",
+  "sek",
+  "sgd",
+  "shp",
+  "sle",
+  "sll",
+  "sos",
+  "srd",
+  "ssp",
+  "stn",
+  "syp",
+  "szl",
+  "thb",
+  "tjs",
+  "tmt",
+  "tnd",
+  "top",
+  "try",
+  "ttd",
+  "tvd",
+  "twd",
+  "tzs",
+  "uah",
+  "ugx",
+  "usd",
+  "uyu",
+  "uzs",
+  "ves",
+  "vnd",
+  "vuv",
+  "wst",
+  "xaf",
+  "xcd",
+  "xcg",
+  "xdr",
+  "xof",
+  "xpf",
+  "yer",
+  "zar",
+  "zmw",
+  "zwg",
+  "zwl",
 ];
 
-// Extra crypto targets that CoinGecko supports as a `vs_currency`, for crypto-to-crypto pairs.
-export const CRYPTO_TARGETS: Asset[] = [
-  {
-    id: "btc",
-    category: "crypto",
-    label: "Bitcoin (BTC)",
-    symbol: "BTC",
-    icon: "token-branded:btc",
-  },
-  {
-    id: "eth",
-    category: "crypto",
-    label: "Ethereum (ETH)",
-    symbol: "ETH",
-    icon: "token-branded:eth",
-  },
+// Shown first in the fiat picker before the rest of FIAT_CODES, alphabetically-unsorted.
+export const COMMON_FIAT_CODES = [
+  "usd",
+  "eur",
+  "rub",
+  "gbp",
+  "jpy",
+  "cny",
+  "uah",
+  "kzt",
+  "try",
+  "inr",
+  "aud",
+  "cad",
+  "chf",
+  "pln",
+  "brl",
 ];
 
-// Options for the "to" dropdown: any fiat currency, plus the crypto targets above.
-export const TARGET_ASSETS: Asset[] = [...FIAT_CURRENCIES, ...CRYPTO_TARGETS];
+// The few fiat codes with a dedicated Material Design Icons symbol (verified live).
+const FIAT_ICON_OVERRIDES: Record<string, string> = {
+  usd: "mdi:currency-usd",
+  aud: "mdi:currency-usd",
+  cad: "mdi:currency-usd",
+  eur: "mdi:currency-eur",
+  rub: "mdi:currency-rub",
+  gbp: "mdi:currency-gbp",
+  jpy: "mdi:currency-jpy",
+  cny: "mdi:currency-cny",
+  uah: "mdi:currency-uah",
+  kzt: "mdi:currency-kzt",
+  try: "mdi:currency-try",
+  inr: "mdi:currency-inr",
+  chf: "mdi:currency-chf",
+  brl: "mdi:currency-brl",
+  krw: "mdi:currency-krw",
+};
 
-const ALL_ASSETS: Asset[] = [
-  ...CRYPTO_ASSETS,
-  ...METAL_ASSETS,
-  ...FIAT_CURRENCIES,
-  ...CRYPTO_TARGETS,
+export function getCurrencyLabel(code: string, locale: string): string {
+  try {
+    const displayNames = new Intl.DisplayNames([locale], { type: "currency" });
+    const name = displayNames.of(code.toUpperCase());
+    return name && name.toUpperCase() !== code.toUpperCase()
+      ? `${name} (${code.toUpperCase()})`
+      : code.toUpperCase();
+  } catch {
+    return code.toUpperCase();
+  }
+}
+
+function buildFiatAsset(code: string, locale: string): Asset {
+  const id = code.toLowerCase();
+  return {
+    id,
+    category: "fiat",
+    label: getCurrencyLabel(id, locale),
+    symbol: id.toUpperCase(),
+    icon: FIAT_ICON_OVERRIDES[id] ?? FALLBACK_FIAT_ICON,
+  };
+}
+
+// CoinGecko's /api/v3/simple/supported_vs_currencies whitelist (confirmed live), split by kind.
+const COINGECKO_CRYPTO_TARGET_CODES = [
+  "btc",
+  "eth",
+  "ltc",
+  "bch",
+  "bnb",
+  "eos",
+  "xrp",
+  "xlm",
+  "link",
+  "dot",
+  "yfi",
+  "sol",
+];
+const COINGECKO_FIAT_TARGET_CODES = [
+  "usd",
+  "aed",
+  "ars",
+  "aud",
+  "bdt",
+  "bhd",
+  "bmd",
+  "brl",
+  "cad",
+  "chf",
+  "clp",
+  "cny",
+  "czk",
+  "dkk",
+  "eur",
+  "gbp",
+  "gel",
+  "hkd",
+  "huf",
+  "idr",
+  "ils",
+  "inr",
+  "jpy",
+  "krw",
+  "kwd",
+  "lkr",
+  "mmk",
+  "mxn",
+  "myr",
+  "ngn",
+  "nok",
+  "nzd",
+  "php",
+  "pkr",
+  "pln",
+  "rub",
+  "sar",
+  "sek",
+  "sgd",
+  "thb",
+  "try",
+  "twd",
+  "uah",
+  "vef",
+  "vnd",
+  "zar",
+  "xdr",
 ];
 
-export function getAsset(id: string): Asset | undefined {
-  return ALL_ASSETS.find((asset) => asset.id === id);
+const CRYPTO_TARGET_META: Record<
+  string,
+  { label: string; symbol: string; icon: string }
+> = {
+  btc: { label: "Bitcoin (BTC)", symbol: "BTC", icon: "token-branded:btc" },
+  eth: { label: "Ethereum (ETH)", symbol: "ETH", icon: "token-branded:eth" },
+  ltc: { label: "Litecoin (LTC)", symbol: "LTC", icon: "token-branded:ltc" },
+  bch: {
+    label: "Bitcoin Cash (BCH)",
+    symbol: "BCH",
+    icon: "token-branded:bch",
+  },
+  bnb: { label: "BNB", symbol: "BNB", icon: "token-branded:bnb" },
+  eos: { label: "EOS", symbol: "EOS", icon: "token-branded:eos" },
+  xrp: { label: "XRP", symbol: "XRP", icon: "token-branded:xrp" },
+  xlm: { label: "Stellar (XLM)", symbol: "XLM", icon: "token-branded:xlm" },
+  link: {
+    label: "Chainlink (LINK)",
+    symbol: "LINK",
+    icon: "token-branded:link",
+  },
+  dot: { label: "Polkadot (DOT)", symbol: "DOT", icon: "token-branded:dot" },
+  yfi: {
+    label: "yearn.finance (YFI)",
+    symbol: "YFI",
+    icon: "token-branded:yfi",
+  },
+  sol: { label: "Solana (SOL)", symbol: "SOL", icon: "token-branded:sol" },
+};
+
+/** Valid `to` options depend on which API serves the pair's `from` asset. */
+export function getTargetAssets(
+  fromCategory: AssetCategory,
+  locale: string,
+): Asset[] {
+  if (fromCategory === "fiat") {
+    return FIAT_CODES.map((code) => buildFiatAsset(code, locale));
+  }
+
+  const cryptoTargets = COINGECKO_CRYPTO_TARGET_CODES.map((code) => ({
+    id: code,
+    category: "crypto" as const,
+    ...CRYPTO_TARGET_META[code],
+  }));
+
+  const metalTargets = METAL_ASSETS.map((metal) => ({
+    ...metal,
+    id: metal.symbol.toLowerCase(),
+  }));
+
+  const fiatTargets = COINGECKO_FIAT_TARGET_CODES.map((code) =>
+    buildFiatAsset(code, locale),
+  );
+
+  return [...cryptoTargets, ...metalTargets, ...fiatTargets];
+}
+
+export function getAsset(id: string, locale = "en"): Asset | undefined {
+  const curated = CURATED_ASSETS.find((asset) => asset.id === id);
+  if (curated) return curated;
+
+  if ((id === "xau" || id === "xag") && !FIAT_CODES.includes(id)) {
+    const metal = METAL_ASSETS.find(
+      (asset) => asset.symbol.toLowerCase() === id,
+    );
+    if (metal) return { ...metal, id };
+  }
+
+  if (CRYPTO_TARGET_META[id]) {
+    return { id, category: "crypto", ...CRYPTO_TARGET_META[id] };
+  }
+
+  if (FIAT_CODES.includes(id)) {
+    return buildFiatAsset(id, locale);
+  }
+
+  return undefined;
+}
+
+export function isSupportedPair(
+  from: string,
+  to: string,
+  locale: string,
+): boolean {
+  const category = getAsset(from, locale)?.category ?? "crypto";
+  return getTargetAssets(category, locale).some((asset) => asset.id === to);
+}
+
+/** Resolves a pair's from/to asset, falling back to a live-search snapshot for non-curated coins. */
+export function resolveAsset(
+  pair: Pair,
+  side: "from" | "to",
+  locale: string,
+): Asset | undefined {
+  const id = side === "from" ? pair.from : pair.to;
+  const asset = getAsset(id, locale);
+  if (asset) return asset;
+
+  if (side === "from" && pair.customAsset) {
+    return { ...pair.customAsset, category: "crypto" };
+  }
+
+  return undefined;
+}
+
+export function isIconUrl(icon: string): boolean {
+  return icon.startsWith("http://") || icon.startsWith("https://");
 }
 
 export function isFiat(id: string): boolean {
-  return FIAT_CURRENCIES.some((asset) => asset.id === id);
+  return FIAT_CODES.includes(id);
 }
