@@ -153,7 +153,9 @@ const initData: State = {
     },
   },
   focus: false,
-  locale: defaultLocale,
+  // Default to English. Auto-detection via browser language is disabled.
+  // Users can change the language in extension settings; the choice is persisted.
+  locale: "en",
   timeZone: null,
   highlightingEnabled: true,
   hideSettingsIcon: false,
