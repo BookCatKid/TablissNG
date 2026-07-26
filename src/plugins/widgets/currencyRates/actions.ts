@@ -21,7 +21,7 @@ export function removePair(id: string) {
   } as const;
 }
 
-export function updatePair(id: string, changes: Partial<Pair>) {
+export function updatePair(id: string, changes: Omit<Partial<Pair>, "id">) {
   return {
     type: "UPDATE_PAIR",
     data: { id, changes },

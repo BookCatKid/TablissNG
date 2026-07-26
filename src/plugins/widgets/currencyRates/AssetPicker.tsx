@@ -116,6 +116,7 @@ const AssetPicker: FC<Props> = ({ side, value, customAsset, onChange }) => {
   useEffect(() => {
     if (!canSearchLive || !isOpen || debouncedQuery.trim().length < 2) {
       setLiveResults([]);
+      setSearching(false);
       return;
     }
 
