@@ -1,9 +1,10 @@
 import { Icon } from "@iconify/react";
-import { type FC, useContext, useState } from "react";
+import { type FC, useContext } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { ErrorContext } from "../../contexts/error";
 import { formatErrorLog } from "../../errorHandler";
+import { useClipboard } from "../../hooks";
 import Modal from "./modal/Modal";
 
 const messages = defineMessages({
@@ -31,27 +32,7 @@ type Props = {
 const Errors: FC<Props> = ({ onClose }) => {
   const { errors } = useContext(ErrorContext);
   const intl = useIntl();
-  const [copied, setCopied] = useState(false);
-  const [copyFailed, setCopyFailed] = useState(false);
-
-  const handleCopy = () => {
-    if (!navigator.clipboard?.writeText) {
-      setCopyFailed(true);
-      setTimeout(() => setCopyFailed(false), 3000);
-      return;
-    }
-    const text = formatErrorLog();
-    navigator.clipboard.writeText(text).then(
-      () => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      },
-      () => {
-        setCopyFailed(true);
-        setTimeout(() => setCopyFailed(false), 3000);
-      },
-    );
-  };
+  const { copy, copied, error: copyFailed } = useClipboard();
 
   return (
     <Modal onClose={onClose}>
@@ -71,7 +52,10 @@ const Errors: FC<Props> = ({ onClose }) => {
               description="Title of the error log panel"
             />
           </h2>
-          <button className="button button--primary" onClick={handleCopy}>
+          <button
+            className="button button--primary"
+            onClick={() => copy(formatErrorLog())}
+          >
             <Icon
               icon={
                 copyFailed

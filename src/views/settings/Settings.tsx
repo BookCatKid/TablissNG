@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { UiContext } from "../../contexts/ui";
 import { exportStore, importStore, resetStore } from "../../db/action";
 import { db } from "../../db/state";
-import { useKeyPress } from "../../hooks";
+import { useClipboard, useKeyPress } from "../../hooks";
 import { useTheme } from "../../hooks";
 import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
@@ -86,27 +86,9 @@ const Settings: FC = () => {
   const [isHovered, setIsHovered] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const planeRef = useRef<HTMLDivElement>(null);
-  const [copied, setCopied] = useState(false);
+  const { copy, copied } = useClipboard();
 
   const startupUrl = window.location.origin + window.location.pathname;
-  const showStartupSection =
-    BUILD_TARGET !== "web" && window.location.protocol.endsWith("-extension:");
-
-  const handleCopy = () => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard
-        .writeText(startupUrl)
-        .then(() => {
-          setCopied(true);
-          setTimeout(() => setCopied(false), 2000);
-        })
-        .catch((err) => {
-          console.error("Failed to copy URL to clipboard:", err);
-        });
-    } else {
-      console.warn("Clipboard API writeText not available");
-    }
-  };
 
   const settingsOnRight =
     settingsIconPosition === "bottomRight" ||
@@ -264,7 +246,7 @@ const Settings: FC = () => {
         {/* Only relevant for the web build where IndexedDB may be evicted. Hide for extension builds to avoid confusing prompts in Firefox/Chromium. */}
         {BUILD_TARGET === "web" && <Persist />}
 
-        {showStartupSection && (
+        {BUILD_TARGET !== "web" && (
           <div className="Widget startup-url">
             <h4>
               <FormattedMessage {...messages.settingsStartupUrlTitle} />
@@ -280,7 +262,7 @@ const Settings: FC = () => {
                 onClick={(e) => (e.target as HTMLInputElement).select()}
               />
               <button
-                onClick={handleCopy}
+                onClick={() => copy(startupUrl)}
                 className="button button--primary"
                 title={intl.formatMessage(
                   copied ? messages.copySuccess : messages.copyTooltip,
