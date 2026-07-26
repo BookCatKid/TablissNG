@@ -1,0 +1,107 @@
+.AssetPicker
+    display: inline-block
+
+    .AssetPicker-trigger
+        display: inline-flex
+        align-items: center
+        gap: 0.4em
+        padding: 0.4em 0.6em
+        background: var(--bg-input)
+        color: var(--text-main)
+        border: 1px solid var(--border-main)
+        border-radius: 6px
+        cursor: pointer
+
+        &:hover
+            border-color: var(--accent-color)
+
+    .AssetPicker-icon
+        display: inline-flex
+        width: 1.2em
+        height: 1.2em
+        flex-shrink: 0
+
+        img, svg
+            width: 100%
+            height: 100%
+            object-fit: contain
+
+    .AssetPicker-overlay
+        position: fixed
+        inset: 0
+        background: var(--bg-overlay)
+        display: flex
+        align-items: center
+        justify-content: center
+        z-index: 1000
+
+    .AssetPicker-modal
+        display: flex
+        flex-direction: column
+        width: 90%
+        max-width: 26em
+        max-height: 80vh
+        background: var(--bg-main)
+        color: var(--text-main)
+        border-radius: 12px
+        box-shadow: 0 0.5rem 1rem var(--shadow-main)
+        padding: 1em
+
+        h4
+            margin: 0 0 0.5em
+            color: var(--text-heading)
+
+    .AssetPicker-search
+        padding: 0.5em
+        margin-bottom: 0.5em
+        background: var(--bg-input)
+        color: var(--text-main)
+        border: 1px solid var(--border-main)
+        border-radius: 6px
+
+    .AssetPicker-list
+        overflow-y: auto
+        flex-grow: 1
+        display: flex
+        flex-direction: column
+        gap: 0.2em
+
+    .AssetPicker-option
+        display: flex
+        align-items: center
+        gap: 0.5em
+        padding: 0.5em
+        background: none
+        border: none
+        border-radius: 6px
+        color: var(--text-main)
+        text-align: left
+        cursor: pointer
+
+        &:hover
+            background: var(--bg-secondary)
+
+    .AssetPicker-divider
+        margin: 0.5em 0 0.2em
+        padding-top: 0.3em
+        border-top: 1px solid var(--border-light)
+        font-size: 0.85em
+        color: var(--text-secondary)
+
+    .AssetPicker-empty
+        color: var(--text-secondary)
+        text-align: center
+        margin-top: 1em
+
+    .AssetPicker-cancel
+        margin-top: 0.6em
+        align-self: flex-end
+        padding: 0.5em 1em
+        background: var(--bg-button)
+        color: var(--text-heading)
+        border: 1px solid var(--border-main)
+        border-radius: 6px
+        cursor: pointer
+
+        &:hover
+            background: var(--border-main)

@@ -5,6 +5,7 @@ import bitcoin from "./bitcoin";
 import bookmarks from "./bookmarks";
 import countdown from "./countdown";
 import css from "./css";
+import currencyRates from "./currencyRates";
 import customText from "./customText";
 import github from "./github";
 import greeting from "./greeting";
@@ -36,6 +37,7 @@ export const widgetConfigs = [
   bitcoin,
   countdown,
   css,
+  currencyRates,
   customText,
   github,
   greeting,

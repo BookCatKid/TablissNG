@@ -78,10 +78,20 @@ export const timingMessages = defineMessages({
     defaultMessage: "Every 15 minutes",
     description: "Every 15 minutes title",
   },
+  every30min: {
+    id: "plugins.every30min",
+    defaultMessage: "Every 30 minutes",
+    description: "Every 30 minutes title",
+  },
   everyHour: {
     id: "plugins.everyHour",
     defaultMessage: "Every hour",
     description: "Every hour title",
+  },
+  every6Hours: {
+    id: "plugins.every6Hours",
+    defaultMessage: "Every 6 hours",
+    description: "Every 6 hours title",
   },
   everyDay: {
     id: "plugins.everyDay",
