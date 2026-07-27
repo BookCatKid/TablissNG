@@ -1,0 +1,49 @@
+.PairRow
+    .PairRow-fields
+        display: flex
+        flex-direction: column
+        gap: 0.5em
+        margin-bottom: 0.4em
+
+    .PairRow-amount
+        display: flex
+        flex-direction: column
+        gap: 0.2em
+        margin: 0
+        font-size: 0.85em
+
+        input[type="number"]
+            width: 4.5em
+
+    .PairRow-currency
+        display: flex
+        flex-direction: column
+        gap: 0.2em
+
+        .AssetPicker
+            display: block
+
+            .AssetPicker-trigger
+                width: 100%
+                justify-content: flex-start
+
+    .PairRow-fieldLabel
+        font-size: 0.85em
+        color: var(--text-secondary)
+
+    .PairRow-warning
+        font-size: 0.85em
+        color: #e6a23c
+        margin: 0.3em 0
+
+    .PairRow-options
+        display: flex
+        gap: 1em
+        flex-wrap: wrap
+        margin-top: 0.6em
+
+        label
+            display: flex
+            align-items: center
+            gap: 0.3em
+            margin: 0

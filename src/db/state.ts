@@ -111,6 +111,8 @@ export interface WidgetDisplay {
   customClass?: string;
   /** Whether to use the global accent color instead of a specific color */
   useAccentColor?: boolean;
+  /** Whether the widget is disabled (not rendered on the dashboard) */
+  disabled?: boolean;
 }
 
 export type WidgetPosition =

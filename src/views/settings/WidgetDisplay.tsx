@@ -165,6 +165,19 @@ const WidgetDisplay: FC<Props> = ({ display, onChange }) => {
           onChange={(event) => onChange({ customClass: event.target.value })}
         />
       </label>
+
+      <label>
+        <input
+          type="checkbox"
+          checked={display.disabled ?? false}
+          onChange={(event) => onChange({ disabled: event.target.checked })}
+        />{" "}
+        <FormattedMessage
+          id="settings.disableWidget"
+          defaultMessage="Disable widget"
+          description="Checkbox label to disable the widget so it is not rendered on the dashboard"
+        />
+      </label>
     </div>
   );
 };

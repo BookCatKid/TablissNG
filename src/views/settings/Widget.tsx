@@ -96,7 +96,10 @@ const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
           </IconButton>
         )}
 
-        <h4 onClick={toggleIsOpen}>
+        <h4
+          onClick={toggleIsOpen}
+          className={plugin.display.disabled ? "widget-disabled" : undefined}
+        >
           <FormattedMessage {...name} />
         </h4>
         {!isOpen && (
