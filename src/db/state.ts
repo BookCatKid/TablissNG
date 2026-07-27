@@ -40,13 +40,7 @@ export interface State {
 }
 
 export type FaviconMode =
-  | "default"
-  | "size32"
-  | "size48"
-  | "size96"
-  | "size128"
-  | "custom"
-  | "url";
+  "default" | "size32" | "size48" | "size96" | "size128" | "custom" | "url";
 
 export interface FaviconState {
   mode: FaviconMode;

@@ -327,8 +327,7 @@ const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
                       onChange={(event) =>
                         setDisplay({
                           textOutlineStyle: event.target.value as
-                            | "basic"
-                            | "advanced",
+                            "basic" | "advanced",
                         })
                       }
                     >

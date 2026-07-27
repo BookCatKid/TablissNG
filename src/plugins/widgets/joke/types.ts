@@ -32,9 +32,7 @@ export interface TwoPartJokeAPIResponse extends BaseJokeAPIResponse {
 }
 
 export type JokeAPIResponse =
-  | SingleJokeAPIResponse
-  | TwoPartJokeAPIResponse
-  | JokeApiErrorResponse;
+  SingleJokeAPIResponse | TwoPartJokeAPIResponse | JokeApiErrorResponse;
 
 export type JokeApiErrorResponse = {
   error: boolean;
