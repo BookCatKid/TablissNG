@@ -9,7 +9,7 @@ import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 import { UiContext } from "../../contexts/ui";
 import { exportStore, importStore, resetStore } from "../../db/action";
 import { db } from "../../db/state";
-import { useKeyPress } from "../../hooks";
+import { useClipboard, useKeyPress } from "../../hooks";
 import { useTheme } from "../../hooks";
 import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
@@ -52,6 +52,34 @@ const messages = defineMessages({
     description:
       "Links for import/export/reset at the bottom of settings. Uses XML-like tags to style each action word as a clickable link.",
   },
+  settingsStartupUrlTitle: {
+    id: "settings.startupUrl.title",
+    defaultMessage: "Startup Page URL",
+    description: "Title for the startup page URL section",
+  },
+  settingsStartupUrlDescription: {
+    id: "settings.startupUrl.description",
+    defaultMessage:
+      "For browsers like Vivaldi, copy this URL to set TablissNG as your startup page. <link>Learn more</link>.",
+    description:
+      "Description for the startup page URL section. The <link> tag wraps a clickable link to the docs.",
+  },
+  copyTooltip: {
+    id: "settings.startupUrl.copyTooltip",
+    defaultMessage: "Copy URL to clipboard",
+    description: "Tooltip for the copy URL button",
+  },
+  copySuccess: {
+    id: "settings.startupUrl.copySuccess",
+    defaultMessage: "Copied!",
+    description:
+      "Toast or indicator text shown after successfully copying the URL",
+  },
+  copyButton: {
+    id: "settings.startupUrl.copyButton",
+    defaultMessage: "Copy",
+    description: "Label for the copy URL button",
+  },
 });
 
 const Settings: FC = () => {
@@ -63,6 +91,9 @@ const Settings: FC = () => {
   const [isHovered, setIsHovered] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const planeRef = useRef<HTMLDivElement>(null);
+  const { copy, copied } = useClipboard();
+
+  const startupUrl = window.location.origin + window.location.pathname;
 
   const settingsOnRight =
     settingsIconPosition === "bottomRight" ||
@@ -219,6 +250,58 @@ const Settings: FC = () => {
         </p>
         {/* Only relevant for the web build where IndexedDB may be evicted. Hide for extension builds to avoid confusing prompts in Firefox/Chromium. */}
         {BUILD_TARGET === "web" && <Persist />}
+
+        {BUILD_TARGET !== "web" && (
+          <div className="Widget" style={{ textAlign: "center" }}>
+            <h4>
+              <FormattedMessage {...messages.settingsStartupUrlTitle} />
+            </h4>
+            <p>
+              <FormattedMessage
+                {...messages.settingsStartupUrlDescription}
+                values={{
+                  link: (chunks) => (
+                    <a
+                      href="https://tablissng.smrff.dev/support/vivaldi-startup"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {chunks}
+                    </a>
+                  ),
+                }}
+              />
+            </p>
+            <input
+              type="text"
+              readOnly
+              value={startupUrl}
+              style={{ textAlign: "left", marginTop: "0.75rem" }}
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+            <button
+              onClick={() => copy(startupUrl)}
+              className="button button--primary"
+              style={{ marginTop: "0.5rem" }}
+              title={intl.formatMessage(
+                copied ? messages.copySuccess : messages.copyTooltip,
+              )}
+              aria-label={intl.formatMessage(
+                copied ? messages.copySuccess : messages.copyTooltip,
+              )}
+            >
+              <Icon
+                icon={copied ? "feather:check" : "feather:copy"}
+                style={{ marginRight: "0.3rem" }}
+              />
+              {copied ? (
+                <FormattedMessage {...messages.copySuccess} />
+              ) : (
+                <FormattedMessage {...messages.copyButton} />
+              )}
+            </button>
+          </div>
+        )}
 
         <div style={{ textAlign: "center" }} className="Widget">
           <h4>

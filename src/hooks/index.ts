@@ -1,6 +1,7 @@
 export * from "./useApi";
 export * from "./useBackgroundRotation";
 export * from "./useCache";
+export * from "./useClipboard";
 export * from "./useDebounce";
 export * from "./useFavicon";
 export * from "./useFormatMessages";
