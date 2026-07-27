@@ -29,6 +29,7 @@ export function useClipboard(resetDelay = DEFAULT_RESET_DELAY) {
 
       if (!navigator?.clipboard?.writeText) {
         console.warn("Clipboard API writeText not available");
+        setCopied(false);
         setError(true);
         if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
         errorTimerRef.current = setTimeout(() => setError(false), resetDelay);

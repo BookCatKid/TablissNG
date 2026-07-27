@@ -569,7 +569,7 @@
   "settings.startupUrl.copySuccess": "Copied!",
   "settings.startupUrl.copyTooltip": "Copy URL to clipboard",
   "settings.startupUrl.description": "For browsers like Vivaldi, copy this URL to set TablissNG as your startup page. <link>Learn more</link>.",
-  "settings.startupUrl.title": "Browser Startup URL",
+  "settings.startupUrl.title": "Startup Page URL",
   "settings.support.contribute": "Contribute to the project! 😍🌟",
   "settings.textOutline": "Text outline",
   "settings.theme": "Theme",
