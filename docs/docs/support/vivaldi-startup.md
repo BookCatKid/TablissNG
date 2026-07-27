@@ -17,11 +17,10 @@ This is a known issue (somebody reported it on my GitHub already [#92](https://g
 
 To fix this, you can manually set your homepage to the TablissNG extension page:
 
-1. Open Vivaldi **Settings**.
-2. Go to **General** > **Homepage**.
-3. Select **Specific Page**.
-4. Enter the following URL:
-   `chrome-extension://dlaogejjiafeobgofajdlkkhjlignalk/index.html`
+1. Open the TablissNG settings panel and look for the **Startup Page URL** section.
+2. Click the copy button to copy the extension URL to your clipboard.
+3. Open Vivaldi **Settings** > **General** > **Homepage**.
+4. Select **Specific Page** and paste the copied URL.
 
    <img src={useBaseUrl("/img/screenshots/support/vivaldi_settings.png")} alt="Vivaldi Settings Example" width="600" />
 
