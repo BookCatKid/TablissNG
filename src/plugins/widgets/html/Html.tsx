@@ -2,69 +2,36 @@ import { FC, useEffect, useMemo, useRef, useState } from "react";
 
 import { defaultData, Props } from "./types";
 
+const RENDER_MSG_TYPE = "tabliss-html-widget-render";
 const HEIGHT_MSG_TYPE = "tabliss-html-widget-height";
-
-/**
- * srcdoc document for JS mode. Runs in a sandboxed iframe (no same-origin)
- * so Chromium MV3 / Firefox extension CSP still allows user scripts.
- * Used only on extension builds when allowJavaScript is enabled.
- */
-function buildSrcDoc(html: string): string {
-  return `<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  html, body {
-    margin: 0;
-    padding: 0;
-    background: transparent;
-    color: #fff;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  }
-  a { color: inherit; }
-</style>
-<script>
-(function () {
-  function report() {
-    try {
-      var h = Math.max(
-        document.documentElement ? document.documentElement.scrollHeight : 0,
-        document.body ? document.body.scrollHeight : 0
-      );
-      parent.postMessage({ type: "${HEIGHT_MSG_TYPE}", height: h }, "*");
-    } catch (e) {}
-  }
-  window.addEventListener("load", report);
-  window.addEventListener("DOMContentLoaded", function () {
-    report();
-    if (typeof ResizeObserver !== "undefined" && document.documentElement) {
-      new ResizeObserver(report).observe(document.documentElement);
-      if (document.body) new ResizeObserver(report).observe(document.body);
-    }
-  });
-  setTimeout(report, 50);
-  setTimeout(report, 300);
-})();
-</script>
-</head>
-<body>
-${html}
-</body>
-</html>`;
-}
 
 const Html: FC<Props> = ({ data = defaultData }) => {
   const input = data.input || "";
   const staticHtml = useMemo(() => ({ __html: input }), [input]);
   // Web keeps the legacy in-page injection (not sandboxed). Sandboxed JS is
-  // an extension-only opt-in so we do not change existing web behavior.
+  // an extension-only opt-in using a declared sandbox page to bypass extension CSP restrictions.
   const useSandbox = BUILD_TARGET !== "web" && Boolean(data.allowJavaScript);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [frameHeight, setFrameHeight] = useState(80);
 
-  // Auto-height from sandboxed iframe (no same-origin access).
+  const sendContent = () => {
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        { type: RENDER_MSG_TYPE, html: input },
+        "*",
+      );
+    }
+  };
+
+  // Send content to sandboxed iframe whenever input changes
+  useEffect(() => {
+    if (!useSandbox) return;
+    sendContent();
+    const timer = setTimeout(sendContent, 100);
+    return () => clearTimeout(timer);
+  }, [useSandbox, input]);
+
+  // Auto-height from sandboxed iframe
   useEffect(() => {
     if (!useSandbox) return;
 
@@ -101,8 +68,8 @@ const Html: FC<Props> = ({ data = defaultData }) => {
         ref={iframeRef}
         className="Html Html-frame"
         title="Custom HTML"
-        sandbox="allow-scripts allow-popups allow-forms allow-modals"
-        srcDoc={buildSrcDoc(input)}
+        src="sandbox.html"
+        onLoad={sendContent}
         style={{
           border: 0,
           width: "100%",

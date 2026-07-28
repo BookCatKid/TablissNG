@@ -101,17 +101,21 @@ function validateMessageObject(obj, filename) {
 }
 
 function runFormatjs(args) {
-  return execFileSync("pnpm", ["exec", "formatjs", ...args], {
+  const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+  return execFileSync(pnpmCmd, ["exec", "formatjs", ...args], {
     cwd: rootDir,
     stdio: "inherit",
+    shell: true,
   });
 }
 
 function assertFormatjsInstalled() {
   try {
-    execFileSync("pnpm", ["exec", "formatjs", "--version"], {
+    const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+    execFileSync(pnpmCmd, ["exec", "formatjs", "--version"], {
       cwd: rootDir,
       stdio: "pipe",
+      shell: true,
     });
   } catch {
     console.error("\n✗ Missing FormatJS CLI dependency: formatjs");

@@ -17,5 +17,10 @@
   ],
   "background": {
     "service_worker": "service-worker.js"
+  },
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
   }
 }

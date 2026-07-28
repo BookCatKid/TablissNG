@@ -29,5 +29,10 @@
   "optional_permissions": [
     "bookmarks",
     "topSites"
-  ]
+  ],
+  "sandbox": {
+    "pages": [
+      "sandbox.html"
+    ]
+  }
 }
