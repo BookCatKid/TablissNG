@@ -14,10 +14,7 @@ type NodeProps = {
   depth: number;
   wrap: boolean;
   navigationStyle:
-    | "drill-down"
-    | "expand-collapse"
-    | "auto-expanded"
-    | "quick-links";
+    "drill-down" | "expand-collapse" | "auto-expanded" | "quick-links";
   onFolderClick?: (folderId: string) => void;
   iconProvider: string;
   shortNames: boolean;

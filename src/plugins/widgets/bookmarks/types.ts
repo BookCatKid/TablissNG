@@ -6,10 +6,7 @@ export type Data = {
   maxHeight: number;
   wrap: boolean;
   navigationStyle:
-    | "drill-down"
-    | "expand-collapse"
-    | "auto-expanded"
-    | "quick-links";
+    "drill-down" | "expand-collapse" | "auto-expanded" | "quick-links";
   columns?: number;
   iconProvider:
     | "_default"

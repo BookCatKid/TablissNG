@@ -1,6 +1,7 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { useClipboard } from "../../../hooks";
 import { ColorProps } from "./types";
 import { getContrastColor, rgbToHex } from "./utils";
 
@@ -10,7 +11,7 @@ type Props = ColorProps & {
 };
 
 const Color: FC<Props> = ({ displayColor, format, showLabel }) => {
-  const [copied, setCopied] = useState(false);
+  const { copy, copied, error } = useClipboard();
 
   if (!displayColor || displayColor.length < 3) {
     return null;
@@ -22,29 +23,6 @@ const Color: FC<Props> = ({ displayColor, format, showLabel }) => {
   const colorCode = format === "hex" ? hex : rgb;
   const contrastColor = getContrastColor(r, g, b);
 
-  const handleCopy = () => {
-    if (!navigator.clipboard || !navigator.clipboard.writeText) {
-      alert(
-        "Clipboard API not available or writeText not supported. Please ensure you are in a secure context (HTTPS) and have granted clipboard permissions.",
-      );
-      console.error("Clipboard API not available or writeText not supported.");
-      return;
-    }
-
-    navigator.clipboard
-      .writeText(colorCode)
-      .then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      })
-      .catch((err) => {
-        alert(
-          "Failed to copy to clipboard. Please check console for more details and ensure permissions are granted.",
-        );
-        console.error("Failed to copy to clipboard:", err);
-      });
-  };
-
   const style = {
     backgroundColor: rgb,
     color: contrastColor,
@@ -54,11 +32,19 @@ const Color: FC<Props> = ({ displayColor, format, showLabel }) => {
     <div
       className="Color"
       style={style}
-      onClick={handleCopy}
+      onClick={() => copy(colorCode)}
       title={`Click to copy ${colorCode}`}
     >
-      <span className={`label ${showLabel || copied ? "visible" : ""}`}>
-        {copied ? (
+      <span
+        className={`label ${showLabel || copied || error ? "visible" : ""}`}
+      >
+        {error ? (
+          <FormattedMessage
+            id="plugins.palette.copyFailed"
+            defaultMessage="Failed!"
+            description="Message displayed when copying a color code fails"
+          />
+        ) : copied ? (
           <FormattedMessage
             id="plugins.palette.copied"
             defaultMessage="Copied!"

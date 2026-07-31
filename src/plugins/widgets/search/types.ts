@@ -1,9 +1,7 @@
 import { API } from "../../types";
 
 export type SearchStyle =
-  | "default"
-  | "transparent-rounded"
-  | "minimal-outlined";
+  "default" | "transparent-rounded" | "minimal-outlined";
 
 type Data = {
   searchEngine: string;

@@ -1,0 +1,34 @@
+.CurrencyRates
+    display: flex
+    flex-direction: column
+    gap: 0.4em
+
+    .currency-rate-row
+        display: flex
+        align-items: baseline
+        gap: 0.5em
+
+    .currency-rate-from
+        font-weight: bold
+
+    .currency-rate-icon
+        width: 1em
+        height: 1em
+        vertical-align: -0.15em
+        margin-right: 0.2em
+
+    .currency-rate-equals
+        opacity: 0.6
+
+    .currency-rate-value--unavailable
+        opacity: 0.5
+
+    .currency-rate-change
+        margin-left: 0.4em
+        font-size: 0.8em
+
+        &--up
+            color: #4caf50
+
+        &--down
+            color: #f44336

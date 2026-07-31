@@ -56,8 +56,7 @@ export const setBackground = (key: string): void => {
   // specific `data/{id}` remains available when switching back.
   const prevId = DB.get(db, `background/id/${key}` as any) as unknown as string;
   const prevDisplay = DB.get(db, `background/display/${key}` as any) as
-    | BackgroundDisplay
-    | undefined;
+    BackgroundDisplay | undefined;
   const id = prevId || createId();
 
   // Restore per-background plugin data into `data/{id}` if missing.

@@ -17,6 +17,7 @@ const Widgets: FC = () => {
   const cssWidgets: Partial<Record<WidgetPosition, WidgetState[]>> = {};
 
   widgets.forEach((widget) => {
+    if (widget.display.disabled) return;
     if (widget.key === "widget/css") {
       cssWidgets[widget.display.position] = [
         ...(cssWidgets[widget.display.position] ?? []),
