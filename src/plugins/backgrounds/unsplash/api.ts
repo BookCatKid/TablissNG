@@ -14,15 +14,18 @@ export const fetchImages = async ({
   featured,
   search,
 }: Config): Promise<Image[]> => {
+  if (!UNSPLASH_API_KEY) {
+    console.warn(
+      "You must set the UNSPLASH_API_KEY environment variable to use Unsplash backgrounds.",
+    );
+    return [];
+  }
+
   const url = "https://api.unsplash.com/photos/random";
   const params = new URLSearchParams();
   const headers = new Headers({
     Authorization: `Client-ID ${UNSPLASH_API_KEY}`,
   });
-
-  if (!UNSPLASH_API_KEY) {
-    throw new Error("You must set the UNSPLASH_API_KEY environment variable.");
-  }
 
   params.set("count", "10");
 
