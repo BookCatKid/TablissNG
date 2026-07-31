@@ -1,11 +1,34 @@
 import { format } from "date-fns";
 import { FC } from "react";
-import { FormattedMessage } from "react-intl";
+import { defineMessages, FormattedMessage } from "react-intl";
 
 import { pluginMessages } from "../../../locales/messages";
 import { parseLocalDate } from "../../../utils";
 import { messages as timeTrackerMessages } from "../timeTracker/index";
 import { defaultData, Props } from "./types";
+
+const sinceMessages = defineMessages({
+  what: {
+    id: "plugins.since.what",
+    defaultMessage: "What",
+    description: "Label for the what field in Since settings",
+  },
+  when: {
+    id: "plugins.since.when",
+    defaultMessage: "When",
+    description: "Label for the when field in Since settings",
+  },
+  date: {
+    id: "plugins.since.date",
+    defaultMessage: "Date",
+    description: "Label for the date field in Since settings",
+  },
+  time: {
+    id: "plugins.since.time",
+    defaultMessage: "Time",
+    description: "Label for the time field in Since settings",
+  },
+});
 
 function formatDate(time: number): string {
   return format(time, "yyyy-MM-dd");
@@ -29,7 +52,7 @@ const SinceSettings: FC<Props> = ({ data = defaultData, setData }) => (
     />
 
     <label>
-      What
+      <FormattedMessage {...sinceMessages.what} />
       <input
         type="text"
         value={data.title || ""}
@@ -38,9 +61,9 @@ const SinceSettings: FC<Props> = ({ data = defaultData, setData }) => (
     </label>
 
     <label>
-      When
+      <FormattedMessage {...sinceMessages.when} />
       <label>
-        Date
+        <FormattedMessage {...sinceMessages.date} />
         <input
           type="date"
           value={formatDate(data.time)}
@@ -60,7 +83,7 @@ const SinceSettings: FC<Props> = ({ data = defaultData, setData }) => (
         />
       </label>
       <label>
-        Time
+        <FormattedMessage {...sinceMessages.time} />
         <input
           type="time"
           value={formatTime(data.time)}

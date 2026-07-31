@@ -104,6 +104,7 @@ function runFormatjs(args) {
   return execFileSync("pnpm", ["exec", "formatjs", ...args], {
     cwd: rootDir,
     stdio: "inherit",
+    shell: true,
   });
 }
 
@@ -112,6 +113,7 @@ function assertFormatjsInstalled() {
     execFileSync("pnpm", ["exec", "formatjs", "--version"], {
       cwd: rootDir,
       stdio: "pipe",
+      shell: true,
     });
   } catch {
     console.error("\n✗ Missing FormatJS CLI dependency: formatjs");
