@@ -1,4 +1,5 @@
 (function () {
+  var RENDER_MSG_TYPE = "tabliss-html-widget-render";
   var HEIGHT_MSG_TYPE = "tabliss-html-widget-height";
 
   function report() {
@@ -23,8 +24,9 @@
   setTimeout(report, 300);
 
   window.addEventListener("message", function (event) {
+    if (event.source !== window.parent) return;
     var data = event.data;
-    if (data && typeof data === "object" && data.type === "tabliss-html-widget-render") {
+    if (data && typeof data === "object" && data.type === RENDER_MSG_TYPE) {
       document.open();
       document.write(data.html || "");
       document.close();

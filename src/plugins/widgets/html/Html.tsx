@@ -1,9 +1,7 @@
 import { FC, useEffect, useMemo, useRef, useState } from "react";
 
+import { HEIGHT_MSG_TYPE, RENDER_MSG_TYPE } from "./constants";
 import { defaultData, Props } from "./types";
-
-const RENDER_MSG_TYPE = "tabliss-html-widget-render";
-const HEIGHT_MSG_TYPE = "tabliss-html-widget-height";
 
 const Html: FC<Props> = ({ data = defaultData }) => {
   const input = data.input || "";
