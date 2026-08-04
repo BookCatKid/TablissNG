@@ -217,6 +217,7 @@
   "plugins.html.name": "HTML Tùy chỉnh",
   "plugins.html.snippet": "Đoạn mã HTML",
   "plugins.html.warning": "Cảnh báo: Chức năng này dành cho người dùng nâng cao.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Bật nhấp để làm mới",
   "plugins.ipInfo.description": "Hiển thị địa chỉ IP và thông tin vị trí của bạn.",
   "plugins.ipInfo.displayCity": "Hiển thị thành phố",

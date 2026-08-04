@@ -217,6 +217,7 @@
   "plugins.html.name": "Vlastní HTML",
   "plugins.html.snippet": "HTML úryvek",
   "plugins.html.warning": "Upozornění: Tato funkce je určena pro pokročilé uživatele.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Povolit obnovení kliknutím",
   "plugins.ipInfo.description": "Zobrazit IP adresu a informace o poloze.",
   "plugins.ipInfo.displayCity": "Zobrazit město",

@@ -217,6 +217,7 @@
   "plugins.html.name": "사용자 지정 HTML",
   "plugins.html.snippet": "HTML 스니펫",
   "plugins.html.warning": "경고: 이 기능은 고급 사용자를 위한 것입니다.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "클릭하여 새로고침 활성화",
   "plugins.ipInfo.description": "IP 주소 및 위치 정보를 표시합니다.",
   "plugins.ipInfo.displayCity": "도시 표시",

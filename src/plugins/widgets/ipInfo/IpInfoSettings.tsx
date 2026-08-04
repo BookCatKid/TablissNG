@@ -75,6 +75,20 @@ const IpInfoSettings: FC<Props> = ({ data = defaultData, setData }) => (
         description="Option to enable click to refresh functionality"
       />
     </label>
+    <label>
+      <input
+        type="checkbox"
+        checked={data.autoRefresh}
+        onChange={(event) =>
+          setData({ ...data, autoRefresh: event.target.checked })
+        }
+      />{" "}
+      <FormattedMessage
+        id="plugins.ipInfo.autoRefresh"
+        defaultMessage="Enable Auto Refresh (30s)"
+        description="Option to enable auto refresh functionality"
+      />
+    </label>
   </div>
 );
 

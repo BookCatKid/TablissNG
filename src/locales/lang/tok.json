@@ -217,6 +217,7 @@
   "plugins.html.name": "toki HTML pi wile sina",
   "plugins.html.snippet": "toki lili pi toki HTML",
   "plugins.html.warning": "o kute: ken ni li tawa jan taso pi sona mute.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "o open e ni: sina pilin e nena la o kama sin",
   "plugins.ipInfo.description": "o lukin e nanpa sina IP e ma sina.",
   "plugins.ipInfo.displayCity": "o lukin e ma tomo sina",

@@ -217,6 +217,7 @@
   "plugins.html.name": "HTML personalizzato",
   "plugins.html.snippet": "HTML Snippet",
   "plugins.html.warning": "Avviso: questa funzionalità è destinata agli utenti avanzati.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Abilita clic per aggiornare",
   "plugins.ipInfo.description": "Visualizza il tuo indirizzo IP e la tua posizione.",
   "plugins.ipInfo.displayCity": "Mostra la città",

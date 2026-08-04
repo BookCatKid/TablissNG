@@ -217,6 +217,7 @@
   "plugins.html.name": "自定义 HTML",
   "plugins.html.snippet": "HTML 代码片段",
   "plugins.html.warning": "警告：此功能专为高级用户设计。",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "启用点击刷新",
   "plugins.ipInfo.description": "显示您的 IP 地址和位置详情。",
   "plugins.ipInfo.displayCity": "显示城市",

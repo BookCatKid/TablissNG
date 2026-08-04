@@ -217,6 +217,7 @@
   "plugins.html.name": "HTML i personalizuar",
   "plugins.html.snippet": "Fragment HTML",
   "plugins.html.warning": "Kujdes: Kjo veçori është për përdorues të avancuar.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Aktivo klikimin për rifreskim",
   "plugins.ipInfo.description": "Shfaq adresën tënde IP dhe detajet e vendndodhjes.",
   "plugins.ipInfo.displayCity": "Shfaq qytetin",

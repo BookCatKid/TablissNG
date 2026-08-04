@@ -217,6 +217,7 @@
   "plugins.html.name": "Произвольный HTML",
   "plugins.html.snippet": "HTML Сниппет",
   "plugins.html.warning": "Внимание: эта функциональность предназначена для опытных пользователей.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Нажмите, чтобы обновить",
   "plugins.ipInfo.description": "Показывает ваш IP-адрес и информацию о местоположении.",
   "plugins.ipInfo.displayCity": "Показывать город",
