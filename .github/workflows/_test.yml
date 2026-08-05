@@ -20,6 +20,37 @@ jobs:
       - name: Run tests
         run: pnpm test
 
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium firefox
+
+      - name: Run e2e tests
+        run: pnpm test:e2e
+        env:
+          # The default Unsplash background throws without a key (and .env is
+          # gitignored, so absent in CI). A placeholder prevents that error.
+          UNSPLASH_API_KEY: placeholder
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
   translations-check:
     name: Translations Check
     runs-on: ubuntu-latest

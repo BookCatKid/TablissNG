@@ -24,6 +24,7 @@ const IpInfo: FC<Props> = ({ cache, data = defaultData, setCache, loader }) => {
     }, 30 * SECONDS);
 
     return () => window.clearInterval(interval);
+    // eslint-disable-next-line @eslint-react/exhaustive-deps
   }, [data.autoRefresh]);
 
   if (!cache) {
