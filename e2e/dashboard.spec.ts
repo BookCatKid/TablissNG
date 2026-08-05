@@ -55,9 +55,11 @@ test.describe("Dashboard", () => {
     const scrollToTopButton = page.locator(".scroll-to-top");
     await expect(scrollToTopButton).toBeVisible();
     await scrollToTopButton.click();
+    // The button scrolls smoothly, so give the animation generous headroom
+    // (it can stall under parallel full-suite load).
     await expect
       .poll(async () => plane.evaluate((el) => el.scrollTop), {
-        timeout: 2000,
+        timeout: 5000,
       })
       .toBeLessThanOrEqual(1);
   });
@@ -68,4 +70,7 @@ test.describe("Dashboard", () => {
       page.locator(".Settings .plane span", { hasText: /TablissNG v/ }),
     ).toBeVisible();
   });
+
+  // Note: the 'f' fullscreen shortcut is not e2e-tested — the Fullscreen API
+  // is unavailable in headless browsers.
 });
