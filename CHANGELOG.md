@@ -8,6 +8,14 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+### Fixed
+
+- perf(trello): applied better fix for drag and drop initial positioning bug [fdb97890](https://github.com/BookCatKid/TablissNG/commit/fdb97890)
+
+### Chore
+
+- feat(trello): minor ui tweaks [eef7f4cf](https://github.com/BookCatKid/TablissNG/commit/eef7f4cf)
+
 ## [1.7.1] - 6/4/2026 | Minor bugfix release
 
 Quick follow-up release fixing an issue where the new sortOrder setting didn't apply during auto-rotation, and adding Trello labels form support.
