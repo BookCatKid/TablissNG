@@ -122,6 +122,19 @@ export function Card({
   }, [isEditingLabels]);
 
   useEffect(() => {
+    if (!isEditingContent) return;
+
+    const handler = (e: MouseEvent) => {
+      if (selfRef.current && !selfRef.current.contains(e.target as Node)) {
+        setIsEditingContent(false);
+        setEditValue(card.name);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isEditingContent, card.name]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditingContent(false);
@@ -142,8 +155,6 @@ export function Card({
   const handleEditLabels = () => {
     setIsEditingLabels(true);
   };
-
-  // Functions to to alter UI
 
   const handleSave = async () => {
     const session = await getSession();
@@ -276,6 +287,12 @@ export function Card({
             edit-card-buttons
             ${hovering ? "visible" : ""}`}
         >
+          <span
+            onClick={isEditingContent ? undefined : handleEditLabels}
+            className={`icon ${isEditingContent ? " disabled" : ""}`}
+          >
+            <LabelsIcon />
+          </span>
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
@@ -291,16 +308,9 @@ export function Card({
               <EditIcon />
             </span>
           )}
-          <span
-            onClick={isEditingContent ? undefined : handleEditLabels}
-            className={`icon ${isEditingContent ? " disabled" : ""}`}
-          >
-            <LabelsIcon />
-          </span>
         </span>
       </div>
 
-      {/* Card editor */}
       {!isEditingContent ? (
         <span>{card.name}</span>
       ) : (

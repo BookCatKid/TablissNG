@@ -94,11 +94,13 @@ export function List({
           className={`add-card-button ${hoveringOverHeader && !cardCreatorOpen ? "visible" : ""}`}
         >
           <ExpandIcon />
-          <FormattedMessage
-            id="plugins.trello.addCard"
-            defaultMessage="Add a card"
-            description="Add a card"
-          />
+          <span className="add-card-title">
+            <FormattedMessage
+              id="plugins.trello.addCard"
+              defaultMessage="Add a card"
+              description="Add a card"
+            />
+          </span>
         </span>
       </div>
       {loading || !cards ? (

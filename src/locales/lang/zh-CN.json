@@ -452,7 +452,6 @@
   "plugins.trello.authenticate": "使用 Trello 登录",
   "plugins.trello.authenticate.button": "认证",
   "plugins.trello.authenticate.error": "认证过程中发生错误",
-  "plugins.trello.authenticating": "认证中...",
   "plugins.trello.boardSelect": "选择看板",
   "plugins.trello.description": "方便查看 Trello 列表",
   "plugins.trello.listSelect": "选择列表",
