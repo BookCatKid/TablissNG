@@ -217,6 +217,7 @@
   "plugins.html.name": "Özel HTML",
   "plugins.html.snippet": "HTML Kodu",
   "plugins.html.warning": "Uyarı: Bu işlevsellik ileri düzey kullanıcılar içindir.",
+  "plugins.ipInfo.autoRefresh": "Enable Auto Refresh",
   "plugins.ipInfo.clickToRefresh": "Yenilemek için Tıklamayı Etkinleştir",
   "plugins.ipInfo.description": "IP adresinizi ve konum bilgilerinizi görüntüleyin.",
   "plugins.ipInfo.displayCity": "Şehri Görüntüle",

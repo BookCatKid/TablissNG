@@ -5,3 +5,6 @@
 tsconfig.tsbuildinfo
 src/locales/lang.compiled
 .eslintcache
+/test-results
+/playwright-report
+/blob-report
