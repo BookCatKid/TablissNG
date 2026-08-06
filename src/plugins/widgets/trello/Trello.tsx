@@ -1,6 +1,6 @@
 import "./Trello.sass";
 
-import { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import useAuth from "../../../hooks/useAuth";
@@ -30,13 +30,15 @@ const Trello: FC<Props> = ({
     trelloAuthStore,
   );
 
+  const [widgetLoaded, setWidgetLoaded] = useState<boolean>(false);
   const { boardId: selectedBoardId } = useSelectedBoard(data);
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
 
-  // Keep track of latest version of cache
-  const cacheRef = useRef(cache);
+  useEffect(() => {
+    setWidgetLoaded(true);
+  }, []);
 
-  // Track if any lists change their status to loading, indicating a new fetch is needed
+  const cacheRef = useRef(cache);
   const loadingListIds = useMemo(
     () =>
       Object.values(cache.lists)
@@ -88,7 +90,6 @@ const Trello: FC<Props> = ({
     [dispatchUI],
   );
 
-  // Fetch cards on first load and when a list's state changes
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     const controller = new AbortController();
@@ -181,6 +182,10 @@ const Trello: FC<Props> = ({
     },
     [getSession, dispatchUI],
   );
+
+  if (!widgetLoaded) {
+    return <div style={{ height: "34vh" }} />;
+  }
 
   if (authStatus !== "authenticated") {
     return (

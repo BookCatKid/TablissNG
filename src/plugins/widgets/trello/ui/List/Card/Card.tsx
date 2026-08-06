@@ -143,8 +143,6 @@ export function Card({
     setIsEditingLabels(true);
   };
 
-  // Functions to to alter UI
-
   const handleSave = async () => {
     const session = await getSession();
     if (!session) return;
@@ -276,6 +274,12 @@ export function Card({
             edit-card-buttons
             ${hovering ? "visible" : ""}`}
         >
+          <span
+            onClick={isEditingContent ? undefined : handleEditLabels}
+            className={`icon ${isEditingContent ? " disabled" : ""}`}
+          >
+            <LabelsIcon />
+          </span>
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
@@ -291,16 +295,9 @@ export function Card({
               <EditIcon />
             </span>
           )}
-          <span
-            onClick={isEditingContent ? undefined : handleEditLabels}
-            className={`icon ${isEditingContent ? " disabled" : ""}`}
-          >
-            <LabelsIcon />
-          </span>
         </span>
       </div>
 
-      {/* Card editor */}
       {!isEditingContent ? (
         <span>{card.name}</span>
       ) : (

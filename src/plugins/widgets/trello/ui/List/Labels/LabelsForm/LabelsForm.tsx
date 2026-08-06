@@ -39,7 +39,7 @@ export function LabelsForm({
 
   const handleLabelToggled = (labelId: string) => {
     const updated: Record<string, boolean> = { ...labelsSelected };
-    const operation = !labelsSelected[labelId] ? "ADD" : "REMOVE";
+    const operation = labelsSelected[labelId] === false ? "ADD" : "REMOVE";
     updated[labelId] = !labelsSelected[labelId];
     setLabelsSelected(updated);
     const label = availableLabels.find((l) => l.id === labelId);
