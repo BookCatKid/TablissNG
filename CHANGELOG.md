@@ -8,6 +8,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+### Translations
+
+- Improve and complete Korean translations across menus, settings, widgets, and validation messages.
+
 ## [1.7.1] - 6/4/2026 | Minor bugfix release
 
 Quick follow-up release fixing an issue where the new sortOrder setting didn't apply during auto-rotation, and adding Trello labels form support.
