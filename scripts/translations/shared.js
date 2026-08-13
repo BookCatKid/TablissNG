@@ -101,7 +101,8 @@ function validateMessageObject(obj, filename) {
 }
 
 function runFormatjs(args) {
-  return execFileSync("pnpm", ["exec", "formatjs", ...args], {
+  const formatjsCliPath = require.resolve("@formatjs/cli/bin/formatjs");
+  return execFileSync(process.execPath, [formatjsCliPath, ...args], {
     cwd: rootDir,
     stdio: "inherit",
   });
@@ -109,7 +110,8 @@ function runFormatjs(args) {
 
 function assertFormatjsInstalled() {
   try {
-    execFileSync("pnpm", ["exec", "formatjs", "--version"], {
+    const formatjsCliPath = require.resolve("@formatjs/cli/bin/formatjs");
+    execFileSync(process.execPath, [formatjsCliPath, "--version"], {
       cwd: rootDir,
       stdio: "pipe",
     });
