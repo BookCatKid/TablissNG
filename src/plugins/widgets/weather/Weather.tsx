@@ -7,7 +7,7 @@ import { defineMessages, useIntl } from "react-intl";
 
 import { useCachedEffect, useTime } from "../../../hooks";
 import { HOURS } from "../../../utils";
-import { getForecast, requestLocation } from "./api";
+import { getForecast, requestLocation, shouldRefreshLocation } from "./api";
 import { findCurrent, weatherCodes } from "./conditions";
 import { defaultData, Props } from "./types";
 
@@ -55,21 +55,31 @@ const Weather: FC<Props> = ({
   const intl = useIntl();
 
   useEffect(() => {
-    if (data.autoUpdate) {
-      requestLocation()
-        .then((coords) => {
-          if (
-            coords.latitude !== data.latitude ||
-            coords.longitude !== data.longitude
-          ) {
-            setData({ ...data, ...coords });
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    }
-  }, [data.autoUpdate, data.latitude, data.longitude]);
+    if (!data.autoUpdate) return;
+
+    if (!shouldRefreshLocation(data)) return;
+
+    let active = true;
+    requestLocation()
+      .then((coords) => {
+        if (!active) return;
+        setData({ ...data, ...coords, locationUpdatedAt: Date.now() });
+      })
+      .catch((err) => {
+        if (active) console.error(err);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [
+    data.autoUpdate,
+    data.latitude,
+    data.locationUpdatedAt,
+    data.longitude,
+    data,
+    setData,
+  ]);
 
   // Cache weather data for 6 hours
   useCachedEffect(

@@ -3,7 +3,7 @@ import { type FC, type MouseEvent, useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { isSpecialUrl, normalizeUrl } from "../../../utils";
-import { Cache, Link } from "./types";
+import { Cache, getCachedIcon, Link } from "./types";
 
 const getDomain = (url: string): string | null => {
   try {
@@ -89,6 +89,7 @@ export const Display: FC<Props> = ({
     () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
     [SvgString, customWidth, customHeight],
   );
+  const cachedIcon = getCachedIcon(cache, iconCacheKey);
 
   const handleClick = async (e: MouseEvent) => {
     if (
@@ -178,14 +179,15 @@ export const Display: FC<Props> = ({
             }}
           />
         </i>
-      ) : icon === "_custom_upload" && iconCacheKey && cache?.[iconCacheKey] ? (
+      ) : (icon === "_custom_svg" || icon === "_custom_upload") &&
+        cachedIcon ? (
         <i className="custom-icon">
-          {cache[iconCacheKey].type === "svg" ? (
-            parseSvg(cache[iconCacheKey].data, customWidth, customHeight)
+          {cachedIcon.type === "svg" ? (
+            parseSvg(cachedIcon.data, customWidth, customHeight)
           ) : (
             <img
               alt={name}
-              src={cache[iconCacheKey].data}
+              src={cachedIcon.data}
               style={{
                 width: conserveAspectRatio
                   ? `${customWidth}px`

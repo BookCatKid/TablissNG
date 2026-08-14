@@ -186,9 +186,13 @@ if (isProduction && buildTarget !== "firefox") {
                   "https://api.github.com/repos/BookCatKid/tablissNG",
                 ),
 
-              handler: "CacheFirst",
+              // CacheFirst can keep stale API responses alive indefinitely on
+              // cache hits. Prefer the network and retain the last response
+              // only as an offline fallback.
+              handler: "NetworkFirst",
               options: {
                 cacheName: "tabliss-cache-apis",
+                networkTimeoutSeconds: 5,
                 expiration: {
                   maxAgeSeconds: 24 * 60 * 60, // 1 day
                 },

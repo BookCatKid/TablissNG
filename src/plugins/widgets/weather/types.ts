@@ -8,6 +8,8 @@ export type Coordinates = {
 
 export type Data = Coordinates & {
   name?: string;
+  /** Last successful automatic location lookup. */
+  locationUpdatedAt?: number;
   showSummary: boolean;
   showDetails: boolean;
   showForecast: boolean;

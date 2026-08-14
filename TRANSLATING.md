@@ -82,3 +82,17 @@ Example:
 If `widgets` is in `whitelist_fr.json`, French keeps the English word "widgets".
 
 Production builds automatically run `pnpm run translations compile` and load compiled locale artifacts.
+
+## README Localization
+
+The project README has its own language files because GitHub renders Markdown directly:
+
+- English source: `README.md`
+- Korean translation: `docs/readme-i18n/README.ko.md`
+- Naming convention for future translations: `docs/readme-i18n/README.<locale>.md`
+
+When translating a README, keep links, commands, environment variable names, error messages, and code blocks unchanged. Translate headings, explanations, alt text, and link labels. Add the new file to the language selector at the top of `README.md` and the translated file.
+
+Check Markdown formatting after editing:
+
+`pnpm exec prettier --check README.md docs/readme-i18n/README.ko.md`

@@ -12,7 +12,7 @@ import {
 import ImportBookmarks from "./ImportBookmarks";
 import Input from "./Input";
 import { reducer } from "./reducer";
-import { Data, defaultData, Link, Props } from "./types";
+import { Data, defaultData, getLastUsed, Link, Props } from "./types";
 
 const LinksSettings: FC<Props> = ({
   data = defaultData,
@@ -33,15 +33,15 @@ const LinksSettings: FC<Props> = ({
         case "icon":
           return (a.icon || "").localeCompare(b.icon || "");
         case "lastUsed": {
-          const bTime = b.lastUsed || 0;
-          const aTime = a.lastUsed || 0;
+          const bTime = getLastUsed(b, cache);
+          const aTime = getLastUsed(a, cache);
           return bTime - aTime; // Most recent first
         }
         default:
           return 0;
       }
     });
-  }, [data.links, data.sortBy]);
+  }, [cache, data.links, data.sortBy]);
 
   return (
     <div className="LinksSettings">
@@ -155,9 +155,13 @@ const LinksSettings: FC<Props> = ({
             key={link.id}
             {...link}
             number={index + 1}
-            onChange={(values) =>
-              dispatch(updateLink(originalIndex, { ...link, ...values }))
-            }
+            onChange={(values) => {
+              const updated = { ...link, ...values };
+              (Object.keys(updated) as (keyof Link)[]).forEach((key) => {
+                if (updated[key] === undefined) delete updated[key];
+              });
+              dispatch(updateLink(originalIndex, updated));
+            }}
             onMoveUp={
               data.sortBy === "none" && index !== 0
                 ? () => dispatch(reorderLink(originalIndex, originalIndex - 1))

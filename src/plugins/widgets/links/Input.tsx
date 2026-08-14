@@ -13,7 +13,13 @@ import {
   RemoveIcon,
   UpIcon,
 } from "../../../views/shared";
-import { Cache, IconCacheItem, Link } from "./types";
+import {
+  Cache,
+  getCachedIcon,
+  getSvgCacheKey,
+  IconCacheItem,
+  Link,
+} from "./types";
 
 const messages = defineMessages({
   githubIssue: {
@@ -86,7 +92,18 @@ const Input: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const selectRef = useRef<HTMLSelectElement>(null);
+  const cacheRef = useRef(props.cache);
   const intl = useIntl();
+
+  useEffect(() => {
+    cacheRef.current = props.cache;
+  }, [props.cache]);
+
+  const updateCache = (key: string, item: IconCacheItem) => {
+    const nextCache = { ...(cacheRef.current || {}), [key]: item };
+    cacheRef.current = nextCache;
+    props.setCache(nextCache);
+  };
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -95,6 +112,35 @@ const Input: FC<Props> = (props) => {
     addIconData(identifier + icon);
     props.onChange({ iconifyIdentifier: identifier, iconifyValue: icon });
     setIsModalOpen(false);
+  };
+
+  const handleIconChange = (icon: string) => {
+    props.onChange({
+      icon,
+      SvgString: undefined,
+      IconString: undefined,
+      IconStringIco: undefined,
+      iconCacheKey:
+        icon === "_custom_svg"
+          ? props.iconCacheKey || getSvgCacheKey(props.id)
+          : icon === "_custom_upload"
+            ? props.iconCacheKey
+            : undefined,
+    });
+  };
+
+  const handleSvgChange = (value: string) => {
+    const cacheKey = props.iconCacheKey || getSvgCacheKey(props.id);
+    updateCache(cacheKey, {
+      data: value,
+      type: "svg",
+      size: value.length,
+    });
+    props.onChange({
+      icon: "_custom_svg",
+      iconCacheKey: cacheKey,
+      SvgString: undefined,
+    });
   };
 
   // Filter icons based on search query
@@ -146,11 +192,9 @@ const Input: FC<Props> = (props) => {
           };
         }
 
-        // Update cache with new icon data
-        props.setCache({
-          ...(props.cache || {}),
-          [cacheKey]: iconData,
-        });
+        // Update cache with new icon data. Use a ref so two FileReader
+        // callbacks cannot overwrite each other's freshly uploaded icons.
+        updateCache(cacheKey, iconData);
 
         // Update link with reference to cached icon
         props.onChange({
@@ -279,7 +323,7 @@ const Input: FC<Props> = (props) => {
         <select
           ref={selectRef}
           value={props.icon}
-          onChange={(event) => props.onChange({ icon: event.target.value })}
+          onChange={(event) => handleIconChange(event.target.value)}
         >
           <option value="">
             <FormattedMessage
@@ -392,11 +436,13 @@ const Input: FC<Props> = (props) => {
             description="Label for the custom SVG HTML input area"
           />
           <textarea
-            value={props.SvgString}
-            style={{ resize: "vertical" }}
-            onChange={(event) =>
-              props.onChange({ SvgString: event.target.value })
+            value={
+              getCachedIcon(props.cache, props.iconCacheKey)?.data ||
+              props.SvgString ||
+              ""
             }
+            style={{ resize: "vertical" }}
+            onChange={(event) => handleSvgChange(event.target.value)}
           />
           <p>
             <FormattedMessage

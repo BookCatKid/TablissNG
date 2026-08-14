@@ -1,7 +1,23 @@
+import { HOURS } from "../../../utils";
 import { API } from "../../types";
 import { Cache, Coordinates, Data } from "./types";
 
 type Config = Pick<Data, "latitude" | "longitude" | "units">;
+
+export const LOCATION_REFRESH_INTERVAL = 24 * HOURS;
+
+export const shouldRefreshLocation = (
+  data: Pick<Data, "latitude" | "longitude" | "locationUpdatedAt">,
+  now = Date.now(),
+): boolean => {
+  const hasCoordinates =
+    data.latitude !== undefined && data.longitude !== undefined;
+  const locationIsFresh =
+    data.locationUpdatedAt !== undefined &&
+    now - data.locationUpdatedAt < LOCATION_REFRESH_INTERVAL;
+
+  return !hasCoordinates || !locationIsFresh;
+};
 
 /** Get current forecast for a location */
 export async function getForecast(

@@ -2,6 +2,8 @@
   <img src="src/views/shared/tabliss.svg" alt="TablissNG logo" width="400" />
 </p>
 
+> Language: **English** · [한국어](docs/readme-i18n/README.ko.md)
+
 > A beautiful, customisable New Tab page for Firefox and Chrome.
 
 <img src="screenshots/screenshot_1.png" width="49%"/> <img src="screenshots/screenshot_2.png" width="50%"/>
@@ -160,3 +162,13 @@ Take a look at the guide to [contributing](CONTRIBUTING.md) before starting.
 ## Translations
 
 Check out the guide to [adding translations](TRANSLATING.md).
+
+## README translations
+
+The README is maintained in English and Korean:
+
+- **English** — this page
+- [**한국어**](docs/readme-i18n/README.ko.md) — complete Korean translation
+- [README localization guide](docs/readme-i18n/README.md)
+
+The extension UI supports the locales listed in [`src/locales/registry.ts`](src/locales/registry.ts). README translations live in [`docs/readme-i18n/`](docs/readme-i18n/). When adding another translation, use the `README.<locale>.md` naming convention and add it to the language links above.

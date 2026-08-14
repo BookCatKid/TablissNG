@@ -27,7 +27,76 @@ export type IconCacheItem = {
   size: number;
 };
 
-export type Cache = Record<string, IconCacheItem>;
+/**
+ * Recently-used timestamps are intentionally kept in the local cache rather
+ * than the synced link configuration. Persisting them in sync storage makes
+ * every click rewrite the complete links payload and can exhaust the browser
+ * storage.sync quota.
+ */
+export type LastUsedCacheItem = {
+  data: Record<string, number>;
+  type: "lastUsed";
+  size: 0;
+};
+
+export type CacheItem = IconCacheItem | LastUsedCacheItem;
+export type Cache = Record<string, CacheItem>;
+
+export const LAST_USED_CACHE_KEY = "__links_last_used__";
+
+export const getCachedIcon = (
+  cache: Cache | undefined,
+  key: string | undefined,
+): IconCacheItem | undefined => {
+  if (!cache || !key) return undefined;
+  const item = cache[key];
+  return item?.type === "lastUsed" ? undefined : item;
+};
+
+export const sanitizeLink = (link: Link): Link => {
+  const sanitized = { ...link };
+
+  delete sanitized.lastUsed;
+  if (sanitized.icon !== "_custom_iconify") delete sanitized.IconString;
+  if (sanitized.icon !== "_custom_ico") delete sanitized.IconStringIco;
+  if (sanitized.icon !== "_custom_svg") delete sanitized.SvgString;
+  if (sanitized.icon !== "_custom_svg" && sanitized.icon !== "_custom_upload")
+    delete sanitized.iconCacheKey;
+  if (sanitized.icon !== "_feather") {
+    delete sanitized.iconifyIdentifier;
+    delete sanitized.iconifyValue;
+  }
+
+  return sanitized;
+};
+
+export const getSvgCacheKey = (linkId: string): string => `svg_${linkId}`;
+
+export const getLastUsed = (link: Link, cache?: Cache): number => {
+  const cached = cache?.[LAST_USED_CACHE_KEY];
+  if (cached?.type === "lastUsed") {
+    return cached.data[link.id] ?? link.lastUsed ?? 0;
+  }
+  return link.lastUsed ?? 0;
+};
+
+export const setLastUsed = (
+  cache: Cache,
+  id: string,
+  timestamp: number,
+): Cache => {
+  const current = cache[LAST_USED_CACHE_KEY];
+  const lastUsed = current?.type === "lastUsed" ? current.data : {};
+
+  return {
+    ...cache,
+    [LAST_USED_CACHE_KEY]: {
+      type: "lastUsed",
+      data: { ...lastUsed, [id]: timestamp },
+      size: 0,
+    },
+  };
+};
 
 export type Data = {
   columns: number;
