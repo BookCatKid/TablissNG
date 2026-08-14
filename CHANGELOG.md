@@ -8,6 +8,8 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+## [1.7.2] - 8/14/2026 | Bug fixes, Korean translations, and README localization
+
 ### Translations
 
 - Improve and complete Korean translations across menus, settings, widgets, and validation messages.
