@@ -95,4 +95,6 @@ When translating a README, keep links, commands, environment variable names, err
 
 Check Markdown formatting after editing:
 
-`pnpm exec prettier --check README.md docs/readme-i18n/README.ko.md`
+`pnpm exec prettier --check README.md docs/readme-i18n/README.*.md`
+
+The `README.*.md` glob checks every localized README in `docs/readme-i18n/`, including future translations.

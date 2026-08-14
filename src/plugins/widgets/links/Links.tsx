@@ -1,20 +1,22 @@
 import "./Links.sass";
 
 import { Icon } from "@iconify/react";
-import { FC, useEffect, useMemo } from "react";
+import { FC, useEffect, useMemo, useRef } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress, useToggle } from "../../../hooks";
 import { Display } from "./Display";
 import {
+  areLastUsedCacheEqual,
+  areLinksEqual,
   defaultCache,
   defaultData,
   getCachedIcon,
   getLastUsed,
   getSvgCacheKey,
   LAST_USED_CACHE_KEY,
+  normalizeLinks,
   Props,
-  sanitizeLink,
   setLastUsed,
 } from "./types";
 
@@ -35,82 +37,65 @@ const Links: FC<Props> = ({
   const [visible, toggleVisible] = useToggle();
 
   const intl = useIntl();
+  const links = data.links;
+  const dataRef = useRef(data);
+  const setDataRef = useRef(setData);
+  const setCacheRef = useRef(setCache);
+  dataRef.current = data;
+  setDataRef.current = setData;
+  setCacheRef.current = setCache;
 
-  // Keep link IDs stable and migrate the volatile last-used timestamps out of
-  // the synced data store. This prevents every click from rewriting the full
-  // links payload in storage.sync and preserves the existing sort behavior.
+  const normalizedLinks = useMemo(() => normalizeLinks(links), [links]);
+
+  // Keep normalization independent from unrelated widget settings. The setter
+  // refs avoid rerunning this migration when the API creates a new callback.
   useEffect(() => {
-    const linksWithIds = data.links.map((link, index) => {
-      const linkWithoutLastUsed = { ...link };
-      delete linkWithoutLastUsed.lastUsed;
-      const hasUniqueId =
-        Boolean(link.id) &&
-        data.links.filter((candidate) => candidate.id === link.id).length === 1;
+    if (!areLinksEqual(links, normalizedLinks)) {
+      setDataRef.current({ ...dataRef.current, links: normalizedLinks });
+    }
+  }, [links, normalizedLinks]);
 
-      if (!hasUniqueId) {
-        return {
-          ...linkWithoutLastUsed,
-          id:
-            Date.now().toString(36) +
-            Math.random().toString(36).slice(2) +
-            index,
-        };
-      }
-
-      return linkWithoutLastUsed;
-    });
-
+  // Migrate volatile timestamps and legacy SVG payloads into the local cache.
+  useEffect(() => {
     let cacheChanged = false;
     const nextCache = { ...cache };
-    const normalizedLinks = linksWithIds.map((link) => {
+
+    links.forEach((link, index) => {
+      const normalized = normalizedLinks[index];
       const legacySvg = link.SvgString;
-      const normalized = sanitizeLink(link);
 
-      if (normalized.icon === "_custom_svg") {
-        const cacheKey =
-          normalized.iconCacheKey || getSvgCacheKey(normalized.id);
-        normalized.iconCacheKey = cacheKey;
-        delete normalized.SvgString;
+      if (normalized.icon !== "_custom_svg" || !legacySvg) return;
 
-        if (legacySvg && getCachedIcon(cache, cacheKey)?.type !== "svg") {
-          nextCache[cacheKey] = {
-            data: legacySvg,
-            type: "svg",
-            size: legacySvg.length,
-          };
-          cacheChanged = true;
-        }
-      }
+      const cacheKey = normalized.iconCacheKey || getSvgCacheKey(normalized.id);
+      if (getCachedIcon(cache, cacheKey)?.type === "svg") return;
 
-      return normalized;
+      nextCache[cacheKey] = {
+        data: legacySvg,
+        type: "svg",
+        size: legacySvg.length,
+      };
+      cacheChanged = true;
     });
 
     const lastUsed = Object.fromEntries(
       normalizedLinks.flatMap((link, index) => {
-        const value = getLastUsed(data.links[index], cache);
+        const value = getLastUsed(links[index], cache);
         return value > 0 ? [[link.id, value]] : [];
       }),
     );
-    const currentLastUsed = cache[LAST_USED_CACHE_KEY];
     const nextLastUsed =
       Object.keys(lastUsed).length > 0
         ? { type: "lastUsed" as const, data: lastUsed, size: 0 as const }
         : undefined;
 
-    // Only update when something actually changed. In particular, remove the
-    // legacy lastUsed fields from synced data after copying them to the cache.
-    if (JSON.stringify(normalizedLinks) !== JSON.stringify(data.links)) {
-      setData({ ...data, links: normalizedLinks });
-    }
-
-    if (JSON.stringify(currentLastUsed) !== JSON.stringify(nextLastUsed)) {
+    if (!areLastUsedCacheEqual(cache[LAST_USED_CACHE_KEY], nextLastUsed)) {
       if (nextLastUsed) nextCache[LAST_USED_CACHE_KEY] = nextLastUsed;
       else delete nextCache[LAST_USED_CACHE_KEY];
       cacheChanged = true;
     }
 
-    if (cacheChanged) setCache(nextCache);
-  }, [cache, data, data.links, setCache, setData]);
+    if (cacheChanged) setCacheRef.current(nextCache);
+  }, [cache, links, normalizedLinks]);
 
   const handleLinkClick = (id: string) => {
     setCache(setLastUsed(cache, id, Date.now()));

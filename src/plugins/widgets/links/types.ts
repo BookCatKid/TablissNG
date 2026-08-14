@@ -70,6 +70,64 @@ export const sanitizeLink = (link: Link): Link => {
   return sanitized;
 };
 
+/** Normalize persisted links without changing their order. */
+export const normalizeLinks = (links: Link[]): Link[] => {
+  const idCounts = new Map<string, number>();
+  links.forEach((link) => {
+    if (link.id) idCounts.set(link.id, (idCounts.get(link.id) ?? 0) + 1);
+  });
+
+  return links.map((link, index) => {
+    const hasUniqueId = Boolean(link.id) && idCounts.get(link.id) === 1;
+    const withId = hasUniqueId
+      ? link
+      : {
+          ...link,
+          id:
+            Date.now().toString(36) +
+            Math.random().toString(36).slice(2) +
+            index,
+        };
+    const normalized = sanitizeLink(withId);
+
+    if (normalized.icon === "_custom_svg") {
+      normalized.iconCacheKey =
+        normalized.iconCacheKey || getSvgCacheKey(normalized.id);
+      delete normalized.SvgString;
+    }
+
+    return normalized;
+  });
+};
+
+/** Compare link records without serializing the full array. */
+export const areLinksEqual = (left: Link[], right: Link[]): boolean => {
+  if (left.length !== right.length) return false;
+
+  return left.every((link, index) => {
+    const other = right[index];
+    const keys = new Set([...Object.keys(link), ...Object.keys(other)]);
+
+    return [...keys].every((key) =>
+      Object.is(link[key as keyof Link], other[key as keyof Link]),
+    );
+  });
+};
+
+/** Compare the optional last-used cache entry without serializing it. */
+export const areLastUsedCacheEqual = (
+  current: CacheItem | undefined,
+  next: LastUsedCacheItem | undefined,
+): boolean => {
+  if (current?.type !== "lastUsed" || !next) return current === next;
+
+  const ids = new Set([
+    ...Object.keys(current.data),
+    ...Object.keys(next.data),
+  ]);
+  return [...ids].every((id) => current.data[id] === next.data[id]);
+};
+
 export const getSvgCacheKey = (linkId: string): string => `svg_${linkId}`;
 
 export const getLastUsed = (link: Link, cache?: Cache): number => {

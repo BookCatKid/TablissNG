@@ -144,27 +144,35 @@ const BaseBackground: FC<Props> = ({
 
         {showControls && (
           <div className={`controls ${controlsOnHover ? "is-on-hover" : ""}`}>
-            <a
+            <button
+              type="button"
               className={`${onPrev ? "" : "hidden"}${
                 isTransitioning ? " transitioning" : ""
               }`}
-              aria-disabled={isTransitioning}
-              onClick={isTransitioning ? undefined : (onPrev ?? undefined)}
+              aria-label="Previous background"
+              disabled={isTransitioning || !onPrev}
+              onClick={onPrev ?? undefined}
             >
               <Icon icon="feather:arrow-left" />
-            </a>{" "}
-            <a onClick={onPause}>
+            </button>{" "}
+            <button
+              type="button"
+              aria-label={paused ? "Resume background" : "Pause background"}
+              onClick={onPause}
+            >
               <Icon icon={paused ? "feather:play" : "feather:pause"} />
-            </a>{" "}
-            <a
+            </button>{" "}
+            <button
+              type="button"
               className={`${onNext ? "" : "hidden"}${
                 isTransitioning ? " transitioning" : ""
               }`}
-              aria-disabled={isTransitioning}
-              onClick={isTransitioning ? undefined : (onNext ?? undefined)}
+              aria-label="Next background"
+              disabled={isTransitioning || !onNext}
+              onClick={onNext ?? undefined}
             >
               <Icon icon="feather:arrow-right" />
-            </a>
+            </button>
           </div>
         )}
 

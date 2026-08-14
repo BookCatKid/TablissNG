@@ -2,7 +2,7 @@ import "./Weather.sass";
 
 import { Icon } from "@iconify/react";
 import type { FC } from "react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useCachedEffect, useTime } from "../../../hooks";
@@ -53,17 +53,29 @@ const Weather: FC<Props> = ({
 }) => {
   const time = useTime("absolute");
   const intl = useIntl();
+  const dataRef = useRef(data);
+  const setDataRef = useRef(setData);
+  dataRef.current = data;
+  setDataRef.current = setData;
+
+  const { autoUpdate, latitude, longitude, locationUpdatedAt } = data;
 
   useEffect(() => {
-    if (!data.autoUpdate) return;
+    if (!autoUpdate) return;
 
-    if (!shouldRefreshLocation(data)) return;
+    if (!shouldRefreshLocation({ latitude, longitude, locationUpdatedAt })) {
+      return;
+    }
 
     let active = true;
     requestLocation()
       .then((coords) => {
         if (!active) return;
-        setData({ ...data, ...coords, locationUpdatedAt: Date.now() });
+        setDataRef.current({
+          ...dataRef.current,
+          ...coords,
+          locationUpdatedAt: Date.now(),
+        });
       })
       .catch((err) => {
         if (active) console.error(err);
@@ -72,14 +84,7 @@ const Weather: FC<Props> = ({
     return () => {
       active = false;
     };
-  }, [
-    data.autoUpdate,
-    data.latitude,
-    data.locationUpdatedAt,
-    data.longitude,
-    data,
-    setData,
-  ]);
+  }, [autoUpdate, latitude, longitude, locationUpdatedAt]);
 
   // Cache weather data for 6 hours
   useCachedEffect(
