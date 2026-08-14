@@ -12,6 +12,14 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - Improve and complete Korean translations across menus, settings, widgets, and validation messages.
 
+### Fixed
+
+- Fix Quick Links, custom SVG uploads, media storage quotas, stale API caches, repeated location prompts, and skipped background fade transitions (#30, #87, #129, #145, #149, #150, #156).
+
+### Documentation
+
+- Add a complete Korean README translation and an English README localization guide.
+
 ## [1.7.1] - 6/4/2026 | Minor bugfix release
 
 Quick follow-up release fixing an issue where the new sortOrder setting didn't apply during auto-rotation, and adding Trello labels form support.
