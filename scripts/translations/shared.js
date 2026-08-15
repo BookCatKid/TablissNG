@@ -11,6 +11,7 @@ const extractedMessagesPath = path.join(
   "extractedMessages",
   "messages.json",
 );
+const formatjsCliModule = "@formatjs/cli/bin/formatjs";
 
 function readJson(filePath) {
   const raw = fs.readFileSync(filePath, "utf8");
@@ -100,24 +101,39 @@ function validateMessageObject(obj, filename) {
   return true;
 }
 
-function runFormatjs(args) {
-  return execFileSync("pnpm", ["exec", "formatjs", ...args], {
-    cwd: rootDir,
-    stdio: "inherit",
-  });
+function resolveFormatjsCliPath() {
+  try {
+    return require.resolve(formatjsCliModule);
+  } catch (err) {
+    throw new Error(
+      'Unable to resolve the FormatJS CLI dependency "@formatjs/cli". ' +
+        "Run `pnpm install` from the repository root, then try again.",
+      { cause: err },
+    );
+  }
+}
+
+function runFormatjs(args, options = {}) {
+  const formatjsCliPath = resolveFormatjsCliPath();
+
+  try {
+    return execFileSync(process.execPath, [formatjsCliPath, ...args], {
+      cwd: rootDir,
+      stdio: options.stdio ?? "inherit",
+    });
+  } catch (err) {
+    throw new Error(
+      `Unable to run the FormatJS CLI (${args.join(" ")}): ${err.message}`,
+      { cause: err },
+    );
+  }
 }
 
 function assertFormatjsInstalled() {
   try {
-    execFileSync("pnpm", ["exec", "formatjs", "--version"], {
-      cwd: rootDir,
-      stdio: "pipe",
-    });
-  } catch {
-    console.error("\n✗ Missing FormatJS CLI dependency: formatjs");
-    console.error(
-      "  Run `pnpm install` from the repository root, then try again.",
-    );
+    runFormatjs(["--version"], { stdio: "pipe" });
+  } catch (err) {
+    console.error(`\n✗ ${err.message}`);
     process.exit(1);
   }
 }

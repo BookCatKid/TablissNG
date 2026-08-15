@@ -1,2 +1,9 @@
 [
+  "backgrounds.giphy.name",
+  "backgrounds.unsplash.name",
+  "plugins.links.input.feather",
+  "plugins.links.input.url",
+  "plugins.palette.hex",
+  "plugins.palette.rgb",
+  "plugins.trello.name"
 ]

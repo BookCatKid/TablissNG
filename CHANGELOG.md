@@ -8,6 +8,10 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+### Translations
+
+- Improve and complete Korean translations across menus, settings, widgets, and validation messages.
+
 ### Fixed
 
 - perf(trello): applied better fix for drag and drop initial positioning bug [fdb97890](https://github.com/BookCatKid/TablissNG/commit/fdb97890)
