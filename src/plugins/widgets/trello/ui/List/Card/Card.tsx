@@ -122,6 +122,19 @@ export function Card({
   }, [isEditingLabels]);
 
   useEffect(() => {
+    if (!isEditingContent) return;
+
+    const handler = (e: MouseEvent) => {
+      if (selfRef.current && !selfRef.current.contains(e.target as Node)) {
+        setIsEditingContent(false);
+        setEditValue(card.name);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [isEditingContent, card.name]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setIsEditingContent(false);

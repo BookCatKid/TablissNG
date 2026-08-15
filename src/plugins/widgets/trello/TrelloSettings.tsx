@@ -59,13 +59,11 @@ const TrelloSettings: FC<Props> = ({
       return;
     }
 
-    // Toggle the selected status for the checked list
     const updatedSettingsOptions = lists.map((l) => {
       return l.id === listID ? { ...l, selected: !l.selected } : l;
     });
-    setLists(updatedSettingsOptions);
 
-    // Update preferences
+    setLists(updatedSettingsOptions);
     const selectedLists = updatedSettingsOptions.filter((l) => l.selected);
     const order = selectedLists.map((l) => l.id);
 
@@ -104,19 +102,11 @@ const TrelloSettings: FC<Props> = ({
           primary={authState !== "pending"}
           onClick={onAuthenticateClick}
         >
-          {authState === "unauthenticated" ? (
-            <FormattedMessage
-              id="plugins.trello.authenticate.button"
-              defaultMessage="Authenticate"
-              description="Button text to start Trello authentication"
-            />
-          ) : (
-            <FormattedMessage
-              id="plugins.trello.authenticating"
-              defaultMessage="Authenticating..."
-              description="Status message while Trello authentication is in progress"
-            />
-          )}
+          <FormattedMessage
+            id="plugins.trello.authenticate.button"
+            defaultMessage="Authenticate"
+            description="Button text to start Trello authentication"
+          />
         </Button>
       </>
     );

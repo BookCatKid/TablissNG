@@ -452,7 +452,6 @@
   "plugins.trello.authenticate": "Se connecter à Trello",
   "plugins.trello.authenticate.button": "S’identifier",
   "plugins.trello.authenticate.error": "Une erreur s’est produite lors de l’authentification.",
-  "plugins.trello.authenticating": "Authentification en cours…",
   "plugins.trello.boardSelect": "Sélectionner un tableau",
   "plugins.trello.description": "Consultez facilement les listes Trello.",
   "plugins.trello.listSelect": "Sélectionner des listes",
