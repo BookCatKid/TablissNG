@@ -21,6 +21,7 @@ export default function useAuth<T extends Session>(
   store: Store<AuthState>,
 ) {
   const { status: authStatus, setStatus: setAuthStatus } = store();
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [authError, setAuthError] = useState<string | null>("");
 
   const getSession = async (): Promise<T | null> => {
@@ -47,7 +48,6 @@ export default function useAuth<T extends Session>(
     }
   };
 
-  // check authentication status on load
   useEffect(() => {
     const effect = async () => {
       try {
@@ -57,6 +57,8 @@ export default function useAuth<T extends Session>(
         console.error("AUTH: Error checking authentication status: ", err);
         setAuthError("Failed to check authentication status");
         setAuthStatus("unauthenticated");
+      } finally {
+        setCheckingAuth(false);
       }
     };
 
@@ -65,7 +67,7 @@ export default function useAuth<T extends Session>(
     if (authStatus !== "pending") {
       effect();
     }
-  }, []);
+  }, [setAuthStatus, setCheckingAuth, setAuthError]);
 
   /**
    * Attempts to authenticate user via an authentication method
@@ -110,5 +112,5 @@ export default function useAuth<T extends Session>(
     }
   };
 
-  return { authStatus, authError, getSession, signIn, signOut };
+  return { authStatus, authError, getSession, signIn, signOut, checkingAuth };
 }
