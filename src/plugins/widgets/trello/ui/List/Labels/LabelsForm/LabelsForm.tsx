@@ -59,7 +59,6 @@ export function LabelsForm({
         <div className="select-labels-label-container">
           {availableLabels.map((l) => {
             const isDark = (c: TrelloColour) => c.endsWith("_dark");
-
             const textColour = isDark(l.colour)
               ? "rgba(255,255,255, 0.8)"
               : "rgba(0, 0, 0, 0.8)";
@@ -81,6 +80,7 @@ export function LabelsForm({
                     background: colourPalette[l.colour],
                     padding: "2px 8px",
                   }}
+                  onClick={() => handleLabelToggled(l.id)}
                 >
                   {l.name}
                 </p>
