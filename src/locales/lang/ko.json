@@ -452,7 +452,6 @@
   "plugins.trello.authenticate": "Trello에 로그인",
   "plugins.trello.authenticate.button": "인증하기",
   "plugins.trello.authenticate.error": "인증하는 중 오류가 발생했습니다.",
-  "plugins.trello.authenticating": "인증 중…",
   "plugins.trello.boardSelect": "보드 선택",
   "plugins.trello.description": "Trello 목록을 한눈에 확인하세요.",
   "plugins.trello.listSelect": "목록 선택",
