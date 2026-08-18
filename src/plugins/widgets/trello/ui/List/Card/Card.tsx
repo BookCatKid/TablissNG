@@ -30,6 +30,7 @@ interface CardProps {
   boardId: string;
   position: number; // 0-index to its position in the list
   dispatchUI: React.Dispatch<CacheReducerAction>;
+  forceFocus?: boolean;
 }
 
 export function Card({
@@ -38,18 +39,29 @@ export function Card({
   boardId,
   position,
   dispatchUI,
+  forceFocus = false,
 }: CardProps) {
   const [labels, setLabels] = useState<Label[]>(card.labels);
   const labelsRef = useRef<Label[]>(card.labels);
   useEffect(() => {
     labelsRef.current = labels;
   }, [labels]);
-  const [hovering, setHovering] = useState<boolean>(false);
+  const [hovering, setHovering] = useState<boolean>(forceFocus);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
+
+  let stateClasses = "";
+  if (isSelected || hovering) {
+    stateClasses += " selected ";
+  }
+
+  if (hovering && !isSelected) {
+    stateClasses += " hovered ";
+  }
+
   const selfRef = useRef<HTMLDivElement>(null);
 
   // Portals are used to display the tag editor
@@ -130,8 +142,6 @@ export function Card({
   const handleEditLabels = () => {
     setIsEditingLabels(true);
   };
-
-  // Functions to to alter UI
 
   const handleSave = async () => {
     const session = await getSession();
@@ -236,15 +246,6 @@ export function Card({
     }
   };
 
-  let stateClasses = "";
-  if (isSelected || hovering) {
-    stateClasses += " selected ";
-  }
-
-  if (hovering && !isSelected) {
-    stateClasses += " hovered ";
-  }
-
   return (
     <div
       ref={selfRef}
@@ -273,6 +274,12 @@ export function Card({
             edit-card-buttons
             ${hovering ? "visible" : ""}`}
         >
+          <span
+            onClick={isEditingContent ? undefined : handleEditLabels}
+            className={`icon ${isEditingContent ? " disabled" : ""}`}
+          >
+            <LabelsIcon />
+          </span>
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
@@ -288,16 +295,9 @@ export function Card({
               <EditIcon />
             </span>
           )}
-          <span
-            onClick={isEditingContent ? undefined : handleEditLabels}
-            className={`icon ${isEditingContent ? " disabled" : ""}`}
-          >
-            <LabelsIcon />
-          </span>
         </span>
       </div>
 
-      {/* Card editor */}
       {!isEditingContent ? (
         <span>{card.name}</span>
       ) : (
