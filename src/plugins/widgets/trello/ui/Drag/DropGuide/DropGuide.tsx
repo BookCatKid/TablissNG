@@ -22,17 +22,13 @@ export function DropGuide({ dropId, ...props }: DropGuideProps) {
   }
 
   const { dropZoneId, dragCardStyle } = context;
-
-  if (dropZoneId !== dropId) {
-    return null;
-  }
-
+  const isActive = dropZoneId === dropId;
   return (
     <div
       className="drop-guide"
       style={{
-        height: `${dragCardStyle?.size.height}px`,
-        width: `${dragCardStyle?.size.width}px`,
+        height: `${isActive ? dragCardStyle?.size.height : 0}px`,
+        width: `${isActive ? dragCardStyle?.size.width : 0}px`,
       }}
       {...props}
     />
