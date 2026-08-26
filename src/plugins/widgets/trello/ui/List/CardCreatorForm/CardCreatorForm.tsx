@@ -47,15 +47,15 @@ export function CardCreatorForm({
       dispatchUI({ type: "ADD_CARD", card: created, listId: listId });
       const trelloCreatedId = await addCardToList(created, listId, session);
 
-      if (trelloCreatedId !== null) {
+      if (trelloCreatedId === null) {
+        dispatchUI({ type: "DELETE_CARD", listId: listId, cardId: created.id });
+      } else {
         dispatchUI({
           type: "UPDATE_CARD_ID",
           oldId: created.id,
           newId: trelloCreatedId,
           listId,
         });
-      } else {
-        dispatchUI({ type: "DELETE_CARD", listId: listId, cardId: created.id });
       }
     }
   };

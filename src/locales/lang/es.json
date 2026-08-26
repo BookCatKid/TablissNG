@@ -452,7 +452,6 @@
   "plugins.trello.authenticate": "Iniciar sesión con Trello",
   "plugins.trello.authenticate.button": "Autenticar",
   "plugins.trello.authenticate.error": "Hubo un error al autentificarse",
-  "plugins.trello.authenticating": "Autenticando...",
   "plugins.trello.boardSelect": "Elegir tablero",
   "plugins.trello.description": "Visualiza cómodamente Listas Trello",
   "plugins.trello.listSelect": "Elegir listas",

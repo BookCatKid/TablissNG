@@ -9,6 +9,7 @@ import {
   LabelsIcon,
   RemoveIcon,
 } from "../../../../../../views/shared";
+import { useLabelsEditor } from "../../../hooks/useLabelsEditor";
 import { CacheReducerAction } from "../../../reducers";
 import { trelloAuthStore } from "../../../stores/trelloAuthStore";
 import {
@@ -30,6 +31,7 @@ interface CardProps {
   boardId: string;
   position: number; // 0-index to its position in the list
   dispatchUI: React.Dispatch<CacheReducerAction>;
+  forceFocus?: boolean;
 }
 
 export function Card({
@@ -39,26 +41,26 @@ export function Card({
   position,
   dispatchUI,
 }: CardProps) {
+  const selfRef = useRef<HTMLDivElement | null>(null);
   const [labels, setLabels] = useState<Label[]>(card.labels);
+  const {
+    portalRef,
+    isEditing: isEditingLabels,
+    setIsEditing: setIsEditingLabels,
+    position: labelsFormPosition,
+  } = useLabelsEditor(selfRef);
+
   const labelsRef = useRef<Label[]>(card.labels);
   useEffect(() => {
     labelsRef.current = labels;
   }, [labels]);
   const [hovering, setHovering] = useState<boolean>(false);
-
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
-  const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
+
   const isSelected = isEditingContent || isEditingLabels;
-  const selfRef = useRef<HTMLDivElement>(null);
 
-  // Portals are used to display the tag editor
-  const portalRef = useRef<HTMLDivElement>(null);
-  const [tagEditorPosition, setTagPosition] = useState<{
-    top: number;
-    left: number;
-  } | null>(null);
-
+  const stateClasses = `${isSelected || hovering ? "active" : ""} ${hovering && !isSelected ? "hovered" : ""}`;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { getSession } = useAuth<TrelloSession>("trello", trelloAuthStore);
 
@@ -68,46 +70,6 @@ export function Card({
       textareaRef.current.select();
     }
   }, [isEditingContent]);
-
-  // Set tag position when opened to align next to card
-  useEffect(() => {
-    if (isEditingLabels && selfRef.current) {
-      const r = selfRef.current.getBoundingClientRect();
-      setTagPosition({ top: r.top, left: r.right + 8 });
-    }
-  }, [isEditingLabels]);
-
-  // Reposition tag editor on scroll/resize
-  useEffect(() => {
-    if (!isEditingLabels) return;
-    const update = () => {
-      if (selfRef.current) {
-        const r = selfRef.current.getBoundingClientRect();
-        setTagPosition({ top: r.top, left: r.right + 8 });
-      }
-    };
-    window.addEventListener("scroll", update, true);
-    window.addEventListener("resize", update);
-    return () => {
-      window.removeEventListener("scroll", update, true);
-      window.removeEventListener("resize", update);
-    };
-  }, [isEditingLabels]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        portalRef.current &&
-        !portalRef.current.contains(e.target as Node) &&
-        selfRef.current &&
-        !selfRef.current.contains(e.target as Node)
-      ) {
-        setIsEditingLabels(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [isEditingLabels]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,7 +81,6 @@ export function Card({
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [card.name]);
 
   const handleEdit = () => {
@@ -130,8 +91,6 @@ export function Card({
   const handleEditLabels = () => {
     setIsEditingLabels(true);
   };
-
-  // Functions to to alter UI
 
   const handleSave = async () => {
     const session = await getSession();
@@ -236,15 +195,6 @@ export function Card({
     }
   };
 
-  let stateClasses = "";
-  if (isSelected || hovering) {
-    stateClasses += " selected ";
-  }
-
-  if (hovering && !isSelected) {
-    stateClasses += " hovered ";
-  }
-
   return (
     <div
       ref={selfRef}
@@ -273,6 +223,12 @@ export function Card({
             edit-card-buttons
             ${hovering ? "visible" : ""}`}
         >
+          <span
+            onClick={isEditingContent ? undefined : handleEditLabels}
+            className={`icon ${isEditingContent ? " disabled" : ""}`}
+          >
+            <LabelsIcon />
+          </span>
           {isEditingContent ? (
             <span
               onClick={isEditingLabels ? undefined : handleDelete}
@@ -288,16 +244,9 @@ export function Card({
               <EditIcon />
             </span>
           )}
-          <span
-            onClick={isEditingContent ? undefined : handleEditLabels}
-            className={`icon ${isEditingContent ? " disabled" : ""}`}
-          >
-            <LabelsIcon />
-          </span>
         </span>
       </div>
 
-      {/* Card editor */}
       {!isEditingContent ? (
         <span>{card.name}</span>
       ) : (
@@ -311,14 +260,14 @@ export function Card({
       )}
 
       {isEditingLabels &&
-        tagEditorPosition &&
+        labelsFormPosition &&
         createPortal(
           <div
             ref={portalRef}
             style={{
               position: "fixed",
-              top: tagEditorPosition.top,
-              left: tagEditorPosition.left,
+              top: labelsFormPosition.top,
+              left: labelsFormPosition.left,
               zIndex: 1000,
             }}
           >

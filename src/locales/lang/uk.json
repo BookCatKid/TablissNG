@@ -452,7 +452,6 @@
   "plugins.trello.authenticate": "Sign in With Trello",
   "plugins.trello.authenticate.button": "Authenticate",
   "plugins.trello.authenticate.error": "Error occurred during authentication",
-  "plugins.trello.authenticating": "Authenticating...",
   "plugins.trello.boardSelect": "Select board",
   "plugins.trello.description": "Conveniently view Trello Lists",
   "plugins.trello.listSelect": "Select lists",

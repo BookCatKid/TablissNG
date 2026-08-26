@@ -104,19 +104,11 @@ const TrelloSettings: FC<Props> = ({
           primary={authState !== "pending"}
           onClick={onAuthenticateClick}
         >
-          {authState === "unauthenticated" ? (
-            <FormattedMessage
-              id="plugins.trello.authenticate.button"
-              defaultMessage="Authenticate"
-              description="Button text to start Trello authentication"
-            />
-          ) : (
-            <FormattedMessage
-              id="plugins.trello.authenticating"
-              defaultMessage="Authenticating..."
-              description="Status message while Trello authentication is in progress"
-            />
-          )}
+          <FormattedMessage
+            id="plugins.trello.authenticate.button"
+            defaultMessage="Authenticate"
+            description="Button text to start Trello authentication"
+          />
         </Button>
       </>
     );

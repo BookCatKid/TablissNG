@@ -25,18 +25,14 @@ const Trello: FC<Props> = ({
   cache = defaultCache,
   setCache,
 }) => {
-  const { authStatus, getSession } = useAuth<TrelloSession>(
+  const { authStatus, getSession, checkingAuth } = useAuth<TrelloSession>(
     "trello",
     trelloAuthStore,
   );
 
   const { boardId: selectedBoardId } = useSelectedBoard(data);
   const dispatchUI = useFreshReducer(cacheReducer, cache, setCache);
-
-  // Keep track of latest version of cache
   const cacheRef = useRef(cache);
-
-  // Track if any lists change their status to loading, indicating a new fetch is needed
   const loadingListIds = useMemo(
     () =>
       Object.values(cache.lists)
@@ -88,7 +84,6 @@ const Trello: FC<Props> = ({
     [dispatchUI],
   );
 
-  // Fetch cards on first load and when a list's state changes
   useEffect(() => {
     if (authStatus !== "authenticated") return;
     const controller = new AbortController();
@@ -182,13 +177,19 @@ const Trello: FC<Props> = ({
     [getSession, dispatchUI],
   );
 
+  if (checkingAuth) {
+    return <div className="widget-container" />;
+  }
+
   if (authStatus !== "authenticated") {
     return (
-      <FormattedMessage
-        id="plugins.trello.unauthenticatedMessage"
-        defaultMessage="Sign into Trello to use me"
-        description="Sign into Trello to use me"
-      />
+      <div className="widget-container">
+        <FormattedMessage
+          id="plugins.trello.unauthenticatedMessage"
+          defaultMessage="Sign into Trello to use me"
+          description="Sign into Trello to use me"
+        />
+      </div>
     );
   }
 
@@ -198,16 +199,18 @@ const Trello: FC<Props> = ({
     selectedBoardId == null
   ) {
     return (
-      <FormattedMessage
-        id="plugins.trello.noListsMessage"
-        defaultMessage="Add some lists to view"
-        description="Add some lists to view"
-      />
+      <div className="widget-container">
+        <FormattedMessage
+          id="plugins.trello.noListsMessage"
+          defaultMessage="Add some lists to view"
+          description="Add some lists to view"
+        />
+      </div>
     );
   }
 
   return (
-    <div className="display-list-container">
+    <div className="widget-container">
       <Drag handleDrop={handleDrop}>
         {cache.order.map((listId) => {
           const { cards, name, status } = cache.lists[listId];

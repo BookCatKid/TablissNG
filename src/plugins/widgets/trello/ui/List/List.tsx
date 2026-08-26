@@ -72,6 +72,10 @@ export function List({
     setCardCreatorOpen(true);
   };
 
+  const handleCreateCard = () => {
+    setCardCreatorOpen(false);
+  };
+
   return (
     <div className="list">
       <div
@@ -85,11 +89,13 @@ export function List({
           className={`add-card-button ${hoveringOverHeader && !cardCreatorOpen ? "visible" : ""}`}
         >
           <ExpandIcon />
-          <FormattedMessage
-            id="plugins.trello.addCard"
-            defaultMessage="Add a card"
-            description="Add a card"
-          />
+          <span className="add-card-title">
+            <FormattedMessage
+              id="plugins.trello.addCard"
+              defaultMessage="Add a card"
+              description="Add a card"
+            />
+          </span>
         </span>
       </div>
       {loading || !cards ? (
@@ -103,12 +109,12 @@ export function List({
               listId={listId}
               selfRef={cardCreatorRef}
               dispatchUI={dispatchUI}
-              onFormSubmit={() => setCardCreatorOpen(false)}
+              onFormSubmit={handleCreateCard}
             />
           )}
           {cards.map((card, i) => (
             <DoubleDropZone
-              key={card.id}
+              key={`list-${listId}-card-${i}`}
               previousId={`list-${listId}-card-${i}`}
               nextId={`list-${listId}-card-${i + 1}`}
               dropType="ITEM"
@@ -125,8 +131,8 @@ export function List({
                 }
               >
                 <CardComponent
+                  key={`list-${listId}-card-${i}`}
                   position={i}
-                  key={card.id}
                   card={card}
                   listId={listId}
                   boardId={boardId}
@@ -135,17 +141,19 @@ export function List({
               </DraggableCard>
             </DoubleDropZone>
           ))}
-          {/* allow placing cards at the end of the list */}
-          <DropZone
-            dropId={`list-${listId}-card-${cards.length}`}
-            dropType="ITEM"
-            style={{ minHeight: "4rem" }}
-          >
-            <DropGuide
-              dropType="ITEM"
+          {isDragging && (
+            /* allow placing cards at the end of the list */
+            <DropZone
               dropId={`list-${listId}-card-${cards.length}`}
-            />
-          </DropZone>
+              dropType="ITEM"
+              style={{ minHeight: "4rem" }}
+            >
+              <DropGuide
+                dropType="ITEM"
+                dropId={`list-${listId}-card-${cards.length}`}
+              />
+            </DropZone>
+          )}
         </div>
       )}
     </div>
