@@ -39,32 +39,21 @@ export function Card({
   boardId,
   position,
   dispatchUI,
-  forceFocus = false,
 }: CardProps) {
   const [labels, setLabels] = useState<Label[]>(card.labels);
   const labelsRef = useRef<Label[]>(card.labels);
   useEffect(() => {
     labelsRef.current = labels;
   }, [labels]);
-  const [hovering, setHovering] = useState<boolean>(forceFocus);
+  const [hovering, setHovering] = useState<boolean>(false);
 
   const [isEditingContent, setIsEditingContent] = useState<boolean>(false);
   const [isEditingLabels, setIsEditingLabels] = useState<boolean>(false);
   const [editValue, setEditValue] = useState<string>(card.name);
   const isSelected = isEditingContent || isEditingLabels;
 
-  let stateClasses = "";
-  if (isSelected || hovering) {
-    stateClasses += " selected ";
-  }
-
-  if (hovering && !isSelected) {
-    stateClasses += " hovered ";
-  }
-
+  const stateClasses = `${isSelected || hovering ? "active" : ""} ${hovering && ~isSelected ? "hovered" : ""}`;
   const selfRef = useRef<HTMLDivElement>(null);
-
-  // Portals are used to display the tag editor
   const portalRef = useRef<HTMLDivElement>(null);
   const [tagEditorPosition, setTagPosition] = useState<{
     top: number;
@@ -131,7 +120,6 @@ export function Card({
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
   }, [card.name]);
 
   const handleEdit = () => {

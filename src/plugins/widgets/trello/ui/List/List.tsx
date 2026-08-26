@@ -38,9 +38,6 @@ export function List({
   const cardCreatorRef = useRef<HTMLTextAreaElement>(null);
   const [hoveringOverHeader, setHoveringOverHeader] = useState<boolean>(false);
   const [cardCreatorOpen, setCardCreatorOpen] = useState<boolean>(false);
-  const [createdCardPosition, setCreatedCardPosition] = useState<number | null>(
-    null,
-  );
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -77,8 +74,6 @@ export function List({
 
   const handleCreateCard = () => {
     setCardCreatorOpen(false);
-    setCreatedCardPosition(0); // Assume that all new cards are added to the top of the list
-    setTimeout(() => setCreatedCardPosition(null), 2000); // Unfocus the new card after 2 seconds
   };
 
   return (
@@ -119,7 +114,7 @@ export function List({
           )}
           {cards.map((card, i) => (
             <DoubleDropZone
-              key={card.id}
+              key={`list-${listId}-card-${i}`}
               previousId={`list-${listId}-card-${i}`}
               nextId={`list-${listId}-card-${i + 1}`}
               dropType="ITEM"
@@ -136,12 +131,12 @@ export function List({
                 }
               >
                 <CardComponent
+                  key={`list-${listId}-card-${i}`}
                   position={i}
                   card={card}
                   listId={listId}
                   boardId={boardId}
                   dispatchUI={dispatchUI}
-                  forceFocus={createdCardPosition === i}
                 />
               </DraggableCard>
             </DoubleDropZone>
