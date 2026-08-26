@@ -62,11 +62,7 @@ export default function useAuth<T extends Session>(
       }
     };
 
-    // prevent cases where signing in triggers the hook to sign the user back in
-    // if the user is attempting to sign out stop the hook
-    if (authStatus !== "pending") {
-      effect();
-    }
+    effect();
   }, [setAuthStatus, setCheckingAuth, setAuthError]);
 
   /**
