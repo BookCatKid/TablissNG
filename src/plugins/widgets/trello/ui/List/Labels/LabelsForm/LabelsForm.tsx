@@ -82,7 +82,10 @@ export function LabelsForm({
                       background: colourPalette[l.colour],
                       padding: "2px 8px",
                     }}
-                    onClick={() => handleLabelToggled(l.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLabelToggled(l.id);
+                    }}
                   >
                     {l.name}
                   </p>
@@ -98,7 +101,10 @@ export function LabelsForm({
                       color: `${textColour}`,
                       background: colourPalette[l.colour],
                     }}
-                    onClick={() => handleLabelToggled(l.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLabelToggled(l.id);
+                    }}
                   />
                 )}
               </div>
