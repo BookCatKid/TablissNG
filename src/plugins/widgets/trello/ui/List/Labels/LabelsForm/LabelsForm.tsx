@@ -20,7 +20,7 @@ export function LabelsForm({
   onSelectedChange,
   boardId,
 }: LabelsFormProps) {
-  const { labels: availableLabels, isLoading } = useLabelsOnBoard(boardId);
+  const { labels: availableLabels, isLoading } = useLabelsOnBoard(boardId); // TODO: store in cache to hide loading state
   const [labelsSelected, setLabelsSelected] = useState<Record<string, boolean>>(
     {},
   );
@@ -70,20 +70,37 @@ export function LabelsForm({
                   checked={labelsSelected[l.id] ?? false}
                   onChange={handleLabelToggled}
                 />
-                <p
-                  style={{
-                    width: "100%",
-                    borderRadius: "2px",
-                    fontWeight: 400,
-                    margin: "0",
-                    color: `${textColour}`,
-                    background: colourPalette[l.colour],
-                    padding: "2px 8px",
-                  }}
-                  onClick={() => handleLabelToggled(l.id)}
-                >
-                  {l.name}
-                </p>
+
+                {l.name ? (
+                  <p
+                    style={{
+                      width: "100%",
+                      borderRadius: "2px",
+                      fontWeight: 400,
+                      margin: "0",
+                      color: `${textColour}`,
+                      background: colourPalette[l.colour],
+                      padding: "2px 8px",
+                    }}
+                    onClick={() => handleLabelToggled(l.id)}
+                  >
+                    {l.name}
+                  </p>
+                ) : (
+                  <div
+                    style={{
+                      width: "30px",
+                      height: "12px",
+                      alignSelf: "center",
+                      borderRadius: "2px",
+                      fontWeight: 400,
+                      margin: "0",
+                      color: `${textColour}`,
+                      background: colourPalette[l.colour],
+                    }}
+                    onClick={() => handleLabelToggled(l.id)}
+                  />
+                )}
               </div>
             );
           })}
