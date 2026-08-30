@@ -16,43 +16,112 @@
       font-size: 0.9em
       text-transform: capitalize
 
-.IconPickerModal
-  max-width: none !important
+.Modal.IconPickerModal
   width: 90vw
   height: 90vh
+  max-width: none
+  max-height: 90vh
 
-  h2
+  .Modal-content
+    display: flex
+    flex-direction: column
+    min-height: 0
+    overflow: hidden
+
+  .IconPickerModal-header
+    h4
+      margin: 0 0 0.5em
+
+  .IconPickerModal-toolbar
+    label:first-child
+      margin-top: 0
+
+  .IconPickerModal-status
+    display: flex
+    align-items: center
+    min-height: 2rem
+    color: var(--text-secondary)
+    font-size: 0.75rem
+
+  .IconPickerModal-results
+    flex: 1 1 auto
+    min-height: 0
+    overflow-y: auto
+    padding-right: 0.25rem
+
+  .IconPickerModal-message
+    min-height: 10rem
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: center
+    gap: 0.75rem
+    color: var(--text-secondary)
     text-align: center
 
-  .no-results
-    text-align: center
-    grid-column: 1 / -1
+    p
+      max-width: 28rem
+      margin: 0
+
+  .IconPickerModal-more
+    display: block
+    margin: 0.75rem auto 0
 
   .icon-grid
     display: grid
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr))
-    gap: 0.5em
-    margin-top: 1em
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr))
+    gap: 0.35rem
     width: 100%
 
   .icon-box
     display: flex
     flex-direction: column
     align-items: center
-    padding: 1em
+    justify-content: center
+    min-width: 0
+    min-height: 74px
+    padding: 0.55rem 0.4rem
     border: 1px solid var(--border-main)
     background-color: var(--bg-button)
-    border-radius: 0.2em
+    border-radius: 0.25rem
     cursor: pointer
-    color: var(--text-heading)
-    transition: background-color 0.2s ease
+    color: var(--text-main)
+    transition: border-color 0.1s ease, background-color 0.1s ease
 
     &:hover
       background-color: var(--bg-secondary)
+      border-color: var(--accent-color)
+
+    &:focus-visible
+      border-color: var(--accent-color)
+      outline: 2px solid var(--accent-color)
+      outline-offset: -2px
+
+    &[data-selected="true"]
+      border-color: var(--accent-color)
+      background-color: var(--bg-secondary)
 
     svg
-      margin-bottom: 1em
+      flex: 0 0 auto
+      margin-bottom: 0.4rem
 
-    span
-      font-size: 0.9em
-      text-transform: capitalize
+    .icon-name,
+    .icon-prefix
+      width: 100%
+      overflow: hidden
+      text-overflow: ellipsis
+      white-space: nowrap
+      text-align: center
+
+    .icon-name
+      font-size: 0.72rem
+
+    .icon-prefix
+      margin-top: 0.12rem
+      color: var(--text-secondary)
+      font-size: 0.62rem
+
+@media (max-width: 600px)
+  .Modal.IconPickerModal
+    .icon-grid
+      grid-template-columns: repeat(auto-fill, minmax(76px, 1fr))

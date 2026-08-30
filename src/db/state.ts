@@ -1,5 +1,8 @@
 import { DB, Storage } from "../lib";
 import { defaultLocale } from "../locales";
+import { cache } from "./cache";
+
+export { cache } from "./cache";
 
 /**
  * Database state
@@ -170,9 +173,6 @@ const initData: State = {
 
 // Database storage
 export const db = DB.init<State>(initData);
-
-// Cache storage
-export const cache = DB.init<Record<string, unknown | undefined>>();
 
 // Persist data
 export const dbStorage =

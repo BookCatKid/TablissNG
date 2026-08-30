@@ -1,6 +1,5 @@
 import "./Settings.sass";
 
-import { Icon } from "@iconify/react";
 import { useEffect, useRef, useState } from "react";
 import { type FC, memo, useContext, useMemo } from "react";
 import GitHubButton from "react-github-btn";
@@ -11,6 +10,7 @@ import { exportStore, importStore, resetStore } from "../../db/action";
 import { db } from "../../db/state";
 import { useClipboard, useKeyPress } from "../../hooks";
 import { useTheme } from "../../hooks";
+import { Icon } from "../../icons";
 import { useKey } from "../../lib/db/react";
 import Logo from "../shared/Logo";
 import Background from "./Background";
@@ -231,7 +231,7 @@ const Settings: FC = () => {
               gap: "0.3rem",
             }}
           >
-            <Icon icon="feather:tag" style={{ fontSize: "0.9em" }} />
+            <Icon name="feather:tag" style={{ fontSize: "0.9em" }} />
             TablissNG v{VERSION} {DEV ? "DEV " : ""}
           </span>
         </div>
@@ -291,7 +291,7 @@ const Settings: FC = () => {
               )}
             >
               <Icon
-                icon={copied ? "feather:check" : "feather:copy"}
+                name={copied ? "feather:check" : "feather:copy"}
                 style={{ marginRight: "0.3rem" }}
               />
               {copied ? (
@@ -341,7 +341,7 @@ const Settings: FC = () => {
                         width: "100%",
                       }}
                     >
-                      <Icon icon="feather:code" />{" "}
+                      <Icon name="feather:code" />{" "}
                       <FormattedMessage
                         id="settings.support.contribute"
                         defaultMessage="Contribute to the project!"
@@ -412,7 +412,7 @@ const Settings: FC = () => {
           onClick={scrollToTop}
           title={intl.formatMessage(messages.scrollToTop)}
         >
-          <Icon icon="feather:arrow-up" />
+          <Icon name="feather:arrow-up" />
         </button>
       )}
     </div>

@@ -1,5 +1,6 @@
-import { Icon } from "@iconify/react";
 import type { FC } from "react";
+
+import { Icon } from "../../../../icons";
 
 interface IconifyIconProps {
   iconString: string;
@@ -18,7 +19,7 @@ export const IconifyIcon: FC<IconifyIconProps> = ({
   return (
     <span className="Link-icon">
       <Icon
-        icon={iconString}
+        name={iconString}
         width={width}
         height={height}
         preserveAspectRatio={conserveAspectRatio ? undefined : "none"}

@@ -1,12 +1,12 @@
 import "./AssetPicker.sass";
 
-import { Icon } from "@iconify/react";
 import type { FC } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { db } from "../../../db/state";
 import { useDebounce } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { useValue } from "../../../lib/db/react";
 import { searchCoins } from "./api";
 import {
@@ -161,7 +161,7 @@ const AssetPicker: FC<Props> = ({ side, value, customAsset, onChange }) => {
             {isIconUrl(selected.icon) ? (
               <img src={selected.icon} alt="" />
             ) : (
-              <Icon icon={selected.icon} />
+              <Icon name={selected.icon} />
             )}
           </span>
         )}
@@ -205,7 +205,7 @@ const AssetPicker: FC<Props> = ({ side, value, customAsset, onChange }) => {
                     {isIconUrl(asset.icon) ? (
                       <img src={asset.icon} alt="" />
                     ) : (
-                      <Icon icon={asset.icon} />
+                      <Icon name={asset.icon} />
                     )}
                   </span>
                   <span>{asset.label}</span>

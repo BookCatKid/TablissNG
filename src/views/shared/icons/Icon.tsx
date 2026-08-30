@@ -1,25 +1,27 @@
-import icons from "feather-icons/dist/icons.json";
-import { FC } from "react";
+import { type CSSProperties, FC } from "react";
+
+import { Icon as SvgIcon } from "../../../icons";
 
 type Props = {
   colour?: string;
   name: string;
   size?: number | string;
+  style?: CSSProperties;
 };
 
-const Icon: FC<Props> = ({ colour = "currentColor", name, size = 24 }) => (
+const Icon: FC<Props> = ({
+  colour = "currentColor",
+  name,
+  size = 24,
+  style,
+}) => (
   <i>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
+    <SvgIcon
+      name={name.startsWith("feather:") ? name : `feather:${name}`}
       width={size}
       height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={colour}
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      dangerouslySetInnerHTML={{ __html: icons[name] }}
+      color={colour}
+      style={style}
     />
   </i>
 );

@@ -1,6 +1,5 @@
 import "./BaseBackground.sass";
 
-import { Icon } from "@iconify/react";
 import {
   type CSSProperties,
   type FC,
@@ -12,6 +11,7 @@ import { CrossFade } from "react-crossfade-simple";
 
 import { db } from "../../../db/state";
 import { useIsNight } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { useValue } from "../../../lib/db/react";
 
 interface CreditLink {
@@ -125,13 +125,13 @@ const BaseBackground: FC<Props> = ({
         {showControls && (
           <div className={`controls ${controlsOnHover ? "is-on-hover" : ""}`}>
             <a className={onPrev ? "" : "hidden"} onClick={onPrev ?? undefined}>
-              <Icon icon="feather:arrow-left" />
+              <Icon name="feather:arrow-left" />
             </a>{" "}
             <a onClick={onPause}>
-              <Icon icon={paused ? "feather:play" : "feather:pause"} />
+              <Icon name={paused ? "feather:play" : "feather:pause"} />
             </a>{" "}
             <a className={onNext ? "" : "hidden"} onClick={onNext ?? undefined}>
-              <Icon icon="feather:arrow-right" />
+              <Icon name="feather:arrow-right" />
             </a>
           </div>
         )}

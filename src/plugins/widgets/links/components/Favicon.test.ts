@@ -7,5 +7,7 @@ describe("links/toFaviconProvider()", () => {
     expect(toFaviconProvider("_favicon_favicone")).toBe("favicone");
     expect(toFaviconProvider("_default")).toBeUndefined();
     expect(toFaviconProvider("_future_provider")).toBeUndefined();
+    expect(toFaviconProvider("constructor")).toBeUndefined();
+    expect(toFaviconProvider("toString")).toBeUndefined();
   });
 });

@@ -1,7 +1,22 @@
 import type { FC } from "react";
 
+export type FaviconProvider = "google" | "duckduckgo" | "favicone";
+
+const FAVICON_PROVIDERS: Record<string, FaviconProvider | undefined> = {
+  _favicon_google: "google",
+  _favicon_duckduckgo: "duckduckgo",
+  _favicon_favicone: "favicone",
+};
+
+export const toFaviconProvider = (
+  legacyProvider: string,
+): FaviconProvider | undefined =>
+  Object.hasOwn(FAVICON_PROVIDERS, legacyProvider)
+    ? FAVICON_PROVIDERS[legacyProvider]
+    : undefined;
+
 interface FaviconProps {
-  provider: "google" | "duckduckgo" | "favicone";
+  provider: FaviconProvider;
   domain: string | null;
   width: number;
   height: number;

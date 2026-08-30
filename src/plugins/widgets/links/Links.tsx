@@ -1,10 +1,10 @@
 import "./Links.sass";
 
-import { Icon } from "@iconify/react";
 import { FC, useEffect, useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress, useToggle } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { Display } from "./Display";
 import { cleanupCache, migrateLinks } from "./migrate";
 import { sortLinks } from "./sortLinks";
@@ -118,7 +118,7 @@ const Links: FC<Props> = ({
           onClick={toggleVisible}
           title={intl.formatMessage(messages.showQuickLinks)}
         >
-          <Icon icon="fe:insert-link" />
+          <Icon name="feather:link-2" />
         </a>
       )}
     </div>

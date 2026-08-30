@@ -167,6 +167,125 @@ test.describe("Quick Links extension integration", () => {
     }
   });
 
+  test("keeps a remote Iconify icon after an offline reload", async () => {
+    const session = await launchExtension();
+    const { context, page } = session;
+
+    try {
+      const settings = await addQuickLinks(page);
+      const link = settings.locator(".LinkInput").first();
+      await link.locator("select").first().selectOption("iconify");
+      await link
+        .locator("label", { hasText: "Custom Iconify Icon" })
+        .locator('input[type="text"]')
+        .fill("solar:home-bold");
+      await expect(page.locator(".Links .Link .Link-icon svg")).toBeVisible();
+      await closeSettings(page);
+
+      // Extension settings are intentionally batched for one second. Wait for
+      // the link itself to be durable so this test isolates the icon cache.
+      await page.waitForTimeout(1100);
+
+      const cdp = await context.newCDPSession(page);
+      await cdp.send("Network.enable");
+      await cdp.send("Network.clearBrowserCache");
+      await context.setOffline(true);
+      await page.reload();
+
+      await expect(page.locator(".Links .Link .Link-icon svg")).toBeVisible();
+    } finally {
+      await closeExtension(session);
+    }
+  });
+
+  test("searches every Iconify set from the picker", async () => {
+    const session = await launchExtension();
+    const { context, page } = session;
+
+    try {
+      await context.route("https://api.iconify.design/collections", (route) =>
+        route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            solar: { name: "Solar", total: 1, category: "General" },
+          }),
+        }),
+      );
+      await context.route("https://api.iconify.design/search?*", (route) =>
+        route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            icons: ["solar:home-bold"],
+            total: 1,
+          }),
+        }),
+      );
+      await context.route("https://api.iconify.design/collection?*", (route) =>
+        route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            prefix: "solar",
+            total: 2,
+            uncategorized: ["home-bold"],
+            categories: { Nature: ["moon-bold"] },
+          }),
+        }),
+      );
+      await context.route("https://api.iconify.design/solar.json?*", (route) =>
+        route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify({
+            prefix: "solar",
+            width: 24,
+            height: 24,
+            icons: {
+              "home-bold": {
+                body: '<path d="M3 11 12 3l9 8v10H3Z" fill="currentColor"/>',
+              },
+              "moon-bold": {
+                body: '<path d="M20 16A8 8 0 0 1 8 4a8 8 0 1 0 12 12Z" fill="currentColor"/>',
+              },
+            },
+          }),
+        }),
+      );
+
+      const settings = await addQuickLinks(page);
+      const link = settings.locator(".LinkInput").first();
+      await link.locator("select").first().selectOption("feather");
+      await link.getByRole("button", { name: "Open icon picker" }).click();
+
+      const modal = page.locator(".IconPickerModal");
+      await expect(
+        modal.getByRole("button", { name: "Show more" }),
+      ).toHaveCount(0);
+      await modal.getByLabel("Icon set").selectOption("all");
+      await expect(modal.getByText("Enter a search term")).toBeVisible();
+      await modal.getByPlaceholder("Search all icon sets...").fill("home");
+      await modal.getByRole("button", { name: "home bold, Solar" }).click();
+
+      await expect(modal).toHaveCount(0);
+      await expect(link.locator("select").first()).toHaveValue("iconify");
+      await expect(
+        link
+          .locator("label", { hasText: "Custom Iconify Icon" })
+          .locator('input[type="text"]'),
+      ).toHaveValue("solar:home-bold");
+      await expect(page.locator(".Links .Link .Link-icon svg")).toBeVisible();
+
+      await link.getByRole("button", { name: "Open icon picker" }).click();
+      await modal.getByLabel("Icon set").selectOption("solar");
+      await modal.getByRole("button", { name: "moon bold, Solar" }).click();
+      await expect(
+        link
+          .locator("label", { hasText: "Custom Iconify Icon" })
+          .locator('input[type="text"]'),
+      ).toHaveValue("solar:moon-bold");
+    } finally {
+      await closeExtension(session);
+    }
+  });
+
   test("imports a recursive real bookmark folder", async () => {
     const session = await launchExtension(true);
     const { page } = session;

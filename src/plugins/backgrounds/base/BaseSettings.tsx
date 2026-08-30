@@ -1,7 +1,7 @@
-import { Icon } from "@iconify/react";
 import { type ChangeEvent, type ReactNode } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { Icon } from "../../../icons";
 import { timingMessages } from "../../../locales/messages";
 
 export interface BaseSettingsData {
@@ -45,7 +45,7 @@ const BaseSettings = <T extends BaseSettingsData>({
           </span>
         ) : null}
         <a onClick={() => setData({ ...data, paused: !data.paused })}>
-          <Icon icon={`feather:${data.paused ? "play" : "pause"}`} />
+          <Icon name={`feather:${data.paused ? "play" : "pause"}`} />
         </a>
       </span>
 

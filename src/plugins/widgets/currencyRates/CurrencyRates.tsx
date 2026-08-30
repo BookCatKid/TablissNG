@@ -1,12 +1,12 @@
 import "./CurrencyRates.sass";
 
-import { Icon } from "@iconify/react";
 import type { FC } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { usePushError } from "../../../api";
 import { db } from "../../../db/state";
 import { useCachedEffect } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { useValue } from "../../../lib/db/react";
 import { getExpiry, getRates, rateKey } from "./api";
 import { isIconUrl, resolveAsset } from "./assets";
@@ -29,7 +29,7 @@ const AssetIcon: FC<{ icon: string }> = ({ icon }) =>
   isIconUrl(icon) ? (
     <img className="currency-rate-icon" src={icon} alt="" />
   ) : (
-    <Icon className="currency-rate-icon" icon={icon} />
+    <Icon className="currency-rate-icon" name={icon} />
   );
 
 const CurrencyRates: FC<Props> = ({

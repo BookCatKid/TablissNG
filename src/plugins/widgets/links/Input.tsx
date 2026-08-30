@@ -1,10 +1,10 @@
 import "./Input.sass";
 
-import { Icon } from "@iconify/react";
 import type { ChangeEvent } from "react";
 import { FC, useEffect, useRef, useState } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
+import { Icon } from "../../../icons";
 import { normalizeUrl } from "../../../utils";
 import {
   DownIcon,
@@ -193,9 +193,10 @@ const Input: FC<Props> = ({
   };
 
   const handleIconSelect = (iconString: string) => {
-    if (iconConfig?.type === "feather") {
-      setIconConfig({ ...iconConfig, value: iconString });
-    }
+    setIconConfig({
+      type: iconString.startsWith("feather:") ? "feather" : "iconify",
+      value: iconString,
+    });
     setIsModalOpen(false);
   };
 
@@ -254,6 +255,18 @@ const Input: FC<Props> = ({
               />{" "}
               <DocsLink />.
             </p>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="button button--primary"
+              style={{ width: "100%" }}
+              type="button"
+            >
+              <FormattedMessage
+                id="plugins.links.input.openIconPicker"
+                defaultMessage="Open icon picker"
+                description="Button text to open the icon picker dialog"
+              />
+            </button>
           </label>
         );
 
@@ -379,7 +392,7 @@ const Input: FC<Props> = ({
             {featherValue && (
               <div className="selected-icon">
                 <div className="selected-icon-preview">
-                  <Icon icon={featherValue} />
+                  <Icon name={featherValue} />
                 </div>
                 <div className="selected-icon-name">
                   {(featherValue.includes(":")
@@ -635,6 +648,9 @@ const Input: FC<Props> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleIconSelect}
+        selectedIcon={
+          iconConfig && "value" in iconConfig ? iconConfig.value : undefined
+        }
       />
     </div>
   );

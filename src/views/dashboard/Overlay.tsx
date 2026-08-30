@@ -1,6 +1,5 @@
 import "./Overlay.sass";
 
-import { Icon } from "@iconify/react";
 import { type FC, useContext } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
@@ -9,6 +8,7 @@ import { UiContext } from "../../contexts/ui";
 import { toggleFocus } from "../../db/action";
 import { db } from "../../db/state";
 import { useFullscreen, useKeyPress } from "../../hooks";
+import { Icon } from "../../icons";
 import { useKey, useValue } from "../../lib/db/react";
 
 const messages = defineMessages({
@@ -66,7 +66,7 @@ const Overlay: FC = () => {
       onClick={toggleSettings}
       title={`${intl.formatMessage(messages.settingsHint)} (S)`}
     >
-      <Icon icon="feather:settings" />
+      <Icon name="feather:settings" />
     </button>
   );
 
@@ -76,13 +76,13 @@ const Overlay: FC = () => {
       onClick={toggleErrors}
       title={intl.formatMessage(messages.errorHint)}
     >
-      <Icon icon="feather:alert-triangle" />
+      <Icon name="feather:alert-triangle" />
     </button>
   );
 
   const loadingBtn = pending > 0 && (
     <span title={intl.formatMessage(messages.loadingHint)}>
-      <Icon icon="feather:zap" />
+      <Icon name="feather:zap" />
     </span>
   );
 
@@ -93,7 +93,7 @@ const Overlay: FC = () => {
       onClick={toggleFocus}
       title={`${intl.formatMessage(messages.focusHint)} (W)`}
     >
-      <Icon icon={`feather:${focus ? "eye-off" : "eye"}`} />
+      <Icon name={`feather:${focus ? "eye-off" : "eye"}`} />
     </button>
   );
 
@@ -104,7 +104,7 @@ const Overlay: FC = () => {
       onClick={handleToggleFullscreen}
       title={`${intl.formatMessage(messages.fullscreenHint)} (F)`}
     >
-      <Icon icon={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`} />
+      <Icon name={`feather:${isFullscreen ? "minimize-2" : "maximize-2"}`} />
     </button>
   );
 
