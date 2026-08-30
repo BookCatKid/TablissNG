@@ -157,6 +157,7 @@ function extractMessages() {
 }
 
 module.exports = {
+  rootDir,
   localesDir,
   extractedMessagesPath,
   readJson,
@@ -170,4 +171,5 @@ module.exports = {
   logInfo,
   validateMessageObject,
   sortKeys,
+  runFormatjs,
 };

@@ -82,3 +82,9 @@ Example:
 If `widgets` is in `whitelist_fr.json`, French keeps the English word "widgets".
 
 Production builds automatically run `pnpm run translations compile` and load compiled locale artifacts.
+
+## Experimental Crowdin Pilot
+
+The `codex/crowdin-pilot` branch contains a two-language Crowdin experiment.
+It preserves this local workflow and uses Crowdin only as an editing layer. See
+`docs/crowdin-pilot.md` for its isolation, commands, and setup instructions.

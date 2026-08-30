@@ -4,6 +4,7 @@ const { runCreate } = require("./commands/create");
 const { runMigrate, parseMigrateArgs } = require("./commands/migrate");
 const { runPurge, parsePurgeArgs } = require("./commands/purge");
 const { runCompile } = require("./commands/compile");
+const { runCrowdin, parseCrowdinArgs } = require("./commands/crowdin");
 
 function parseGlobalOptions(argv) {
   const options = { dryRun: false, quiet: false, check: false };
@@ -49,6 +50,9 @@ Commands:
 					Migrate renamed IDs in language/whitelist files.
 					Mapping format: --map old.id=new.id (repeatable)
 	purge <key>         Purge a change key from all files so that it can be regenerated correctly.
+	crowdin extract     Generate the ignored Crowdin source catalog
+	crowdin seed <lang> [lang...]  Generate filtered catalogs for initial import
+	crowdin import [lang] [lang...]  Merge downloaded Crowdin translations into locale files
 Examples:
 		node scripts/translations/translations.js              # sync all languages
 		node scripts/translations/translations.js --dry-run    # preview all changes
@@ -110,6 +114,9 @@ switch (command) {
       const { keyToPurge } = parsePurgeArgs(commandArgs);
       runPurge(keyToPurge, context);
     }
+    break;
+  case "crowdin":
+    runCrowdin(parseCrowdinArgs(commandArgs), context);
     break;
   case "help":
   case "--help":

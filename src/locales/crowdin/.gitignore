@@ -1,0 +1,4 @@
+# Crowdin exchange files are generated locally or in CI. The application keeps
+# using the reviewed flat catalogs in ../lang.
+*.json
+

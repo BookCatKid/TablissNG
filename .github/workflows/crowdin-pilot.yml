@@ -1,0 +1,77 @@
+name: Crowdin Pilot
+
+on:
+  workflow_dispatch:
+    inputs:
+      upload_existing_translations:
+        description: "Seed Crowdin with the existing French and Turkish translations"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  synchronize:
+    name: Synchronize pilot translations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: codex/crowdin-pilot
+
+      - uses: pnpm/action-setup@f520eceda224fe1a4aed5a2a27a194379a409996 # v6
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate Crowdin exchange catalogs
+        run: |
+          pnpm run translations crowdin extract
+          pnpm run translations crowdin seed fr tr
+
+      - name: Upload sources and download pilot translations
+        uses: crowdin/github-action@e4a6c1338b4063c77d46a81875265f9e8bd76f95 # v3
+        with:
+          skip_ref_checkout: true
+          upload_sources: true
+          upload_translations: ${{ inputs.upload_existing_translations }}
+          import_eq_suggestions: true
+          auto_approve_imported: false
+          download_translations: true
+          skip_untranslated_strings: true
+          push_translations: false
+          create_pull_request: false
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Import downloaded translations
+        run: pnpm run translations crowdin import fr tr
+
+      - name: Verify the translated application
+        run: pnpm test
+
+      - name: Open a pilot translation pull request
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        with:
+          branch: crowdin/pilot-translations
+          base: codex/crowdin-pilot
+          delete-branch: true
+          commit-message: "translation: import Crowdin pilot updates"
+          title: "translation: Crowdin pilot updates"
+          body: |
+            Experimental French and Turkish updates imported from Crowdin.
+
+            The existing translation pipeline normalized and structurally
+            validated these files before this pull request was created.
+          labels: translation
+          add-paths: |
+            src/locales/lang/fr.json
+            src/locales/lang/tr.json
