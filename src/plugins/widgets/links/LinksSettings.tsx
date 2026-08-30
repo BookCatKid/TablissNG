@@ -136,8 +136,10 @@ const LinksSettings: FC<Props> = ({
       <label>
         <input
           type="checkbox"
-          checked={data.centerLinks}
-          onChange={() => setData({ ...data, centerLinks: !data.centerLinks })}
+          checked={data.centerLinks ?? false}
+          onChange={() =>
+            setData({ ...data, centerLinks: !(data.centerLinks ?? false) })
+          }
         />
         <FormattedMessage
           id="plugins.links.centerLinks"

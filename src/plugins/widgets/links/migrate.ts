@@ -56,6 +56,15 @@ const getMigratedIconConfig = (
   }
 
   if (
+    legacyIcon.includes(":") &&
+    !legacyIcon.startsWith("_") &&
+    !iconifyValue
+  ) {
+    iconifyValue = legacyIcon;
+    legacyIcon = "_custom_iconify";
+  }
+
+  if (
     legacyIcon &&
     !legacyIcon.includes(":") &&
     !legacyIcon.startsWith("_") &&
@@ -224,17 +233,19 @@ export function migrateLinks(
         newCache = migratedIcon.cache;
       }
 
-      updatedLink.iconConfig = migratedIcon.iconConfig;
-      delete updatedLink.icon;
-      delete updatedLink.iconifyValue;
-      delete updatedLink.imageUrl;
-      delete updatedLink.iconCacheKey;
-      delete updatedLink.iconSize;
-      delete updatedLink.IconString;
-      delete updatedLink.SvgString;
-      delete updatedLink.IconStringIco;
-      delete updatedLink.iconifyIdentifier;
-      linkModified = true;
+      if (migratedIcon.iconConfig) {
+        updatedLink.iconConfig = migratedIcon.iconConfig;
+        delete updatedLink.icon;
+        delete updatedLink.iconifyValue;
+        delete updatedLink.imageUrl;
+        delete updatedLink.iconCacheKey;
+        delete updatedLink.iconSize;
+        delete updatedLink.IconString;
+        delete updatedLink.SvgString;
+        delete updatedLink.IconStringIco;
+        delete updatedLink.iconifyIdentifier;
+        linkModified = true;
+      }
     }
 
     if (linkModified) {

@@ -2,7 +2,7 @@ import "./Input.sass";
 
 import { Icon } from "@iconify/react";
 import type { ChangeEvent } from "react";
-import { FC, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { normalizeUrl } from "../../../utils";
@@ -20,31 +20,38 @@ const messages = defineMessages({
   removeLink: {
     id: "plugins.links.input.removeLink",
     defaultMessage: "Remove link",
+    description: "Button title to remove a link from the list",
   },
   moveDown: {
     id: "plugins.links.input.moveDown",
     defaultMessage: "Move link down",
+    description: "Button title to move a link down in the list",
   },
   moveUp: {
     id: "plugins.links.input.moveUp",
     defaultMessage: "Move link up",
+    description: "Button title to move a link up in the list",
   },
   websiteIcons: {
     id: "plugins.links.input.websiteIcons",
     defaultMessage: "Website Icons",
+    description: "Group label for website favicon options",
   },
   custom: {
     id: "plugins.links.input.custom",
     defaultMessage: "Custom",
+    description: "Group label for custom icon options",
   },
   iconifyIcons: {
     id: "plugins.links.input.iconifyIcons",
     defaultMessage: "Iconify Icons",
+    description: "Group label for Iconify icon options",
   },
   useExtensionTabsHelp: {
     id: "plugins.links.input.useExtensionTabsHelp",
     defaultMessage:
       "When enabled, links open through the browser extension API instead of the default browser behavior. Useful for restricted URLs like file://, about:, or browser settings. Some URLs will always open through the extension API regardless of this setting.",
+    description: "Help tooltip explaining the extension tabs toggle",
   },
 });
 
@@ -117,6 +124,7 @@ const DocsLink: FC = () => (
     <FormattedMessage
       id="plugins.links.input.docsPage"
       defaultMessage="the documentation"
+      description="Link text pointing to the Quick Links documentation"
     />
   </a>
 );
@@ -141,9 +149,30 @@ const Input: FC<Props> = ({
   const [urlValue, setUrlValue] = useState(url);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [svgDraft, setSvgDraft] = useState<string | null>(null);
+  const pendingUploadRef = useRef<{
+    cacheKey: string;
+    iconData: IconCacheItem;
+  } | null>(null);
   const intl = useIntl();
 
   const iconSelectValue = getIconSelectValue(iconConfig);
+
+  useEffect(() => {
+    const pendingUpload = pendingUploadRef.current;
+    if (
+      !pendingUpload ||
+      iconConfig?.type !== "custom_upload" ||
+      iconConfig.cacheKey !== pendingUpload.cacheKey
+    ) {
+      return;
+    }
+
+    setCache({
+      ...(cache || {}),
+      [pendingUpload.cacheKey]: pendingUpload.iconData,
+    });
+    pendingUploadRef.current = null;
+  }, [cache, iconConfig, setCache]);
 
   const setIconConfig = (newConfig?: IconConfig) => {
     const oldConfig = iconConfig;
@@ -154,6 +183,10 @@ const Input: FC<Props> = ({
 
     if (oldKey && cache?.[oldKey] && oldConfig?.type !== newConfig?.type) {
       setCache(removeCacheKey(cache, oldKey));
+    }
+
+    if (oldConfig?.type !== newConfig?.type) {
+      setSvgDraft(null);
     }
 
     onChange({ iconConfig: newConfig });
@@ -183,14 +216,8 @@ const Input: FC<Props> = ({
           iconData = { data: result, type: "image" };
         }
 
-        const oldKey =
-          iconConfig?.type === "custom_svg" ||
-          iconConfig?.type === "custom_upload"
-            ? iconConfig.cacheKey
-            : undefined;
         const cacheKey = `icon_${Date.now()}`;
-        const baseCache = oldKey ? removeCacheKey(cache, oldKey) : cache;
-        setCache({ ...baseCache, [cacheKey]: iconData });
+        pendingUploadRef.current = { cacheKey, iconData };
         setIconConfig({ type: "custom_upload", cacheKey });
       }
     };
@@ -210,6 +237,7 @@ const Input: FC<Props> = ({
             <FormattedMessage
               id="plugins.links.input.customIconifyIdentifier"
               defaultMessage="Custom Iconify Icon"
+              description="Label for setting a custom Iconify identifier"
             />
             <input
               type="text"
@@ -221,8 +249,9 @@ const Input: FC<Props> = ({
             <p>
               <FormattedMessage
                 id="plugins.links.input.iconifyHelp"
-                defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see "
-              />
+                defaultMessage="Enter the iconify identifier for the icon you want to use in your links. For more detailed info see"
+                description="Help text for the Iconify identifier input"
+              />{" "}
               <DocsLink />.
             </p>
           </label>
@@ -239,6 +268,7 @@ const Input: FC<Props> = ({
             <FormattedMessage
               id="plugins.links.input.customSvgHtmlLabel"
               defaultMessage="Custom SVG HTML"
+              description="Label for the custom SVG HTML input area"
             />
             <textarea
               value={displayValue}
@@ -262,14 +292,16 @@ const Input: FC<Props> = ({
                 <FormattedMessage
                   id="plugins.links.input.applySvg"
                   defaultMessage="Apply"
+                  description="Button text to apply custom SVG changes"
                 />
               </button>
             )}
             <p>
               <FormattedMessage
                 id="plugins.links.input.customSvgHelp"
-                defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see "
-              />
+                defaultMessage="Enter your custom SVG HTML code above to use an icon in your links. For more detailed info see"
+                description="Help text for the custom SVG input area"
+              />{" "}
               <DocsLink />.
             </p>
           </label>
@@ -282,6 +314,7 @@ const Input: FC<Props> = ({
             <FormattedMessage
               id="plugins.links.input.customImageUrlLabel"
               defaultMessage="Custom Image URL"
+              description="Label for the custom image URL input"
             />
             <input
               type="text"
@@ -294,6 +327,7 @@ const Input: FC<Props> = ({
               <FormattedMessage
                 id="plugins.links.input.customImageUrlHelp"
                 defaultMessage="Enter a url on the internet for an image file"
+                description="Help text for the custom image URL input"
               />
             </p>
           </label>
@@ -306,6 +340,7 @@ const Input: FC<Props> = ({
               <FormattedMessage
                 id="plugins.links.input.uploadIcon"
                 defaultMessage="Upload Icon"
+                description="Label for the icon file input"
               />
               <input
                 type="file"
@@ -330,11 +365,13 @@ const Input: FC<Props> = ({
                 <FormattedMessage
                   id="plugins.links.input.openIconPicker"
                   defaultMessage="Open icon picker"
+                  description="Button text to open the icon picker dialog"
                 />
               ) : (
                 <FormattedMessage
                   id="plugins.links.input.chooseIcon"
                   defaultMessage="Choose an Icon"
+                  description="Button text asking the user to choose an icon"
                 />
               )}
             </button>
@@ -393,18 +430,24 @@ const Input: FC<Props> = ({
           <FormattedMessage
             id="plugins.links.input.keyboardShortcut"
             defaultMessage="Keyboard shortcut {number}"
+            description="Keyboard shortcut identifier for this link"
             values={{ number }}
           />
         ) : (
           <FormattedMessage
             id="plugins.links.input.shortcut"
             defaultMessage="Shortcut"
+            description="Shortcut heading for links beyond number nine"
           />
         )}
       </h5>
 
       <label>
-        <FormattedMessage id="plugins.links.input.url" defaultMessage="URL" />
+        <FormattedMessage
+          id="plugins.links.input.url"
+          defaultMessage="URL"
+          description="Label for the URL input field"
+        />
         <input
           type="url"
           value={urlValue}
@@ -418,12 +461,17 @@ const Input: FC<Props> = ({
       </label>
 
       <label>
-        <FormattedMessage id="plugins.links.input.name" defaultMessage="Name" />{" "}
+        <FormattedMessage
+          id="plugins.links.input.name"
+          defaultMessage="Name"
+          description="Label for the link name input"
+        />{" "}
         <span className="text--grey">
           (
           <FormattedMessage
             id="plugins.links.input.optional"
             defaultMessage="optional"
+            description="Label indicating an input is optional"
           />
           )
         </span>
@@ -435,12 +483,17 @@ const Input: FC<Props> = ({
       </label>
 
       <label>
-        <FormattedMessage id="plugins.links.input.icon" defaultMessage="Icon" />{" "}
+        <FormattedMessage
+          id="plugins.links.input.icon"
+          defaultMessage="Icon"
+          description="Label for the icon selector"
+        />{" "}
         <span className="text--grey">
           (
           <FormattedMessage
             id="plugins.links.input.optional"
             defaultMessage="optional"
+            description="Label indicating an input is optional"
           />
           )
         </span>
@@ -456,6 +509,7 @@ const Input: FC<Props> = ({
             <FormattedMessage
               id="plugins.links.input.none"
               defaultMessage="None"
+              description="Dropdown option to select no icon"
             />
           </option>
           <optgroup label={intl.formatMessage(messages.websiteIcons)}>
@@ -463,18 +517,21 @@ const Input: FC<Props> = ({
               <FormattedMessage
                 id="plugins.links.input.fromGoogle"
                 defaultMessage="From Google"
+                description="Dropdown option to fetch a favicon from Google"
               />
             </option>
             <option value="favicon_duckduckgo">
               <FormattedMessage
                 id="plugins.links.input.fromDuckDuckGo"
                 defaultMessage="From DuckDuckGo"
+                description="Dropdown option to fetch a favicon from DuckDuckGo"
               />
             </option>
             <option value="favicon_favicone">
               <FormattedMessage
                 id="plugins.links.input.fromFavicone"
                 defaultMessage="From Favicone"
+                description="Dropdown option to fetch a favicon from Favicone"
               />
             </option>
           </optgroup>
@@ -483,24 +540,28 @@ const Input: FC<Props> = ({
               <FormattedMessage
                 id="plugins.links.input.fromIconify"
                 defaultMessage="From Iconify"
+                description="Dropdown option to use an Iconify icon"
               />
             </option>
             <option value="custom_svg">
               <FormattedMessage
                 id="plugins.links.input.customSvgHtml"
                 defaultMessage="Custom SVG HTML"
+                description="Dropdown option to use custom SVG HTML"
               />
             </option>
             <option value="custom_image_url">
               <FormattedMessage
                 id="plugins.links.input.customImageUrl"
                 defaultMessage="Custom Image URL"
+                description="Dropdown option to use a custom image URL"
               />
             </option>
             <option value="custom_upload">
               <FormattedMessage
                 id="plugins.links.input.uploadCustomIcon"
                 defaultMessage="Upload Custom Icon"
+                description="Dropdown option to upload a custom icon"
               />
             </option>
           </optgroup>
@@ -509,6 +570,7 @@ const Input: FC<Props> = ({
               <FormattedMessage
                 id="plugins.links.input.feather"
                 defaultMessage="Feather"
+                description="Dropdown option to select a Feather icon"
               />
             </option>
           </optgroup>
@@ -536,6 +598,7 @@ const Input: FC<Props> = ({
         <FormattedMessage
           id="plugins.links.input.keyboardShortcut"
           defaultMessage="Keyboard shortcut {number}"
+          description="Keyboard shortcut identifier for this link"
           values={{ number }}
         />
         <input
@@ -561,6 +624,7 @@ const Input: FC<Props> = ({
           <FormattedMessage
             id="plugins.links.input.useExtensionTabs"
             defaultMessage="Use browser extension API to open link"
+            description="Toggle label to open links through the extension API"
           />
         </label>
       )}

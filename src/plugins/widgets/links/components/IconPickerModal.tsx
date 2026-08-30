@@ -41,11 +41,13 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
   };
 
   // Filter icons based on search query
+  const normalizedQuery = searchQuery.toLowerCase();
+  const dashedQuery = normalizedQuery.replace(/\s/g, "-");
   const filteredIcons = iconList.filter((icon) => {
-    const searchQueryNoSpaces = searchQuery.replace(/\s/g, "-");
+    const normalizedIcon = icon.toLowerCase();
     return (
-      icon.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      icon.toLowerCase().includes(searchQueryNoSpaces)
+      normalizedIcon.includes(normalizedQuery) ||
+      normalizedIcon.includes(dashedQuery)
     );
   });
 

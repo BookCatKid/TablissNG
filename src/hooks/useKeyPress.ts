@@ -1,11 +1,13 @@
 import { useEffect } from "react";
 
 function isInputEvent(event: KeyboardEvent) {
-  return (
-    event.target instanceof HTMLInputElement ||
-    event.target instanceof HTMLTextAreaElement ||
-    (event.target instanceof HTMLSpanElement &&
-      Boolean(event.target.contentEditable))
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return false;
+
+  return Boolean(
+    target.closest("input, textarea, select, button") ||
+    target.isContentEditable ||
+    target.closest('[contenteditable]:not([contenteditable="false"])'),
   );
 }
 

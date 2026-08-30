@@ -21,7 +21,7 @@ const Modal: FC<Props> = ({ children, footer, onClose, className, center }) => {
         onClick={(event) => event.stopPropagation()}
       >
         <div className="Modal-content">{children}</div>
-        {footer && <div className="Modal-footer">{footer}</div>}
+        {footer != null && <div className="Modal-footer">{footer}</div>}
       </div>
     </div>
   );

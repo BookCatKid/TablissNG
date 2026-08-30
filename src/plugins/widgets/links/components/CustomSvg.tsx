@@ -9,6 +9,36 @@ interface CustomSvgProps {
   className?: string;
 }
 
+const blockedElements = new Set(["foreignobject", "script"]);
+
+const sanitizeAttributes = (element: Element): void => {
+  for (const attribute of Array.from(element.attributes)) {
+    const name = attribute.name.toLowerCase();
+    const value = attribute.value.trim();
+
+    if (
+      name.startsWith("on") ||
+      /(?:javascript:|data\s*:\s*text\/html)/i.test(value)
+    ) {
+      element.removeAttribute(attribute.name);
+    }
+  }
+};
+
+const sanitizeSvg = (svg: SVGElement): void => {
+  sanitizeAttributes(svg);
+
+  for (const element of Array.from(svg.querySelectorAll("*"))) {
+    const name = element.localName.toLowerCase();
+    if (blockedElements.has(name)) {
+      element.remove();
+      continue;
+    }
+
+    sanitizeAttributes(element);
+  }
+};
+
 const parseSvg = (
   svgString: string,
   width: number,
@@ -22,6 +52,8 @@ const parseSvg = (
     if (parseError) return null;
     const svg = doc.querySelector("svg");
     if (!svg) return null;
+
+    sanitizeSvg(svg);
 
     svg.setAttribute("width", `${width}`);
     if (!conserveAspectRatio) {
