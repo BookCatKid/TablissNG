@@ -33,17 +33,28 @@ jobs:
       - name: Generate Crowdin exchange catalogs
         run: pnpm run translations crowdin extract
 
-      - name: Upload sources and download approved translations
-        uses: crowdin/github-action@e4a6c1338b4063c77d46a81875265f9e8bd76f95 # v3
-        with:
-          skip_ref_checkout: true
-          upload_sources: true
-          upload_translations: false
-          download_translations: true
-          skip_untranslated_strings: true
-          export_only_approved: true
-          push_translations: false
-          create_pull_request: false
+      - name: Upload source messages
+        run: pnpm dlx @crowdin/cli@5.0.0 upload sources --no-progress --no-colors
+        env:
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}
+
+      - name: Download each approved target locale
+        run: |
+          languages=$(
+            pnpm dlx @crowdin/cli@5.0.0 language list \
+              --code id --no-colors --output json | jq -r '.[].code'
+          )
+
+          while IFS= read -r language; do
+            [[ -z "$language" ]] && continue
+            pnpm dlx @crowdin/cli@5.0.0 download translations \
+              --language "$language" \
+              --export-only-approved \
+              --skip-untranslated-strings \
+              --no-progress \
+              --no-colors
+          done <<< "$languages"
         env:
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
           CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_PERSONAL_TOKEN }}

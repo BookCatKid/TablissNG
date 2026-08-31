@@ -59,13 +59,14 @@ values stay English, and FormatJS verifies ICU structure before writing.
 5. For local testing, export `CROWDIN_PROJECT_ID` and
    `CROWDIN_PERSONAL_TOKEN`; never add either value to `crowdin.yml`.
 6. Generate the source and seeds, then use Crowdin CLI to upload them once:
-   `pnpm dlx @crowdin/cli upload sources` followed by
-   `pnpm dlx @crowdin/cli upload translations --auto-approve-imported
---import-eq-suggestions`. This grandfathers repository translations as the
-   approved baseline.
-7. Download with `pnpm dlx @crowdin/cli download translations
---skip-untranslated-strings --export-only-approved`, then run the import command and inspect the
-   resulting locale diff.
+   `pnpm dlx @crowdin/cli@5.0.0 upload sources` followed by
+   `pnpm dlx @crowdin/cli@5.0.0 upload translations --auto-approve-imported --import-eq-suggestions`.
+   This grandfathers repository translations as the approved baseline.
+7. Download each target separately with
+   `pnpm dlx @crowdin/cli@5.0.0 download translations --language <crowdin-language-id> --skip-untranslated-strings --export-only-approved`,
+   then run the import command and inspect the resulting locale diff.
+   Per-language builds prevent regional families from colliding inside a
+   multi-language Crowdin archive.
 
 New community translations remain unapproved until a Crowdin proofreader
 approves them. The recurring workflow never uploads target catalogs, so later

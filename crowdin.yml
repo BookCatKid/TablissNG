@@ -5,20 +5,46 @@ preserve_hierarchy: true
 
 files:
   - source: /src/locales/crowdin/en.json
-    translation: /src/locales/crowdin/%two_letters_code%.json
+    translation: /src/locales/crowdin/%locale%.json
     skip_untranslated_strings: true
     languages_mapping:
-      two_letters_code:
+      locale:
+        ar: ar
+        be: be
         ca: ca-ES
-        en-AU: en-AU
-        en-CA: en-CA
-        en-GB: en-GB
+        cs: cs
+        de: de
+        el: el
         es-ES: es
+        fa: fa
+        fi: fi
+        fr: fr
         ga-IE: ga
+        gd: gd
+        gl: gl
         gu-IN: gu
+        he: he
+        hi: hi
+        hu: hu
+        id: id
+        it: it
+        ja: ja
+        ko: ko
+        lb: lb
+        lt: lt
         ne-NP: ne
-        pt-BR: pt-BR
+        nl: nl
+        no: no
+        pl: pl
         pt-PT: pt
+        ro: ro
+        ru: ru
+        sk: sk
+        sq: sq
+        sr: sr
         sv-SE: sv
-        zh-CN: zh-CN
-        zh-TW: zh-TW
+        ta: ta
+        th: th
+        tr: tr
+        uk: uk
+        vi: vi
