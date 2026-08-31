@@ -1,91 +1,158 @@
-# Translation Guide
+# Translating TablissNG
 
-This guide covers how to add a new language, update existing translations, and migrate renamed translation keys.
+Translations are contributed through two supported workflows:
 
-## Quick Start
+1. **Crowdin** is the main translation platform for all languages it supports.
+2. **Direct repository changes** are used for Toki Pona and Korean (North
+   Korea), which are not available as Crowdin target languages.
 
-1. Install dependencies:
-   `pnpm install`
-2. Sync extracted messages into locale files:
-   `pnpm run translations`
-3. Edit your language file in `src/locales/lang`.
-4. Verify status:
-   `pnpm run translations status <lang>`
-5. Run app locally to test:
-   `pnpm run dev`
+## Translate with Crowdin
 
-## Where Files Live
+Most translators do not need to clone the repository or install development
+tools.
 
-- Locale files: `src/locales/lang/<lang>.json`
-- Compiled locale files (build artifact): `src/locales/lang.compiled/<lang>.json`
-- Whitelist files: `src/locales/lang/whitelist_<lang>.json`
-- Locale registry (single source of truth): `src/locales/registry.ts`
+1. Open the **[TablissNG project on Crowdin](https://crowdin.com/project/tablissng)**.
+2. Sign in or create a free Crowdin account.
+3. Select the language you want to translate.
+4. Choose a file and translate its unfinished strings, or improve an existing
+   translation.
+5. Submit your translations for review.
 
-## Commands
+New and edited translations stay in Crowdin until they are approved. The
+translation automation downloads approved work, validates it against the
+English messages, and opens or updates a translation pull request. A project
+maintainer then reviews and merges that pull request into TablissNG.
 
-- Sync/extract all messages:
-  `pnpm run translations`
-- Show status for all locales:
-  `pnpm run translations status`
-- Show status for one locale:
-  `pnpm run translations status fr`
-- Compile stripped/minified locale artifacts for production:
-  `pnpm run translations compile`
-- Create a new locale file:
-  `pnpm run translations create de-AT`
-- Migrate renamed keys (all locales):
-  `pnpm run translations migrate --map old.id=new.id`
-- Migrate renamed keys (one locale):
-  `pnpm run translations migrate es --map old.id=new.id`
+### Translation rules
 
-You can pass multiple migration mappings in one command:
+- Translate the text a person will read, but preserve variable names and ICU
+  syntax exactly.
+- Do not translate placeholders such as `{name}`, `{count}`, `{date}`, or
+  `{key}`.
+- In ICU messages, do not translate control words such as `select`, `plural`,
+  or `other`, and do not change selector keys such as `0`, `1`, or `23`.
+- Preserve markup-like placeholders such as `[count]` and `[year]` when they
+  appear in the source message.
+- Read the description and surrounding strings in Crowdin before translating;
+  the same English word can require different translations in different UI
+  contexts.
+- Leave product names, technical terms, and intentionally English strings
+  unchanged when the project marks them that way.
+- Prefer natural wording over a literal word-for-word translation.
 
-`pnpm run translations migrate --map old.one=new.one --map old.two=new.two`
+For example, translate only the visible words in this message:
 
-## Adding a New Language
+```text
+Hello, {name}! You have {count, number} items.
+```
 
-1. Create locale file from extracted defaults:
-   `pnpm run translations create <lang>`
-2. Add locale metadata in `src/locales/registry.ts`.
-3. Ensure locale aliases are correct in `src/locales/registry.ts` if needed (example: `zh` -> `zh-CN`).
-4. Translate values in `src/locales/lang/<lang>.json`.
-5. Run `pnpm run translations` to normalize and sort keys.
-6. Check progress with `pnpm run translations status <lang>`.
+Both `{name}` and `{count, number}` must remain structurally unchanged.
 
-## Updating Existing Translations
+## Translate Toki Pona or Korean (North Korea)
 
-1. Run `pnpm run translations`.
-2. Edit target locale files in `src/locales/lang`.
-3. Re-run `pnpm run translations`.
-4. Verify with `pnpm run translations status <lang>`.
+Crowdin does not currently offer Toki Pona (`tok`) or Korean (North Korea)
+(`ko-KP`) as project target languages. Changes for these two languages are
+accepted directly through GitHub.
 
-## Migrating Renamed Keys
+1. Fork and clone the repository.
+2. Install dependencies with `pnpm install`.
+3. Edit the appropriate catalog:
+   - Toki Pona: `src/locales/lang/tok.json`
+   - North Korean Korean: `src/locales/lang/ko-KP.json`
+4. Run `pnpm run translations` to add new source strings, remove obsolete
+   strings, normalize the catalog, and preserve its key ordering.
+5. Check the language's progress:
+   - `pnpm run translations status tok`
+   - `pnpm run translations status ko-KP`
+6. Run `pnpm test`.
+7. Open a pull request containing the locale-file change.
 
-When IDs are renamed in code, preserve existing translated values with the migrate command.
+The placeholder and ICU rules from the Crowdin section also apply to direct
+catalog edits. Do not edit English source text or invent new translation IDs in
+a locale file.
 
-Example:
+## Request a new language
 
-`pnpm run translations migrate --map plugins.github.month.jan=time.month.short.jan`
+[Open a GitHub issue](https://github.com/BookCatKid/TablissNG/issues/new) if the
+language is not already listed in TablissNG. Include the language's English
+name, native name, and locale code.
 
-Then run:
+If Crowdin supports the language, maintainers will add it to the Crowdin
+project. If Crowdin does not support it, maintainers may establish another
+direct repository catalog like `tok` and `ko-KP`.
 
-`pnpm run translations`
+## Maintainer and developer reference
 
-This updates locale files to the new IDs and keeps extracted files in sync.
+Application source messages remain authoritative in the TypeScript and TSX
+files. Crowdin provides translation editing and approval; it does not replace
+the repository's locale registry, validation, or build pipeline.
 
-## Whitelist Files
+### Translation files
 
-Whitelist files (`whitelist_<lang>.json`) define keys that should remain in English for that locale.
+- `src/locales/lang/<locale>.json`: reviewed application catalogs
+- `src/locales/lang/whitelist_<locale>.json`: strings intentionally kept in
+  English
+- `src/locales/registry.ts`: supported locales, labels, and aliases
+- `src/locales/lang.compiled/<locale>.json`: generated production catalogs
+- `src/locales/crowdin`: ignored exchange catalogs generated for Crowdin
 
-Example:
+### Common commands
 
-If `widgets` is in `whitelist_fr.json`, French keeps the English word "widgets".
+- `pnpm run translations`: extract source messages and synchronize every locale
+- `pnpm run translations status`: show progress for every locale
+- `pnpm run translations status <locale>`: show untranslated strings for one
+  locale
+- `pnpm run translations compile`: generate production catalogs
+- `pnpm run translations create <locale>`: create a repository catalog
+- `pnpm run translations crowdin extract`: generate the Crowdin source catalog
+- `pnpm run translations crowdin seed [locale...]`: generate existing
+  translation catalogs for an initial maintainer-controlled Crowdin import
+- `pnpm run translations crowdin import [locale...]`: validate downloaded
+  Crowdin catalogs and merge them into repository catalogs
 
-Production builds automatically run `pnpm run translations compile` and load compiled locale artifacts.
+Routine community translation updates should flow through Crowdin and the
+approved-translation automation. The `seed` command is only for establishing
+existing repository translations as a new Crowdin language's initial baseline;
+it must not be used to bypass review of contributor changes.
 
-## Crowdin Translation Workflow
+### Add a language
 
-Translate TablissNG through the
-[TablissNG project on Crowdin](https://crowdin.com/project/tablissng). New and
-updated translations are reviewed in Crowdin, and automation imports approved
-changes into the repository as a pull request.
+1. Run `pnpm run translations create <locale>`.
+2. Add its code, English title, and native label to
+   `src/locales/registry.ts`.
+3. Add any required browser-locale aliases to the registry.
+4. Add the target language to Crowdin when Crowdin supports it.
+5. Add a `crowdin.yml` locale mapping when Crowdin's locale does not match the
+   repository filename. For a language unavailable in Crowdin, exclude it from
+   the Crowdin exchange commands instead.
+6. Run `pnpm run translations`, `pnpm run translations status <locale>`, and
+   `pnpm test`.
+
+### Rename translation IDs
+
+Preserve existing work when a source ID changes by migrating it instead of
+making every language start over:
+
+```sh
+pnpm run translations migrate --map old.id=new.id
+```
+
+To migrate only one locale:
+
+```sh
+pnpm run translations migrate es --map old.id=new.id
+```
+
+Repeat `--map` to migrate multiple IDs in one run, then run
+`pnpm run translations` to synchronize the catalogs.
+
+### Intentionally English strings
+
+Whitelist files identify strings that should remain equal to the English
+source in a particular locale. Add a translation ID to
+`src/locales/lang/whitelist_<locale>.json` only when retaining the English term
+is intentional. Whitelisted values are preserved by both the repository and
+Crowdin import workflows.
+
+Production builds run `pnpm run translations compile` automatically and load
+the generated compiled catalogs.
