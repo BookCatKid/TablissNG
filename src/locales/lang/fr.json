@@ -514,7 +514,7 @@
   "settings.basicOutline": "Basique (ombre)",
   "settings.customClass.placeholder": "Entrer une classe facilitant le style",
   "settings.customClass.title": "Classe CSS personnalisée",
-  "settings.disableWidget": "Disable widget",
+  "settings.disableWidget": "Désactiver le widget",
   "settings.favicon": "Favicône",
   "settings.favicon.error.read": "Échec de la lecture du fichier, veuillez réessayer.",
   "settings.favicon.error.size": "La taille de l’image doit être inférieure à 8 ko.",
