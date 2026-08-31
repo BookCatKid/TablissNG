@@ -23,31 +23,6 @@ translation automation downloads approved work, validates it against the
 English messages, and opens or updates a translation pull request. A project
 maintainer then reviews and merges that pull request into TablissNG.
 
-### Translation rules
-
-- Translate the text a person will read, but preserve variable names and ICU
-  syntax exactly.
-- Do not translate placeholders such as `{name}`, `{count}`, `{date}`, or
-  `{key}`.
-- In ICU messages, do not translate control words such as `select`, `plural`,
-  or `other`, and do not change selector keys such as `0`, `1`, or `23`.
-- Preserve markup-like placeholders such as `[count]` and `[year]` when they
-  appear in the source message.
-- Read the description and surrounding strings in Crowdin before translating;
-  the same English word can require different translations in different UI
-  contexts.
-- Leave product names, technical terms, and intentionally English strings
-  unchanged when the project marks them that way.
-- Prefer natural wording over a literal word-for-word translation.
-
-For example, translate only the visible words in this message:
-
-```text
-Hello, {name}! You have {count, number} items.
-```
-
-Both `{name}` and `{count, number}` must remain structurally unchanged.
-
 ## Translate Toki Pona or Korean (North Korea)
 
 Crowdin does not currently offer Toki Pona (`tok`) or Korean (North Korea)
@@ -67,9 +42,7 @@ accepted directly through GitHub.
 6. Run `pnpm test`.
 7. Open a pull request containing the locale-file change.
 
-The placeholder and ICU rules from the Crowdin section also apply to direct
-catalog edits. Do not edit English source text or invent new translation IDs in
-a locale file.
+Do not edit English source text or invent new translation IDs in a locale file.
 
 ## Request a new language
 
