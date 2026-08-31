@@ -302,9 +302,6 @@ function runCrowdin({ operation, languages }, context) {
 }
 
 module.exports = {
-  buildCrowdinSeed,
-  listCrowdinLanguages,
-  mergeCrowdinTranslation,
   parseCrowdinArgs,
   runCrowdin,
 };

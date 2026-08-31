@@ -85,8 +85,7 @@ Production builds automatically run `pnpm run translations compile` and load com
 
 ## Crowdin Translation Workflow
 
-Crowdin provides the browser-based editing and approval layer while this
-repository remains authoritative for source messages and release catalogs.
-Only approved Crowdin translations are imported by automation. See
-`docs/crowdin-pilot.md` for commands, locale coverage, and synchronization
-details.
+Translate TablissNG through the
+[TablissNG project on Crowdin](https://crowdin.com/project/tablissng). New and
+updated translations are reviewed in Crowdin, and automation imports approved
+changes into the repository as a pull request.
