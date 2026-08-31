@@ -7,3 +7,18 @@ files:
   - source: /src/locales/crowdin/en.json
     translation: /src/locales/crowdin/%two_letters_code%.json
     skip_untranslated_strings: true
+    languages_mapping:
+      two_letters_code:
+        ca: ca-ES
+        en-AU: en-AU
+        en-CA: en-CA
+        en-GB: en-GB
+        es-ES: es
+        ga-IE: ga
+        gu-IN: gu
+        ne-NP: ne
+        pt-BR: pt-BR
+        pt-PT: pt
+        sv-SE: sv
+        zh-CN: zh-CN
+        zh-TW: zh-TW

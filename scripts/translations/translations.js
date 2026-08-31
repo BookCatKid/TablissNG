@@ -51,7 +51,7 @@ Commands:
 					Mapping format: --map old.id=new.id (repeatable)
 	purge <key>         Purge a change key from all files so that it can be regenerated correctly.
 	crowdin extract     Generate the ignored Crowdin source catalog
-	crowdin seed <lang> [lang...]  Generate filtered catalogs for initial import
+	crowdin seed [lang] [lang...]  Generate filtered catalogs for all or selected locales
 	crowdin import [lang] [lang...]  Merge downloaded Crowdin translations into locale files
 Examples:
 		node scripts/translations/translations.js              # sync all languages

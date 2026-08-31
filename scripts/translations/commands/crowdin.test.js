@@ -1,7 +1,12 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 
-const { buildCrowdinSeed, mergeCrowdinTranslation } = require("./crowdin");
+const {
+  buildCrowdinSeed,
+  listCrowdinLanguages,
+  mergeCrowdinTranslation,
+  parseCrowdinArgs,
+} = require("./crowdin");
 
 const sourceCatalog = {
   greeting: { message: "Hello, {name}", description: "A greeting" },
@@ -60,4 +65,18 @@ test("Crowdin import rejects IDs that are not present in source", () => {
       ),
     /unknown message IDs: removed/,
   );
+});
+
+test("Crowdin seed defaults to every supported repository locale", () => {
+  assert.deepEqual(parseCrowdinArgs(["seed"]), {
+    operation: "seed",
+    languages: [],
+  });
+
+  const languages = listCrowdinLanguages();
+  assert.equal(languages.length, 45);
+  assert.equal(languages.includes("ko-KP"), false);
+  assert.equal(languages.includes("tok"), false);
+  assert.equal(languages.includes("zh-CN"), true);
+  assert.equal(languages.includes("zh-TW"), true);
 });

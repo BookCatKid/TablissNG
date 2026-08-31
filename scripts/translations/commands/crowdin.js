@@ -5,6 +5,7 @@ const path = require("path");
 const {
   extractedMessagesPath,
   getWhitelistedIds,
+  listLanguageFiles,
   localesDir,
   readJson,
   rootDir,
@@ -15,6 +16,7 @@ const {
 
 const crowdinDir = path.join(rootDir, "src", "locales", "crowdin");
 const crowdinSourcePath = path.join(crowdinDir, "en.json");
+const unsupportedCrowdinLanguages = new Set(["ko-KP", "tok"]);
 
 function parseCrowdinArgs(args) {
   const [operation, ...languages] = args;
@@ -26,12 +28,13 @@ function parseCrowdinArgs(args) {
     process.exit(1);
   }
 
-  if (operation === "seed" && languages.length === 0) {
-    console.error("✗ Crowdin seed requires at least one language code.");
-    process.exit(1);
-  }
-
   return { operation, languages };
+}
+
+function listCrowdinLanguages() {
+  return listLanguageFiles()
+    .map((file) => file.replace(/\.json$/, ""))
+    .filter((language) => !unsupportedCrowdinLanguages.has(language));
 }
 
 function assertLanguageCode(language) {
@@ -97,7 +100,9 @@ function buildCrowdinSeed(sourceCatalog, translations, whitelistedIds) {
   return sortKeys(seed);
 }
 
-function runCrowdinSeed(languages, context) {
+function runCrowdinSeed(requestedLanguages, context) {
+  const languages =
+    requestedLanguages.length > 0 ? requestedLanguages : listCrowdinLanguages();
   if (!context.dryRun) extractCrowdinCatalog(crowdinSourcePath);
 
   const sourceCatalog = context.dryRun
@@ -298,6 +303,7 @@ function runCrowdin({ operation, languages }, context) {
 
 module.exports = {
   buildCrowdinSeed,
+  listCrowdinLanguages,
   mergeCrowdinTranslation,
   parseCrowdinArgs,
   runCrowdin,
