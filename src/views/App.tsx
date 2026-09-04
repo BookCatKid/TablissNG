@@ -52,7 +52,7 @@ const Root: FC = () => {
 
   // Wait for storage to be ready before displaying
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
   const themePreference = useValue(db, "themePreference");
   const systemIsDark = useSystemTheme();
   const accent = useValue(db, "accent");
@@ -82,10 +82,10 @@ const Root: FC = () => {
   useEffect(() => {
     const handleError =
       (message: string, showError: boolean) => (error: Error) => {
-        pushError({ message });
+        pushError({ message: `${message} ${error.message}` });
         console.error(error);
         console.error("Caused by:", error.cause);
-        if (showError) setError(true);
+        if (showError) setStorageError(error.message);
       };
 
     const subscriptions = Promise.all([
@@ -135,7 +135,12 @@ const Root: FC = () => {
       {ready ? <Dashboard /> : null}
       {ready && settings ? <Settings /> : null}
       {errors ? <Errors onClose={toggleErrors} /> : null}
-      {error ? <StoreError onClose={() => setError(false)} /> : null}
+      {storageError !== null ? (
+        <StoreError
+          details={storageError}
+          onClose={() => setStorageError(null)}
+        />
+      ) : null}
     </>
   );
 };

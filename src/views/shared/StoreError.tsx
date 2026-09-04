@@ -4,10 +4,11 @@ import { FormattedMessage } from "react-intl";
 import Modal from "./modal/Modal";
 
 type Props = {
+  details: string;
   onClose: () => void;
 };
 
-const StoreError: FC<Props> = ({ onClose }) => {
+const StoreError: FC<Props> = ({ details, onClose }) => {
   return (
     <Modal onClose={onClose}>
       <div className="Settings">
@@ -18,6 +19,9 @@ const StoreError: FC<Props> = ({ onClose }) => {
             description="Title for the storage error modal"
           />
         </h2>
+        <div className="Widget" style={{ overflowWrap: "break-word" }}>
+          {details}
+        </div>
         <p className="large">
           <FormattedMessage
             id="plugins.storageError"
