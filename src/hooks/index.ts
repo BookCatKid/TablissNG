@@ -3,6 +3,7 @@ export * from "./useBackgroundRotation";
 export * from "./useCache";
 export * from "./useClipboard";
 export * from "./useDebounce";
+export * from "./useDeferredFavicon";
 export * from "./useFavicon";
 export * from "./useFormatMessages";
 export * from "./useFullscreen";

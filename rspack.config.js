@@ -209,16 +209,24 @@ if (isProduction && buildTarget !== "firefox") {
                   maxEntries: 50,
                   maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
                 },
+                cacheableResponse: {
+                  statuses: [0, 200], // allow opaque responses to be cached
+                },
               },
             },
 
             // Cache images (use NetworkFirst to respect server cache-control headers)
+            // Ignore blob: and data: URLs as they are local and ServiceWorker NetworkFirst struggles with them.
             {
-              urlPattern: ({ request }) => request.destination === "image",
+              urlPattern: ({ request, url }) =>
+                request.destination === "image" &&
+                !url.href.startsWith("blob:") &&
+                !url.href.startsWith("data:"),
 
               handler: "NetworkFirst",
               options: {
                 cacheName: "tabliss-cache-images",
+                networkTimeoutSeconds: 3,
                 expiration: {
                   maxEntries: 10,
                   maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year

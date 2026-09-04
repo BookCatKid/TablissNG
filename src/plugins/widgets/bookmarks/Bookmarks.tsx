@@ -3,6 +3,8 @@ import "../links/Links.sass";
 
 import { FC, useEffect, useState } from "react";
 
+import { useDeferredFavicon } from "../../../hooks";
+import { getFaviconUrl } from "../../../utils";
 import Icon from "../../../views/shared/icons/Icon";
 import { Display } from "../links/Display";
 import { cleanTitle, truncateText } from "../topSites/TopSites";
@@ -61,6 +63,10 @@ const Node: FC<NodeProps> = ({
     isExpanded = false;
   }
   const cls = isFolder ? "folder" : "bookmark";
+
+  const domain = node.url ? new URL(node.url).hostname : "";
+  const faviconRawSrc = getFaviconUrl(iconProvider, domain, 256);
+  const deferredFaviconSrc = useDeferredFavicon(faviconRawSrc);
 
   // Skip rendering if this is the root node in auto-expanded mode
   if (navigationStyle === "auto-expanded" && isRoot && isFolder) {
@@ -123,8 +129,6 @@ const Node: FC<NodeProps> = ({
     displayTitle = truncateText(node.title, maxTextLength);
   }
 
-  const domain = node.url ? new URL(node.url).hostname : "";
-
   // Determine if we should add the 'no-rotate' class for auto-expanded mode
   const folderClass = `${cls} ${isExpanded ? "expanded" : ""} ${navigationStyle === "auto-expanded" ? "no-rotate" : ""}`;
 
@@ -166,24 +170,15 @@ const Node: FC<NodeProps> = ({
       >
         {isFolder ? (
           <Icon name={cls} size={iconSize} />
-        ) : iconProvider === "_favicon_duckduckgo" ? (
-          <img
-            alt=""
-            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-            style={iconStyle}
-          />
-        ) : iconProvider === "_favicon_google" ? (
-          <img
-            alt=""
-            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=256`}
-            style={iconStyle}
-          />
-        ) : iconProvider === "_favicon_favicone" ? (
-          <img
-            alt=""
-            src={`https://favicone.com/${domain}?s=256`}
-            style={iconStyle}
-          />
+        ) : (iconProvider === "_favicon_duckduckgo" ||
+            iconProvider === "_favicon_google" ||
+            iconProvider === "_favicon_favicone") &&
+          deferredFaviconSrc ? (
+          <img alt="" src={deferredFaviconSrc} style={iconStyle} />
+        ) : iconProvider === "_favicon_duckduckgo" ||
+          iconProvider === "_favicon_google" ||
+          iconProvider === "_favicon_favicone" ? (
+          <span style={{ display: "inline-block", ...iconStyle }} />
         ) : (
           <Icon name={cls} size={iconSize} />
         )}

@@ -36,6 +36,42 @@ export const formatBytes = (
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
 };
 
+export function runWhenIdle(
+  callback: () => void,
+  options: { delay?: number; timeout?: number } = {},
+) {
+  const { delay = 0, timeout = 2000 } = options;
+
+  if (typeof window.requestIdleCallback === "function") {
+    const handle = window.requestIdleCallback(callback, { timeout });
+
+    return () => window.cancelIdleCallback(handle);
+  }
+
+  const handle = window.setTimeout(callback, delay);
+  return () => clearTimeout(handle);
+}
+
+export function getFaviconUrl(
+  provider: string | undefined,
+  domain: string | null,
+  size = 256,
+): string {
+  if (!domain) return "";
+
+  switch (provider) {
+    case "_favicon_duckduckgo":
+      return `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+    case "_favicon_google":
+    case "_favicon":
+      return `https://www.google.com/s2/favicons?domain=${domain}&sz=${size}`;
+    case "_favicon_favicone":
+      return `https://favicone.com/${domain}?s=${size}`;
+    default:
+      return "";
+  }
+}
+
 // Code for unbiased rand from https://pthree.org/2018/06/13/why-the-multiply-and-floor-rng-method-is-biased
 export const unbiasedRand = (range: number) => {
   const max = Math.floor(2 ** 32 / range) * range;

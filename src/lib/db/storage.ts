@@ -37,45 +37,79 @@ export const indexeddb = (
       const trx = conn.transaction("changes", "readonly");
       trx.onerror = rejectError("Cannot read changes from store");
 
-      const changes: DB.Change[] = [];
-      const cursor = trx.objectStore("changes").openCursor();
-      cursor.onsuccess = () => {
-        if (cursor.result) {
-          if (typeof cursor.result.key === "string")
-            changes.push([cursor.result.key, cursor.result.value]);
-          cursor.result.continue();
-        } else {
-          // Finished loading
-          DB.atomic(db, (trx) => {
-            changes.forEach(([key, val]) => DB.put(trx, key, val));
+      const store = trx.objectStore("changes");
+      const keysReq = store.getAllKeys();
+      const valsReq = store.getAll();
+
+      let keys: IDBValidKey[] = [];
+      let vals: unknown[] = [];
+      let keysDone = false;
+      let valsDone = false;
+
+      const finishLoading = () => {
+        if (keysDone && valsDone) {
+          const changeCount = Math.min(keys.length, vals.length);
+
+          if (keys.length !== vals.length) {
+            console.warn(
+              "Storage: IndexedDB restore saw mismatched key/value counts",
+              { keys: keys.length, values: vals.length },
+            );
+          }
+
+          DB.atomic(db, (updateTrx) => {
+            keys.slice(0, changeCount).forEach((key, index) => {
+              if (typeof key === "string") {
+                DB.put(updateTrx, key, vals[index]);
+              } else {
+                console.warn(
+                  "Storage: IndexedDB restore skipping non-string key",
+                  key,
+                );
+              }
+            });
           });
 
           // Write
           const errors = Stream.init<StorageError>();
           DB.listen(
             db,
-            batch((changes) => {
-              if (DEV) console.log("Storage: saving changes:", changes);
+            batch((changesArr) => {
+              if (DEV) console.log("Storage: saving changes:", changesArr);
 
-              const trx = conn.transaction("changes", "readwrite");
-              trx.oncomplete = () => {}; // nice
-              trx.onerror = (error) =>
+              const writeTrx = conn.transaction("changes", "readwrite");
+              writeTrx.oncomplete = () => {}; // nice
+              writeTrx.onerror = (error) =>
                 Stream.publish(
                   errors,
                   mapError("Cannot write changes to store", error),
                 );
 
-              const store = trx.objectStore("changes");
-              // TODO: iterator helpers
-              for (const [key, val] of changes) {
-                if (val === undefined) store.delete(key);
-                else store.put(val, key);
+              const writeStore = writeTrx.objectStore("changes");
+              for (const [key, val] of changesArr) {
+                if (val === undefined) writeStore.delete(key);
+                else writeStore.put(val, key);
               }
             }, SAVE_BATCH_TIMEOUT),
           );
           resolve(errors);
         }
       };
+
+      keysReq.onsuccess = () => {
+        keys = keysReq.result || [];
+        keysDone = true;
+        finishLoading();
+      };
+
+      valsReq.onsuccess = () => {
+        vals = valsReq.result || [];
+        valsDone = true;
+        finishLoading();
+      };
+
+      // Error handling is already covered by trx.onerror
+      // which catches keysReq and valsReq failures
     };
   });
 };
