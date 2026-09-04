@@ -9,7 +9,7 @@ export type Cache<Shape = unknown> = {
   /**
    * Set (replace) the cache for the plugin.
    */
-  setCache: (cache: Shape) => void;
+  setCache: (cache: Shape | undefined) => void;
 };
 
 export type Data<Shape = unknown> = {

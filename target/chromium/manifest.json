@@ -22,6 +22,10 @@
     "bookmarks",
     "topSites"
   ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "service-worker.js"
   },

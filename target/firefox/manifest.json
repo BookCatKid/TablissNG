@@ -28,6 +28,8 @@
   ],
   "optional_permissions": [
     "bookmarks",
-    "topSites"
+    "topSites",
+    "http://*/*",
+    "https://*/*"
   ]
 }

@@ -45,6 +45,95 @@ test.describe("Background", () => {
     await expect(image).toHaveCSS("background-image", /data:image/);
   });
 
+  test("extracts an image URL from a JSON response", async ({ page }) => {
+    const apiUrl =
+      "https://wallhaven.cc/api/v1/search?sorting=random&ratios=16x9,16x10&categories=010&atleast=1920x1080";
+    let requestCount = 0;
+    await page.route(apiUrl, (route) => {
+      requestCount += 1;
+      return route.fulfill({
+        json: {
+          data: [
+            {
+              path: `https://w.wallhaven.cc/full/test/wallpaper-${requestCount}.jpg`,
+            },
+          ],
+        },
+      });
+    });
+    await page.route(
+      /https:\/\/w\.wallhaven\.cc\/full\/test\/wallpaper-\d+\.jpg/,
+      (route) =>
+        route.fulfill({
+          path: path.join(__dirname, "fixtures", "pixel.png"),
+          contentType: "image/png",
+        }),
+    );
+
+    await selectBackground(page, "background/online");
+    await page
+      .locator('.OnlineSettings label:has-text("Image URL") input')
+      .fill(apiUrl);
+    await page
+      .locator('.OnlineSettings label:has-text("Parse JSON Response") input')
+      .check();
+    await page
+      .locator('.OnlineSettings label:has-text("JSON Path") input')
+      .fill("data.0.path");
+    await page.locator(".OnlineSettings select").selectOption("0");
+
+    // URL and path inputs debounce before updating plugin data.
+    await page.waitForTimeout(1200);
+    await closeSettings(page);
+
+    await expect.poll(() => requestCount).toBeGreaterThan(0);
+    await page.waitForTimeout(250);
+    const initialRequestCount = requestCount;
+    expect(initialRequestCount).toBeLessThanOrEqual(2);
+    await page.waitForTimeout(250);
+    expect(requestCount).toBe(initialRequestCount);
+    await expect(
+      page.locator(
+        `.Background .Online .image[style*="wallpaper-${initialRequestCount}.jpg"]`,
+      ),
+    ).toBeVisible();
+
+    await page.addInitScript(() => {
+      const seenUrls: string[] = [];
+      Object.assign(window, { __onlineBackgroundUrls: seenUrls });
+
+      const captureUrls = () => {
+        for (const image of document.querySelectorAll<HTMLElement>(
+          ".Background .Online .image",
+        )) {
+          const match =
+            image.style.backgroundImage.match(/wallpaper-(\d+)\.jpg/);
+          if (match && !seenUrls.includes(match[0])) seenUrls.push(match[0]);
+        }
+      };
+
+      window.addEventListener("DOMContentLoaded", () => {
+        new MutationObserver(captureUrls).observe(document.body, {
+          attributes: true,
+          attributeFilter: ["style"],
+          childList: true,
+          subtree: true,
+        });
+        captureUrls();
+      });
+    });
+
+    await page.reload();
+    await expect.poll(() => requestCount).toBeGreaterThan(initialRequestCount);
+    await page.waitForTimeout(500);
+    const displayedUrls = await page.evaluate(
+      () =>
+        (window as typeof window & { __onlineBackgroundUrls: string[] })
+          .__onlineBackgroundUrls,
+    );
+    expect(displayedUrls).toEqual([`wallpaper-${initialRequestCount}.jpg`]);
+  });
+
   test("uploads media from a file", async ({ page }) => {
     // Key is background/image for backwards compatibility.
     await selectBackground(page, "background/image");

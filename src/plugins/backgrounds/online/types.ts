@@ -1,9 +1,28 @@
+import { RotatingCache } from "../../../hooks";
 import { API } from "../../types";
 
 export type Data = {
-  url?: string;
+  jsonPath: string;
+  paused: boolean;
+  responseType: "image" | "json";
+  showControls: boolean;
+  timeout: number;
+  url: string;
 };
 
-export type Props = API<Data>;
+export type Image = {
+  url: string;
+};
 
-export const defaultData: Data = {};
+export type Cache = RotatingCache<Image>;
+
+export type Props = API<Data, Cache>;
+
+export const defaultData: Data = {
+  jsonPath: "",
+  paused: false,
+  responseType: "image",
+  showControls: true,
+  timeout: 900,
+  url: "",
+};
