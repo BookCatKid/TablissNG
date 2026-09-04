@@ -17,6 +17,68 @@ const storageBytes = (key: string, value: unknown): number =>
   new TextEncoder().encode(key).byteLength +
   new TextEncoder().encode(JSON.stringify(value)).byteLength;
 
+const describeStorageError = (error: unknown): string => {
+  const name = error instanceof Error ? error.name : "";
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+        ? error
+        : "";
+  const detail = `${name} ${message}`.trim();
+  const normalized = detail.toLowerCase();
+
+  if (
+    normalized.includes("max_write_operations") ||
+    normalized.includes("write operations") ||
+    normalized.includes("write-rate") ||
+    normalized.includes("write rate")
+  ) {
+    return "The browser sync write-rate limit was exceeded. Try again later.";
+  }
+  if (
+    normalized.includes("quota_bytes_per_item") ||
+    normalized.includes("per-item") ||
+    normalized.includes("item exceeds")
+  ) {
+    return "An individual item exceeds the browser storage limit.";
+  }
+  if (normalized.includes("quota") || normalized.includes("storage is full")) {
+    return "The browser storage quota is full.";
+  }
+  if (
+    normalized.includes("not writable") ||
+    normalized.includes("not a writable") ||
+    normalized.includes("read-only") ||
+    normalized.includes("read only")
+  ) {
+    return "The requested storage area is read-only.";
+  }
+  if (
+    normalized.includes("context invalidated") ||
+    normalized.includes("context is unavailable")
+  ) {
+    return "The extension context is unavailable. Reload TablissNG and try again.";
+  }
+  if (
+    normalized.includes("permission") ||
+    normalized.includes("access denied") ||
+    normalized.includes("not allowed")
+  ) {
+    return "The browser denied access to extension storage.";
+  }
+  if (
+    normalized.includes("circular") ||
+    normalized.includes("bigint") ||
+    normalized.includes("serialize") ||
+    normalized.includes("datacloneerror")
+  ) {
+    return "The value could not be serialized for storage.";
+  }
+  if (detail) return `Browser error: ${detail}`;
+  return "The browser did not provide details for this storage failure.";
+};
+
 const isChunkManifest = (value: unknown): value is ChunkManifest =>
   typeof value === "object" &&
   value !== null &&
@@ -79,7 +141,10 @@ export const indexeddb = (
       err.target.error instanceof Error
         ? err.target.error
         : undefined;
-    return new StorageError(`IndexedDB: ${name}: ${message}`, { cause });
+    return new StorageError(
+      `IndexedDB: ${name}: ${message} — ${describeStorageError(cause ?? err)}`,
+      { cause },
+    );
   };
 
   return new Promise((resolve, reject) => {
@@ -149,9 +214,10 @@ export const extension = async (
 ): Promise<Stream.Stream<StorageError>> => {
   // Map errors to a standard format
   const mapError = (message: string, err: unknown) =>
-    new StorageError(`Extension[${area}]: ${name}: ${message}`, {
-      cause: err instanceof Error ? err : undefined,
-    });
+    new StorageError(
+      `Extension[${area}]: ${name}: ${message} — ${describeStorageError(err)}`,
+      { cause: err instanceof Error ? err : undefined },
+    );
 
   const storageArea = browser.storage[area];
   const chunkKeysByStorageKey = new Map<string, string[]>();
