@@ -5,6 +5,67 @@ import * as Stream from "./stream";
 // TODO: clean up indexeddb usage, convert to promises and double check error handling
 
 const EXTENSION_SAVE_BATCH_TIMEOUT = 1000; // 1s
+const SYNC_STORAGE_ITEM_QUOTA = 8192;
+const CHUNK_PATH = "/$chunks/";
+const CHUNK_MANIFEST = "__tablissChunks";
+
+type ChunkManifest = {
+  [CHUNK_MANIFEST]: string[];
+};
+
+const storageBytes = (key: string, value: unknown): number =>
+  new TextEncoder().encode(key).byteLength +
+  new TextEncoder().encode(JSON.stringify(value)).byteLength;
+
+const isChunkManifest = (value: unknown): value is ChunkManifest =>
+  typeof value === "object" &&
+  value !== null &&
+  CHUNK_MANIFEST in value &&
+  Array.isArray(value[CHUNK_MANIFEST]) &&
+  value[CHUNK_MANIFEST].every((key) => typeof key === "string");
+
+const chunkValue = (key: string, value: unknown): Record<string, unknown> => {
+  const serialized = JSON.stringify(value);
+  const chunks: string[] = [];
+  const updates: Record<string, unknown> = {};
+  let offset = 0;
+
+  while (offset < serialized.length) {
+    const chunkKey = `${key}${CHUNK_PATH}${chunks.length}`;
+    let low = offset + 1;
+    let high = serialized.length;
+    let end = offset;
+
+    while (low <= high) {
+      const midpoint = Math.floor((low + high) / 2);
+      const candidateEnd =
+        midpoint < serialized.length &&
+        /[\uD800-\uDBFF]/.test(serialized[midpoint - 1]) &&
+        /[\uDC00-\uDFFF]/.test(serialized[midpoint])
+          ? midpoint - 1
+          : midpoint;
+      const candidate = serialized.slice(offset, candidateEnd);
+
+      if (storageBytes(chunkKey, candidate) <= SYNC_STORAGE_ITEM_QUOTA) {
+        end = candidateEnd;
+        low = midpoint + 1;
+      } else {
+        high = midpoint - 1;
+      }
+    }
+
+    if (end === offset) {
+      throw new Error(`Storage key is too large to chunk: ${key}`);
+    }
+
+    chunks.push(chunkKey);
+    updates[chunkKey] = serialized.slice(offset, end);
+    offset = end;
+  }
+
+  updates[key] = { [CHUNK_MANIFEST]: chunks } satisfies ChunkManifest;
+  return updates;
+};
 
 export const indexeddb = (
   db: DB.Database,
@@ -93,17 +154,31 @@ export const extension = async (
     });
 
   const storageArea = browser.storage[area];
+  const chunkKeysByStorageKey = new Map<string, string[]>();
 
   // Pull
   await storageArea
     .get()
-    .then((stored) =>
+    .then((stored) => {
       Object.keys(stored)
-        .filter((key) => key.startsWith(name))
-        .forEach((key) =>
-          DB.put(db, key.substring(name.length + 1), stored[key]),
-        ),
-    )
+        .filter(
+          (key) => key.startsWith(`${name}/`) && !key.includes(CHUNK_PATH),
+        )
+        .forEach((key) => {
+          const value = stored[key];
+          if (isChunkManifest(value)) {
+            chunkKeysByStorageKey.set(key, value[CHUNK_MANIFEST]);
+          }
+          const restored = isChunkManifest(value)
+            ? JSON.parse(
+                value[CHUNK_MANIFEST].map((chunkKey) => stored[chunkKey]).join(
+                  "",
+                ),
+              )
+            : value;
+          DB.put(db, key.substring(name.length + 1), restored);
+        });
+    })
     .catch((error) => {
       throw mapError("Cannot read from storage", error);
     });
@@ -113,29 +188,79 @@ export const extension = async (
   const handleError = (message: string) => (err: unknown) => {
     Stream.publish(errors, mapError(message, err));
   };
+  const saveChanges = async (changesArray: DB.Change[]): Promise<void> => {
+    // TODO: iterator helpers
+    const updates: Record<string, unknown> = {};
+    const deletes = new Set<string>();
+    const nextChunkKeys = new Map(chunkKeysByStorageKey);
+
+    for (const [key, val] of changesArray) {
+      const storageKey = `${name}/${key}`;
+      const oldChunkKeys = chunkKeysByStorageKey.get(storageKey) ?? [];
+
+      try {
+        if (val === undefined) {
+          deletes.add(storageKey);
+          oldChunkKeys.forEach((chunkKey) => deletes.add(chunkKey));
+          nextChunkKeys.delete(storageKey);
+        } else if (
+          area === "sync" &&
+          storageBytes(storageKey, val) > SYNC_STORAGE_ITEM_QUOTA
+        ) {
+          const chunked = chunkValue(storageKey, val);
+          Object.assign(updates, chunked);
+          const manifest = chunked[storageKey];
+          if (!isChunkManifest(manifest)) {
+            throw new Error("Chunked storage value is missing its manifest");
+          }
+          const newChunkKeys = manifest[CHUNK_MANIFEST];
+          oldChunkKeys
+            .filter((chunkKey) => !newChunkKeys.includes(chunkKey))
+            .forEach((chunkKey) => deletes.add(chunkKey));
+          nextChunkKeys.set(storageKey, newChunkKeys);
+        } else {
+          updates[storageKey] = val;
+          oldChunkKeys.forEach((chunkKey) => deletes.add(chunkKey));
+          nextChunkKeys.delete(storageKey);
+        }
+      } catch (error) {
+        handleError("Cannot prepare value for storage")(error);
+      }
+    }
+
+    if (Object.keys(updates).length > 0) {
+      try {
+        await storageArea.set(updates);
+      } catch (error) {
+        handleError("Cannot write updates to storage")(error);
+        return;
+      }
+    }
+
+    for (const [key] of changesArray) {
+      const storageKey = `${name}/${key}`;
+      const chunkKeys = nextChunkKeys.get(storageKey);
+      if (chunkKeys) chunkKeysByStorageKey.set(storageKey, chunkKeys);
+      else chunkKeysByStorageKey.delete(storageKey);
+    }
+
+    if (deletes.size > 0) {
+      try {
+        await storageArea.remove([...deletes]);
+      } catch (error) {
+        handleError("Cannot write deletes to storage")(error);
+      }
+    }
+  };
+  let writeQueue = Promise.resolve();
   DB.listen(
     db,
     batch((changes) => {
       if (DEV) console.log("Storage: saving changes:", changes);
-
-      // TODO: test for both updates and deletes for the same key
-      // TODO: iterator helpers
       const changesArray = Array.from(changes);
-      const updates = Object.fromEntries(
-        changesArray
-          .filter(([, val]) => val !== undefined)
-          .map(([key, val]) => [`${name}/${key}`, val]),
-      );
-      const deletes = changesArray
-        .filter(([, val]) => val === undefined)
-        .map(([key]) => `${name}/${key}`);
-
-      storageArea
-        .set(updates)
-        .catch(handleError("Cannot write updates to storage"));
-      storageArea
-        .remove(deletes)
-        .catch(handleError("Cannot write deletes to storage"));
+      writeQueue = writeQueue
+        .then(() => saveChanges(changesArray))
+        .catch(handleError("Cannot save changes to storage"));
     }, EXTENSION_SAVE_BATCH_TIMEOUT),
   );
 
