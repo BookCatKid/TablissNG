@@ -6,11 +6,12 @@ import {
   Fragment,
   memo,
   type ReactNode,
+  useState,
 } from "react";
 import { CrossFade } from "react-crossfade-simple";
 
 import { db } from "../../../db/state";
-import { useIsNight } from "../../../hooks";
+import { useDebounce, useIsNight } from "../../../hooks";
 import { Icon } from "../../../icons";
 import { useValue } from "../../../lib/db/react";
 
@@ -33,6 +34,8 @@ interface Props {
   rightInfo?: CreditLink | null;
   children?: ReactNode;
 }
+
+export const CROSS_FADE_TIMEOUT = 2500;
 
 const BaseBackground: FC<Props> = ({
   containerClassName = "Unsplash fullscreen",
@@ -59,6 +62,9 @@ const BaseBackground: FC<Props> = ({
     position,
   } = background.display;
   const isNight = useIsNight();
+  const [transition, setTransition] = useState(0);
+  const settledTransition = useDebounce(transition, CROSS_FADE_TIMEOUT);
+  const isTransitioning = transition !== settledTransition;
 
   const backdropStyle: CSSProperties = {};
 
@@ -92,7 +98,11 @@ const BaseBackground: FC<Props> = ({
         className="fullscreen"
         style={{ backgroundColor: luminosity > 0 ? "white" : "black" }}
       >
-        <CrossFade contentKey={url || ""} timeout={2500}>
+        <CrossFade
+          contentKey={url || ""}
+          onTransition={() => setTransition((value) => value + 1)}
+          timeout={CROSS_FADE_TIMEOUT}
+        >
           <div
             className="image fullscreen"
             style={{
@@ -124,15 +134,29 @@ const BaseBackground: FC<Props> = ({
 
         {showControls && (
           <div className={`controls ${controlsOnHover ? "is-on-hover" : ""}`}>
-            <a className={onPrev ? "" : "hidden"} onClick={onPrev ?? undefined}>
+            <button
+              type="button"
+              className={`${onPrev ? "" : "hidden"}${
+                isTransitioning ? " transitioning" : ""
+              }`}
+              disabled={isTransitioning || !onPrev}
+              onClick={onPrev ?? undefined}
+            >
               <Icon name="feather:arrow-left" />
-            </a>{" "}
-            <a onClick={onPause}>
+            </button>{" "}
+            <button type="button" onClick={onPause}>
               <Icon name={paused ? "feather:play" : "feather:pause"} />
-            </a>{" "}
-            <a className={onNext ? "" : "hidden"} onClick={onNext ?? undefined}>
+            </button>{" "}
+            <button
+              type="button"
+              className={`${onNext ? "" : "hidden"}${
+                isTransitioning ? " transitioning" : ""
+              }`}
+              disabled={isTransitioning || !onNext}
+              onClick={onNext ?? undefined}
+            >
               <Icon name="feather:arrow-right" />
-            </a>
+            </button>
           </div>
         )}
 

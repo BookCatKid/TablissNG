@@ -19,6 +19,17 @@
             left: 50%
             transform: translateX(-50%)
 
+            button
+                background: transparent
+                border: 0
+                color: inherit
+                cursor: pointer
+                font: inherit
+                padding: 0
+
+                &:disabled
+                    cursor: default
+
             &.is-on-hover
                 opacity: 0
                 transition: opacity 0.25s ease-out
@@ -31,6 +42,10 @@
 
         .hidden
             visibility: hidden
+
+        .transitioning
+            opacity: 0.5
+            pointer-events: none
 
     .image
         background-position: 50% 50%
