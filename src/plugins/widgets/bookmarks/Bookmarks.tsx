@@ -4,6 +4,7 @@ import "../links/Links.sass";
 import { FC, useEffect, useState } from "react";
 
 import Icon from "../../../views/shared/icons/Icon";
+import { toFaviconProvider } from "../links/components/Favicon";
 import { Display } from "../links/Display";
 import { cleanTitle, truncateText } from "../topSites/TopSites";
 import { defaultData, Props } from "./types";
@@ -124,6 +125,7 @@ const Node: FC<NodeProps> = ({
   }
 
   const domain = node.url ? new URL(node.url).hostname : "";
+  const faviconProvider = toFaviconProvider(iconProvider);
 
   // Determine if we should add the 'no-rotate' class for auto-expanded mode
   const folderClass = `${cls} ${isExpanded ? "expanded" : ""} ${navigationStyle === "auto-expanded" ? "no-rotate" : ""}`;
@@ -142,8 +144,16 @@ const Node: FC<NodeProps> = ({
         number={10} // Set to ten so that it doesn't display a hover title. Kinda hacky, but whatever
         linkOpenStyle={false} // Just use default I guess
         linksNumbered={false}
-        icon={node.url ? iconProvider : "folder"}
-        iconSize={iconSize}
+        customWidth={iconSize}
+        customHeight={iconSize}
+        iconConfig={
+          node.url && faviconProvider
+            ? {
+                type: "favicon",
+                provider: faviconProvider,
+              }
+            : undefined
+        }
         onLinkClick={handleClick}
       />
     );

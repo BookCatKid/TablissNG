@@ -1,10 +1,10 @@
 import "./LocationInput.sass";
 
-import { Icon } from "@iconify/react";
 import { type FC, type FormEvent, useState } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { useToggle } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { geocodeLocation, requestLocation } from "./api";
 import { Coordinates } from "./types";
 
@@ -83,7 +83,7 @@ const GeocodeInput: FC<Props> = ({ onChange }) => {
         />
 
         <button type="submit" className="button--primary button--icon">
-          <Icon icon="feather:search" />
+          <Icon name="feather:search" />
         </button>
       </div>
     </form>
@@ -152,7 +152,7 @@ const CoordinateInput: FC<Props> = ({ latitude, longitude, onChange }) => {
             className="button--primary button--icon"
             onClick={handleLocate}
           >
-            <Icon icon="feather:navigation" />
+            <Icon name="feather:navigation" />
           </button>
         )}
       </div>

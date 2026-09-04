@@ -3,6 +3,7 @@ import "./TopSites.sass";
 import { FC, useEffect, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { toFaviconProvider } from "../links/components/Favicon";
 import { Display } from "../links/Display";
 import { defaultCache, defaultData, Props } from "./types";
 
@@ -83,6 +84,8 @@ export const TopSites: FC<Props> = ({
     );
   }
 
+  const faviconProvider = toFaviconProvider(data.iconProvider);
+
   return (
     <div
       className="Links"
@@ -100,7 +103,11 @@ export const TopSites: FC<Props> = ({
             cleanTitle(site.title || "", site.url),
             data.maxTextLength,
           )}
-          icon={data.iconProvider}
+          iconConfig={
+            faviconProvider
+              ? { type: "favicon", provider: faviconProvider }
+              : undefined
+          }
           number={index + 1}
           linkOpenStyle={data.linkOpenStyle}
           linksNumbered={data.linksNumbered}

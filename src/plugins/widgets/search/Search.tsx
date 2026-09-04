@@ -1,6 +1,5 @@
 import "./Search.sass";
 
-import { Icon } from "@iconify/react";
 import type {
   ChangeEvent,
   FormEvent,
@@ -10,6 +9,7 @@ import { FC, useRef, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { isSpecialUrl } from "../../../utils";
 import {
   getSuggestions,
@@ -191,7 +191,7 @@ const Search: FC<Props> = ({ data = defaultData }) => {
       {(data.style === "transparent-rounded" ||
         data.style === "minimal-outlined") && (
         <button className="search-submit" type="submit">
-          <Icon icon="feather:search" />
+          <Icon name="feather:search" />
         </button>
       )}
 

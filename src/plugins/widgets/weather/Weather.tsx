@@ -1,11 +1,11 @@
 import "./Weather.sass";
 
-import { Icon } from "@iconify/react";
 import type { FC } from "react";
 import { useEffect } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useCachedEffect, useTime } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { HOURS } from "../../../utils";
 import { getForecast, requestLocation } from "./api";
 import { findCurrent, weatherCodes } from "./conditions";
@@ -100,7 +100,7 @@ const Weather: FC<Props> = ({
           title={intl.formatMessage(messages.toggleDetails)}
         >
           {data.name && data.showCity ? <span>{data.name}</span> : null}
-          <Icon icon={`feather:` + weatherCodes[conditions.weatherCode]} />
+          <Icon name={`feather:` + weatherCodes[conditions.weatherCode]} />
           <span className="temperature">
             {Math.round(conditions.temperature)}˚
           </span>
@@ -133,7 +133,7 @@ const Weather: FC<Props> = ({
                 })}
               </dt>
               <dd className="condition">
-                <Icon icon={`feather:${weatherCodes[daily.weatherCode]}`} />
+                <Icon name={`feather:${weatherCodes[daily.weatherCode]}`} />
               </dd>
               <dd className="temperatures">
                 <span title={intl.formatMessage(messages.high)}>

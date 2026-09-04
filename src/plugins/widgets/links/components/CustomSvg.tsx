@@ -1,0 +1,65 @@
+import DOMPurify from "dompurify";
+import type { FC } from "react";
+import { useMemo } from "react";
+
+interface CustomSvgProps {
+  svgString: string;
+  width: number;
+  height: number;
+  conserveAspectRatio?: boolean;
+  className?: string;
+}
+
+const parseSvg = (
+  svgString: string,
+  width: number,
+  height: number,
+  conserveAspectRatio?: boolean,
+): string | null => {
+  try {
+    const parser = new DOMParser();
+    const sanitized = DOMPurify.sanitize(svgString, {
+      USE_PROFILES: { svg: true, svgFilters: true },
+    });
+    const doc = parser.parseFromString(sanitized, "image/svg+xml");
+    const parseError = doc.querySelector("parsererror");
+    if (parseError) return null;
+    const svg = doc.querySelector("svg");
+    if (!svg) return null;
+
+    svg.setAttribute("width", `${width}`);
+    if (!conserveAspectRatio) {
+      svg.setAttribute("height", `${height}`);
+      svg.setAttribute("preserveAspectRatio", "none");
+    } else {
+      svg.removeAttribute("height");
+      svg.removeAttribute("preserveAspectRatio");
+    }
+
+    return svg.outerHTML;
+  } catch {
+    return null;
+  }
+};
+
+export const CustomSvg: FC<CustomSvgProps> = ({
+  svgString,
+  width,
+  height,
+  conserveAspectRatio,
+  className,
+}) => {
+  const parsedSvg = useMemo(
+    () => parseSvg(svgString, width, height, conserveAspectRatio),
+    [svgString, width, height, conserveAspectRatio],
+  );
+
+  if (!parsedSvg) return null;
+
+  return (
+    <span
+      className={`Link-icon ${className ?? ""}`.trim()}
+      dangerouslySetInnerHTML={{ __html: parsedSvg }}
+    />
+  );
+};

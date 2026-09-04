@@ -1,32 +1,12 @@
-import { Icon } from "@iconify/react";
 import { type FC, type MouseEvent, useMemo } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { isSpecialUrl, normalizeUrl } from "../../../utils";
+import { CustomImage } from "./components/CustomImage";
+import { CustomSvg } from "./components/CustomSvg";
+import { Favicon } from "./components/Favicon";
+import { IconifyIcon } from "./components/IconifyIcon";
 import { Cache, Link } from "./types";
-
-const getDomain = (url: string): string | null => {
-  try {
-    return new URL(url).hostname;
-  } catch (e) {
-    return null;
-  }
-};
-
-const parseSvg = (svgString: string, width?: number, height?: number) => {
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, "image/svg+xml");
-    const svg = doc.querySelector("svg");
-    if (!svg) return null;
-
-    svg.setAttribute("width", `${width ?? 24}`);
-    svg.setAttribute("height", `${height ?? 24}`);
-    return <span dangerouslySetInnerHTML={{ __html: svg.outerHTML }} />;
-  } catch {
-    return null;
-  }
-};
 
 const messages = defineMessages({
   shortcutHint: {
@@ -41,6 +21,14 @@ const messages = defineMessages({
   },
 });
 
+const getDomain = (url: string): string | null => {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+};
+
 type Props = Link & {
   number: number;
   linkOpenStyle: boolean;
@@ -50,19 +38,12 @@ type Props = Link & {
 };
 
 export const Display: FC<Props> = ({
-  icon,
-  iconSize,
-  IconString,
-  IconStringIco,
-  SvgString,
+  iconConfig,
   name,
   number,
   url,
   linkOpenStyle,
   linksNumbered,
-  iconifyIdentifier,
-  iconifyValue,
-  iconCacheKey,
   cache,
   customWidth,
   customHeight,
@@ -84,11 +65,11 @@ export const Display: FC<Props> = ({
       return intl.formatMessage(messages.shortcutHint, { key: label });
     return intl.formatMessage(messages.standardHint);
   }, [intl, number, keyboardShortcut]);
+
   const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
-  const parsedSvg = useMemo(
-    () => (SvgString ? parseSvg(SvgString, customWidth, customHeight) : null),
-    [SvgString, customWidth, customHeight],
-  );
+
+  const displayWidth = customWidth ?? 24;
+  const displayHeight = customHeight ?? 24;
 
   const handleClick = async (e: MouseEvent) => {
     if (
@@ -123,6 +104,87 @@ export const Display: FC<Props> = ({
     onLinkClick?.();
   };
 
+  const renderIcon = () => {
+    if (!iconConfig) return null;
+
+    switch (iconConfig.type) {
+      case "favicon":
+        return (
+          <Favicon
+            provider={iconConfig.provider}
+            domain={domain}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+            resolution={iconConfig.resolution}
+          />
+        );
+      case "iconify":
+        return (
+          <IconifyIcon
+            iconString={iconConfig.value}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      case "custom_svg":
+      case "custom_upload": {
+        const cachedItem = cache?.[iconConfig.cacheKey];
+        if (!cachedItem) return null;
+
+        if (cachedItem.type === "svg") {
+          return (
+            <CustomSvg
+              svgString={cachedItem.data}
+              width={displayWidth}
+              height={displayHeight}
+              conserveAspectRatio={conserveAspectRatio}
+            />
+          );
+        }
+
+        if (iconConfig.type === "custom_svg") {
+          console.error(
+            `Expected cached icon ${iconConfig.cacheKey} to be svg, but found ${cachedItem.type}. Icon will not render.`,
+          );
+          return null;
+        }
+
+        return (
+          <CustomImage
+            src={cachedItem.data}
+            alt={name}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      }
+      case "custom_image_url":
+        return (
+          <CustomImage
+            src={iconConfig.url}
+            alt={name}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      case "feather":
+        return (
+          <IconifyIcon
+            iconString={iconConfig.value || "feather:bookmark"}
+            width={displayWidth}
+            height={displayHeight}
+            conserveAspectRatio={conserveAspectRatio}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <a
       className={`Link ${linkOpenStyle ? "Link--open" : ""}`}
@@ -133,87 +195,8 @@ export const Display: FC<Props> = ({
       title={title}
     >
       {linksNumbered ? <span className="LinkNumber">{number} </span> : null}
-      {icon === "_favicon_duckduckgo" && domain ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://icons.duckduckgo.com/ip3/${domain}.ico`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : (icon === "_favicon_google" && domain) ||
-        (icon === "_favicon" && domain) ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://www.google.com/s2/favicons?domain=${domain}&sz=${iconSize ?? 256}`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : icon === "_favicon_favicone" && domain ? (
-        <i>
-          <img
-            alt={domain}
-            src={`https://favicone.com/${domain}?s=${iconSize ?? 256}`}
-            style={{ width: iconSize, height: iconSize }}
-          />
-        </i>
-      ) : icon === "_custom_iconify" && IconString ? (
-        <i>
-          <Icon icon={IconString} width={customWidth} height={customWidth} />
-        </i>
-      ) : icon === "_custom_svg" && parsedSvg ? (
-        <span className="custom-icon">{parsedSvg}</span>
-      ) : icon === "_custom_ico" && IconStringIco ? (
-        <i>
-          <img
-            src={IconStringIco}
-            alt={name}
-            style={{
-              width: conserveAspectRatio
-                ? `${customWidth}px`
-                : `${customWidth}px`,
-              height: conserveAspectRatio ? "auto" : `${customHeight}px`,
-              display: "inline-block",
-            }}
-          />
-        </i>
-      ) : icon === "_custom_upload" && iconCacheKey && cache?.[iconCacheKey] ? (
-        <i className="custom-icon">
-          {cache[iconCacheKey].type === "svg" ? (
-            parseSvg(cache[iconCacheKey].data, customWidth, customHeight)
-          ) : (
-            <img
-              alt={name}
-              src={cache[iconCacheKey].data}
-              style={{
-                width: conserveAspectRatio
-                  ? `${customWidth}px`
-                  : `${customWidth}px`,
-                height: conserveAspectRatio ? "auto" : `${customHeight}px`,
-                display: "inline-block",
-              }}
-            />
-          )}
-        </i>
-      ) : icon === "_feather" ? (
-        <i>
-          <Icon
-            icon={
-              iconifyValue
-                ? iconifyIdentifier + iconifyValue
-                : "feather:bookmark"
-            }
-            width={customWidth || iconSize}
-            height={customHeight || iconSize}
-          />
-        </i>
-      ) : icon ? (
-        <i>
-          <Icon icon={"feather:" + icon} width={iconSize} height={iconSize} />
-        </i>
-      ) : null}
-      {name}
+      {renderIcon()}
+      <span className="Link-name">{name}</span>
     </a>
   );
 };

@@ -2,14 +2,32 @@
     column-gap: 1em
     display: inline-grid
 
-    .custom-icon, i
-        margin-right: 5px
-        margin-left: -2px
+    &.center-links
+        justify-items: center
+
+        a
+            justify-content: center
 
     a
-        display: block
+        display: flex
+        align-items: center
         margin: 0.25em
         white-space: nowrap
+        text-decoration: none
+
+        &:hover
+            .Link-name
+                text-decoration: underline
+
+        .LinkNumber
+            margin-right: 0.4em
+            display: inline-block
+
+        .Link-icon
+            margin-right: 5px
+            margin-left: -2px
+            display: flex
+            flex-shrink: 0
 
         img
             height: 1em
@@ -21,6 +39,6 @@
             flex-direction: column
             align-items: center
 
-            .custom-icon, i
+            .Link-icon
                 margin-right: 0
                 margin-left: 0

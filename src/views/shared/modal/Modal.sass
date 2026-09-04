@@ -1,5 +1,5 @@
 .Modal-container
-  background: rgba(0, 0, 0, 0.25)
+  background: var(--light-bg-overlay)
   position: fixed
   top: 0
   right: 0
@@ -10,40 +10,36 @@
   align-items: end
   justify-content: center
 
+.Modal-container--center
+  align-items: center
+
 .Modal
-  background: white
+  background: var(--bg-main)
   border-radius: 1rem 1rem 0 0
   padding: 2rem
   min-width: 300px
   max-width: 500px
-  max-height: 80vh
-  overflow-y: auto
-  overflow-x: hidden
+  max-height: 90vh
+  color: var(--text-heading)
+  box-shadow: 0 -4px 16px var(--shadow-main)
+  display: flex
+  flex-direction: column
 
-body.dark .Modal
-  background: #1a1a1a
-  color: #ffffff
+.Modal-content
+  flex: 1 1 auto
+  overflow: auto
 
 .Modal-footer
+  display: flex
+  margin-top: 1.5rem
   text-align: center
+  padding-top: 1rem
+  border-top: 1px solid var(--border-light)
+  justify-content: flex-end
 
-/* Add dark mode styles for any links inside modals */
-body.dark .Modal
-  color: #ffffff
-
-/* Add dark mode styles for any inputs inside modals */
-body.dark .Modal input,
-body.dark .Modal select,
-body.dark .Modal textarea
-  background-color: #2d2d2d
-  border-color: #444
-  color: #ffffff
-
-/* Add dark mode styles for any buttons inside modals */
-body.dark .Modal button
-  background-color: #2d2d2d
-  color: #ffffff
-  border-color: #444
-
-body.dark .Modal button:hover
-  background-color: #3a3a3a
+.Modal input,
+.Modal select,
+.Modal textarea
+  background-color: var(--bg-input)
+  border: 1px solid var(--border-main)
+  color: var(--text-main)

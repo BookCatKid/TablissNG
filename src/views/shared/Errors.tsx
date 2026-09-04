@@ -1,10 +1,10 @@
-import { Icon } from "@iconify/react";
 import { type FC, useContext } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { ErrorContext } from "../../contexts/error";
 import { formatErrorLog } from "../../errorHandler";
 import { useClipboard } from "../../hooks";
+import { Icon } from "../../icons";
 import Modal from "./modal/Modal";
 
 const messages = defineMessages({
@@ -57,7 +57,7 @@ const Errors: FC<Props> = ({ onClose }) => {
             onClick={() => copy(formatErrorLog())}
           >
             <Icon
-              icon={
+              name={
                 copyFailed
                   ? "feather:x"
                   : copied

@@ -1,10 +1,10 @@
 import "./Notes.sass";
 
-import { Icon } from "@iconify/react";
 import { type FC, useState } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { useKeyPress } from "../../../hooks";
+import { Icon } from "../../../icons";
 import { API } from "../../types";
 import { Data, defaultData } from "./data";
 import Input from "./Input";
@@ -54,10 +54,10 @@ const Notes: FC<API<Data>> = ({ data = defaultData, setData }) => {
                 }}
               >
                 {data.placeholderStyle === "icon" ? (
-                  <Icon icon="feather:edit" />
+                  <Icon name="feather:edit" />
                 ) : (
                   <>
-                    <Icon icon="feather:edit-3" />
+                    <Icon name="feather:edit-3" />
                     <span>
                       <FormattedMessage
                         id="plugins.notes.clickToAdd"

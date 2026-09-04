@@ -1,7 +1,7 @@
-import { Icon } from "@iconify/react";
 import type { ChangeEvent, FC } from "react";
 import { FormattedMessage } from "react-intl";
 
+import { Icon } from "../../../icons";
 import { timingMessages } from "../../../locales/messages";
 import { defaultData, Props } from "./types";
 
@@ -25,7 +25,7 @@ const CustomTextSettings: FC<Props> = ({ data = defaultData, setData }) => {
             </span>
           ) : null}
           <a onClick={() => setData({ ...data, paused: !data.paused })}>
-            <Icon icon={`feather:${data.paused ? "play" : "pause"}`} />
+            <Icon name={`feather:${data.paused ? "play" : "pause"}`} />
           </a>
         </span>
         <FormattedMessage

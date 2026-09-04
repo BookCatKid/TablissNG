@@ -1,9 +1,9 @@
 import "./TallyCounter.sass";
 
-import { Icon } from "@iconify/react";
 import type { FC } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
+import { Icon } from "../../../icons";
 import { API } from "../../types";
 import { messages } from "./messages";
 import { Data, defaultData } from "./types";
@@ -32,7 +32,7 @@ const TallyCounter: FC<API<Data>> = ({ data = defaultData, setData }) => {
           onClick={decrement}
           title={intl.formatMessage(messages.decrement)}
         >
-          <Icon icon="feather:minus" />
+          <Icon name="feather:minus" />
         </button>
         <span className="count">{data.count}</span>
         <button
@@ -40,12 +40,12 @@ const TallyCounter: FC<API<Data>> = ({ data = defaultData, setData }) => {
           onClick={increment}
           title={intl.formatMessage(messages.increment)}
         >
-          <Icon icon="feather:plus" />
+          <Icon name="feather:plus" />
         </button>
       </div>
       {data.showReset && (
         <button className="button button--primary reset-btn" onClick={reset}>
-          <Icon icon="feather:rotate-ccw" />
+          <Icon name="feather:rotate-ccw" />
           <span>
             <FormattedMessage {...messages.reset} />
           </span>

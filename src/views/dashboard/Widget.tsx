@@ -1,4 +1,3 @@
-import { Icon } from "@iconify/react";
 import {
   type CSSProperties,
   type FC,
@@ -12,6 +11,7 @@ import { FormattedMessage } from "react-intl";
 
 import { setWidgetDisplay } from "../../db/action";
 import { db, WidgetDisplay } from "../../db/state";
+import { Icon } from "../../icons";
 import { useKey } from "../../lib/db/react";
 import { pluginMessages } from "../../locales/messages";
 import { parseFontFamilyAndFeatures } from "../../utils";
@@ -260,7 +260,7 @@ const Widget: FC<WidgetProps> = ({
       {isEditingPosition && (
         <FloatingButton onClick={handleSave}>
           <Icon
-            icon="feather:check"
+            name="feather:check"
             style={{ marginRight: "8px", verticalAlign: "middle" }}
           />
           <FormattedMessage {...pluginMessages.freeMoveSave} />
