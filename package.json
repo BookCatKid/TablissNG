@@ -51,6 +51,7 @@
     "core-js": "^3.49.0",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
+    "dompurify": "^3.4.14",
     "in-browser-language": "^1.0.3",
     "nanoid": "^6.0.0",
     "normalize.css": "^8.0.1",

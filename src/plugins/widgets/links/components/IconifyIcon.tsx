@@ -20,8 +20,8 @@ export const IconifyIcon: FC<IconifyIconProps> = ({
     <span className="Link-icon">
       <Icon
         name={iconString}
-        width={width}
-        height={height}
+        width={`${width}`}
+        height={`${height}`}
         preserveAspectRatio={conserveAspectRatio ? undefined : "none"}
       />
     </span>

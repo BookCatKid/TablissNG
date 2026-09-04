@@ -549,13 +549,6 @@ const Input: FC<Props> = ({
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.custom)}>
-            <option value="iconify">
-              <FormattedMessage
-                id="plugins.links.input.fromIconify"
-                defaultMessage="From Iconify"
-                description="Dropdown option to use an Iconify icon"
-              />
-            </option>
             <option value="custom_svg">
               <FormattedMessage
                 id="plugins.links.input.customSvgHtml"
@@ -579,6 +572,13 @@ const Input: FC<Props> = ({
             </option>
           </optgroup>
           <optgroup label={intl.formatMessage(messages.iconifyIcons)}>
+            <option value="iconify">
+              <FormattedMessage
+                id="plugins.links.input.fromIconify"
+                defaultMessage="From Iconify"
+                description="Dropdown option to use an Iconify icon"
+              />
+            </option>
             <option value="feather">
               <FormattedMessage
                 id="plugins.links.input.feather"

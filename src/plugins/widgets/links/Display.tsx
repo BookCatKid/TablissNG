@@ -68,8 +68,8 @@ export const Display: FC<Props> = ({
 
   const domain = useMemo(() => getDomain(normalizedUrl), [normalizedUrl]);
 
-  const displayWidth = customWidth || 24;
-  const displayHeight = customHeight || 24;
+  const displayWidth = customWidth ?? 24;
+  const displayHeight = customHeight ?? 24;
 
   const handleClick = async (e: MouseEvent) => {
     if (

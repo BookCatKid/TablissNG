@@ -10,6 +10,23 @@ type LegacyLink = LinkType & {
   imageUrl?: string;
   iconCacheKey?: string;
   iconSize?: number;
+  customIconSize?: number;
+};
+
+type LegacyData = Omit<
+  Data,
+  "links" | "linksNumbered" | "sortBy" | "centerLinks"
+> & {
+  links: LegacyLink[];
+  linksNumbered?: boolean;
+  sortBy?: Data["sortBy"];
+  centerLinks?: boolean;
+  customWidth?: number;
+  customHeight?: number;
+  customIconSize?: number;
+  iconifyIdentifier?: string;
+  iconifyValue?: string;
+  conserveAspectRatio?: boolean;
 };
 
 const hasLegacyIconFields = (link: LegacyLink): boolean =>
@@ -22,8 +39,47 @@ const hasLegacyIconFields = (link: LegacyLink): boolean =>
     link.iconifyValue ||
     link.imageUrl ||
     link.iconCacheKey ||
-    link.iconSize,
+    link.iconSize ||
+    link.customIconSize,
   );
+
+const migrateLegacyDimensions = (link: LegacyLink, data: LegacyData): void => {
+  const legacyIcon = link.icon;
+  const iconUsedIconSize =
+    legacyIcon === "_favicon" ||
+    legacyIcon?.startsWith("_favicon_") ||
+    (typeof legacyIcon === "string" && !legacyIcon.startsWith("_"));
+
+  if (iconUsedIconSize && link.iconSize !== undefined) {
+    link.customWidth = link.iconSize;
+    link.customHeight = link.iconSize;
+    return;
+  }
+
+  const legacySquareSize = link.customIconSize;
+  const fallbackWidth =
+    legacySquareSize ?? data.customWidth ?? data.customIconSize;
+  const fallbackHeight =
+    legacySquareSize ??
+    data.customHeight ??
+    data.customWidth ??
+    data.customIconSize;
+  if (link.customWidth === undefined && fallbackWidth !== undefined) {
+    link.customWidth = fallbackWidth;
+  }
+  if (link.customHeight === undefined && fallbackHeight !== undefined) {
+    link.customHeight = fallbackHeight;
+  }
+
+  // The old custom Iconify renderer always used width for both dimensions.
+  if (
+    legacyIcon === "_custom_iconify" &&
+    link.customWidth !== undefined &&
+    link.customHeight !== link.customWidth
+  ) {
+    link.customHeight = link.customWidth;
+  }
+};
 
 const getMigratedIconConfig = (
   link: LegacyLink,
@@ -211,10 +267,11 @@ export function migrateLinks(
   let dataChanged = false;
   let cacheChanged = false;
   let newCache = { ...cache };
+  const legacyData = data as unknown as LegacyData;
 
   const seenIds = new Set<string>();
 
-  const linksWithIds = data.links.map((link, index) => {
+  const linksWithIds = legacyData.links.map((link, index) => {
     const updatedLink = { ...link } as LegacyLink;
     let linkModified = false;
 
@@ -234,6 +291,7 @@ export function migrateLinks(
       }
 
       if (migratedIcon.iconConfig) {
+        migrateLegacyDimensions(updatedLink, legacyData);
         updatedLink.iconConfig = migratedIcon.iconConfig;
         delete updatedLink.icon;
         delete updatedLink.iconifyValue;
@@ -244,6 +302,7 @@ export function migrateLinks(
         delete updatedLink.SvgString;
         delete updatedLink.IconStringIco;
         delete updatedLink.iconifyIdentifier;
+        delete updatedLink.customIconSize;
         linkModified = true;
       }
     }
@@ -255,8 +314,39 @@ export function migrateLinks(
     return link;
   });
 
+  const migratedData = {
+    ...legacyData,
+    links: linksWithIds,
+    linksNumbered: legacyData.linksNumbered ?? false,
+    sortBy: legacyData.sortBy ?? "none",
+    centerLinks: legacyData.centerLinks ?? false,
+  } as LegacyData;
+
+  const legacyDataKeys = [
+    "customWidth",
+    "customHeight",
+    "customIconSize",
+    "iconifyIdentifier",
+    "iconifyValue",
+    "conserveAspectRatio",
+  ] as const;
+  for (const key of legacyDataKeys) {
+    if (key in migratedData) {
+      delete migratedData[key];
+      dataChanged = true;
+    }
+  }
+
+  if (
+    legacyData.linksNumbered === undefined ||
+    legacyData.sortBy === undefined ||
+    legacyData.centerLinks === undefined
+  ) {
+    dataChanged = true;
+  }
+
   return {
-    data: { ...data, links: linksWithIds },
+    data: migratedData as Data,
     cache: newCache,
     dataChanged: dataChanged,
     cacheChanged,

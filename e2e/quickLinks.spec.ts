@@ -29,6 +29,136 @@ test.describe("Quick Links widget", () => {
     await page.goto("/");
   });
 
+  test("imports and migrates a real pre-overhaul TablissNG setup", async ({
+    page,
+  }) => {
+    // Representative Quick Links data from this public v3 export:
+    // https://github.com/chpaxson/chpaxson.github.io/blob/35e83295c7c4a9aa3a773c6325fba40b045b7a82/data/new-tab-icons/tablissng.json
+    const legacyConfig = {
+      background: {
+        id: "legacy-background",
+        key: "background/colour",
+        display: { blur: 0, luminosity: -0.2 },
+      },
+      "data/legacy-background": { colour: "#15161e" },
+      "data/legacy-links": {
+        columns: 6,
+        conserveAspectRatio: false,
+        customHeight: 24,
+        customWidth: 24,
+        iconifyIdentifier: "feather:",
+        linkOpenStyle: true,
+        links: [
+          {
+            icon: "_favicon_favicone",
+            iconSize: 128,
+            id: "meuiki535j5j74417ts0",
+            lastUsed: 1760166168858,
+            name: "Personal",
+            url: "https://mail.google.com/mail/u/0/#inbox",
+          },
+          {
+            IconStringIco:
+              "https://chpaxson.github.io/data/new-tab-icons/gmessages.svg",
+            customWidth: 24,
+            icon: "_custom_ico",
+            iconCacheKey: "icon_1746214785515",
+            iconSize: 32,
+            id: "meuiki53a3nnk3h4w1n4",
+            lastUsed: 1760145277520,
+            name: "Messages",
+            url: "https://messages.google.com/web",
+          },
+          {
+            icon: "_favicon_google",
+            iconSize: 64,
+            id: "meuiki5334mww9btioh14",
+            lastUsed: 1757117580517,
+            name: "Music",
+            url: "https://music.youtube.com/",
+          },
+        ],
+        linksNumbered: false,
+        visible: true,
+      },
+      focus: false,
+      locale: "en",
+      timeZone: null,
+      "widget/legacy-links": {
+        id: "legacy-links",
+        key: "widget/links",
+        order: 0,
+        display: { position: "topCentre" },
+      },
+      version: 3,
+    };
+
+    await openSettings(page);
+    const fileChooserPromise = page.waitForEvent("filechooser");
+    await page.getByText("Import", { exact: true }).click();
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles({
+      name: "tablissng.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(legacyConfig)),
+    });
+
+    const links = page.locator(".Links .Link");
+    await expect(links).toHaveCount(3);
+
+    const personalLink = links.filter({ hasText: "Personal" });
+    const messagesLink = links.filter({ hasText: "Messages" });
+    const musicLink = links.filter({ hasText: "Music" });
+
+    await expect(personalLink).toHaveAttribute(
+      "href",
+      "https://mail.google.com/mail/u/0/#inbox",
+    );
+    await expect(messagesLink).toHaveAttribute(
+      "href",
+      "https://messages.google.com/web",
+    );
+    await expect(musicLink).toHaveAttribute(
+      "href",
+      "https://music.youtube.com/",
+    );
+
+    const personalIcon = personalLink.locator("img");
+    await expect(personalIcon).toHaveCSS("width", "128px");
+    await expect(personalIcon).toHaveCSS("height", "128px");
+    await expect(personalIcon).toHaveAttribute("src", /\?s=128$/);
+
+    const messagesIcon = messagesLink.locator("img");
+    await expect(messagesIcon).toHaveCSS("width", "24px");
+    await expect(messagesIcon).toHaveCSS("height", "24px");
+    await expect(messagesIcon).toHaveAttribute(
+      "src",
+      "https://chpaxson.github.io/data/new-tab-icons/gmessages.svg",
+    );
+
+    const musicIcon = musicLink.locator("img");
+    await expect(musicIcon).toHaveCSS("width", "64px");
+    await expect(musicIcon).toHaveCSS("height", "64px");
+    await expect(musicIcon).toHaveAttribute("src", /sz=64$/);
+
+    await page.waitForTimeout(100);
+    await page.reload();
+    await expect(links).toHaveCount(3);
+    await expect(personalLink).toHaveAttribute(
+      "href",
+      "https://mail.google.com/mail/u/0/#inbox",
+    );
+    await expect(messagesLink).toHaveAttribute(
+      "href",
+      "https://messages.google.com/web",
+    );
+    await expect(musicLink).toHaveAttribute(
+      "href",
+      "https://music.youtube.com/",
+    );
+    await expect(personalIcon).toHaveCSS("width", "128px");
+  });
+
   test("adds, edits, normalizes, removes, and persists links", async ({
     page,
   }) => {
@@ -191,6 +321,17 @@ test.describe("Quick Links widget", () => {
       "20",
     );
 
+    await widthInput.fill("0");
+    await heightInput.fill("0");
+    await expect(page.locator(".Links .Link svg")).toHaveAttribute(
+      "width",
+      "0",
+    );
+    await expect(page.locator(".Links .Link svg")).toHaveAttribute(
+      "height",
+      "0",
+    );
+
     await page.reload();
     await openSettings(page);
     await expandWidgetSettings(page, "Quick Links");
@@ -202,12 +343,12 @@ test.describe("Quick Links widget", () => {
       reopenedInput
         .locator("label", { hasText: "Icon Width" })
         .locator('input[type="number"]'),
-    ).toHaveValue("40");
+    ).toHaveValue("0");
     await expect(
       reopenedInput
         .locator("label", { hasText: "Icon Height" })
         .locator('input[type="number"]'),
-    ).toHaveValue("20");
+    ).toHaveValue("0");
   });
 
   test("renders every favicon provider with resolution and aspect controls", async ({
@@ -538,6 +679,9 @@ test.describe("Quick Links widget", () => {
       <svg viewBox="0 0 10 10" onload="window.__quickLinksSvgRan = true">
         <script>window.__quickLinksSvgRan = true</script>
         <style>[data-safe-shape] { fill: currentColor; }</style>
+        <animate attributeName="href" values="javascript:window.__quickLinksSvgRan = true" />
+        <animateTransform attributeName="transform" type="rotate" from="0 5 5" to="360 5 5" dur="2s" repeatCount="indefinite" />
+        <set attributeName="onload" to="window.__quickLinksSvgRan = true" />
         <foreignObject><div onclick="window.__quickLinksSvgRan = true">bad</div></foreignObject>
         <a href="javascript:window.__quickLinksSvgRan = true">
           <rect data-safe-shape="yes" width="10" height="10" style="stroke: currentColor" />
@@ -550,9 +694,12 @@ test.describe("Quick Links widget", () => {
     const renderedSvg = page.locator(".Links .Link .Link-icon svg");
     await expect(renderedSvg).toBeVisible();
     await expect(renderedSvg.locator('[data-safe-shape="yes"]')).toBeVisible();
-    await expect(renderedSvg.locator("script, foreignObject")).toHaveCount(0);
+    await expect(
+      renderedSvg.locator("script, animate, set, discard, foreignObject"),
+    ).toHaveCount(0);
     await expect(renderedSvg.locator("[onload], [onclick]")).toHaveCount(0);
     await expect(renderedSvg.locator("style")).toHaveCount(1);
+    await expect(renderedSvg.locator("animateTransform")).toHaveCount(1);
     await expect(
       renderedSvg.locator('[data-safe-shape="yes"]'),
     ).toHaveAttribute("style", "stroke: currentColor");

@@ -1,3 +1,4 @@
+import DOMPurify from "dompurify";
 import type { FC } from "react";
 import { useMemo } from "react";
 
@@ -9,36 +10,6 @@ interface CustomSvgProps {
   className?: string;
 }
 
-const blockedElements = new Set(["foreignobject", "script"]);
-
-const sanitizeAttributes = (element: Element): void => {
-  for (const attribute of Array.from(element.attributes)) {
-    const name = attribute.name.toLowerCase();
-    const value = attribute.value.trim();
-
-    if (
-      name.startsWith("on") ||
-      /(?:javascript:|data\s*:\s*text\/html)/i.test(value)
-    ) {
-      element.removeAttribute(attribute.name);
-    }
-  }
-};
-
-const sanitizeSvg = (svg: SVGElement): void => {
-  sanitizeAttributes(svg);
-
-  for (const element of Array.from(svg.querySelectorAll("*"))) {
-    const name = element.localName.toLowerCase();
-    if (blockedElements.has(name)) {
-      element.remove();
-      continue;
-    }
-
-    sanitizeAttributes(element);
-  }
-};
-
 const parseSvg = (
   svgString: string,
   width: number,
@@ -47,13 +18,14 @@ const parseSvg = (
 ): string | null => {
   try {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(svgString, "image/svg+xml");
+    const sanitized = DOMPurify.sanitize(svgString, {
+      USE_PROFILES: { svg: true, svgFilters: true },
+    });
+    const doc = parser.parseFromString(sanitized, "image/svg+xml");
     const parseError = doc.querySelector("parsererror");
     if (parseError) return null;
     const svg = doc.querySelector("svg");
     if (!svg) return null;
-
-    sanitizeSvg(svg);
 
     svg.setAttribute("width", `${width}`);
     if (!conserveAspectRatio) {

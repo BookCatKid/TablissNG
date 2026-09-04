@@ -13,6 +13,160 @@ const dataWithLink = (link: Record<string, unknown>): Data =>
   }) as unknown as Data;
 
 describe("links/migrateLinks()", () => {
+  it("migrates a real pre-overhaul TablissNG setup without changing icon sizes", () => {
+    // Representative entries from this public v3 export:
+    // https://github.com/chpaxson/chpaxson.github.io/blob/35e83295c7c4a9aa3a773c6325fba40b045b7a82/data/new-tab-icons/tablissng.json
+    const data = {
+      columns: 6,
+      conserveAspectRatio: false,
+      customHeight: 24,
+      customWidth: 24,
+      iconifyIdentifier: "feather:",
+      linkOpenStyle: true,
+      links: [
+        {
+          icon: "_favicon_favicone",
+          iconSize: 128,
+          id: "meuiki535j5j74417ts0",
+          lastUsed: 1760166168858,
+          name: "Personal",
+          url: "https://mail.google.com/mail/u/0/#inbox",
+        },
+        {
+          IconStringIco:
+            "https://chpaxson.github.io/data/new-tab-icons/gmessages.svg",
+          customWidth: 24,
+          icon: "_custom_ico",
+          iconCacheKey: "icon_1746214785515",
+          iconSize: 32,
+          id: "meuiki53a3nnk3h4w1n4",
+          lastUsed: 1760145277520,
+          name: "Messages",
+          url: "https://messages.google.com/web",
+        },
+        {
+          icon: "_favicon_google",
+          iconSize: 64,
+          id: "meuiki5334mww9btioh14",
+          lastUsed: 1757117580517,
+          name: "Music",
+          url: "https://music.youtube.com/",
+        },
+      ],
+      linksNumbered: false,
+      visible: true,
+    } as unknown as Data;
+
+    const result = migrateLinks(data, {});
+
+    expect(result.data).toMatchObject({
+      columns: 6,
+      linkOpenStyle: true,
+      linksNumbered: false,
+      sortBy: "none",
+      centerLinks: false,
+      visible: true,
+    });
+    expect(result.data).not.toHaveProperty("customWidth");
+    expect(result.data).not.toHaveProperty("customHeight");
+    expect(result.data).not.toHaveProperty("iconifyIdentifier");
+    expect(result.data.links).toEqual([
+      {
+        id: "meuiki535j5j74417ts0",
+        lastUsed: 1760166168858,
+        name: "Personal",
+        url: "https://mail.google.com/mail/u/0/#inbox",
+        customWidth: 128,
+        customHeight: 128,
+        iconConfig: {
+          type: "favicon",
+          provider: "favicone",
+          resolution: 128,
+        },
+      },
+      {
+        id: "meuiki53a3nnk3h4w1n4",
+        lastUsed: 1760145277520,
+        name: "Messages",
+        url: "https://messages.google.com/web",
+        customWidth: 24,
+        customHeight: 24,
+        iconConfig: {
+          type: "custom_image_url",
+          url: "https://chpaxson.github.io/data/new-tab-icons/gmessages.svg",
+        },
+      },
+      {
+        id: "meuiki5334mww9btioh14",
+        lastUsed: 1757117580517,
+        name: "Music",
+        url: "https://music.youtube.com/",
+        customWidth: 64,
+        customHeight: 64,
+        iconConfig: {
+          type: "favicon",
+          provider: "google",
+          resolution: 64,
+        },
+      },
+    ]);
+  });
+
+  it("migrates old upstream exports with missing IDs and widget defaults", () => {
+    // Shape used by public Tabliss v2/v3 exports, including:
+    // https://github.com/GVodyanov/Lime_Gruv_i3WM/blob/6b1c744354663d3a6a1d718756a808b1d23ce916/tabliss.json
+    const data = {
+      columns: 2,
+      links: [
+        { url: "https://github.com", name: "GitHub", icon: "github" },
+        { url: "https://stackoverflow.com", icon: "settings" },
+      ],
+      visible: true,
+      linkOpenStyle: false,
+    } as unknown as Data;
+
+    const result = migrateLinks(data, {});
+
+    expect(result.data).toMatchObject({
+      columns: 2,
+      visible: true,
+      linkOpenStyle: false,
+      linksNumbered: false,
+      sortBy: "none",
+      centerLinks: false,
+    });
+    expect(result.data.links.map(({ iconConfig }) => iconConfig)).toEqual([
+      { type: "feather", value: "feather:github" },
+      { type: "feather", value: "feather:settings" },
+    ]);
+    expect(result.data.links.every(({ id }) => Boolean(id))).toBe(true);
+  });
+
+  it("preserves sizes from the oldest customIconSize schema", () => {
+    const data = {
+      columns: 1,
+      customIconSize: 40,
+      links: [
+        {
+          url: "https://example.com",
+          icon: "_custom_svg",
+          SvgString: '<svg viewBox="0 0 1 1"><path d="M0 0" /></svg>',
+        },
+      ],
+      visible: true,
+      linkOpenStyle: false,
+    } as unknown as Data;
+
+    const result = migrateLinks(data, {});
+
+    expect(result.data.links[0]).toMatchObject({
+      customWidth: 40,
+      customHeight: 40,
+      iconConfig: { type: "custom_svg" },
+    });
+    expect(result.data).not.toHaveProperty("customIconSize");
+  });
+
   it.each([
     ["_favicon", "google"],
     ["_favicon_google", "google"],

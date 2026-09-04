@@ -317,7 +317,9 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
         ) : isLoading ? null : visibleIcons.length > 0 ? (
           <div className="icon-grid">
             {visibleIcons.map((icon) => {
-              const [prefix, name] = icon.split(":", 2);
+              const separator = icon.indexOf(":");
+              const prefix = separator === -1 ? "" : icon.slice(0, separator);
+              const name = separator === -1 ? icon : icon.slice(separator + 1);
               const label = name.replace(/-/g, " ");
               const collection = iconSets.find((set) => set.prefix === prefix);
               return (
@@ -353,9 +355,7 @@ export const IconPickerModal: FC<IconPickerModalProps> = ({
           </div>
         )}
 
-        {scope !== FEATHER_SCOPE &&
-        scope !== ALL_SCOPE &&
-        allResults.length > visibleLimit ? (
+        {scope !== FEATHER_SCOPE && allResults.length > visibleLimit ? (
           <button
             type="button"
             className="button button--primary IconPickerModal-more"
