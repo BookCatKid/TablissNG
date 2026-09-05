@@ -167,15 +167,35 @@ export const extension = async (
               }
             }
 
-            // Remove obsolete chunks first so a chunked-to-small rewrite does
-            // not temporarily exceed the total sync-storage quota. Generation-
-            // scoped chunk keys and per-key decode isolation make this safe even
-            // if another device observes the transition between operations.
-            if (deletes.length > 0) {
-              await storageArea.remove(deletes);
+            const hasUpdates = Object.keys(updates).length > 0;
+            let deletesApplied = false;
+
+            if (hasUpdates) {
+              try {
+                // Keep the previous chunk set readable until its replacement is
+                // committed whenever sync quota allows both to coexist briefly.
+                await storageArea.set(updates);
+              } catch (error) {
+                if (deletes.length === 0) throw error;
+
+                // Near the total sync quota, make room for the replacement but
+                // keep a rollback copy so a failed retry cannot destroy the
+                // previously readable value.
+                const rollback = await storageArea.get(deletes);
+                await storageArea.remove(deletes);
+                deletesApplied = true;
+                try {
+                  await storageArea.set(updates);
+                } catch (retryError) {
+                  if (Object.keys(rollback).length > 0) {
+                    await storageArea.set(rollback);
+                  }
+                  throw retryError;
+                }
+              }
             }
-            if (Object.keys(updates).length > 0) {
-              await storageArea.set(updates);
+            if (!deletesApplied && deletes.length > 0) {
+              await storageArea.remove(deletes);
             }
 
             chunkSets = nextChunkSets;
