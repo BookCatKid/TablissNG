@@ -20,6 +20,12 @@ type ChromeExtensionApi = {
       callback?: (granted: boolean) => void,
     ): Promise<boolean> | void;
   };
+  storage: {
+    sync: {
+      get(keys?: null): Promise<Record<string, unknown>>;
+      get(keys: null, callback: (items: Record<string, unknown>) => void): void;
+    };
+  };
   bookmarks: {
     getTree(
       callback?: (results: BookmarkTreeNodeFixture[]) => void,
@@ -50,6 +56,18 @@ async function addQuickLinks(page: Page) {
   return widgetSettingsFieldset(page, "Quick Links");
 }
 
+async function hasBookmarksPermission(page: Page): Promise<boolean> {
+  return page.evaluate(
+    () =>
+      new Promise<boolean>((resolve) => {
+        (window as ExtensionWindow).chrome.permissions.contains(
+          { permissions: ["bookmarks"] },
+          resolve,
+        );
+      }),
+  );
+}
+
 test.describe("Quick Links extension integration", () => {
   test("shows the optional bookmarks permission gate", async () => {
     const session = await launchExtension();
@@ -63,13 +81,7 @@ test.describe("Quick Links extension integration", () => {
       await expect(
         settings.getByRole("button", { name: "Request Permission" }),
       ).toBeEnabled();
-      expect(
-        await page.evaluate(() =>
-          (window as ExtensionWindow).chrome.permissions.contains({
-            permissions: ["bookmarks"],
-          }),
-        ),
-      ).toBe(false);
+      expect(await hasBookmarksPermission(page)).toBe(false);
     } finally {
       await closeExtension(session);
     }
@@ -262,13 +274,7 @@ test.describe("Quick Links extension integration", () => {
         };
       });
 
-      expect(
-        await page.evaluate(() =>
-          (window as ExtensionWindow).chrome.permissions.contains({
-            permissions: ["bookmarks"],
-          }),
-        ),
-      ).toBe(false);
+      expect(await hasBookmarksPermission(page)).toBe(false);
 
       const requestPermission = settings.getByRole("button", {
         name: "Request Permission",
@@ -285,13 +291,7 @@ test.describe("Quick Links extension integration", () => {
       // Chrome owns the native Allow/Deny sheet from here. Playwright does not
       // expose extension permission prompts, so the E2E stops at the real API
       // boundary instead of mutating the manifest or faking a grant.
-      expect(
-        await page.evaluate(() =>
-          (window as ExtensionWindow).chrome.permissions.contains({
-            permissions: ["bookmarks"],
-          }),
-        ),
-      ).toBe(false);
+      expect(await hasBookmarksPermission(page)).toBe(false);
     } finally {
       await closeExtension(session);
     }
@@ -396,7 +396,23 @@ test.describe("Quick Links extension integration", () => {
         page.locator('.Links .Link[href="https://example.com/nested"]'),
       ).toBeVisible();
 
-      await page.waitForTimeout(1100);
+      await expect
+        .poll(() =>
+          page.evaluate(async () => {
+            const stored = await new Promise<Record<string, unknown>>(
+              (resolve) => {
+                (window as ExtensionWindow).chrome.storage.sync.get(
+                  null,
+                  resolve,
+                );
+              },
+            );
+            return JSON.stringify(stored).includes(
+              "https://example.com/nested",
+            );
+          }),
+        )
+        .toBe(true);
       await page.reload();
       await expect(page.locator(".Dashboard")).toBeVisible();
       await expect(page.locator(".Links .Link-name")).toContainText([

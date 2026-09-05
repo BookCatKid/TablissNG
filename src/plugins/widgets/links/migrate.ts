@@ -327,9 +327,7 @@ export function migrateLinks(
         removeLegacyIconFields(updatedLink);
         linkModified = true;
       } else if (hasRecognizedLegacyIcon(updatedLink)) {
-        // Known legacy icon types with missing payloads could not render in the
-        // old implementation either. Drop their stale metadata instead of
-        // preserving an entry that can never be migrated.
+        // Drop known legacy icon types with missing payloads
         removeLegacyIconFields(updatedLink);
         linkModified = true;
       }

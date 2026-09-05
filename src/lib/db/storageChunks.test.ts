@@ -18,7 +18,7 @@ const makeLargeValue = (marker = "x") => ({
   })),
 });
 
-test("keeps small sync values in the legacy single-item layout", () => {
+test("keeps small sync values in the single-item layout", () => {
   const value = { links: [{ id: "one", url: "https://example.com" }] };
   const encoded = encodeSyncValue(NAME, KEY, value);
 
@@ -73,7 +73,7 @@ test("does not combine chunks from different generations", () => {
   };
   const secondChunkKeys = syncChunkKeys(NAME, KEY, {
     chunkCount: second.chunkCount,
-    generation: second.generation,
+    generation: second.generation!,
   });
   mixed[secondChunkKeys[0]] = second.updates[secondChunkKeys[0]];
 
@@ -93,7 +93,7 @@ test("isolates an incomplete chunk set from unrelated sync values", () => {
   };
   const chunkKeys = syncChunkKeys(NAME, KEY, {
     chunkCount: encoded.chunkCount,
-    generation: encoded.generation,
+    generation: encoded.generation!,
   });
   delete stored[chunkKeys[0]];
 
@@ -113,13 +113,43 @@ test("isolates invalid chunk JSON from unrelated sync values", () => {
   };
   const chunkKeys = syncChunkKeys(NAME, KEY, {
     chunkCount: encoded.chunkCount,
-    generation: encoded.generation,
+    generation: encoded.generation!,
   });
   stored[chunkKeys[0]] = "not-json";
 
   expect(decodeSyncStorage(stored, NAME).entries).toEqual([
     ["locale", "en-US"],
   ]);
+});
+
+test("rejects unbounded chunk counts without blocking unrelated sync values", () => {
+  const stored = {
+    [`${NAME}/${KEY}`]: {
+      __tablissStorage: "tabliss-sync-chunks-v1",
+      chunks: Number.MAX_SAFE_INTEGER,
+      generation: "corrupt-generation",
+    },
+    [`${NAME}/locale`]: "en-US",
+  };
+
+  const decoded = decodeSyncStorage(stored, NAME);
+  expect(decoded.entries).toEqual([["locale", "en-US"]]);
+  expect(decoded.chunkSets.has(KEY)).toBe(false);
+});
+
+test("refuses to construct an unbounded chunk-key list", () => {
+  expect(() =>
+    syncChunkKeys(NAME, KEY, {
+      chunkCount: Number.MAX_SAFE_INTEGER,
+      generation: "corrupt-generation",
+    }),
+  ).toThrow(RangeError);
+});
+
+test("refuses to encode values requiring more than the safe chunk limit", () => {
+  expect(() =>
+    encodeSyncValue(NAME, "data/huge", { value: "x".repeat(300_000) }),
+  ).toThrow("Sync-storage value requires too many chunks");
 });
 
 test("removes old chunks when a chunked value becomes small", () => {
@@ -138,36 +168,15 @@ test("removes the manifest and all chunks when deleting a value", () => {
   ]);
 });
 
-test("loads existing v1 chunked sync data and tracks it for cleanup", () => {
-  const value = { links: [{ id: "legacy" }, { id: "legacy-two" }] };
-  const serialised = JSON.stringify(value);
-  const split = Math.floor(serialised.length / 2);
-  const stored = {
-    [`${NAME}/${KEY}`]: {
-      __tablissStorage: "tabliss-sync-chunks-v1",
-      chunks: 2,
-    },
-    [`${NAME}/$chunks/${encodeURIComponent(KEY)}/0`]: serialised.slice(
-      0,
-      split,
-    ),
-    [`${NAME}/$chunks/${encodeURIComponent(KEY)}/1`]: serialised.slice(split),
-  };
-
-  const decoded = decodeSyncStorage(stored, NAME);
-  expect(decoded.entries).toEqual([[KEY, value]]);
-  expect(decoded.chunkSets.get(KEY)).toEqual({ chunkCount: 2 });
-});
-
 test("loads existing unchunked sync data unchanged", () => {
   const stored = {
     [`${NAME}/locale`]: "en-US",
-    [`${NAME}/${KEY}`]: { links: [{ id: "legacy" }] },
+    [`${NAME}/${KEY}`]: { links: [{ id: "existing" }] },
     "other-extension/value": "ignore me",
   };
 
   expect(decodeSyncStorage(stored, NAME).entries).toEqual([
     ["locale", "en-US"],
-    [KEY, { links: [{ id: "legacy" }] }],
+    [KEY, { links: [{ id: "existing" }] }],
   ]);
 });

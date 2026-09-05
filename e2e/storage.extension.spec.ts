@@ -135,7 +135,7 @@ test.describe("Extension sync storage", () => {
       const manifest = stored[STORED_LINKS_KEY] as ChunkManifest;
       const keys = chunkKeys(stored, manifest.generation);
 
-      expect(manifest.__tablissStorage).toBe("tabliss-sync-chunks-v2");
+      expect(manifest.__tablissStorage).toBe("tabliss-sync-chunks-v1");
       expect(manifest.generation).toEqual(expect.any(String));
       expect(keys).toHaveLength(manifest.chunks);
       for (const key of [STORED_LINKS_KEY, ...keys]) {

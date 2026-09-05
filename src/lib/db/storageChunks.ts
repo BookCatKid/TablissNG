@@ -1,7 +1,7 @@
 const SYNC_ITEM_TARGET_BYTES = 7_000;
+const MAX_SYNC_CHUNKS = 32;
 const CHUNK_NAMESPACE = "$chunks";
-const CHUNK_MANIFEST_TAG = "tabliss-sync-chunks-v2";
-const LEGACY_CHUNK_MANIFEST_TAG = "tabliss-sync-chunks-v1";
+const CHUNK_MANIFEST_TAG = "tabliss-sync-chunks-v1";
 
 type ChunkManifest = {
   __tablissStorage: typeof CHUNK_MANIFEST_TAG;
@@ -9,14 +9,9 @@ type ChunkManifest = {
   generation: string;
 };
 
-type LegacyChunkManifest = {
-  __tablissStorage: typeof LEGACY_CHUNK_MANIFEST_TAG;
-  chunks: number;
-};
-
 export interface SyncChunkSet {
   chunkCount: number;
-  generation?: string;
+  generation: string;
 }
 
 export interface DecodedSyncStorage {
@@ -54,39 +49,33 @@ export const syncChunkKey = (
 ): string =>
   `${name}/${CHUNK_NAMESPACE}/${encodeURIComponent(key)}/${encodeURIComponent(generation)}/${index}`;
 
-const legacySyncChunkKey = (name: string, key: string, index: number): string =>
-  `${name}/${CHUNK_NAMESPACE}/${encodeURIComponent(key)}/${index}`;
+const isValidChunkCount = (value: unknown): value is number =>
+  typeof value === "number" &&
+  Number.isInteger(value) &&
+  value > 0 &&
+  value <= MAX_SYNC_CHUNKS;
+
+const assertValidChunkCount = (value: number): void => {
+  if (!isValidChunkCount(value)) {
+    throw new RangeError(`Invalid sync-storage chunk count: ${value}`);
+  }
+};
 
 const isChunkManifest = (value: unknown): value is ChunkManifest => {
   if (typeof value !== "object" || value === null) return false;
   const candidate = value as Partial<ChunkManifest>;
   return (
     candidate.__tablissStorage === CHUNK_MANIFEST_TAG &&
-    typeof candidate.chunks === "number" &&
-    Number.isInteger(candidate.chunks) &&
-    candidate.chunks > 0 &&
+    isValidChunkCount(candidate.chunks) &&
     typeof candidate.generation === "string" &&
     candidate.generation.length > 0
-  );
-};
-
-const isLegacyChunkManifest = (
-  value: unknown,
-): value is LegacyChunkManifest => {
-  if (typeof value !== "object" || value === null) return false;
-  const candidate = value as Partial<LegacyChunkManifest>;
-  return (
-    candidate.__tablissStorage === LEGACY_CHUNK_MANIFEST_TAG &&
-    typeof candidate.chunks === "number" &&
-    Number.isInteger(candidate.chunks) &&
-    candidate.chunks > 0
   );
 };
 
 const isChunkStorageMarker = (value: unknown): boolean => {
   if (typeof value !== "object" || value === null) return false;
   const tag = (value as { __tablissStorage?: unknown }).__tablissStorage;
-  return tag === CHUNK_MANIFEST_TAG || tag === LEGACY_CHUNK_MANIFEST_TAG;
+  return tag === CHUNK_MANIFEST_TAG;
 };
 
 const splitSerialisedValue = (
@@ -99,6 +88,10 @@ const splitSerialisedValue = (
   let start = 0;
 
   while (start < serialised.length) {
+    if (chunks.length >= MAX_SYNC_CHUNKS) {
+      throw new RangeError("Sync-storage value requires too many chunks");
+    }
+
     const index = chunks.length;
     const keyForChunk = syncChunkKey(name, key, generation, index);
     let low = start + 1;
@@ -134,12 +127,12 @@ export const syncChunkKeys = (
   name: string,
   key: string,
   chunkSet: SyncChunkSet,
-): string[] =>
-  Array.from({ length: chunkSet.chunkCount }, (_, index) =>
-    chunkSet.generation
-      ? syncChunkKey(name, key, chunkSet.generation, index)
-      : legacySyncChunkKey(name, key, index),
+): string[] => {
+  assertValidChunkCount(chunkSet.chunkCount);
+  return Array.from({ length: chunkSet.chunkCount }, (_, index) =>
+    syncChunkKey(name, key, chunkSet.generation, index),
   );
+};
 
 export const encodeSyncValue = (
   name: string,
@@ -204,22 +197,21 @@ export const decodeSyncStorage = (
     }
 
     const key = keyInStorage.slice(prefix.length);
-    if (!isChunkManifest(value) && !isLegacyChunkManifest(value)) {
+    if (!isChunkManifest(value)) {
       if (isChunkStorageMarker(value)) continue;
       entries.push([key, value]);
       continue;
     }
 
-    const chunkSet: SyncChunkSet = isChunkManifest(value)
-      ? { chunkCount: value.chunks, generation: value.generation }
-      : { chunkCount: value.chunks };
+    const chunkSet: SyncChunkSet = {
+      chunkCount: value.chunks,
+      generation: value.generation,
+    };
     chunkSets.set(key, chunkSet);
 
     const chunks: string[] = [];
     for (let index = 0; index < value.chunks; index += 1) {
-      const chunkKey = chunkSet.generation
-        ? syncChunkKey(name, key, chunkSet.generation, index)
-        : legacySyncChunkKey(name, key, index);
+      const chunkKey = syncChunkKey(name, key, chunkSet.generation, index);
       const chunk = stored[chunkKey];
       if (typeof chunk !== "string") {
         chunks.length = 0;
