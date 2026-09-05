@@ -45,6 +45,16 @@ const messages = defineMessages({
     defaultMessage: "Star BookCatKid/tablissNG on GitHub",
     description: "ARIA label for the GitHub star button",
   },
+  ariaSponsor: {
+    id: "settings.aria.sponsor",
+    defaultMessage: "Sponsor TablissNG on GitHub",
+    description: "ARIA label for the GitHub Sponsors link",
+  },
+  sponsor: {
+    id: "settings.support.sponsor",
+    defaultMessage: "Sponsor",
+    description: "Call to action to sponsor TablissNG on GitHub",
+  },
   settingsImportExportReset: {
     id: "settings.importExportReset",
     defaultMessage:
@@ -317,9 +327,9 @@ const Settings: FC = () => {
               <div
                 style={{
                   marginTop: "14px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "14px",
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "10px",
                   width: "100%",
                 }}
               >
@@ -344,53 +354,57 @@ const Settings: FC = () => {
                       <Icon name="feather:code" />{" "}
                       <FormattedMessage
                         id="settings.support.contribute"
-                        defaultMessage="Contribute to the project!"
+                        defaultMessage="Contribute"
                         description="Call to action to contribute to the project"
                       />
                     </span>
                   </GitHubButton>
                 </div>
 
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "10px",
-                    width: "100%",
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <GitHubButton
-                      href="https://github.com/BookCatKid/tablissNG/subscription"
-                      data-icon="octicon-eye"
-                      data-size="large"
-                      data-show-count="true"
-                      data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label={intl.formatMessage(messages.ariaWatch)}
-                    >
-                      <FormattedMessage
-                        id="settings.github.watch"
-                        defaultMessage="Watch"
-                        description="GitHub Watch button text"
-                      />
-                    </GitHubButton>
-                  </div>
+                <div style={{ width: "100%" }}>
+                  <GitHubButton
+                    href="https://github.com/sponsors/BookCatKid"
+                    data-icon="octicon-heart"
+                    data-size="large"
+                    data-color-scheme={isDark ? "dark" : "light"}
+                    aria-label={intl.formatMessage(messages.ariaSponsor)}
+                  >
+                    <FormattedMessage {...messages.sponsor} />
+                  </GitHubButton>
+                </div>
 
-                  <div style={{ flex: 1 }}>
-                    <GitHubButton
-                      href="https://github.com/BookCatKid/tablissNG"
-                      data-icon="octicon-star"
-                      data-size="large"
-                      data-show-count="true"
-                      data-color-scheme={isDark ? "dark" : "light"}
-                      aria-label={intl.formatMessage(messages.ariaStar)}
-                    >
-                      <FormattedMessage
-                        id="settings.github.star"
-                        defaultMessage="Star"
-                        description="GitHub Star button text"
-                      />
-                    </GitHubButton>
-                  </div>
+                <div style={{ width: "100%" }}>
+                  <GitHubButton
+                    href="https://github.com/BookCatKid/tablissNG/subscription"
+                    data-icon="octicon-eye"
+                    data-size="large"
+                    data-show-count="true"
+                    data-color-scheme={isDark ? "dark" : "light"}
+                    aria-label={intl.formatMessage(messages.ariaWatch)}
+                  >
+                    <FormattedMessage
+                      id="settings.github.watch"
+                      defaultMessage="Watch"
+                      description="GitHub Watch button text"
+                    />
+                  </GitHubButton>
+                </div>
+
+                <div style={{ width: "100%" }}>
+                  <GitHubButton
+                    href="https://github.com/BookCatKid/tablissNG"
+                    data-icon="octicon-star"
+                    data-size="large"
+                    data-show-count="true"
+                    data-color-scheme={isDark ? "dark" : "light"}
+                    aria-label={intl.formatMessage(messages.ariaStar)}
+                  >
+                    <FormattedMessage
+                      id="settings.github.star"
+                      defaultMessage="Star"
+                      description="GitHub Star button text"
+                    />
+                  </GitHubButton>
                 </div>
               </div>
             ),
