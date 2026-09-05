@@ -40,8 +40,7 @@
     "deps:check": "pnpm dlx npm-check",
     "deps:update": "pnpm dlx npm-check -u",
     "typecheck": "tsc",
-    "prepare": "husky",
-    "test:e2e:storage": "playwright test --config playwright.extension.config.ts e2e/storage.extension.spec.ts"
+    "prepare": "husky"
   },
   "lint-staged": {
     "**/*.{ts,tsx}": "eslint --fix --cache",

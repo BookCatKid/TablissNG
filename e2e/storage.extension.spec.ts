@@ -11,7 +11,7 @@ import {
 } from "@playwright/test";
 import { rspack } from "@rspack/core";
 
-import type {} from "./fixtures/storage/harness";
+import type { StorageBackend } from "./fixtures/storage/harness";
 
 let extensionPath: string;
 let context: BrowserContext;
@@ -92,7 +92,7 @@ test.afterEach(async () => {
   if (profilePath) await rm(profilePath, { recursive: true, force: true });
 });
 
-async function start(target = page, area: "sync" | "local" = "sync") {
+async function start(target = page, area: StorageBackend = "sync") {
   expect(
     await target.evaluate((area) => window.storageHarness.start(area), area),
   ).toBe(true);
@@ -106,10 +106,10 @@ async function save(value: unknown, target = page, key = "value") {
     { serialized: JSON.stringify(value), key },
   );
 }
-async function reload(target = page) {
+async function reload(target = page, area: StorageBackend = "sync") {
   await target.reload();
   await target.waitForFunction(() => !!window.storageHarness);
-  await start(target);
+  await start(target, area);
   return JSON.parse(
     await target.evaluate(() => JSON.stringify(window.storageHarness.values())),
   );
@@ -713,4 +713,77 @@ test("a damaged manifest arriving after startup cannot be overwritten by a later
   expect(await page.evaluate(() => window.storageHarness.errors)).toEqual([
     expect.stringContaining("Invalid chunk manifest"),
   ]);
+});
+
+test.describe("storage provider parity", () => {
+  test("IndexedDB persists ordinary and large values, updates, deletes, and reloads", async () => {
+    await start(page, "indexeddb");
+    const values = [
+      { small: true, nested: [1, null, "text"] },
+      { payload: "😀漢é".repeat(5000), revision: 2 },
+      { small: "again" },
+    ];
+
+    for (const value of values) {
+      await save(value);
+      expect((await reload(page, "indexeddb")).value).toEqual(value);
+    }
+
+    await page.evaluate(async () => {
+      window.storageHarness.del("value");
+      await window.storageHarness.drain();
+    });
+    expect((await reload(page, "indexeddb")).value).toBeUndefined();
+    expect(await page.evaluate(() => window.storageHarness.errors)).toEqual([]);
+  });
+
+  test("IndexedDB keeps unrelated records when one record is deleted", async () => {
+    await start(page, "indexeddb");
+    await page.evaluate(async () => {
+      window.storageHarness.put("first", { keep: true });
+      window.storageHarness.put("second", { remove: true });
+      await window.storageHarness.drain();
+    });
+    await page.evaluate(async () => {
+      window.storageHarness.del("second");
+      await window.storageHarness.drain();
+    });
+    const restored = await reload(page, "indexeddb");
+    expect(restored.first).toEqual({ keep: true });
+    expect(restored.second).toBeUndefined();
+  });
+
+  test("managed storage reports its read-only write failure without claiming persistence", async () => {
+    await start(page, "managed");
+    await page.evaluate(async () => {
+      window.storageHarness.put("value", { shouldNotPersist: true });
+      window.storageHarness.flush();
+    });
+    await expect
+      .poll(() => page.evaluate(() => window.storageHarness.errors.join("\n")))
+      .toMatch(/managed|write|not allowed|read.?only/i);
+    expect(
+      (await page.evaluate(() => window.storageHarness.raw())).value,
+    ).toBeUndefined();
+  });
+
+  test("local storage persists ordinary CRUD without applying sync chunk rules", async () => {
+    await start(page, "local");
+    const value = {
+      payload: "😀漢é".repeat(5000),
+      __tablissChunks: ["user data"],
+    };
+    await save(value);
+    expect((await reload(page, "local")).value).toEqual(value);
+
+    await page.evaluate(async () => {
+      window.storageHarness.del("value");
+      window.storageHarness.put("other", { survives: true });
+      await window.storageHarness.drain();
+    });
+    const restored = await reload(page, "local");
+    expect(restored.value).toBeUndefined();
+    expect(restored.other).toEqual({ survives: true });
+    expect(await page.evaluate(() => window.storageHarness.errors)).toEqual([]);
+  });
 });

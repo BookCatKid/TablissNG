@@ -1,7 +1,7 @@
 import browserApi from "webextension-polyfill";
 
 import * as DB from "../../../src/lib/db/db";
-import { extension } from "../../../src/lib/db/storage";
+import { extension, indexeddb } from "../../../src/lib/db/storage";
 import * as Stream from "../../../src/lib/db/stream";
 
 type Method = "set" | "remove" | "get";
@@ -10,17 +10,18 @@ type Fault = {
   skip?: number;
   action: "fail" | "hold" | "fail-after";
 };
-const name = "stress/config";
+export type StorageBackend = "sync" | "local" | "managed" | "indexeddb";
+let name = "stress/config";
 const barrierKey = `__barrier/${crypto.randomUUID()}`;
 const errors: string[] = [];
 let fault: Fault | undefined;
 let release: (() => void) | undefined;
 let blocked = false;
 let db = DB.init();
-let area: "sync" | "local" = "sync";
+let area: StorageBackend = "sync";
 const calls: { method: Method; keys: string[] }[] = [];
 const storage = Object.fromEntries(
-  (["sync", "local"] as const).map((storageArea) => [
+  (["sync", "local", "managed"] as const).map((storageArea) => [
     storageArea,
     Object.fromEntries(
       (["get", "set", "remove"] as const).map((method) => [
@@ -65,18 +66,63 @@ const storage = Object.fromEntries(
 );
 Object.defineProperty(globalThis, "browser", { value: { storage } });
 
+// Read/write the browser's physical IndexedDB store independently of the
+// production adapter, so persistence assertions cannot pass on in-memory state.
+const idbStorage = (
+  updates?: Record<string, unknown>,
+): Promise<Record<string, unknown>> =>
+  new Promise((resolve, reject) => {
+    const open = indexedDB.open(name, 1);
+    open.onerror = () => reject(open.error);
+    open.onupgradeneeded = () => open.result.createObjectStore("changes");
+    open.onsuccess = () => {
+      const conn = open.result;
+      const trx = conn.transaction(
+        "changes",
+        updates ? "readwrite" : "readonly",
+      );
+      const store = trx.objectStore("changes");
+      if (updates) {
+        for (const [key, value] of Object.entries(updates))
+          store.put(value, key);
+      }
+      const keys = store.getAllKeys();
+      const values = store.getAll();
+      trx.oncomplete = () => {
+        conn.close();
+        resolve(
+          Object.fromEntries(
+            keys.result.map((key, i) => [String(key), values.result[i]]),
+          ),
+        );
+      };
+      trx.onabort = () => {
+        conn.close();
+        reject(trx.error);
+      };
+    };
+  });
+
 export const harness = {
   errors,
   calls,
   get blocked() {
     return blocked;
   },
-  async start(storageArea: "sync" | "local" = "sync") {
+  async start(
+    storageArea: StorageBackend = "sync",
+    storageName = "stress/config",
+    defaults?: Record<string, unknown>,
+  ) {
     area = storageArea;
-    db = DB.init();
+    name = storageName;
+    db = DB.init(defaults);
     try {
-      Stream.subscribe(await extension(db, name, area), (error) =>
-        errors.push(error.message),
+      Stream.subscribe(
+        await (area === "indexeddb"
+          ? indexeddb(db, name)
+          : extension(db, name, area)),
+        (error) => errors.push(error.message),
       );
       return true;
     } catch (error) {
@@ -97,7 +143,7 @@ export const harness = {
     DB.del(db, key);
   },
   values() {
-    return Object.fromEntries(db);
+    return Object.fromEntries(DB.prefix(db, ""));
   },
   flush() {
     window.dispatchEvent(new Event("beforeunload"));
@@ -110,26 +156,31 @@ export const harness = {
     this.flush();
     const deadline = Date.now() + 10_000;
     while (
-      (await browserApi.storage[area].get(`${name}/${barrierKey}`))[
-        `${name}/${barrierKey}`
+      (await this.raw())[
+        area === "indexeddb" ? barrierKey : `${name}/${barrierKey}`
       ] !== marker
     ) {
       if (Date.now() > deadline)
         throw new Error(`Save did not finish: ${errors.join("; ")}`);
       await new Promise((resolve) => setTimeout(resolve, 5));
     }
-    await navigator.locks.request(
-      `tabliss-storage:${area}:${name}`,
-      async () => {},
-    );
+    if (area !== "indexeddb") {
+      await navigator.locks.request(
+        `tabliss-storage:${area}:${name}`,
+        async () => {},
+      );
+    }
   },
   raw() {
-    return browserApi.storage[area].get();
+    return area === "indexeddb" ? idbStorage() : browserApi.storage[area].get();
   },
   seed(data: Record<string, unknown>) {
-    return browserApi.storage[area].set(data);
+    return area === "indexeddb"
+      ? idbStorage(data).then(() => {})
+      : browserApi.storage[area].set(data);
   },
   remove(keys: string[]) {
+    if (area === "indexeddb") throw new Error("Use del() for IndexedDB tests");
     return browserApi.storage[area].remove(keys);
   },
 };
