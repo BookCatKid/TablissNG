@@ -1,4 +1,10 @@
 import * as DB from "./db";
+import {
+  decodeSyncStorage,
+  encodeSyncValue,
+  syncChunkDeletes,
+  type SyncChunkSet,
+} from "./storageChunks";
 import * as Stream from "./stream";
 
 /** IndexedDB storage provider */
@@ -93,17 +99,25 @@ export const extension = async (
     });
 
   const storageArea = browser.storage[area];
+  let chunkSets = new Map<string, SyncChunkSet>();
 
   // Pull
   await storageArea
     .get()
-    .then((stored) =>
+    .then((stored) => {
+      if (area === "sync") {
+        const decoded = decodeSyncStorage(stored, name);
+        chunkSets = decoded.chunkSets;
+        decoded.entries.forEach(([key, value]) => DB.put(db, key, value));
+        return;
+      }
+
       Object.keys(stored)
-        .filter((key) => key.startsWith(name))
+        .filter((key) => key.startsWith(`${name}/`))
         .forEach((key) =>
           DB.put(db, key.substring(name.length + 1), stored[key]),
-        ),
-    )
+        );
+    })
     .catch((error) => {
       throw mapError("Cannot read from storage", error);
     });
@@ -113,6 +127,7 @@ export const extension = async (
   const handleError = (message: string) => (err: unknown) => {
     Stream.publish(errors, mapError(message, err));
   };
+  let syncWriteQueue = Promise.resolve();
   DB.listen(
     db,
     batch((changes) => {
@@ -121,6 +136,74 @@ export const extension = async (
       // TODO: test for both updates and deletes for the same key
       // TODO: iterator helpers
       const changesArray = Array.from(changes);
+
+      if (area === "sync") {
+        syncWriteQueue = syncWriteQueue
+          .then(async () => {
+            const updates: Record<string, unknown> = {};
+            const deletes: string[] = [];
+            const nextChunkSets = new Map(chunkSets);
+
+            for (const [key, val] of changesArray) {
+              const previousChunkSet = chunkSets.get(key);
+
+              if (val === undefined) {
+                deletes.push(...syncChunkDeletes(name, key, previousChunkSet));
+                nextChunkSets.delete(key);
+                continue;
+              }
+
+              const encoded = encodeSyncValue(name, key, val, previousChunkSet);
+              Object.assign(updates, encoded.updates);
+              deletes.push(...encoded.deletes);
+
+              if (encoded.chunkCount > 0 && encoded.generation) {
+                nextChunkSets.set(key, {
+                  chunkCount: encoded.chunkCount,
+                  generation: encoded.generation,
+                });
+              } else {
+                nextChunkSets.delete(key);
+              }
+            }
+
+            const hasUpdates = Object.keys(updates).length > 0;
+            let deletesApplied = false;
+
+            if (hasUpdates) {
+              try {
+                // Keep the previous chunk set readable until its replacement is
+                // committed whenever sync quota allows both to coexist briefly.
+                await storageArea.set(updates);
+              } catch (error) {
+                if (deletes.length === 0) throw error;
+
+                // Near the total sync quota, make room for the replacement but
+                // keep a rollback copy so a failed retry cannot destroy the
+                // previously readable value.
+                const rollback = await storageArea.get(deletes);
+                await storageArea.remove(deletes);
+                deletesApplied = true;
+                try {
+                  await storageArea.set(updates);
+                } catch (retryError) {
+                  if (Object.keys(rollback).length > 0) {
+                    await storageArea.set(rollback);
+                  }
+                  throw retryError;
+                }
+              }
+            }
+            if (!deletesApplied && deletes.length > 0) {
+              await storageArea.remove(deletes);
+            }
+
+            chunkSets = nextChunkSets;
+          })
+          .catch(handleError("Cannot write changes to storage"));
+        return;
+      }
+
       const updates = Object.fromEntries(
         changesArray
           .filter(([, val]) => val !== undefined)
