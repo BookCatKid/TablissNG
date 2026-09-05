@@ -51,6 +51,36 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  extension-e2e:
+    name: Extension storage and UI stress tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Install Chromium and virtual display dependencies
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run extension E2E and storage stress tests
+        run: xvfb-run -a pnpm test:e2e:extension
+        env:
+          UNSPLASH_API_KEY: placeholder
+
+      - name: Upload extension test results on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-e2e-results
+          path: test-results/
+          retention-days: 7
+
   translations-check:
     name: Translations Check
     runs-on: ubuntu-latest

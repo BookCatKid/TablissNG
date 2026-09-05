@@ -4,7 +4,8 @@ Run the adapter suite with `pnpm test:e2e:storage`. For repeated runs, use
 `pnpm test:e2e:storage --repeat-each=5`. Run `pnpm test:e2e:extension` to also
 build the production Chromium extension and exercise its dashboard, including
 oversized Notes edits and a full browser restart. Headed Chromium is required;
-on Linux CI use `xvfb-run -a pnpm test:e2e:extension`.
+on Linux CI use `xvfb-run -a pnpm test:e2e:extension`. The reusable test
+workflow runs this in a separate extension E2E job on pull requests and pushes.
 
 The adapter suite builds a temporary, minimal extension that imports the actual
 `src/lib/db/storage.ts`, DB and Stream modules. Each test uses a fresh disposable
@@ -24,7 +25,8 @@ Coverage includes:
 - Hundreds of distinct keys in one batch, delayed overlapping batches, and
   real Chrome total-byte, item-count and write-rate quota rejections.
 - Failures before chunk staging, before pointer publication, during deletion,
-  and during obsolete-chunk cleanup; recovery on subsequent saves.
+  and during obsolete-chunk cleanup; lost acknowledgements after successful
+  writes; recovery on subsequent saves.
 - Closing a writer between persistence phases, plus a full browser restart
   after a successful UI save.
 - Missing, malformed, reordered, duplicated, foreign, non-string and modified
