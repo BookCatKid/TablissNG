@@ -43,6 +43,37 @@ const hasLegacyIconFields = (link: LegacyLink): boolean =>
     link.customIconSize,
   );
 
+const recognizedLegacyIconValues = new Set([
+  "_favicon",
+  "_favicon_google",
+  "_favicon_duckduckgo",
+  "_favicon_favicone",
+  "_custom_iconify",
+  "_custom_svg",
+  "_custom_ico",
+  "_custom_upload",
+  "_feather",
+]);
+
+const hasRecognizedLegacyIcon = (link: LegacyLink): boolean =>
+  Boolean(
+    link.icon &&
+    (recognizedLegacyIconValues.has(link.icon) || !link.icon.startsWith("_")),
+  );
+
+const removeLegacyIconFields = (link: LegacyLink): void => {
+  delete link.icon;
+  delete link.iconifyValue;
+  delete link.imageUrl;
+  delete link.iconCacheKey;
+  delete link.iconSize;
+  delete link.IconString;
+  delete link.SvgString;
+  delete link.IconStringIco;
+  delete link.iconifyIdentifier;
+  delete link.customIconSize;
+};
+
 const migrateLegacyDimensions = (link: LegacyLink, data: LegacyData): void => {
   const legacyIcon = link.icon;
   const iconUsedIconSize =
@@ -293,16 +324,13 @@ export function migrateLinks(
       if (migratedIcon.iconConfig) {
         migrateLegacyDimensions(updatedLink, legacyData);
         updatedLink.iconConfig = migratedIcon.iconConfig;
-        delete updatedLink.icon;
-        delete updatedLink.iconifyValue;
-        delete updatedLink.imageUrl;
-        delete updatedLink.iconCacheKey;
-        delete updatedLink.iconSize;
-        delete updatedLink.IconString;
-        delete updatedLink.SvgString;
-        delete updatedLink.IconStringIco;
-        delete updatedLink.iconifyIdentifier;
-        delete updatedLink.customIconSize;
+        removeLegacyIconFields(updatedLink);
+        linkModified = true;
+      } else if (hasRecognizedLegacyIcon(updatedLink)) {
+        // Known legacy icon types with missing payloads could not render in the
+        // old implementation either. Drop their stale metadata instead of
+        // preserving an entry that can never be migrated.
+        removeLegacyIconFields(updatedLink);
         linkModified = true;
       }
     }
