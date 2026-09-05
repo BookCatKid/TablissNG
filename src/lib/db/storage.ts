@@ -18,64 +18,8 @@ const storageBytes = (key: string, value: unknown): number =>
   new TextEncoder().encode(JSON.stringify(value)).byteLength;
 
 const describeStorageError = (error: unknown): string => {
-  const name = error instanceof Error ? error.name : "";
-  const message =
-    error instanceof Error
-      ? error.message
-      : typeof error === "string"
-        ? error
-        : "";
-  const detail = `${name} ${message}`.trim();
-  const normalized = detail.toLowerCase();
-
-  if (
-    normalized.includes("max_write_operations") ||
-    normalized.includes("write operations") ||
-    normalized.includes("write-rate") ||
-    normalized.includes("write rate")
-  ) {
-    return "The browser sync write-rate limit was exceeded. Try again later.";
-  }
-  if (
-    normalized.includes("quota_bytes_per_item") ||
-    normalized.includes("per-item") ||
-    normalized.includes("item exceeds")
-  ) {
-    return "An individual item exceeds the browser storage limit.";
-  }
-  if (normalized.includes("quota") || normalized.includes("storage is full")) {
-    return "The browser storage quota is full.";
-  }
-  if (
-    normalized.includes("not writable") ||
-    normalized.includes("not a writable") ||
-    normalized.includes("read-only") ||
-    normalized.includes("read only")
-  ) {
-    return "The requested storage area is read-only.";
-  }
-  if (
-    normalized.includes("context invalidated") ||
-    normalized.includes("context is unavailable")
-  ) {
-    return "The extension context is unavailable. Reload TablissNG and try again.";
-  }
-  if (
-    normalized.includes("permission") ||
-    normalized.includes("access denied") ||
-    normalized.includes("not allowed")
-  ) {
-    return "The browser denied access to extension storage.";
-  }
-  if (
-    normalized.includes("circular") ||
-    normalized.includes("bigint") ||
-    normalized.includes("serialize") ||
-    normalized.includes("datacloneerror")
-  ) {
-    return "The value could not be serialized for storage.";
-  }
-  if (detail) return `Browser error: ${detail}`;
+  if (error instanceof Error) return error.toString();
+  if (typeof error === "string" && error) return error;
   return "The browser did not provide details for this storage failure.";
 };
 

@@ -241,30 +241,24 @@ test("overlapping batches save and clean up in order", async () => {
 });
 
 test.each([
-  ["QuotaExceededError: sync storage is full", "storage quota is full"],
-  [
-    "MAX_WRITE_OPERATIONS_PER_MINUTE quota exceeded",
-    "write-rate limit was exceeded",
-  ],
-  ["This is not a writable storage area", "storage area is read-only"],
-  ["Extension context invalidated", "extension context is unavailable"],
-])(
-  "reports a specific storage failure for %s",
-  async (browserMessage, detail) => {
-    const sync = new SyncStorage(Number.POSITIVE_INFINITY, {}, () =>
-      Promise.reject(new Error(browserMessage)),
-    );
-    const flush = setupExtensionStorage(sync);
-    const source = DB.init();
-    const errors: Error[] = [];
-    const errorStream = await extension(source, "tabliss/config", "sync");
-    Stream.subscribe(errorStream, (error) => errors.push(error));
+  "QuotaExceededError: sync storage is full",
+  "MAX_WRITE_OPERATIONS_PER_MINUTE quota exceeded",
+  "This is not a writable storage area",
+  "Extension context invalidated",
+])("includes the raw browser storage failure: %s", async (browserMessage) => {
+  const sync = new SyncStorage(Number.POSITIVE_INFINITY, {}, () =>
+    Promise.reject(new Error(browserMessage)),
+  );
+  const flush = setupExtensionStorage(sync);
+  const source = DB.init();
+  const errors: Error[] = [];
+  const errorStream = await extension(source, "tabliss/config", "sync");
+  Stream.subscribe(errorStream, (error) => errors.push(error));
 
-    DB.put(source, "data/widget", { payload: "value" });
-    flush();
-    await settle();
+  DB.put(source, "data/widget", { payload: "value" });
+  flush();
+  await settle();
 
-    expect(errors).toHaveLength(1);
-    expect(errors[0].message).toContain(detail);
-  },
-);
+  expect(errors).toHaveLength(1);
+  expect(errors[0].message).toContain(browserMessage);
+});
