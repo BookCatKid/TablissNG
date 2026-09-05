@@ -52,7 +52,22 @@ class SyncStorage {
   }
 }
 
+let storageLock: Promise<unknown> = Promise.resolve();
+
 const setupExtensionStorage = (sync: SyncStorage) => {
+  storageLock = Promise.resolve();
+  Object.defineProperty(globalThis, "navigator", {
+    configurable: true,
+    value: {
+      locks: {
+        request: (_name: string, run: () => Promise<unknown>) => {
+          const result = storageLock.then(run);
+          storageLock = result.catch(() => {});
+          return result;
+        },
+      },
+    },
+  });
   let flush: (() => void) | undefined;
   Object.defineProperty(globalThis, "browser", {
     configurable: true,
@@ -77,9 +92,9 @@ const setupExtensionStorage = (sync: SyncStorage) => {
 };
 
 const settle = async () => {
-  for (let index = 0; index < 20; index += 1) {
-    await Promise.resolve();
-  }
+  // Await real adapter work (including crypto), rather than sleeping and hoping
+  // the runtime worker has completed. Each turn lets the next queued batch lock.
+  for (let index = 0; index < 20; index += 1) await storageLock;
 };
 
 test("sync storage round-trips a value larger than the per-item quota", async () => {
@@ -226,10 +241,11 @@ test("overlapping batches save and clean up in order", async () => {
 
   DB.put(source, "data/widget", { payload: "a".repeat(10_000) });
   flush();
-  await settle();
+  await expect.poll(() => writes).toBe(1);
   DB.put(source, "data/widget", { payload: "new value" });
   flush();
-  await settle();
+  await Promise.resolve();
+  expect(writes).toBe(1);
   releaseFirstWrite();
   await settle();
   await settle();

@@ -26,6 +26,7 @@ type ExtensionSession = {
 };
 
 type ChromeExtensionApi = {
+  storage: { sync: { get(): Promise<Record<string, unknown>> } };
   permissions: {
     contains(details: { permissions: string[] }): Promise<boolean>;
   };
@@ -107,7 +108,7 @@ test.describe("Quick Links extension integration", () => {
       ).toBeEnabled();
       expect(
         await page.evaluate(() =>
-          (window as ExtensionWindow).chrome.permissions.contains({
+          (window as unknown as ExtensionWindow).chrome.permissions.contains({
             permissions: ["bookmarks"],
           }),
         ),
@@ -292,7 +293,8 @@ test.describe("Quick Links extension integration", () => {
 
     try {
       await page.evaluate(async () => {
-        const bookmarks = (window as ExtensionWindow).chrome.bookmarks;
+        const bookmarks = (window as unknown as ExtensionWindow).chrome
+          .bookmarks;
         const parent = await bookmarks.create({ title: "E2E Import" });
         await bookmarks.create({
           parentId: parent.id,
@@ -339,6 +341,78 @@ test.describe("Quick Links extension integration", () => {
       await expect(
         page.locator('.Links .Link[href="https://example.com/nested"]'),
       ).toBeVisible();
+    } finally {
+      await closeExtension(session);
+    }
+  });
+});
+
+test.describe("Storage UI integration", () => {
+  test("oversized notes survive edits, reloads and a full browser restart", async () => {
+    test.setTimeout(60_000);
+    const session = await launchExtension();
+    let page = session.page;
+    try {
+      await addWidget(page, "widget/notes");
+      await closeSettings(page);
+      const values = [
+        "First: " + "x".repeat(9000),
+        "Expanded: " + '漢😀\\"'.repeat(2400),
+        "Small again",
+        "Final: " + "é😀漢".repeat(2400),
+      ];
+      for (const value of values) {
+        await page.locator(".Notes").click();
+        const input = page.locator('.Notes [contenteditable="true"]');
+        await input.fill(value);
+        await input.blur();
+        // Wait for durable backend content, not an arbitrary batching delay.
+        await expect
+          .poll(() =>
+            page.evaluate(async () => {
+              const stored = await (
+                window as unknown as ExtensionWindow
+              ).chrome.storage.sync.get();
+              for (const [key, raw] of Object.entries(stored)) {
+                if (!key.startsWith("tabliss/config/data/")) continue;
+                const manifest = raw as { __tablissChunks?: string[] } | null;
+                let value = raw;
+                if (manifest?.__tablissChunks) {
+                  const keys = manifest.__tablissChunks;
+                  if (!keys.every((key) => typeof stored[key] === "string"))
+                    continue;
+                  value = JSON.parse(keys.map((key) => stored[key]).join(""));
+                }
+                const data = value as { notes?: { contents: string }[] } | null;
+                if (data?.notes) return data.notes[0].contents;
+              }
+              return null;
+            }),
+          )
+          .toBe(value);
+        await page.reload();
+        await expect(page.locator(".Notes")).toHaveText(value);
+        await expect(
+          page.getByText("Cannot save your settings.", { exact: false }),
+        ).toHaveCount(0);
+      }
+      await session.context.close();
+      const extensionPath = path.resolve("dist/chromium");
+      session.context = await chromium.launchPersistentContext(
+        session.profilePath,
+        {
+          headless: false,
+          args: [
+            `--disable-extensions-except=${extensionPath}`,
+            `--load-extension=${extensionPath}`,
+          ],
+        },
+      );
+      page = session.context.pages()[0] ?? (await session.context.newPage());
+      await page.goto("chrome://newtab");
+      await expect(page.locator(".Notes")).toHaveText(
+        values[values.length - 1],
+      );
     } finally {
       await closeExtension(session);
     }

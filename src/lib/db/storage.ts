@@ -6,16 +6,20 @@ import * as Stream from "./stream";
 
 const EXTENSION_SAVE_BATCH_TIMEOUT = 1000; // 1s
 const SYNC_STORAGE_ITEM_QUOTA = 8192;
-const CHUNK_PATH = "/$chunks/";
+const SYNC_STORAGE_TOTAL_QUOTA = 102400;
+const CHUNK_PATH = "/$chunks/"; // Legacy PR format; read compatibility only.
+const encoder = new TextEncoder();
 const CHUNK_MANIFEST = "__tablissChunks";
 
 type ChunkManifest = {
   [CHUNK_MANIFEST]: string[];
+  version?: 2;
+  digest?: string;
 };
 
 const storageBytes = (key: string, value: unknown): number =>
-  new TextEncoder().encode(key).byteLength +
-  new TextEncoder().encode(JSON.stringify(value)).byteLength;
+  encoder.encode(key).byteLength +
+  encoder.encode(JSON.stringify(value)).byteLength;
 
 const describeStorageError = (error: unknown): string => {
   if (error instanceof Error) return error.toString();
@@ -23,21 +27,43 @@ const describeStorageError = (error: unknown): string => {
   return "The browser did not provide details for this storage failure.";
 };
 
+const hasChunkMarker = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && CHUNK_MANIFEST in value;
+
 const isChunkManifest = (value: unknown): value is ChunkManifest =>
-  typeof value === "object" &&
-  value !== null &&
-  CHUNK_MANIFEST in value &&
+  hasChunkMarker(value) &&
   Array.isArray(value[CHUNK_MANIFEST]) &&
   value[CHUNK_MANIFEST].every((key) => typeof key === "string");
 
-const chunkValue = (key: string, value: unknown): Record<string, unknown> => {
+// Outside the database namespace, so even keys containing /$chunks/ are data.
+const chunkPrefix = (name: string, key: string) =>
+  `/$tablissChunks/${encodeURIComponent(name)}/${encodeURIComponent(key)}/`;
+
+const digest = async (value: string): Promise<string> =>
+  Array.from(
+    new Uint8Array(
+      await crypto.subtle.digest("SHA-256", encoder.encode(value)),
+    ),
+  )
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+
+const chunkValue = async (
+  name: string,
+  key: string,
+  value: unknown,
+): Promise<Record<string, unknown>> => {
   const serialized = JSON.stringify(value);
+  if (encoder.encode(serialized).byteLength > SYNC_STORAGE_TOTAL_QUOTA) {
+    throw new Error(`Value exceeds total sync storage quota: ${key}`);
+  }
   const chunks: string[] = [];
   const updates: Record<string, unknown> = {};
   let offset = 0;
+  const generation = `${chunkPrefix(name, key)}${crypto.randomUUID()}/`;
 
   while (offset < serialized.length) {
-    const chunkKey = `${key}${CHUNK_PATH}${chunks.length}`;
+    const chunkKey = `${generation}${chunks.length}`;
     let low = offset + 1;
     let high = serialized.length;
     let end = offset;
@@ -69,7 +95,14 @@ const chunkValue = (key: string, value: unknown): Record<string, unknown> => {
     offset = end;
   }
 
-  updates[key] = { [CHUNK_MANIFEST]: chunks } satisfies ChunkManifest;
+  updates[key] = {
+    [CHUNK_MANIFEST]: chunks,
+    version: 2,
+    digest: await digest(serialized),
+  } satisfies ChunkManifest;
+  if (storageBytes(key, updates[key]) > SYNC_STORAGE_ITEM_QUOTA) {
+    throw new Error(`Storage manifest is too large: ${key}`);
+  }
   return updates;
 };
 
@@ -164,104 +197,190 @@ export const extension = async (
     );
 
   const storageArea = browser.storage[area];
-  const chunkKeysByStorageKey = new Map<string, string[]>();
+  // Web Locks coordinate tabs on this device. Remote sync is not transactional;
+  // immutable generations and checksums prevent accepting a mixed payload.
+  const locked = <T>(run: () => Promise<T>): Promise<T> =>
+    typeof navigator !== "undefined" && navigator.locks
+      ? navigator.locks.request(`tabliss-storage:${area}:${name}`, run)
+      : run();
 
-  // Pull
-  await storageArea
-    .get()
-    .then((stored) => {
-      Object.keys(stored)
-        .filter(
-          (key) => key.startsWith(`${name}/`) && !key.includes(CHUNK_PATH),
-        )
-        .forEach((key) => {
-          const value = stored[key];
-          if (isChunkManifest(value)) {
-            chunkKeysByStorageKey.set(key, value[CHUNK_MANIFEST]);
+  const manifestKeys = (key: string, value: ChunkManifest): string[] => {
+    const keys = value[CHUNK_MANIFEST];
+    const prefix = chunkPrefix(name, key);
+    if (
+      keys.length === 0 ||
+      new Set(keys).size !== keys.length ||
+      !keys.every((chunkKey, index) =>
+        value.version === 2
+          ? chunkKey.startsWith(prefix) &&
+            /^[0-9a-f-]{36}\/\d+$/.test(chunkKey.slice(prefix.length)) &&
+            chunkKey ===
+              `${keys[0].slice(0, keys[0].lastIndexOf("/") + 1)}${index}`
+          : value.version === undefined &&
+            chunkKey === `${key}${CHUNK_PATH}${index}`,
+      )
+    ) {
+      throw new Error(`Invalid chunk manifest: ${key}`);
+    }
+    return keys;
+  };
+
+  // Load healthy keys even if another record is damaged. Reject initialization
+  // afterwards so migrations/defaults cannot overwrite recoverable stored data.
+  await locked(async () => {
+    try {
+      const stored = await storageArea.get();
+      const internalKeys = new Set<string>();
+      const restored: DB.Change[] = [];
+      const failures: string[] = [];
+      for (const [key, value] of Object.entries(stored)) {
+        if (!key.startsWith(`${name}/`)) continue;
+        try {
+          if (area === "sync" && hasChunkMarker(value)) {
+            if (!isChunkManifest(value))
+              throw new Error(`Invalid chunk manifest: ${key}`);
+            const keys = manifestKeys(key, value);
+            keys.forEach((chunkKey) => internalKeys.add(chunkKey));
+            if (
+              !keys.every((chunkKey) => typeof stored[chunkKey] === "string")
+            ) {
+              throw new Error(`Missing or non-string chunk: ${key}`);
+            }
+            const serialized = keys
+              .map((chunkKey) => stored[chunkKey])
+              .join("");
+            if (
+              value.version === 2 &&
+              (await digest(serialized)) !== value.digest
+            ) {
+              throw new Error(`Chunk checksum mismatch: ${key}`);
+            }
+            restored.push([key, JSON.parse(serialized)]);
+          } else {
+            restored.push([key, value]);
           }
-          const restored = isChunkManifest(value)
-            ? JSON.parse(
-                value[CHUNK_MANIFEST].map((chunkKey) => stored[chunkKey]).join(
-                  "",
-                ),
-              )
-            : value;
-          DB.put(db, key.substring(name.length + 1), restored);
-        });
-    })
-    .catch((error) => {
+        } catch (error) {
+          failures.push(describeStorageError(error));
+        }
+      }
+      DB.atomic(db, (trx) => {
+        for (const [key, value] of restored) {
+          if (!internalKeys.has(key))
+            DB.put(trx, key.substring(name.length + 1), value);
+        }
+      });
+      if (failures.length) throw new Error(failures.join("; "));
+    } catch (error) {
       throw mapError("Cannot read from storage", error);
-    });
+    }
+  });
 
-  // Push
   const errors = Stream.init<StorageError>();
   const handleError = (message: string) => (err: unknown) => {
     Stream.publish(errors, mapError(message, err));
   };
-  const saveChanges = async (changesArray: DB.Change[]): Promise<void> => {
-    // TODO: iterator helpers
-    const updates: Record<string, unknown> = {};
-    const deletes = new Set<string>();
-    const nextChunkKeys = new Map(chunkKeysByStorageKey);
-
-    for (const [key, val] of changesArray) {
-      const storageKey = `${name}/${key}`;
-      const oldChunkKeys = chunkKeysByStorageKey.get(storageKey) ?? [];
-
-      try {
-        if (val === undefined) {
-          deletes.add(storageKey);
-          oldChunkKeys.forEach((chunkKey) => deletes.add(chunkKey));
-          nextChunkKeys.delete(storageKey);
-        } else if (
-          area === "sync" &&
-          storageBytes(storageKey, val) > SYNC_STORAGE_ITEM_QUOTA
-        ) {
-          const chunked = chunkValue(storageKey, val);
-          Object.assign(updates, chunked);
-          const manifest = chunked[storageKey];
-          if (!isChunkManifest(manifest)) {
-            throw new Error("Chunked storage value is missing its manifest");
+  // Only unreachable immutable chunks go here, never a logical data key.
+  const pendingCleanup = new Set<string>();
+  const cleanup = async () => {
+    if (!pendingCleanup.size) return;
+    try {
+      // A rejected write may have reached storage before its acknowledgement
+      // failed. Never remove chunks that a current manifest still references.
+      const stored = await storageArea.get();
+      const referenced = new Set<string>();
+      for (const value of Object.values(stored)) {
+        if (hasChunkMarker(value) && Array.isArray(value[CHUNK_MANIFEST])) {
+          for (const key of value[CHUNK_MANIFEST]) {
+            if (typeof key === "string") referenced.add(key);
           }
-          const newChunkKeys = manifest[CHUNK_MANIFEST];
-          oldChunkKeys
-            .filter((chunkKey) => !newChunkKeys.includes(chunkKey))
-            .forEach((chunkKey) => deletes.add(chunkKey));
-          nextChunkKeys.set(storageKey, newChunkKeys);
-        } else {
-          updates[storageKey] = val;
-          oldChunkKeys.forEach((chunkKey) => deletes.add(chunkKey));
-          nextChunkKeys.delete(storageKey);
         }
-      } catch (error) {
-        handleError("Cannot prepare value for storage")(error);
       }
-    }
-
-    if (Object.keys(updates).length > 0) {
-      try {
-        await storageArea.set(updates);
-      } catch (error) {
-        handleError("Cannot write updates to storage")(error);
-        return;
-      }
-    }
-
-    for (const [key] of changesArray) {
-      const storageKey = `${name}/${key}`;
-      const chunkKeys = nextChunkKeys.get(storageKey);
-      if (chunkKeys) chunkKeysByStorageKey.set(storageKey, chunkKeys);
-      else chunkKeysByStorageKey.delete(storageKey);
-    }
-
-    if (deletes.size > 0) {
-      try {
-        await storageArea.remove([...deletes]);
-      } catch (error) {
-        handleError("Cannot write deletes to storage")(error);
-      }
+      const unreachable = [...pendingCleanup].filter(
+        (key) => !referenced.has(key),
+      );
+      if (unreachable.length) await storageArea.remove(unreachable);
+      unreachable.forEach((key) => pendingCleanup.delete(key));
+    } catch (error) {
+      handleError("Cannot write deletes to storage")(error);
     }
   };
+  const saveChanges = async (changesArray: DB.Change[]): Promise<void> =>
+    locked(async () => {
+      await cleanup();
+      // Refresh inside the lock: another tab may have replaced a generation.
+      const stored = await storageArea.get();
+      const updates: Record<string, unknown> = {};
+      const chunks: Record<string, unknown> = {};
+      const obsolete: string[] = [];
+      const deletes = new Map<string, string[]>();
+      for (const [key, val] of changesArray) {
+        const storageKey = `${name}/${key}`;
+        try {
+          const previous = stored[storageKey];
+          if (
+            area === "sync" &&
+            hasChunkMarker(previous) &&
+            !isChunkManifest(previous)
+          ) {
+            throw new Error(`Invalid chunk manifest: ${storageKey}`);
+          }
+          const oldChunkKeys =
+            area === "sync" && isChunkManifest(previous)
+              ? manifestKeys(storageKey, previous)
+              : [];
+          if (val === undefined) {
+            deletes.set(storageKey, oldChunkKeys);
+            continue;
+          }
+          if (
+            area === "sync" &&
+            (storageBytes(storageKey, val) > SYNC_STORAGE_ITEM_QUOTA ||
+              hasChunkMarker(val) ||
+              // Chrome normalizes lone surrogates in raw strings. JSON's escaped
+              // representation preserves them, including inside nested values.
+              /\\u[dD][89a-fA-F][0-9a-fA-F]{2}/.test(JSON.stringify(val)))
+          ) {
+            const chunked = await chunkValue(name, storageKey, val);
+            updates[storageKey] = chunked[storageKey];
+            delete chunked[storageKey];
+            Object.assign(chunks, chunked);
+          } else {
+            updates[storageKey] = val;
+          }
+          obsolete.push(...oldChunkKeys);
+        } catch (error) {
+          handleError("Cannot prepare value for storage")(error);
+        }
+      }
+      try {
+        // Copy-on-write: publish pointers only after all chunks are durable.
+        // This deliberately needs space for both old and new generations.
+        // Keep writes batched to respect Chrome's write-operation quota.
+        if (Object.keys(chunks).length) await storageArea.set(chunks);
+        if (Object.keys(updates).length) await storageArea.set(updates);
+      } catch (error) {
+        Object.keys(chunks).forEach((key) => pendingCleanup.add(key));
+        obsolete.forEach((key) => pendingCleanup.add(key));
+        handleError("Cannot write updates to storage")(error);
+        await cleanup();
+        return;
+      }
+      obsolete.forEach((key) => {
+        if (!Object.hasOwn(updates, key)) pendingCleanup.add(key);
+      });
+      if (deletes.size) {
+        try {
+          // Delete pointers first. A failed delete must retain their payloads.
+          await storageArea.remove([...deletes.keys()]);
+          for (const keys of deletes.values()) {
+            keys.forEach((key) => pendingCleanup.add(key));
+          }
+        } catch (error) {
+          handleError("Cannot write deletes to storage")(error);
+        }
+      }
+      await cleanup();
+    });
   let writeQueue = Promise.resolve();
   DB.listen(
     db,
