@@ -1,6 +1,6 @@
 import "./Overlay.sass";
 
-import { type FC, useContext, useSyncExternalStore } from "react";
+import { type FC, useContext } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { ErrorContext } from "../../contexts/error";
@@ -10,14 +10,6 @@ import { db } from "../../db/state";
 import { useFullscreen, useKeyPress } from "../../hooks";
 import { Icon } from "../../icons";
 import { useKey, useValue } from "../../lib/db/react";
-import {
-  SYNC_LARGE_VALUE_WARNING_CHUNKS,
-  SYNC_QUOTA_WARNING_RATIO,
-} from "../../lib/db/storageChunks";
-import {
-  getSyncStorageUsageSnapshot,
-  subscribeSyncStorageUsage,
-} from "../../lib/db/storageQuota";
 
 const messages = defineMessages({
   settingsHint: {
@@ -46,20 +38,7 @@ const messages = defineMessages({
     defaultMessage: "Show errors",
     description: "Hover hint text for the error indicator icon",
   },
-  syncQuotaHint: {
-    id: "dashboard.syncQuotaHint",
-    defaultMessage: "Sync storage is {percent}% full ({used} of {quota}).",
-    description: "Hover warning when extension sync storage is nearly full",
-  },
-  syncLargeValueHint: {
-    id: "dashboard.syncLargeValueHint",
-    defaultMessage: "{key} uses {chunks} sync chunks ({size}).",
-    description: "Hover warning when one saved setting uses many sync chunks",
-  },
 });
-
-const formatBytes = (bytes: number): string =>
-  `${(bytes / 1024).toFixed(1)} KB`;
 
 const Overlay: FC = () => {
   const intl = useIntl();
@@ -68,11 +47,6 @@ const Overlay: FC = () => {
   const { pending, toggleErrors, toggleSettings } = useContext(UiContext);
   const [hideSettingsIcon] = useKey(db, "hideSettingsIcon");
   const [settingsIconPosition] = useKey(db, "settingsIconPosition");
-  const syncUsage = useSyncExternalStore(
-    subscribeSyncStorageUsage,
-    getSyncStorageUsageSnapshot,
-    getSyncStorageUsageSnapshot,
-  );
 
   useKeyPress(toggleFocus, ["w"]);
   useKeyPress(toggleSettings, ["s"]);
@@ -112,47 +86,6 @@ const Overlay: FC = () => {
     </span>
   );
 
-  const quotaWarning =
-    syncUsage !== null &&
-    syncUsage.usedBytes / syncUsage.quotaBytes >= SYNC_QUOTA_WARNING_RATIO;
-  const largeValueWarning =
-    syncUsage?.largestChunkedValue !== undefined &&
-    syncUsage.largestChunkedValue.chunkCount >= SYNC_LARGE_VALUE_WARNING_CHUNKS;
-  const storageWarning = quotaWarning || largeValueWarning;
-  const warningDetails = storageWarning
-    ? [
-        quotaWarning && syncUsage
-          ? intl.formatMessage(messages.syncQuotaHint, {
-              percent: Math.round(
-                (syncUsage.usedBytes / syncUsage.quotaBytes) * 100,
-              ),
-              used: formatBytes(syncUsage.usedBytes),
-              quota: formatBytes(syncUsage.quotaBytes),
-            })
-          : null,
-        largeValueWarning && syncUsage?.largestChunkedValue
-          ? intl.formatMessage(messages.syncLargeValueHint, {
-              key: syncUsage.largestChunkedValue.key,
-              chunks: syncUsage.largestChunkedValue.chunkCount,
-              size: formatBytes(syncUsage.largestChunkedValue.bytes),
-            })
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" ")
-    : "";
-
-  const storageWarningIcon = storageWarning && (
-    <span
-      data-storage-warning
-      role="status"
-      aria-label={warningDetails}
-      title={warningDetails}
-    >
-      <Icon name="feather:alert-triangle" />
-    </span>
-  );
-
   const focusBtn = (
     <button
       type="button"
@@ -184,7 +117,6 @@ const Overlay: FC = () => {
         <div className="Overlay__group Overlay__group--center">
           {settingsBtn}
           {errorBtn}
-          {storageWarningIcon}
           {loadingBtn}
           {focus && focusBtn}
         </div>
@@ -199,7 +131,6 @@ const Overlay: FC = () => {
     <div className={wrapperClass}>
       {settingsBtn}
       {errorBtn}
-      {storageWarningIcon}
       {loadingBtn}
       {focusBtn}
       {fullscreenBtn}

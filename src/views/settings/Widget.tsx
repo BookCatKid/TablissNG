@@ -1,16 +1,25 @@
 import "./Widget.sass";
 
-import type { FC } from "react";
+import { type FC, useState, useSyncExternalStore } from "react";
 import { defineMessages, FormattedMessage, useIntl } from "react-intl";
 
 import { setWidgetDisplay } from "../../db/action";
 import { WidgetState } from "../../db/state";
 import { useToggle } from "../../hooks";
+import {
+  SYNC_LARGE_VALUE_WARNING_CHUNKS,
+  SYNC_QUOTA_WARNING_RATIO,
+} from "../../lib/db/storageChunks";
+import {
+  getSyncStorageUsageSnapshot,
+  subscribeSyncStorageUsage,
+} from "../../lib/db/storageQuota";
 import { sectionMessages } from "../../locales/messages";
 import { getConfig } from "../../plugins";
 import { DownIcon, Icon, IconButton, RemoveIcon, UpIcon } from "../shared";
 import PluginContainer from "../shared/Plugin";
 import ToggleSection from "../shared/ToggleSection";
+import StorageWarningModal from "./StorageWarningModal";
 import WidgetDisplay from "./WidgetDisplay";
 
 // Define messages used in props/attributes
@@ -40,6 +49,11 @@ const messages = defineMessages({
     defaultMessage: "Move widget up",
     description: "Button title for moving widget up",
   },
+  storageWarning: {
+    id: "settings.actions.storageWarning",
+    defaultMessage: "Sync storage warning",
+    description: "Button title for opening widget sync storage details",
+  },
 });
 
 interface Props {
@@ -51,7 +65,25 @@ interface Props {
 
 const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
   const [isOpen, toggleIsOpen] = useToggle(onRemove === undefined);
+  const [storageModalOpen, setStorageModalOpen] = useState(false);
   const intl = useIntl();
+  const syncUsage = useSyncExternalStore(
+    subscribeSyncStorageUsage,
+    getSyncStorageUsageSnapshot,
+    getSyncStorageUsageSnapshot,
+  );
+  const syncValue = syncUsage?.chunkedValues.find(
+    ({ key }) => key === `data/${plugin.id}`,
+  );
+  const quotaWarning =
+    syncValue !== undefined &&
+    syncUsage !== null &&
+    syncUsage.largestChunkedValue?.key === syncValue.key &&
+    syncUsage.usedBytes / syncUsage.quotaBytes >= SYNC_QUOTA_WARNING_RATIO;
+  const largeValueWarning =
+    syncValue !== undefined &&
+    syncValue.chunkCount >= SYNC_LARGE_VALUE_WARNING_CHUNKS;
+  const storageWarning = quotaWarning || largeValueWarning;
 
   const { defaultData, description, name, settingsComponent } = getConfig(
     plugin.key,
@@ -68,6 +100,17 @@ const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
         >
           <RemoveIcon />
         </IconButton>
+
+        {storageWarning && syncUsage && syncValue && (
+          <IconButton
+            onClick={() => setStorageModalOpen(true)}
+            title={intl.formatMessage(messages.storageWarning)}
+          >
+            <span data-storage-warning>
+              <Icon name="feather:alert-triangle" />
+            </span>
+          </IconButton>
+        )}
 
         <IconButton
           onClick={toggleIsOpen}
@@ -403,6 +446,14 @@ const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
             </>
           </ToggleSection>
         </div>
+      )}
+
+      {storageModalOpen && syncUsage && syncValue && (
+        <StorageWarningModal
+          usage={syncUsage}
+          widgetUsage={syncValue}
+          onClose={() => setStorageModalOpen(false)}
+        />
       )}
     </fieldset>
   );

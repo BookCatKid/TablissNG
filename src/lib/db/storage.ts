@@ -22,12 +22,17 @@ export const indexeddb = (
 ): Promise<Stream.Stream<StorageError>> => {
   // Map idb errors to a standard format
   const mapError = (message: string, err: unknown): StorageError => {
+    const target = err instanceof Event ? err.target : null;
+    const targetError =
+      target && "error" in target
+        ? (target as IDBRequest | IDBTransaction).error
+        : null;
     const cause =
-      err instanceof Event &&
-      err.target instanceof IDBRequest &&
-      err.target.error instanceof Error
-        ? err.target.error
-        : undefined;
+      targetError instanceof Error
+        ? targetError
+        : err instanceof Error
+          ? err
+          : undefined;
     return new StorageError(`IndexedDB: ${name}: ${message}`, { cause });
   };
 

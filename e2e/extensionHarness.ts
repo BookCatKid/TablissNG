@@ -19,7 +19,10 @@ export async function launchExtension(): Promise<ExtensionSession> {
   const extensionPath = path.resolve("dist/chromium");
   const profilePath = await mkdtemp(path.join(tmpdir(), "tablissng-profile-"));
   const context = await chromium.launchPersistentContext(profilePath, {
-    headless: false,
+    // Playwright's default headless shell disables extensions. The Chromium
+    // channel uses the newer headless implementation, which supports them.
+    channel: "chromium",
+    headless: process.env.PW_HEADLESS !== "0",
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,

@@ -339,7 +339,7 @@ test.describe("Extension sync storage", () => {
     }
   });
 
-  test("shows the dashboard warning for a many-chunk value and high quota use", async () => {
+  test("shows widget sync-storage details for a many-chunk value", async () => {
     const session = await launchExtension();
     const { page } = session;
 
@@ -348,22 +348,14 @@ test.describe("Extension sync storage", () => {
       const warning = page.locator("[data-storage-warning]");
 
       await expect(warning).toBeVisible();
-      await expect(warning).toHaveAttribute("title", /uses \d+ sync chunks/);
+      await warning.click();
 
-      await page.evaluate(async () => {
-        const sync = (window as ExtensionWindow).chrome.storage.sync;
-        let index = 0;
-        while ((await sync.getBytesInUse(null)) / sync.QUOTA_BYTES < 0.82) {
-          await sync.set({
-            [`e2e-warning-fill-${index}`]: "x".repeat(4_000),
-          });
-          index += 1;
-        }
-      });
-
-      await expect(warning).toHaveAttribute(
-        "title",
-        /Sync storage is \d+% full/,
+      const modal = page.locator("[data-storage-warning-modal]");
+      await expect(modal).toBeVisible();
+      await expect(modal).toContainText(/\d+ pieces/);
+      await expect(modal.locator("[data-sync-usage-meter]")).toHaveAttribute(
+        "aria-valuenow",
+        /\d+/,
       );
     } finally {
       await closeExtension(session);

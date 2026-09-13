@@ -1,7 +1,7 @@
 const SYNC_ITEM_TARGET_BYTES = 7_000;
 export const SYNC_TOTAL_QUOTA_BYTES = 102_400;
 export const SYNC_QUOTA_WARNING_RATIO = 0.8;
-export const SYNC_LARGE_VALUE_WARNING_CHUNKS = 8;
+export const SYNC_LARGE_VALUE_WARNING_CHUNKS = 4;
 const MAX_SYNC_CHUNKS = 32;
 const CHUNK_NAMESPACE = "$chunks";
 const CHUNK_MANIFEST_TAG = "tabliss-sync-chunks-v1";
@@ -44,6 +44,7 @@ export interface SyncChunkUsage {
 export interface SyncStorageUsage {
   usedBytes: number;
   quotaBytes: number;
+  chunkedValues: SyncChunkUsage[];
   largestChunkedValue?: SyncChunkUsage;
 }
 
@@ -272,6 +273,7 @@ export const getSyncStorageUsage = (
   name: string,
 ): SyncStorageUsage => {
   const decoded = decodeSyncStorage(stored, name);
+  const chunkedValues: SyncChunkUsage[] = [];
   let largestChunkedValue: SyncChunkUsage | undefined;
 
   for (const [key, chunkSet] of decoded.chunkSets) {
@@ -285,18 +287,22 @@ export const getSyncStorageUsage = (
       }
     }
 
+    const usage = {
+      key,
+      chunkCount: chunkSet.chunkCount,
+      bytes,
+    };
+    chunkedValues.push(usage);
+
     if (!largestChunkedValue || bytes > largestChunkedValue.bytes) {
-      largestChunkedValue = {
-        key,
-        chunkCount: chunkSet.chunkCount,
-        bytes,
-      };
+      largestChunkedValue = usage;
     }
   }
 
   return {
     usedBytes: syncStorageBytes(stored),
     quotaBytes: SYNC_TOTAL_QUOTA_BYTES,
+    chunkedValues,
     largestChunkedValue,
   };
 };

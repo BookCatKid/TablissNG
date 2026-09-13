@@ -13,6 +13,11 @@ import { Settings } from "./settings";
 import Errors from "./shared/Errors";
 import StoreError from "./shared/StoreError";
 
+type SettingsStorageError = {
+  error: Error;
+  operation: "load" | "save";
+};
+
 const messages = defineMessages({
   pageTitle: {
     id: "app.pageTitle",
@@ -52,7 +57,9 @@ const Root: FC = () => {
 
   // Wait for storage to be ready before displaying
   const [ready, setReady] = useState(false);
-  const [error, setError] = useState(false);
+  const [storageError, setStorageError] = useState<SettingsStorageError | null>(
+    null,
+  );
   const themePreference = useValue(db, "themePreference");
   const systemIsDark = useSystemTheme();
   const accent = useValue(db, "accent");
@@ -81,11 +88,16 @@ const Root: FC = () => {
 
   useEffect(() => {
     const handleError =
-      (message: string, showError: boolean) => (error: Error) => {
+      (
+        message: string,
+        showError: boolean,
+        operation?: SettingsStorageError["operation"],
+      ) =>
+      (error: Error) => {
         pushError({ message });
         console.error(error);
         console.error("Caused by:", error.cause);
-        if (showError) setError(true);
+        if (showError && operation) setStorageError({ error, operation });
       };
 
     const subscriptions = Promise.all([
@@ -94,11 +106,19 @@ const Root: FC = () => {
         .then((errors) =>
           Stream.subscribe(
             errors,
-            handleError(intl.formatMessage(messages.saveSettingsError), true),
+            handleError(
+              intl.formatMessage(messages.saveSettingsError),
+              true,
+              "save",
+            ),
           ),
         )
         .catch(
-          handleError(intl.formatMessage(messages.openSettingsError), true),
+          handleError(
+            intl.formatMessage(messages.openSettingsError),
+            true,
+            "load",
+          ),
         ),
       // Cache database
       cacheStorage
@@ -135,7 +155,13 @@ const Root: FC = () => {
       {ready ? <Dashboard /> : null}
       {ready && settings ? <Settings /> : null}
       {errors ? <Errors onClose={toggleErrors} /> : null}
-      {error ? <StoreError onClose={() => setError(false)} /> : null}
+      {storageError ? (
+        <StoreError
+          error={storageError.error}
+          operation={storageError.operation}
+          onClose={() => setStorageError(null)}
+        />
+      ) : null}
     </>
   );
 };
