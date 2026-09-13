@@ -2,9 +2,13 @@ import * as DB from "./db";
 import {
   decodeSyncStorage,
   encodeSyncValue,
+  getSyncStorageUsage,
+  SYNC_TOTAL_QUOTA_BYTES,
   syncChunkDeletes,
-  type SyncChunkSet,
+  syncOrphanChunkDeletes,
+  syncStorageBytes,
 } from "./storageChunks";
+import { publishSyncStorageUsage } from "./storageQuota";
 import * as Stream from "./stream";
 
 /** IndexedDB storage provider */
@@ -99,7 +103,12 @@ export const extension = async (
     });
 
   const storageArea = browser.storage[area];
-  let chunkSets = new Map<string, SyncChunkSet>();
+
+  const publishUsage = (stored: Record<string, unknown>): void => {
+    if (area === "sync") {
+      publishSyncStorageUsage(getSyncStorageUsage(stored, name));
+    }
+  };
 
   // Pull
   await storageArea
@@ -107,8 +116,8 @@ export const extension = async (
     .then((stored) => {
       if (area === "sync") {
         const decoded = decodeSyncStorage(stored, name);
-        chunkSets = decoded.chunkSets;
         decoded.entries.forEach(([key, value]) => DB.put(db, key, value));
+        publishUsage(stored);
         return;
       }
 
@@ -127,6 +136,17 @@ export const extension = async (
   const handleError = (message: string) => (err: unknown) => {
     Stream.publish(errors, mapError(message, err));
   };
+
+  if (area === "sync") {
+    browser.storage.onChanged.addListener((_changes, changedArea) => {
+      if (changedArea !== "sync") return;
+      storageArea
+        .get()
+        .then(publishUsage)
+        .catch(handleError("Cannot read sync-storage usage"));
+    });
+  }
+
   let syncWriteQueue = Promise.resolve();
   DB.listen(
     db,
@@ -140,31 +160,37 @@ export const extension = async (
       if (area === "sync") {
         syncWriteQueue = syncWriteQueue
           .then(async () => {
+            const stored = await storageArea.get();
+            const currentChunkSets = decodeSyncStorage(stored, name).chunkSets;
             const updates: Record<string, unknown> = {};
             const deletes: string[] = [];
-            const nextChunkSets = new Map(chunkSets);
+            const changedKeys = new Set<string>();
 
             for (const [key, val] of changesArray) {
-              const previousChunkSet = chunkSets.get(key);
+              changedKeys.add(key);
+              const previousChunkSet = currentChunkSets.get(key);
 
               if (val === undefined) {
                 deletes.push(...syncChunkDeletes(name, key, previousChunkSet));
-                nextChunkSets.delete(key);
                 continue;
               }
 
               const encoded = encodeSyncValue(name, key, val, previousChunkSet);
               Object.assign(updates, encoded.updates);
               deletes.push(...encoded.deletes);
+            }
 
-              if (encoded.chunkCount > 0 && encoded.generation) {
-                nextChunkSets.set(key, {
-                  chunkCount: encoded.chunkCount,
-                  generation: encoded.generation,
-                });
-              } else {
-                nextChunkSets.delete(key);
-              }
+            // Heal stale generations left by older/concurrent writers before
+            // evaluating the final quota footprint. This also gives the retry
+            // path room to succeed when leaked chunks were consuming quota.
+            deletes.push(...syncOrphanChunkDeletes(stored, name, changedKeys));
+            const deleteKeys = Array.from(new Set(deletes));
+
+            const predictedStorage = { ...stored };
+            for (const key of deleteKeys) delete predictedStorage[key];
+            Object.assign(predictedStorage, updates);
+            if (syncStorageBytes(predictedStorage) > SYNC_TOTAL_QUOTA_BYTES) {
+              throw new RangeError("Sync storage quota would be exceeded");
             }
 
             const hasUpdates = Object.keys(updates).length > 0;
@@ -176,13 +202,13 @@ export const extension = async (
                 // committed whenever sync quota allows both to coexist briefly.
                 await storageArea.set(updates);
               } catch (error) {
-                if (deletes.length === 0) throw error;
+                if (deleteKeys.length === 0) throw error;
 
                 // Near the total sync quota, make room for the replacement but
                 // keep a rollback copy so a failed retry cannot destroy the
                 // previously readable value.
-                const rollback = await storageArea.get(deletes);
-                await storageArea.remove(deletes);
+                const rollback = await storageArea.get(deleteKeys);
+                await storageArea.remove(deleteKeys);
                 deletesApplied = true;
                 try {
                   await storageArea.set(updates);
@@ -194,11 +220,24 @@ export const extension = async (
                 }
               }
             }
-            if (!deletesApplied && deletes.length > 0) {
-              await storageArea.remove(deletes);
+            if (!deletesApplied && deleteKeys.length > 0) {
+              await storageArea.remove(deleteKeys);
             }
 
-            chunkSets = nextChunkSets;
+            const postWriteStorage = await storageArea.get();
+            const orphanedChunks = syncOrphanChunkDeletes(
+              postWriteStorage,
+              name,
+              changedKeys,
+            );
+            if (orphanedChunks.length > 0) {
+              await storageArea.remove(orphanedChunks);
+              const cleanedStorage = { ...postWriteStorage };
+              orphanedChunks.forEach((key) => delete cleanedStorage[key]);
+              publishUsage(cleanedStorage);
+            } else {
+              publishUsage(postWriteStorage);
+            }
           })
           .catch(handleError("Cannot write changes to storage"));
         return;

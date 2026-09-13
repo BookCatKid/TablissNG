@@ -68,6 +68,18 @@ async function hasBookmarksPermission(page: Page): Promise<boolean> {
   );
 }
 
+async function syncStorageContains(page: Page, text: string): Promise<boolean> {
+  return page.evaluate(
+    (needle) =>
+      new Promise<boolean>((resolve) => {
+        (window as ExtensionWindow).chrome.storage.sync.get(null, (stored) => {
+          resolve(JSON.stringify(stored).includes(needle));
+        });
+      }),
+    text,
+  );
+}
+
 test.describe("Quick Links extension integration", () => {
   test("shows the optional bookmarks permission gate", async () => {
     const session = await launchExtension();
@@ -152,9 +164,11 @@ test.describe("Quick Links extension integration", () => {
       await expect(page.locator(".Links .Link .Link-icon svg")).toBeVisible();
       await closeSettings(page);
 
-      // Extension settings are intentionally batched for one second. Wait for
-      // the link itself to be durable so this test isolates the icon cache.
-      await page.waitForTimeout(1100);
+      // Wait for the link itself to be durable so this test isolates the icon
+      // cache without depending on scheduler timing around the save debounce.
+      await expect
+        .poll(() => syncStorageContains(page, "solar:home-bold"))
+        .toBe(true);
 
       const cdp = await context.newCDPSession(page);
       await cdp.send("Network.enable");
@@ -397,21 +411,7 @@ test.describe("Quick Links extension integration", () => {
       ).toBeVisible();
 
       await expect
-        .poll(() =>
-          page.evaluate(async () => {
-            const stored = await new Promise<Record<string, unknown>>(
-              (resolve) => {
-                (window as ExtensionWindow).chrome.storage.sync.get(
-                  null,
-                  resolve,
-                );
-              },
-            );
-            return JSON.stringify(stored).includes(
-              "https://example.com/nested",
-            );
-          }),
-        )
+        .poll(() => syncStorageContains(page, "https://example.com/nested"))
         .toBe(true);
       await page.reload();
       await expect(page.locator(".Dashboard")).toBeVisible();

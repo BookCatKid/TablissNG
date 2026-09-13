@@ -286,4 +286,87 @@ test.describe("Extension sync storage", () => {
       await closeExtension(session);
     }
   });
+
+  test("cleans a stale generation when two tabs rewrite the same chunked value", async () => {
+    const session = await launchExtension();
+    const { context, page } = session;
+    let secondPage: Page | undefined;
+
+    try {
+      await importConfig(page, makeConfig(makeLinksData(80)));
+      await expect
+        .poll(async () => {
+          const stored = await readSyncStorage(page);
+          return (stored[STORED_LINKS_KEY] as ChunkManifest | undefined)
+            ?.generation;
+        })
+        .toEqual(expect.any(String));
+
+      const firstStored = await readSyncStorage(page);
+      const firstManifest = firstStored[STORED_LINKS_KEY] as ChunkManifest;
+
+      secondPage = await context.newPage();
+      await secondPage.goto("chrome://newtab");
+      await expect(secondPage.locator(".Dashboard")).toBeVisible();
+
+      await importConfig(page, makeConfig(makeLinksData(90)));
+      await expect
+        .poll(async () => {
+          const stored = await readSyncStorage(page);
+          return (stored[STORED_LINKS_KEY] as ChunkManifest | undefined)
+            ?.generation;
+        })
+        .not.toBe(firstManifest.generation);
+
+      const secondStored = await readSyncStorage(page);
+      const secondManifest = secondStored[STORED_LINKS_KEY] as ChunkManifest;
+
+      await importConfig(secondPage, makeConfig(makeLinksData(100)));
+      await expect
+        .poll(async () => {
+          const stored = await readSyncStorage(secondPage!);
+          const manifest = stored[STORED_LINKS_KEY] as
+            ChunkManifest | undefined;
+          if (!manifest || manifest.generation === secondManifest.generation) {
+            return false;
+          }
+          return chunkKeys(stored).length === manifest.chunks;
+        })
+        .toBe(true);
+    } finally {
+      if (secondPage) await secondPage.close();
+      await closeExtension(session);
+    }
+  });
+
+  test("shows the dashboard warning for a many-chunk value and high quota use", async () => {
+    const session = await launchExtension();
+    const { page } = session;
+
+    try {
+      await importConfig(page, makeConfig(makeLinksData(260)));
+      const warning = page.locator("[data-storage-warning]");
+
+      await expect(warning).toBeVisible();
+      await expect(warning).toHaveAttribute("title", /uses \d+ sync chunks/);
+
+      await page.evaluate(async () => {
+        const sync = (window as ExtensionWindow).chrome.storage.sync;
+        let index = 0;
+        while ((await sync.getBytesInUse(null)) / sync.QUOTA_BYTES < 0.82) {
+          await sync.set({
+            [`e2e-warning-fill-${index}`]: "x".repeat(4_000),
+          });
+          index += 1;
+        }
+      });
+
+      await expect(warning).toHaveAttribute(
+        "title",
+        /Sync storage is \d+% full/,
+      );
+    } finally {
+      await closeExtension(session);
+    }
+  });
 });

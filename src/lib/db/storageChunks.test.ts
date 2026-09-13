@@ -1,9 +1,12 @@
 import {
   decodeSyncStorage,
   encodeSyncValue,
+  SYNC_TOTAL_QUOTA_BYTES,
   syncChunkDeletes,
   syncChunkKeys,
   syncItemBytes,
+  syncOrphanChunkDeletes,
+  syncStorageBytes,
 } from "./storageChunks";
 
 const NAME = "tabliss/config";
@@ -27,6 +30,41 @@ test("keeps small sync values in the single-item layout", () => {
   expect(decodeSyncStorage(encoded.updates, NAME).entries).toEqual([
     [KEY, value],
   ]);
+});
+
+test("round-trips user values that look like internal storage markers", () => {
+  const values = [
+    {
+      __tablissStorage: "tabliss-sync-chunks-v1",
+      chunks: 1,
+      generation: "this-is-user-data",
+    },
+    {
+      __tablissStorage: "tabliss-sync-chunks-v1",
+      chunks: "not-a-manifest",
+    },
+    {
+      __tablissStorage: "tabliss-sync-value-v1",
+      value: { nested: true },
+    },
+  ];
+
+  for (const [index, value] of values.entries()) {
+    const key = `data/marker-${index}`;
+    const encoded = encodeSyncValue(NAME, key, value);
+    expect(decodeSyncStorage(encoded.updates, NAME).entries).toEqual([
+      [key, value],
+    ]);
+  }
+});
+
+test("rejects logical keys that collide with the internal chunk namespace", () => {
+  expect(() =>
+    encodeSyncValue(NAME, "$chunks/user-data", { important: true }),
+  ).toThrow("Sync-storage key uses reserved namespace");
+  expect(() => syncChunkDeletes(NAME, "$chunks/user-data")).toThrow(
+    "Sync-storage key uses reserved namespace",
+  );
 });
 
 test("chunks values into a generation-scoped set below Firefox's item quota", () => {
@@ -150,6 +188,34 @@ test("refuses to encode values requiring more than the safe chunk limit", () => 
   expect(() =>
     encodeSyncValue(NAME, "data/huge", { value: "x".repeat(300_000) }),
   ).toThrow("Sync-storage value requires too many chunks");
+});
+
+test("refuses a value that exceeds the total sync quota before the chunk limit", () => {
+  expect(() =>
+    encodeSyncValue(NAME, "data/huge", { value: "x".repeat(110_000) }),
+  ).toThrow("Sync-storage value exceeds the total quota");
+});
+
+test("measures the complete encoded storage footprint", () => {
+  const first = encodeSyncValue(NAME, KEY, makeLargeValue("a"));
+  const second = encodeSyncValue(NAME, "data/other", makeLargeValue("b"));
+  const stored = { ...first.updates, ...second.updates };
+
+  expect(syncStorageBytes(stored)).toBeGreaterThan(0);
+  expect(syncStorageBytes(stored)).toBeLessThan(SYNC_TOTAL_QUOTA_BYTES);
+});
+
+test("removes non-current generations for a rewritten key", () => {
+  const first = encodeSyncValue(NAME, KEY, makeLargeValue("a"));
+  const second = encodeSyncValue(NAME, KEY, makeLargeValue("b"));
+  const stored = { ...first.updates, ...second.updates };
+
+  expect(syncOrphanChunkDeletes(stored, NAME, [KEY]).sort()).toEqual(
+    syncChunkKeys(NAME, KEY, {
+      chunkCount: first.chunkCount,
+      generation: first.generation!,
+    }).sort(),
+  );
 });
 
 test("removes old chunks when a chunked value becomes small", () => {
