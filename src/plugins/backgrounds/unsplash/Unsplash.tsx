@@ -1,4 +1,4 @@
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useMemo } from "react";
 import { FormattedMessage } from "react-intl";
 
 import { useBackgroundRotation } from "../../../hooks";
@@ -58,7 +58,8 @@ const Unsplash: FC<Props> = ({
     buildUrl: (i: UnsplashImage) => buildLink(i.src),
   });
 
-  const url = item ? buildLink(item.src) : null;
+  const itemSrc = item?.src;
+  const url = useMemo(() => (itemSrc ? buildLink(itemSrc) : null), [itemSrc]);
 
   const credits = item
     ? [

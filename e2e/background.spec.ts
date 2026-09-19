@@ -45,6 +45,60 @@ test.describe("Background", () => {
     await expect(image).toHaveCSS("background-image", /data:image/);
   });
 
+  test("does not cross-fade the current image after resizing", async ({
+    page,
+  }) => {
+    await page.route("https://api.unsplash.com/photos/random**", (route) =>
+      route.fulfill({
+        json: [
+          {
+            urls: { raw: "https://images.unsplash.com/photo-test" },
+            links: { html: "https://unsplash.com/photos/test" },
+            location: null,
+            user: {
+              name: "Test User",
+              links: { html: "https://unsplash.com/@test" },
+            },
+          },
+        ],
+      }),
+    );
+    await page.route("https://images.unsplash.com/photo-test**", (route) =>
+      route.fulfill({
+        path: path.join(__dirname, "fixtures", "pixel.png"),
+        contentType: "image/png",
+      }),
+    );
+
+    await page.reload();
+    const images = page.locator(".Background .Unsplash .image");
+    await expect(images).toHaveCount(1);
+    await page.waitForTimeout(3000);
+
+    const transitionStarted = page.evaluate(
+      () =>
+        new Promise<boolean>((resolve) => {
+          const observer = new MutationObserver(() => {
+            if (
+              document.querySelectorAll(".Background .Unsplash .image").length >
+              1
+            ) {
+              observer.disconnect();
+              resolve(true);
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+          setTimeout(() => {
+            observer.disconnect();
+            resolve(false);
+          }, 1800);
+        }),
+    );
+    await page.setViewportSize({ width: 3000, height: 720 });
+
+    expect(await transitionStarted).toBe(false);
+  });
+
   test("extracts an image URL from a JSON response", async ({ page }) => {
     const apiUrl =
       "https://wallhaven.cc/api/v1/search?sorting=random&ratios=16x9,16x10&categories=010&atleast=1920x1080";
