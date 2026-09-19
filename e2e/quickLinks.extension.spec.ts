@@ -1,15 +1,6 @@
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import path from "node:path";
+import { expect, type Page, test } from "@playwright/test";
 
-import {
-  type BrowserContext,
-  chromium,
-  expect,
-  type Page,
-  test,
-} from "@playwright/test";
-
+import { closeExtension, launchExtension } from "./extensionHarness";
 import {
   addWidget,
   closeSettings,
@@ -18,78 +9,75 @@ import {
   widgetSettingsFieldset,
 } from "./helpers";
 
-type ExtensionSession = {
-  context: BrowserContext;
-  page: Page;
-  profilePath: string;
-  extensionPath?: string;
-};
-
 type ChromeExtensionApi = {
   permissions: {
-    contains(details: { permissions: string[] }): Promise<boolean>;
+    contains(
+      details: { permissions: string[] },
+      callback?: (granted: boolean) => void,
+    ): Promise<boolean> | void;
+    request(
+      details: { permissions: string[] },
+      callback?: (granted: boolean) => void,
+    ): Promise<boolean> | void;
+  };
+  storage: {
+    sync: {
+      get(keys?: null): Promise<Record<string, unknown>>;
+      get(keys: null, callback: (items: Record<string, unknown>) => void): void;
+    };
   };
   bookmarks: {
-    create(details: {
-      title: string;
-      parentId?: string;
-      url?: string;
-    }): Promise<{ id: string }>;
+    getTree(
+      callback?: (results: BookmarkTreeNodeFixture[]) => void,
+    ): Promise<BookmarkTreeNodeFixture[]> | void;
+    getSubTree(
+      id: string,
+      callback?: (results: BookmarkTreeNodeFixture[]) => void,
+    ): Promise<BookmarkTreeNodeFixture[]> | void;
   };
 };
 
-type ExtensionWindow = Window & { chrome: ChromeExtensionApi };
+type BookmarkTreeNodeFixture = {
+  id: string;
+  title: string;
+  url?: string;
+  children?: BookmarkTreeNodeFixture[];
+};
 
-async function launchExtension(
-  bookmarksRequired = false,
-): Promise<ExtensionSession> {
-  const sourcePath = path.resolve("dist/chromium");
-  let extensionPath = sourcePath;
-
-  if (bookmarksRequired) {
-    extensionPath = await mkdtemp(path.join(tmpdir(), "tablissng-extension-"));
-    await cp(sourcePath, extensionPath, { recursive: true });
-    const manifestPath = path.join(extensionPath, "manifest.json");
-    const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-    manifest.optional_permissions = manifest.optional_permissions.filter(
-      (permission: string) => permission !== "bookmarks",
-    );
-    manifest.permissions.push("bookmarks");
-    await writeFile(manifestPath, JSON.stringify(manifest));
-  }
-
-  const profilePath = await mkdtemp(path.join(tmpdir(), "tablissng-profile-"));
-  const context = await chromium.launchPersistentContext(profilePath, {
-    headless: false,
-    args: [
-      `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`,
-    ],
-  });
-  const page = context.pages()[0] || (await context.newPage());
-  await page.goto("chrome://newtab");
-  await expect(page.locator(".Dashboard")).toBeVisible();
-
-  return {
-    context,
-    page,
-    profilePath,
-    extensionPath: bookmarksRequired ? extensionPath : undefined,
-  };
-}
-
-async function closeExtension(session: ExtensionSession): Promise<void> {
-  await session.context.close();
-  await rm(session.profilePath, { recursive: true, force: true });
-  if (session.extensionPath) {
-    await rm(session.extensionPath, { recursive: true, force: true });
-  }
-}
+type ExtensionWindow = Window & {
+  chrome: ChromeExtensionApi;
+  browser?: ChromeExtensionApi;
+  __e2ePermissionRequests?: { permissions: string[] }[];
+};
 
 async function addQuickLinks(page: Page) {
   await addWidget(page, "widget/links");
   await expandWidgetSettings(page, "Quick Links");
   return widgetSettingsFieldset(page, "Quick Links");
+}
+
+async function hasBookmarksPermission(page: Page): Promise<boolean> {
+  return page.evaluate(
+    () =>
+      new Promise<boolean>((resolve) => {
+        (window as ExtensionWindow).chrome.permissions.contains(
+          { permissions: ["bookmarks"] },
+          resolve,
+        );
+      }),
+  );
+}
+
+async function syncStorageContains(page: Page, text: string): Promise<boolean> {
+  return page.evaluate(
+    (needle) =>
+      new Promise<boolean>((resolve) => {
+        (window as ExtensionWindow).chrome.storage.sync.get(null, (stored) => {
+          resolve(JSON.stringify(stored).includes(needle));
+        });
+      }),
+    text,
+  );
 }
 
 test.describe("Quick Links extension integration", () => {
@@ -105,13 +93,7 @@ test.describe("Quick Links extension integration", () => {
       await expect(
         settings.getByRole("button", { name: "Request Permission" }),
       ).toBeEnabled();
-      expect(
-        await page.evaluate(() =>
-          (window as ExtensionWindow).chrome.permissions.contains({
-            permissions: ["bookmarks"],
-          }),
-        ),
-      ).toBe(false);
+      expect(await hasBookmarksPermission(page)).toBe(false);
     } finally {
       await closeExtension(session);
     }
@@ -182,9 +164,11 @@ test.describe("Quick Links extension integration", () => {
       await expect(page.locator(".Links .Link .Link-icon svg")).toBeVisible();
       await closeSettings(page);
 
-      // Extension settings are intentionally batched for one second. Wait for
-      // the link itself to be durable so this test isolates the icon cache.
-      await page.waitForTimeout(1100);
+      // Wait for the link itself to be durable so this test isolates the icon
+      // cache without depending on scheduler timing around the save debounce.
+      await expect
+        .poll(() => syncStorageContains(page, "solar:home-bold"))
+        .toBe(true);
 
       const cdp = await context.newCDPSession(page);
       await cdp.send("Network.enable");
@@ -286,47 +270,139 @@ test.describe("Quick Links extension integration", () => {
     }
   });
 
-  test("imports a recursive real bookmark folder", async () => {
-    const session = await launchExtension(true);
+  test("requests the optional bookmarks permission through Chrome", async () => {
+    const session = await launchExtension();
     const { page } = session;
 
     try {
-      await page.evaluate(async () => {
-        const bookmarks = (window as ExtensionWindow).chrome.bookmarks;
-        const parent = await bookmarks.create({ title: "E2E Import" });
-        await bookmarks.create({
-          parentId: parent.id,
-          title: "First bookmark",
-          url: "https://example.com/first",
-        });
-        const child = await bookmarks.create({
-          parentId: parent.id,
-          title: "Nested folder",
-        });
-        await bookmarks.create({
-          parentId: child.id,
+      const settings = await addQuickLinks(page);
+      await page.evaluate(() => {
+        const extensionWindow = window as ExtensionWindow;
+        extensionWindow.__e2ePermissionRequests = [];
+        const originalRequest = extensionWindow.chrome.permissions.request.bind(
+          extensionWindow.chrome.permissions,
+        );
+        extensionWindow.chrome.permissions.request = (details, callback) => {
+          extensionWindow.__e2ePermissionRequests?.push(details);
+          return originalRequest(details, callback);
+        };
+      });
+
+      expect(await hasBookmarksPermission(page)).toBe(false);
+
+      const requestPermission = settings.getByRole("button", {
+        name: "Request Permission",
+      });
+      await requestPermission.click();
+      await expect
+        .poll(() =>
+          page.evaluate(
+            () => (window as ExtensionWindow).__e2ePermissionRequests,
+          ),
+        )
+        .toEqual([{ permissions: ["bookmarks"] }]);
+
+      // Chrome owns the native prompt, which Playwright cannot control, so stop
+      // at the real permission API boundary.
+      expect(await hasBookmarksPermission(page)).toBe(false);
+    } finally {
+      await closeExtension(session);
+    }
+  });
+
+  test("imports a recursive bookmark folder after permission is granted", async () => {
+    const session = await launchExtension();
+    const { context, page } = session;
+
+    try {
+      await context.addInitScript(() => {
+        const extensionWindow = window as ExtensionWindow;
+        const nestedBookmark: BookmarkTreeNodeFixture = {
+          id: "e2e-nested-bookmark",
           title: "Nested bookmark",
           url: "https://example.com/nested",
-        });
+        };
+        const importFolder: BookmarkTreeNodeFixture = {
+          id: "e2e-import-folder",
+          title: "E2E Import",
+          children: [
+            {
+              id: "e2e-first-bookmark",
+              title: "First bookmark",
+              url: "https://example.com/first",
+            },
+            {
+              id: "e2e-nested-folder",
+              title: "Nested folder",
+              children: [nestedBookmark],
+            },
+          ],
+        };
+        const root: BookmarkTreeNodeFixture = {
+          id: "0",
+          title: "",
+          children: [importFolder],
+        };
+
+        const containsPermission: ChromeExtensionApi["permissions"]["contains"] =
+          (_details, callback) => {
+            if (callback) {
+              callback(true);
+              return;
+            }
+            return Promise.resolve(true);
+          };
+        extensionWindow.chrome.permissions.contains = containsPermission;
+        if (extensionWindow.browser?.permissions) {
+          extensionWindow.browser.permissions.contains = containsPermission;
+        }
+        const bookmarksApi: ChromeExtensionApi["bookmarks"] = {
+          getTree: (callback) => {
+            const result = [root];
+            if (callback) {
+              callback(result);
+              return;
+            }
+            return Promise.resolve(result);
+          },
+          getSubTree: (id, callback) => {
+            const result = id === importFolder.id ? [importFolder] : [];
+            if (callback) {
+              callback(result);
+              return;
+            }
+            return Promise.resolve(result);
+          },
+        };
+        extensionWindow.chrome.bookmarks = bookmarksApi;
+        if (extensionWindow.browser) {
+          extensionWindow.browser.bookmarks = bookmarksApi;
+        }
       });
+      await page.reload();
+      await expect(page.locator(".Dashboard")).toBeVisible();
 
       const settings = await addQuickLinks(page);
       await expect(
         settings.getByText("Bookmarks permission is required to import."),
       ).toHaveCount(0);
+
       const folderSelect = settings
         .getByText("Select folder")
         .locator("select");
-      const folderId = await folderSelect
-        .locator("option", { hasText: "E2E Import" })
-        .getAttribute("value");
-      expect(folderId).not.toBeNull();
+      const folderOption = folderSelect.locator("option", {
+        hasText: "E2E Import",
+      });
+      await expect(folderOption).toHaveCount(1);
+      const folderId = await folderOption.getAttribute("value");
+      expect(folderId).toBe("e2e-import-folder");
+
       await folderSelect.selectOption(folderId!);
       await settings
         .getByRole("button", { name: "Import", exact: true })
         .click();
-
       await expect(settings.getByText("Imported 2 links")).toBeVisible();
+
       await closeSettings(page);
       await expect(page.locator(".Links .Link-name")).toContainText([
         "TablissNG",
@@ -339,6 +415,17 @@ test.describe("Quick Links extension integration", () => {
       await expect(
         page.locator('.Links .Link[href="https://example.com/nested"]'),
       ).toBeVisible();
+
+      await expect
+        .poll(() => syncStorageContains(page, "https://example.com/nested"))
+        .toBe(true);
+      await page.reload();
+      await expect(page.locator(".Dashboard")).toBeVisible();
+      await expect(page.locator(".Links .Link-name")).toContainText([
+        "TablissNG",
+        "First bookmark",
+        "Nested bookmark",
+      ]);
     } finally {
       await closeExtension(session);
     }

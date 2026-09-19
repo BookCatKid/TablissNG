@@ -4,39 +4,113 @@ import { FormattedMessage } from "react-intl";
 import Modal from "./modal/Modal";
 
 type Props = {
+  error: Error;
+  operation: "load" | "save";
   onClose: () => void;
 };
 
-const StoreError: FC<Props> = ({ onClose }) => {
+const getRootCause = (error: Error): Error => {
+  const seen = new Set<Error>();
+  let current = error;
+
+  while (current.cause instanceof Error && !seen.has(current.cause)) {
+    seen.add(current);
+    current = current.cause;
+  }
+
+  return current;
+};
+
+const StoreError: FC<Props> = ({ error, operation, onClose }) => {
+  const rootCause = getRootCause(error);
+  const errorText = `${error.message} ${rootCause.name} ${rootCause.message}`;
+  const rateLimited =
+    operation === "save" &&
+    /max_write_operations|write operations|rate.?limit/i.test(errorText);
+  const quotaExceeded =
+    operation === "save" &&
+    !rateLimited &&
+    /quota|quota_bytes|storage (?:limit|capacity)|exceed(?:ed|s)/i.test(
+      errorText,
+    );
+  const detail =
+    rootCause === error
+      ? `${error.name}: ${error.message}`
+      : `${rootCause.name}: ${rootCause.message}`;
+
   return (
     <Modal onClose={onClose}>
       <div className="Settings">
         <h2 className="no-margin">
-          <FormattedMessage
-            id="plugins.storageError.title"
-            defaultMessage="Storage Error"
-            description="Title for the storage error modal"
-          />
+          {quotaExceeded ? (
+            <FormattedMessage
+              id="plugins.storageError.quotaTitle"
+              defaultMessage="Storage limit reached"
+              description="Title shown when saving settings would exceed the storage quota"
+            />
+          ) : rateLimited ? (
+            <FormattedMessage
+              id="plugins.storageError.rateLimitTitle"
+              defaultMessage="Sync saves are temporarily limited"
+              description="Title shown when browser sync storage rate-limits writes"
+            />
+          ) : operation === "save" ? (
+            <FormattedMessage
+              id="plugins.storageError.saveTitle"
+              defaultMessage="Couldn't save settings"
+              description="Title shown when settings storage cannot be written"
+            />
+          ) : (
+            <FormattedMessage
+              id="plugins.storageError.loadTitle"
+              defaultMessage="Couldn't load settings"
+              description="Title shown when settings storage cannot be opened or read"
+            />
+          )}
         </h2>
         <p className="large">
+          {quotaExceeded ? (
+            <FormattedMessage
+              id="plugins.storageError.quota"
+              defaultMessage="TablissNG couldn't save this change because it would exceed the browser's storage quota. Reduce the amount of synced data and try again."
+              description="Explanation shown when settings exceed the browser storage quota"
+            />
+          ) : rateLimited ? (
+            <FormattedMessage
+              id="plugins.storageError.rateLimit"
+              defaultMessage="The browser temporarily refused this sync write because too many changes were saved in a short period. Your settings can be saved again once the browser allows more sync writes."
+              description="Explanation shown when browser sync storage rate-limits writes"
+            />
+          ) : operation === "save" ? (
+            <FormattedMessage
+              id="plugins.storageError.save"
+              defaultMessage="TablissNG couldn't write this change to settings storage. The change that triggered this error may not have been saved."
+              description="Explanation shown when settings storage cannot be written"
+            />
+          ) : (
+            <FormattedMessage
+              id="plugins.storageError.load"
+              defaultMessage="TablissNG couldn't open or read your settings storage, so your saved settings could not be loaded."
+              description="Explanation shown when settings storage cannot be opened or read"
+            />
+          )}
+        </p>
+        <p>
           <FormattedMessage
-            id="plugins.storageError"
-            defaultMessage="TablissNG is unable to load or save settings. This is most commonly caused by running in private browsing mode; but low disk space or a corrupt browser profile can also be the problem."
-            description="First paragraph explaining the reasons for a storage error"
+            id="plugins.storageError.reportedError"
+            defaultMessage="Error: <error>{details}</error>"
+            description="Shows the underlying error that caused the storage error modal to appear"
+            values={{
+              error: (chunks) => <code>{chunks}</code>,
+              details: detail,
+            }}
           />
         </p>
         <p>
           <FormattedMessage
-            id="plugins.storageError2"
-            defaultMessage="If you have settings saved with TablissNG, it might be a temporary issue. Try restarting your browser and checking if your settings return."
-            description="Second paragraph suggesting to restart the browser to fix the storage error"
-          />
-        </p>
-        <p>
-          <FormattedMessage
-            id="plugins.storageError3"
-            defaultMessage="If they do not return, the <guide>support guide</guide> covers the common causes and how to resolve them. Otherwise, create an issue at <github>GitHub</github> if you are still unable to solve the issue."
-            description="Third paragraph linking to the support guide and GitHub issues. Tags wrap clickable link text."
+            id="plugins.storageError.help"
+            defaultMessage="The <guide>support guide</guide> covers common storage problems and fixes. If this error keeps happening, <github>open an issue</github> and include the reported error above."
+            description="Links to storage support and GitHub after showing the specific storage error"
             values={{
               guide: (chunks) => (
                 <a href="https://tablissng.smrff.dev/support/storage-errors">

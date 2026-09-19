@@ -331,6 +331,26 @@ describe("links/migrateLinks()", () => {
     expect(result.data).toEqual(data);
     expect(result.dataChanged).toBe(false);
   });
+
+  it("removes incomplete recognized legacy icon metadata", () => {
+    const result = migrateLinks(
+      dataWithLink({
+        id: "incomplete-custom-ico",
+        url: "https://example.com",
+        icon: "_custom_ico",
+        iconifyValue: "log-in",
+        iconifyIdentifier: "feather:",
+      }),
+      {},
+    );
+
+    expect(result.data.links[0]).toEqual({
+      id: "incomplete-custom-ico",
+      url: "https://example.com",
+    });
+    expect(result.data.links[0]).not.toHaveProperty("iconConfig");
+    expect(result.dataChanged).toBe(true);
+  });
 });
 
 describe("links/cleanupCache()", () => {

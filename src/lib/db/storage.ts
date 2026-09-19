@@ -1,4 +1,14 @@
 import * as DB from "./db";
+import {
+  decodeSyncStorage,
+  encodeSyncValue,
+  getSyncStorageUsage,
+  SYNC_TOTAL_QUOTA_BYTES,
+  syncChunkDeletes,
+  syncOrphanChunkDeletes,
+  syncStorageBytes,
+} from "./storageChunks";
+import { publishSyncStorageUsage } from "./storageQuota";
 import * as Stream from "./stream";
 
 /** IndexedDB storage provider */
@@ -12,12 +22,17 @@ export const indexeddb = (
 ): Promise<Stream.Stream<StorageError>> => {
   // Map idb errors to a standard format
   const mapError = (message: string, err: unknown): StorageError => {
+    const target = err instanceof Event ? err.target : null;
+    const targetError =
+      target && "error" in target
+        ? (target as IDBRequest | IDBTransaction).error
+        : null;
     const cause =
-      err instanceof Event &&
-      err.target instanceof IDBRequest &&
-      err.target.error instanceof Error
-        ? err.target.error
-        : undefined;
+      targetError instanceof Error
+        ? targetError
+        : err instanceof Error
+          ? err
+          : undefined;
     return new StorageError(`IndexedDB: ${name}: ${message}`, { cause });
   };
 
@@ -94,16 +109,29 @@ export const extension = async (
 
   const storageArea = browser.storage[area];
 
+  const publishUsage = (stored: Record<string, unknown>): void => {
+    if (area === "sync") {
+      publishSyncStorageUsage(getSyncStorageUsage(stored, name));
+    }
+  };
+
   // Pull
   await storageArea
     .get()
-    .then((stored) =>
+    .then((stored) => {
+      if (area === "sync") {
+        const decoded = decodeSyncStorage(stored, name);
+        decoded.entries.forEach(([key, value]) => DB.put(db, key, value));
+        publishUsage(stored);
+        return;
+      }
+
       Object.keys(stored)
-        .filter((key) => key.startsWith(name))
+        .filter((key) => key.startsWith(`${name}/`))
         .forEach((key) =>
           DB.put(db, key.substring(name.length + 1), stored[key]),
-        ),
-    )
+        );
+    })
     .catch((error) => {
       throw mapError("Cannot read from storage", error);
     });
@@ -113,6 +141,18 @@ export const extension = async (
   const handleError = (message: string) => (err: unknown) => {
     Stream.publish(errors, mapError(message, err));
   };
+
+  if (area === "sync") {
+    browser.storage.onChanged.addListener((_changes, changedArea) => {
+      if (changedArea !== "sync") return;
+      storageArea
+        .get()
+        .then(publishUsage)
+        .catch(handleError("Cannot read sync-storage usage"));
+    });
+  }
+
+  let syncWriteQueue = Promise.resolve();
   DB.listen(
     db,
     batch((changes) => {
@@ -121,6 +161,71 @@ export const extension = async (
       // TODO: test for both updates and deletes for the same key
       // TODO: iterator helpers
       const changesArray = Array.from(changes);
+
+      if (area === "sync") {
+        syncWriteQueue = syncWriteQueue
+          .then(async () => {
+            const stored = await storageArea.get();
+            const currentChunkSets = decodeSyncStorage(stored, name).chunkSets;
+            const updates: Record<string, unknown> = {};
+            const deletes: string[] = [];
+            const changedKeys = new Set<string>();
+
+            for (const [key, val] of changesArray) {
+              changedKeys.add(key);
+              const previousChunkSet = currentChunkSets.get(key);
+
+              if (val === undefined) {
+                deletes.push(...syncChunkDeletes(name, key, previousChunkSet));
+                continue;
+              }
+
+              const encoded = encodeSyncValue(name, key, val, previousChunkSet);
+              Object.assign(updates, encoded.updates);
+              deletes.push(...encoded.deletes);
+            }
+
+            // Account for stale generations in cleanup and the final quota
+            // check.
+            deletes.push(...syncOrphanChunkDeletes(stored, name, changedKeys));
+            const deleteKeys = Array.from(new Set(deletes));
+
+            const predictedStorage = { ...stored };
+            for (const key of deleteKeys) delete predictedStorage[key];
+            Object.assign(predictedStorage, updates);
+            if (syncStorageBytes(predictedStorage) > SYNC_TOTAL_QUOTA_BYTES) {
+              throw new RangeError("Sync storage quota would be exceeded");
+            }
+
+            const hasUpdates = Object.keys(updates).length > 0;
+            if (hasUpdates) {
+              // Preserve the previous value until its replacement is
+              // committed.
+              await storageArea.set(updates);
+            }
+            if (deleteKeys.length > 0) {
+              await storageArea.remove(deleteKeys);
+            }
+
+            const postWriteStorage = await storageArea.get();
+            const orphanedChunks = syncOrphanChunkDeletes(
+              postWriteStorage,
+              name,
+              changedKeys,
+            );
+            if (orphanedChunks.length > 0) {
+              await storageArea.remove(orphanedChunks);
+              const cleanedStorage = { ...postWriteStorage };
+              orphanedChunks.forEach((key) => delete cleanedStorage[key]);
+              publishUsage(cleanedStorage);
+            } else {
+              publishUsage(postWriteStorage);
+            }
+          })
+          .catch(handleError("Cannot write changes to storage"));
+        return;
+      }
+
       const updates = Object.fromEntries(
         changesArray
           .filter(([, val]) => val !== undefined)
