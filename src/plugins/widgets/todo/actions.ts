@@ -19,6 +19,12 @@ export function removeTodo(id: string) {
   } as const;
 }
 
+export function clearCompletedTodos() {
+  return {
+    type: "CLEAR_COMPLETED_TODOS",
+  } as const;
+}
+
 export function toggleTodo(id: string) {
   return {
     type: "TOGGLE_TODO",
@@ -43,6 +49,7 @@ export function reorderTodo(index: number, to: number) {
 export type Action =
   | ReturnType<typeof addTodo>
   | ReturnType<typeof removeTodo>
+  | ReturnType<typeof clearCompletedTodos>
   | ReturnType<typeof toggleTodo>
   | ReturnType<typeof updateTodo>
   | ReturnType<typeof reorderTodo>;

@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Tiêu đề (tùy chọn)",
   "plugins.timeTracker.was": "đã",
   "plugins.timeZone": "Múi giờ",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Thêm nhắc nhở để trì hoãn.",
   "plugins.todo.name": "Việc cần làm",
   "plugins.topSites.columns": "Number of columns",

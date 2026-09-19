@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "제목(선택 사항)",
   "plugins.timeTracker.was": "경과:",
   "plugins.timeZone": "시간대",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "할 일을 목록으로 관리하세요.",
   "plugins.todo.name": "할 일",
   "plugins.topSites.columns": "열 개수",

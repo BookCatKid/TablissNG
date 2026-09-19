@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Titre (facultatif)",
   "plugins.timeTracker.was": "est survenu",
   "plugins.timeZone": "Fuseau horaire",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Ajoutez des rappels pour vous aider à procrastiner.",
   "plugins.todo.name": "Tâches",
   "plugins.topSites.columns": "Nombre de colonnes",

@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Título (opcional)",
   "plugins.timeTracker.was": "foi",
   "plugins.timeZone": "Fuso horário",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Adicione lembretes para procrastinar.",
   "plugins.todo.name": "Tarefas",
   "plugins.topSites.columns": "Number of columns",

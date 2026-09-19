@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "nimi (ken)",
   "plugins.timeTracker.was": "li",
   "plugins.timeZone": "tenpo sina",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "kama la sina pali ala e pali ni. taso, pali ni li lon ni la, sina pilin pona.",
   "plugins.todo.name": "pali",
   "plugins.topSites.columns": "Number of columns",

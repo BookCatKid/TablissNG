@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Título (opcional)",
   "plugins.timeTracker.was": "era",
   "plugins.timeZone": "Zona horaria",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Añadir recordatorios para procrastinar.",
   "plugins.todo.name": "TODOs",
   "plugins.topSites.columns": "Número de columnas",

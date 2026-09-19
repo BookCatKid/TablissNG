@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Başlık (isteğe bağlı)",
   "plugins.timeTracker.was": "oldu",
   "plugins.timeZone": "Saat Dilimi",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Ertelemek için hatırlatıcılar ekleyin.",
   "plugins.todo.name": "Yapılacaklar",
   "plugins.topSites.columns": "Number of columns",

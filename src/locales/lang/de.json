@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Titel (optional)",
   "plugins.timeTracker.was": "war",
   "plugins.timeZone": "Zeitzone",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Füge Erinnerungen hinzu, um aufzuschieben.",
   "plugins.todo.name": "Aufgabenlisten",
   "plugins.topSites.columns": "Number of columns",

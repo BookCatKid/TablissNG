@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "标题（可选）",
   "plugins.timeTracker.was": "已经",
   "plugins.timeZone": "时区",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "添加提醒以便拖延。",
   "plugins.todo.name": "待办事项",
   "plugins.topSites.columns": "列数",

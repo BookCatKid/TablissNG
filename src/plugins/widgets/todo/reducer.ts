@@ -17,6 +17,9 @@ export function reducer(state: State, action: Action) {
     case "REMOVE_TODO":
       return state.filter((todo) => todo.id !== action.data.id);
 
+    case "CLEAR_COMPLETED_TODOS":
+      return state.filter((todo) => !todo.completed);
+
     case "TOGGLE_TODO":
       return state.map((todo) =>
         todo.id === action.data.id

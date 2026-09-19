@@ -467,6 +467,8 @@
   "plugins.timeTracker.titleOptional": "Název (volitelný)",
   "plugins.timeTracker.was": "byla",
   "plugins.timeZone": "Časové pásmo",
+  "plugins.todo.clearCompleted": "Clear completed todos",
+  "plugins.todo.clearCompletedConfirm": "Are you sure you want to delete all completed todos? This cannot be undone.",
   "plugins.todo.description": "Přidejte připomínky k odkládání úkolů.",
   "plugins.todo.name": "Úkoly",
   "plugins.topSites.columns": "Number of columns",
