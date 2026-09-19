@@ -108,7 +108,7 @@ const StoreError: FC<Props> = ({ error, operation, onClose }) => {
         </p>
         <p>
           <FormattedMessage
-            id="plugins.storageError3"
+            id="plugins.storageError.help"
             defaultMessage="The <guide>support guide</guide> covers common storage problems and fixes. If this error keeps happening, <github>open an issue</github> and include the reported error above."
             description="Links to storage support and GitHub after showing the specific storage error"
             values={{

@@ -46,7 +46,7 @@ type BookmarkTreeNodeFixture = {
 
 type ExtensionWindow = Window & {
   chrome: ChromeExtensionApi;
-  browser: ChromeExtensionApi;
+  browser?: ChromeExtensionApi;
   __e2ePermissionRequests?: { permissions: string[] }[];
 };
 
@@ -302,9 +302,8 @@ test.describe("Quick Links extension integration", () => {
         )
         .toEqual([{ permissions: ["bookmarks"] }]);
 
-      // Chrome owns the native Allow/Deny sheet from here. Playwright does not
-      // expose extension permission prompts, so the E2E stops at the real API
-      // boundary instead of mutating the manifest or faking a grant.
+      // Chrome owns the native prompt, which Playwright cannot control, so stop
+      // at the real permission API boundary.
       expect(await hasBookmarksPermission(page)).toBe(false);
     } finally {
       await closeExtension(session);
@@ -345,13 +344,18 @@ test.describe("Quick Links extension integration", () => {
           children: [importFolder],
         };
 
-        extensionWindow.chrome.permissions.contains = (_details, callback) => {
-          if (callback) {
-            callback(true);
-            return;
-          }
-          return Promise.resolve(true);
-        };
+        const containsPermission: ChromeExtensionApi["permissions"]["contains"] =
+          (_details, callback) => {
+            if (callback) {
+              callback(true);
+              return;
+            }
+            return Promise.resolve(true);
+          };
+        extensionWindow.chrome.permissions.contains = containsPermission;
+        if (extensionWindow.browser?.permissions) {
+          extensionWindow.browser.permissions.contains = containsPermission;
+        }
         const bookmarksApi: ChromeExtensionApi["bookmarks"] = {
           getTree: (callback) => {
             const result = [root];
@@ -371,7 +375,9 @@ test.describe("Quick Links extension integration", () => {
           },
         };
         extensionWindow.chrome.bookmarks = bookmarksApi;
-        extensionWindow.browser.bookmarks = bookmarksApi;
+        if (extensionWindow.browser) {
+          extensionWindow.browser.bookmarks = bookmarksApi;
+        }
       });
       await page.reload();
       await expect(page.locator(".Dashboard")).toBeVisible();

@@ -185,9 +185,8 @@ export const extension = async (
               deletes.push(...encoded.deletes);
             }
 
-            // Heal stale generations left by older/concurrent writers before
-            // evaluating the final quota footprint. This also gives the retry
-            // path room to succeed when leaked chunks were consuming quota.
+            // Account for stale generations in cleanup and the final quota
+            // check.
             deletes.push(...syncOrphanChunkDeletes(stored, name, changedKeys));
             const deleteKeys = Array.from(new Set(deletes));
 
@@ -199,33 +198,12 @@ export const extension = async (
             }
 
             const hasUpdates = Object.keys(updates).length > 0;
-            let deletesApplied = false;
-
             if (hasUpdates) {
-              try {
-                // Keep the previous chunk set readable until its replacement is
-                // committed whenever sync quota allows both to coexist briefly.
-                await storageArea.set(updates);
-              } catch (error) {
-                if (deleteKeys.length === 0) throw error;
-
-                // Near the total sync quota, make room for the replacement but
-                // keep a rollback copy so a failed retry cannot destroy the
-                // previously readable value.
-                const rollback = await storageArea.get(deleteKeys);
-                await storageArea.remove(deleteKeys);
-                deletesApplied = true;
-                try {
-                  await storageArea.set(updates);
-                } catch (retryError) {
-                  if (Object.keys(rollback).length > 0) {
-                    await storageArea.set(rollback);
-                  }
-                  throw retryError;
-                }
-              }
+              // Preserve the previous value until its replacement is
+              // committed.
+              await storageArea.set(updates);
             }
-            if (!deletesApplied && deleteKeys.length > 0) {
+            if (deleteKeys.length > 0) {
               await storageArea.remove(deleteKeys);
             }
 
