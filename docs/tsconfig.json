@@ -1,9 +1,19 @@
 {
   // This file is not used in compilation. It is here just for a nice editor experience.
-  "extends": "@docusaurus/tsconfig",
+  // Mirrors @docusaurus/tsconfig, minus baseUrl which TypeScript 7 removed.
   "compilerOptions": {
-    "ignoreDeprecations": "6.0", // TODO: remove this when @docusaurus/tsconfig supports TypeScript 6
-    "baseUrl": "."
+    "allowJs": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "noEmit": true,
+    "paths": {
+      "@site/*": ["./*"]
+    },
+    "skipLibCheck": true
   },
   "exclude": [".docusaurus", "build"]
 }
