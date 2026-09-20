@@ -20,7 +20,7 @@ const config = {
   lazyCompilation: false,
   entry: {
     polyfills: "./src/polyfills.ts",
-    main: ["normalize.css", "./src/styles.sass", "./src/main.tsx"],
+    main: ["./src/main.tsx"],
   },
   output: {
     path: path.resolve("dist", buildTarget),

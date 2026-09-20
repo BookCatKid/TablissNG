@@ -1,3 +1,6 @@
+import "normalize.css";
+import "./styles.sass";
+
 import { createRoot } from "react-dom/client";
 
 import { capture } from "./errorHandler";
