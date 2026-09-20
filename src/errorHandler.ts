@@ -2,6 +2,7 @@ export type ErrorLogEntry = {
   timestamp: string;
   message: string;
   stack?: string;
+  raw?: unknown;
 };
 
 const errorLog: ErrorLogEntry[] = [];
@@ -22,6 +23,7 @@ export function capture(error: unknown): void {
     timestamp: new Date().toISOString(),
     message: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
+    raw: error,
   };
   errorLog.push(entry);
   for (const fn of listeners) {

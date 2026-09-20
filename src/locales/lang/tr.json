@@ -545,6 +545,7 @@
   "settings.aria.watch": "Watch BookCatKid/tablissNG on GitHub",
   "settings.basicModeDescription": "Temel mod, yalnızca tek bir boyuta sahip olabilen bir metin gölgesi kullanır.",
   "settings.basicOutline": "Temel (Metin Gölgesi)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "Enter a custom class for easier styling",
   "settings.customClass.title": "Custom CSS Class",
   "settings.disableWidget": "Disable widget",

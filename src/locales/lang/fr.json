@@ -545,6 +545,7 @@
   "settings.aria.watch": "Suivre BookCatKid/tablissNG sur GitHub",
   "settings.basicModeDescription": "Le mode basique utilise une ombre du texte qui ne peut avoir qu’une seule taille.",
   "settings.basicOutline": "Basique (ombre)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "Entrer une classe facilitant le style",
   "settings.customClass.title": "Classe CSS personnalisée",
   "settings.disableWidget": "Disable widget",

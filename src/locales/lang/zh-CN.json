@@ -545,6 +545,7 @@
   "settings.aria.watch": "在 GitHub 上关注 BookCatKid/tablissNG",
   "settings.basicModeDescription": "基本模式使用文本阴影，只能有一个尺寸。",
   "settings.basicOutline": "基本（文本阴影）",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "输入自定义类以便于样式设置",
   "settings.customClass.title": "自定义 CSS 类",
   "settings.disableWidget": "禁用部件",

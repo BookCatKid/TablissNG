@@ -545,6 +545,7 @@
   "settings.aria.watch": "Watch BookCatKid/tablissNG on GitHub",
   "settings.basicModeDescription": "Chế độ cơ bản sử dụng bóng chữ chỉ có thể có một kích thước.",
   "settings.basicOutline": "Cơ bản (Bóng chữ)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "Nhập lớp tùy chỉnh để dễ dàng tùy chỉnh kiểu",
   "settings.customClass.title": "Lớp CSS Tùy chỉnh",
   "settings.disableWidget": "Disable widget",

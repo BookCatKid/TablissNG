@@ -70,6 +70,10 @@ const System: FC = () => {
   );
   const [favicon, setFavicon] = useKey(db, "favicon");
   const [accent, setAccent] = useKey(db, "accent");
+  const [crashReportingEnabled, setCrashReportingEnabled] = useKey(
+    db,
+    "crashReportingEnabled",
+  );
 
   return (
     <div>
@@ -368,6 +372,21 @@ const System: FC = () => {
           type="checkbox"
           checked={autoHideSettings}
           onChange={(e) => setAutoHideSettings(e.target.checked)}
+        />
+      </label>
+
+      <label className="u-grid-2col">
+        <span>
+          <FormattedMessage
+            id="settings.crashReporting"
+            defaultMessage="Send Anonymous Crash Reports"
+            description="Crash reporting opt-out toggle label"
+          />
+        </span>
+        <input
+          type="checkbox"
+          checked={crashReportingEnabled}
+          onChange={(e) => setCrashReportingEnabled(e.target.checked)}
         />
       </label>
     </div>

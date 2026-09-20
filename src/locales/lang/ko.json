@@ -545,6 +545,7 @@
   "settings.aria.watch": "GitHub에서 BookCatKid/tablissNG 저장소 구독하기",
   "settings.basicModeDescription": "기본 모드는 텍스트 그림자로 윤곽선을 표현하며 크기를 하나만 지정할 수 있습니다.",
   "settings.basicOutline": "기본(텍스트 그림자)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "스타일을 쉽게 적용할 수 있도록 사용자 지정 클래스 이름을 입력하세요.",
   "settings.customClass.title": "사용자 지정 CSS 클래스",
   "settings.disableWidget": "위젯 비활성화",

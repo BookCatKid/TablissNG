@@ -545,6 +545,7 @@
   "settings.aria.watch": "Watch BookCatKid/tablissNG on GitHub",
   "settings.basicModeDescription": "Der Basismodus verwendet einen Textschatten, der nur eine Größe haben kann.",
   "settings.basicOutline": "Basic (Textschatten)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "Eigene Klasse für einfacheres Styling",
   "settings.customClass.title": "Benutzerdefinierte CSS Klasse",
   "settings.disableWidget": "Disable widget",

@@ -3,6 +3,7 @@ packages:
 
 allowBuilds:
   '@parcel/watcher': false
+  '@sentry/cli': true
   '@swc/core': false
   core-js: false
 

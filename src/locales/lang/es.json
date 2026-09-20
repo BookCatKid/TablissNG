@@ -545,6 +545,7 @@
   "settings.aria.watch": "Seguir BookCatKid/tablissNG en GitHub",
   "settings.basicModeDescription": "El modo básico usa texto sombreado que solo tiene un tamaño.",
   "settings.basicOutline": "Básico (Sombreado)",
+  "settings.crashReporting": "Send Anonymous Crash Reports",
   "settings.customClass.placeholder": "Ingresa una clase personalizada para facilitar el estilo",
   "settings.customClass.title": "Clase CSS personalizada",
   "settings.disableWidget": "Disable widget",

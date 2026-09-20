@@ -140,9 +140,15 @@ const config = {
       UNSPLASH_API_KEY: JSON.stringify(process.env.UNSPLASH_API_KEY),
       NASA_API_KEY: JSON.stringify(process.env.NASA_API_KEY),
       TRELLO_API_KEY: JSON.stringify(process.env.TRELLO_API_KEY),
+      SENTRY_DSN: JSON.stringify(process.env.SENTRY_DSN),
     }),
   ].filter(Boolean),
-  devtool: isWeb || !isProduction ? "source-map" : false,
+  devtool:
+    isWeb || !isProduction
+      ? "source-map"
+      : process.env.SENTRY_SOURCEMAPS
+        ? "hidden-source-map"
+        : false,
   stats: {
     warnings: true,
   },

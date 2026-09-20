@@ -37,6 +37,7 @@
     "icons:generate": "node scripts/icons/generate.mjs",
     "translations": "node ./scripts/translations/translations.js",
     "sign:firefox": "node ./scripts/firefox-sign-manual.js",
+    "sentry:sourcemaps": "node scripts/sentry-sourcemaps.mjs",
     "deps:check": "pnpm dlx npm-check",
     "deps:update": "pnpm dlx npm-check -u",
     "typecheck": "tsc",
@@ -48,6 +49,7 @@
   },
   "dependencies": {
     "@iconify/react": "^6.0.2",
+    "@sentry/browser": "10.74.0",
     "core-js": "^3.50.0",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
@@ -78,6 +80,7 @@
     "@rspack/dev-server": "2.2.1",
     "@rspack/plugin-react-refresh": "^2.0.2",
     "@rstest/core": "^0.12.0",
+    "@sentry/cli": "3.7.0",
     "@types/core-js": "~2.5.8",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

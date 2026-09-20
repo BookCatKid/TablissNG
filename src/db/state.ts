@@ -40,6 +40,8 @@ export interface State {
   favicon: FaviconState;
   /** Global accent color in hex format */
   accent: string;
+  /** Whether to send anonymised crash reports to Sentry */
+  crashReportingEnabled: boolean;
 }
 
 export type FaviconMode =
@@ -169,6 +171,7 @@ const initData: State = {
     data: null,
   },
   accent: "#3498db",
+  crashReportingEnabled: true,
 };
 
 // Database storage

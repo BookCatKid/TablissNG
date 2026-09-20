@@ -41,7 +41,7 @@ export default defineConfig(
   {
     files: [
       "rspack.config.js",
-      "scripts/**/*.js",
+      "scripts/**/*.{js,mjs}",
       "eslint.config.mjs",
       "docs/sync-assets.js",
     ],
