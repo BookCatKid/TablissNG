@@ -8,9 +8,67 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+## [1.8.0] - 9/19/2026 | Quick Links overhaul, sync reliability, and dashboard improvements
+
+This release adds a redesigned Quick Links experience with better Iconify support, a Currency Rates widget, per-widget visibility controls, browser startup URL support, and several usability improvements. It also hardens browser sync storage, improves background transitions, expands translations, and adds GitHub Sponsors.
+
+### Added
+
+- Overhaul Quick Links with typed icon configuration, Iconify support, improved custom images, migration handling, drafts, and SVG support (#111). [149a5e35](https://github.com/BookCatKid/TablissNG/commit/149a5e35)
+
+- Add a Currency Rates widget for fiat currencies, cryptocurrencies, and precious metals, with configurable pairs, refresh intervals, 24-hour changes, and currency icons (#170). [78d623ab](https://github.com/BookCatKid/TablissNG/commit/78d623ab)
+
+- Allow widgets to be disabled in their settings, removing them from dashboard rendering while keeping them available for editing (#155). [086a4cf1](https://github.com/BookCatKid/TablissNG/commit/086a4cf1)
+
+- Add a copyable browser startup URL to extension settings for browsers such as Vivaldi (#163). [5e795be4](https://github.com/BookCatKid/TablissNG/commit/5e795be4)
+
+- Add an automatic refresh option to the IP Info widget. [5436293a](https://github.com/BookCatKid/TablissNG/commit/5436293a)
+
+- Add an option to clear completed todos. [fba2c80a](https://github.com/BookCatKid/TablissNG/commit/fba2c80a)
+
+- Add GitHub Sponsors support to the settings interface. [1995e85f](https://github.com/BookCatKid/TablissNG/commit/1995e85f)
+
+- Add the GitHub Sponsors profile configuration. [5c56c33b](https://github.com/BookCatKid/TablissNG/commit/5c56c33b)
+
+- Support JSON API responses in Online backgrounds using dot-separated image paths, standard background rotation controls, and optional cross-origin access. [f931ffbe](https://github.com/BookCatKid/TablissNG/commit/f931ffbe)
+
+### Changed
+
+- Improve Trello drag performance, drop targets, card and label interactions, authentication feedback, and empty and loading states (#177). [027821f7](https://github.com/BookCatKid/TablissNG/commit/027821f7)
+
+### Fixed
+
+- Chunk oversized browser sync storage values so large configurations can be persisted reliably (#184). [525643d3](https://github.com/BookCatKid/TablissNG/commit/525643d3)
+
+- Prevent background fade skips during repeated navigation. [deb7c898](https://github.com/BookCatKid/TablissNG/commit/deb7c898)
+
+- Prevent resize operations from triggering an unintended background cross-fade. [144c54de](https://github.com/BookCatKid/TablissNG/commit/144c54de)
+
+- Add missing translation keys across locale files. [67bbcca5](https://github.com/BookCatKid/TablissNG/commit/67bbcca5)
+
 ### Translations
 
-- Improve and complete Korean translations across menus, settings, widgets, and validation messages.
+- Update Korean translations (#159). [4821b37c](https://github.com/BookCatKid/TablissNG/commit/4821b37c)
+
+- Improve French translations and remove an obsolete translation key. [46d4c8fd](https://github.com/BookCatKid/TablissNG/commit/46d4c8fd)
+
+- Bring Simplified Chinese translation coverage to 98.8% (#166). [dd240823](https://github.com/BookCatKid/TablissNG/commit/dd240823)
+
+- Update Spanish translations (#167). [88c13014](https://github.com/BookCatKid/TablissNG/commit/88c13014)
+
+- Improve and complete Korean translations across menus, settings, widgets, and validation messages (#174). [f0d4fb32](https://github.com/BookCatKid/TablissNG/commit/f0d4fb32)
+
+- Update Simplified Chinese translations for Currency Rates, the startup URL, and other UI text (#179). [ce00d2e4](https://github.com/BookCatKid/TablissNG/commit/ce00d2e4)
+
+### Testing and Maintenance
+
+- Add and expand Playwright end-to-end coverage for Chromium, Firefox, widgets, backgrounds, settings, and IP Info. [d587d911](https://github.com/BookCatKid/TablissNG/commit/d587d911), [105813c9](https://github.com/BookCatKid/TablissNG/commit/105813c9)
+
+- Compile locales before end-to-end tests in CI. [b0cab722](https://github.com/BookCatKid/TablissNG/commit/b0cab722)
+
+- Update dependencies and formatting. [ee1dcceb](https://github.com/BookCatKid/TablissNG/commit/ee1dcceb)
+
+- Add CodeRabbit and Sourcery review configuration. [908592f8](https://github.com/BookCatKid/TablissNG/commit/908592f8)
 
 ## [1.7.1] - 6/4/2026 | Minor bugfix release
 
