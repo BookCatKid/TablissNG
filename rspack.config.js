@@ -174,6 +174,37 @@ if (!isWeb) {
 
 if (isProduction && buildTarget !== "firefox") {
   const workbox = require("workbox-build");
+
+  // Workbox decides whether a cached entry is fresh by reading the copy's `Date`
+  // header. `Date` is not a CORS-safelisted response header and the APIs below
+  // do not expose it, so that check never fires. Workbox's IndexedDB cleanup is
+  // not a substitute: it keys off a timestamp that is refreshed on every read,
+  // so an entry that keeps being requested is never seen as expired. Stamping
+  // the response with the time it was fetched makes expiration work again.
+  const stampResponseDate = {
+    // Entries cached before this plugin existed have no `Date` header, and
+    // `cacheWillUpdate` only runs when something is written, so nothing would
+    // ever replace them. Report them as a miss so they are re-fetched once and
+    // re-cached with a stamp.
+    cachedResponseWillBeUsed: async ({ cachedResponse }) =>
+      cachedResponse?.headers.has("date") ? cachedResponse : null,
+
+    cacheWillUpdate: async ({ response }) => {
+      // Returning a response here replaces Workbox's own cacheability check, so
+      // keep the status filter it would otherwise apply.
+      if (!response || response.status !== 200) {
+        return null;
+      }
+      const headers = new Headers(response.headers);
+      headers.set("date", new Date().toUTCString());
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+      });
+    },
+  };
+
   config.plugins.push({
     apply(compiler) {
       compiler.hooks.afterEmit.tapPromise("WorkboxPlugin", async () => {
@@ -198,6 +229,7 @@ if (isProduction && buildTarget !== "firefox") {
               handler: "CacheFirst",
               options: {
                 cacheName: "tabliss-cache-apis",
+                plugins: [stampResponseDate],
                 expiration: {
                   maxAgeSeconds: 24 * 60 * 60, // 1 day
                 },
