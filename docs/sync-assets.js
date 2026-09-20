@@ -10,6 +10,7 @@ const filesToSync = [
   { from: "CONTRIBUTING.md", to: "docs/community/contributing.md" },
   { from: "TRANSLATING.md", to: "docs/community/translating.md" },
   { from: "BUILDING.md", to: "docs/developing/building.md" },
+  { from: "PRIVACY.md", to: "docs/privacy.md" },
   { from: "src/views/shared/tabliss.svg", to: "static/img/logo.svg" },
 ];
 
