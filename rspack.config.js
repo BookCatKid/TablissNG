@@ -30,6 +30,9 @@ const config = {
     clean: true,
   },
   mode: isProduction ? "production" : "development",
+  experiments: {
+    css: true,
+  },
   resolve: {
     extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
@@ -37,7 +40,10 @@ const config = {
     rules: [
       {
         test: /\.css$/,
-        type: "css",
+        type: "css/auto",
+        parser: {
+          exportType: isProduction ? "link" : "style",
+        },
       },
       {
         test: /\.(gif|jpe?g|png)$/,
@@ -54,7 +60,10 @@ const config = {
       {
         test: /\.sass$/,
         use: ["sass-loader"],
-        type: "css",
+        type: "css/auto",
+        parser: {
+          exportType: isProduction ? "link" : "style",
+        },
       },
       {
         test: /\.svg$/,
