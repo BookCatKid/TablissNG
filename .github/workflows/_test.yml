@@ -51,6 +51,29 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  extension-e2e:
+    name: Extension E2E tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run extension e2e tests
+        run: pnpm run test:e2e:extension
+        env:
+          # The default Unsplash background throws without a key (and .env is
+          # gitignored, so absent in CI). A placeholder prevents that error.
+          UNSPLASH_API_KEY: placeholder
+
   translations-check:
     name: Translations Check
     runs-on: ubuntu-latest
