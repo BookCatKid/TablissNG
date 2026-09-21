@@ -158,6 +158,7 @@ export type Board = {
 
 export type Card = {
   id: string;
+  clientId?: string; // Temporary id assigned for rendering it gets replaced by id after Trello create the object.
   name: string;
   position: number;
   labels: Label[];
@@ -170,8 +171,10 @@ export type Label = {
 };
 
 export const createCard = (name: string): Card => {
+  const id = nanoid();
   return {
-    id: nanoid(), // Used only for uniquely identifying card when rendering, true id is derived from Trello
+    id: id,
+    clientId: id,
     name,
     position: 0, // in Trello's api 0 indicates at the top of the list
     labels: [],

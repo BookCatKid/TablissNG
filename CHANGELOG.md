@@ -14,6 +14,8 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 - Fix extension builds rendering a blank new tab page by importing the stylesheets from the main entry instead of listing them as separate entry modules.
 
+- Fix critical bug in Trello module's card rendering by stabilising keys. [fbac239](https://github.com/BookCatKid/TablissNG/commit/fbac239d0e8104db3dfd0f378845923fa653c633)
+
 ## [1.8.0] - 9/19/2026 | Quick Links overhaul, sync reliability, and dashboard improvements
 
 This release adds a redesigned Quick Links experience with better Iconify support, a Currency Rates widget, per-widget visibility controls, browser startup URL support, and several usability improvements. It also hardens browser sync storage, improves background transitions, expands translations, and adds GitHub Sponsors.
