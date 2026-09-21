@@ -8,13 +8,29 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
-- Change Trello widget height to auto rather than fixed height to fix bug with widget overflowing into below neighbours at certain font sizes + scale. [683cd41](https://github.com/John-Ling/TablissNG/commit/683cd41f141f654ec1b8d90350bca2d947356ec5)
+## [1.8.1] - 9/21/2026 | Crash reporting and Trello fixes
+
+A quick follow-up release adding privacy-preserving, opt-out Sentry crash reporting and a privacy policy, fixing two Trello widget bugs, and expiring stale cached API responses.
+
+### Added
+
+- Add private, opt-out Sentry crash reporting with privacy-preserving event scrubbing and toggles in Settings and the Errors panel. [2ef8d3d4](https://github.com/BookCatKid/TablissNG/commit/2ef8d3d4)
+
+- Add a privacy policy. [25482cc9](https://github.com/BookCatKid/TablissNG/commit/25482cc9)
 
 ### Fixed
 
-- Fix extension builds rendering a blank new tab page by importing the stylesheets from the main entry instead of listing them as separate entry modules.
+- Change Trello widget height to auto rather than fixed height to fix bug with widget overflowing into below neighbours at certain font sizes + scale. [683cd41](https://github.com/John-Ling/TablissNG/commit/683cd41f141f654ec1b8d90350bca2d947356ec5)
 
 - Fix critical bug in Trello module's card rendering by stabilising keys. [fbac239](https://github.com/BookCatKid/TablissNG/commit/fbac239d0e8104db3dfd0f378845923fa653c633)
+
+- Expire cached API responses in the service worker after one day. [98012531](https://github.com/BookCatKid/TablissNG/commit/98012531)
+
+### Testing and Maintenance
+
+- Verify a real extension build on every pull request. [c8170276](https://github.com/BookCatKid/TablissNG/commit/c8170276)
+
+- Update dependencies and GitHub Actions. [eae112b1](https://github.com/BookCatKid/TablissNG/commit/eae112b1), [8785886b](https://github.com/BookCatKid/TablissNG/commit/8785886b)
 
 ## [1.8.0] - 9/19/2026 | Quick Links overhaul, sync reliability, and dashboard improvements
 
