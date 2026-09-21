@@ -114,7 +114,7 @@ export function List({
           )}
           {cards.map((card, i) => (
             <DoubleDropZone
-              key={`list-${listId}-card-${i}`}
+              key={card.clientId ?? card.id}
               previousId={`list-${listId}-card-${i}`}
               nextId={`list-${listId}-card-${i + 1}`}
               dropType="ITEM"
@@ -131,7 +131,6 @@ export function List({
                 }
               >
                 <CardComponent
-                  key={`list-${listId}-card-${i}`}
                   position={i}
                   card={card}
                   listId={listId}
