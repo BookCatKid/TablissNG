@@ -8,6 +8,8 @@ I also attempt to follow the [Conventional Commits](https://www.conventionalcomm
 
 ## [Unreleased]
 
+- Change Trello widget height to auto rather than fixed height to fix bug with widget overflowing into below neighbours at certain font sizes + scale. [683cd41](https://github.com/John-Ling/TablissNG/commit/683cd41f141f654ec1b8d90350bca2d947356ec5)
+
 ### Fixed
 
 - Fix extension builds rendering a blank new tab page by importing the stylesheets from the main entry instead of listing them as separate entry modules.
