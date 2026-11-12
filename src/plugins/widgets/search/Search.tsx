@@ -5,20 +5,28 @@ import type {
   FormEvent,
   KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress } from "../../../hooks";
 import { Icon } from "../../../icons";
 import { isSpecialUrl } from "../../../utils";
 import {
+  getJsonSuggestions,
   getSuggestions,
   getWikipediaSuggestions,
   WikipediaSuggestionResult,
 } from "./getSuggestions";
 import Suggestions from "./Suggestions";
 import { defaultData, Props } from "./types";
-import { buildUrl, getSearchUrl, getSuggestUrl } from "./utils";
+import {
+  buildUrl,
+  getSearchUrl,
+  getSuggestJsonUrl,
+  getSuggestUrl,
+} from "./utils";
+
+const SUGGESTION_DEBOUNCE_MS = 200;
 
 export const messages = defineMessages({
   placeholder: {
@@ -37,6 +45,8 @@ export const messages = defineMessages({
 const Search: FC<Props> = ({ data = defaultData }) => {
   const searchInput = useRef<HTMLInputElement>(null);
   const previousValue = useRef("");
+  const suggestTimeoutRef = useRef<number>(undefined);
+  const suggestionRequestRef = useRef(0);
 
   const [active, setActive] = useState<number>();
   const [suggestions, setSuggestions] =
@@ -57,29 +67,69 @@ const Search: FC<Props> = ({ data = defaultData }) => {
     [keyBind.toUpperCase(), keyBind.toLowerCase()],
   );
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    previousValue.current = event.target.value;
+  useEffect(() => {
+    setSuggestions(undefined);
+    setActive(undefined);
 
-    if (data.suggestionsEngine === "wikipedia") {
-      // Use Wikipedia API for suggestions
-      const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(event.target.value)}&limit=10`;
-      getWikipediaSuggestions(event.target.value, url).then((suggestions) => {
-        setSuggestions(suggestions.slice(0, data.suggestionsQuantity));
-        setActive(undefined);
-      });
-    } else if (BUILD_TARGET === "web") {
-      const suggestUrl = getSuggestUrl(data.suggestionsEngine);
-      if (suggestUrl) {
-        getSuggestions(event.target.value, suggestUrl).then((suggestions) => {
-          setSuggestions(suggestions.slice(0, data.suggestionsQuantity));
-          setActive(undefined);
-        });
+    return () => {
+      suggestionRequestRef.current += 1;
+      window.clearTimeout(suggestTimeoutRef.current);
+    };
+  }, [data.suggestionsEngine, data.suggestionsQuantity]);
+
+  const fetchSuggestions = async (query: string, request: number) => {
+    const isCurrent = () =>
+      suggestionRequestRef.current === request &&
+      searchInput.current?.value === query;
+
+    try {
+      let results: (string | WikipediaSuggestionResult)[];
+
+      if (data.suggestionsEngine === "wikipedia") {
+        const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(query)}&limit=10`;
+        results = await getWikipediaSuggestions(query, url);
+      } else if (BUILD_TARGET === "web") {
+        const url = getSuggestUrl(data.suggestionsEngine);
+        if (!url) return;
+        results = await getSuggestions(query, url);
+      } else {
+        const url = getSuggestJsonUrl(data.suggestionsEngine);
+        if (!url) return;
+        results = await getJsonSuggestions(query, url);
       }
+
+      if (isCurrent()) {
+        const limited = results.slice(0, data.suggestionsQuantity);
+        setSuggestions(limited.length ? limited : undefined);
+        setActive(undefined);
+      }
+    } catch {
+      if (isCurrent()) setSuggestions(undefined);
     }
   };
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const query = event.target.value;
+    previousValue.current = query;
+    const request = ++suggestionRequestRef.current;
+
+    window.clearTimeout(suggestTimeoutRef.current);
+    setSuggestions(undefined);
+    setActive(undefined);
+    if (!query) return;
+
+    suggestTimeoutRef.current = window.setTimeout(() => {
+      fetchSuggestions(query, request);
+    }, SUGGESTION_DEBOUNCE_MS);
+  };
+
   const handleKeyUp = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions) {
+    if (event.key === "Escape") {
+      suggestionRequestRef.current += 1;
+      window.clearTimeout(suggestTimeoutRef.current);
+    }
+
+    if (!suggestions?.length) {
       return;
     }
 

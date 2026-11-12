@@ -39,3 +39,17 @@ export function getSuggestUrl(key?: string) {
 
   return engine ? engine.suggest_url : undefined;
 }
+
+export function getSuggestJsonUrl(key?: string) {
+  const engine = engines.find((engine) => engine.key === key);
+
+  return engine ? engine.suggest_json_url : undefined;
+}
+
+// Match pattern (e.g. "https://duckduckgo.com/*") for the host a suggestion
+// engine needs access to, or undefined if it needs none.
+export function getSuggestOrigin(key?: string) {
+  const url = getSuggestJsonUrl(key);
+
+  return url ? `${new URL(url).origin}/*` : undefined;
+}

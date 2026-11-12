@@ -1,12 +1,80 @@
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { engines } from "./engines";
 import { messages } from "./Search";
 import { defaultData, Props, SEARCH_ENGINE_CUSTOM, SearchStyle } from "./types";
+import { getSuggestOrigin } from "./utils";
 
 const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
+
+  const [deniedEngine, setDeniedEngine] = useState<string>();
+  const permissionEngine = deniedEngine ?? data.suggestionsEngine;
+
+  useEffect(() => {
+    if (BUILD_TARGET === "web") return;
+
+    const origin = getSuggestOrigin(permissionEngine);
+    if (!origin) return;
+
+    let current = true;
+    const check = () => {
+      browser.permissions
+        .contains({ origins: [origin] })
+        .then((granted) => {
+          if (current) {
+            setDeniedEngine((denied) => {
+              if (denied && denied !== permissionEngine) return denied;
+              return granted ? undefined : permissionEngine;
+            });
+          }
+        })
+        .catch(() => {});
+    };
+
+    check();
+    browser.permissions.onAdded.addListener(check);
+    browser.permissions.onRemoved.addListener(check);
+    window.addEventListener("focus", check);
+    document.addEventListener("visibilitychange", check);
+
+    return () => {
+      current = false;
+      browser.permissions.onAdded.removeListener(check);
+      browser.permissions.onRemoved.removeListener(check);
+      window.removeEventListener("focus", check);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [permissionEngine]);
+
+  const requestSuggestionsAccess = async (engine: string) => {
+    const origin = getSuggestOrigin(engine);
+    if (!origin) return;
+
+    try {
+      const granted = await browser.permissions.request({ origins: [origin] });
+      if (granted) {
+        setDeniedEngine(undefined);
+        setData({ ...data, suggestionsEngine: engine });
+      } else {
+        setDeniedEngine(engine);
+      }
+    } catch {
+      setDeniedEngine(engine);
+    }
+  };
+
+  const handleSuggestionsEngine = (value: string) => {
+    setDeniedEngine(undefined);
+
+    if (BUILD_TARGET === "web" || !getSuggestOrigin(value)) {
+      setData({ ...data, suggestionsEngine: value });
+      return;
+    }
+
+    requestSuggestionsAccess(value);
+  };
 
   return (
     <div className="SearchSettings">
@@ -189,10 +257,8 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
           description="Suggestions Provider title"
         />
         <select
-          onChange={(event) =>
-            setData({ ...data, suggestionsEngine: event.target.value })
-          }
-          value={data.suggestionsEngine}
+          onChange={(event) => handleSuggestionsEngine(event.target.value)}
+          value={data.suggestionsEngine ?? ""}
         >
           <option key="off" value="">
             <FormattedMessage
@@ -210,12 +276,42 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
                 </option>
               ))
           ) : (
-            <option key="wikipedia" value="wikipedia">
-              Wikipedia
-            </option>
+            <>
+              <option key="wikipedia" value="wikipedia">
+                Wikipedia
+              </option>
+              {engines
+                .filter(({ suggest_json_url }) => Boolean(suggest_json_url))
+                .map(({ key, name }) => (
+                  <option key={key} value={key}>
+                    {name}
+                  </option>
+                ))}
+            </>
           )}
         </select>
       </label>
+
+      {deniedEngine && (
+        <p className="info">
+          <FormattedMessage
+            id="plugins.search.suggestionsPermission"
+            defaultMessage="TablissNG needs permission to access the search engine's website to show suggestions."
+            description="Message shown when the browser denies permission needed to fetch search suggestions"
+          />
+          <button
+            type="button"
+            className="button button--primary"
+            onClick={() => requestSuggestionsAccess(deniedEngine)}
+          >
+            <FormattedMessage
+              id="plugins.search.requestAccess"
+              defaultMessage="Request access"
+              description="Button label to re-request permission for search suggestions"
+            />
+          </button>
+        </p>
+      )}
 
       {data.suggestionsEngine && (
         <label>

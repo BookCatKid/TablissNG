@@ -59,6 +59,30 @@ type SuggestionsResult = {
   [1]: string[];
 };
 
+// Extension builds fetch the suggestion JSON directly; the JSONP path below is
+// blocked by the extension CSP.
+export async function getJsonSuggestions(
+  query: string,
+  engineUrl: string,
+): Promise<string[]> {
+  if (query === "") return [];
+
+  const response = await fetch(
+    engineUrl.replace("{searchTerms}", encodeURIComponent(query)),
+  );
+  if (!response.ok)
+    throw new Error(
+      `Failed to fetch suggestions from ${engineUrl} (${response.status})`,
+    );
+
+  const data = await response.json();
+  if (!Array.isArray(data) || !Array.isArray(data[1])) return [];
+
+  return data[1].filter((suggestion): suggestion is string => {
+    return typeof suggestion === "string";
+  });
+}
+
 export function getSuggestions(query: string, engineUrl: string) {
   return new Promise<string[]>((resolve, reject) => {
     if (!window.mountResult) {
