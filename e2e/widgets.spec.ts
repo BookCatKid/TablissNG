@@ -40,6 +40,11 @@ test.describe("Widgets", () => {
     const fieldset = widgetSettingsFieldset(page, "Tally Counter");
     await expect(fieldset).toHaveCount(1);
 
+    page.once("dialog", async (dialog) => {
+      expect(dialog.type()).toBe("confirm");
+      expect(dialog.message()).toContain('remove "Tally Counter"');
+      await dialog.accept();
+    });
     await fieldset.locator('button[title="Remove widget"]').click();
     await expect(fieldset).toHaveCount(0);
   });

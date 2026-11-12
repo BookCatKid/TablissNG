@@ -29,6 +29,12 @@ const messages = defineMessages({
     defaultMessage: "Remove widget",
     description: "Button title for removing a widget",
   },
+  removeConfirm: {
+    id: "settings.actions.removeConfirm",
+    defaultMessage:
+      'Are you sure you want to remove "{name}" and delete all of its settings? This cannot be undone.',
+    description: "Confirmation before deleting a widget and its configuration",
+  },
   editSettings: {
     id: "settings.actions.editSettings",
     defaultMessage: "Edit widget settings",
@@ -91,11 +97,19 @@ const Widget: FC<Props> = ({ plugin, onMoveDown, onMoveUp, onRemove }) => {
 
   const setDisplay = setWidgetDisplay.bind(null, plugin.id);
 
+  const handleRemove = () => {
+    const message = intl.formatMessage(messages.removeConfirm, {
+      name: intl.formatMessage(name),
+    });
+
+    if (confirm(message)) onRemove();
+  };
+
   return (
     <fieldset className="Widget">
       <div className="title--buttons">
         <IconButton
-          onClick={onRemove}
+          onClick={handleRemove}
           title={intl.formatMessage(messages.removeWidget)}
         >
           <RemoveIcon />

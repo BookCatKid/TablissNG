@@ -536,6 +536,7 @@
   "settings.actions.moveDown": "向下移动部件",
   "settings.actions.moveUp": "向上移动部件",
   "settings.actions.remove": "移除部件",
+  "settings.actions.removeConfirm": "Are you sure you want to remove \"{name}\" and delete all of its settings? This cannot be undone.",
   "settings.actions.storageWarning": "Sync storage warning",
   "settings.advancedModeDescription": "高级模式使用带文本描边的第二个元素，并允许任意尺寸。",
   "settings.advancedOutline": "高级（描边）",

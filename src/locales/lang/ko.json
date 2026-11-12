@@ -536,6 +536,7 @@
   "settings.actions.moveDown": "위젯을 아래로 이동",
   "settings.actions.moveUp": "위젯을 위로 이동",
   "settings.actions.remove": "위젯 제거",
+  "settings.actions.removeConfirm": "Are you sure you want to remove \"{name}\" and delete all of its settings? This cannot be undone.",
   "settings.actions.storageWarning": "Sync storage warning",
   "settings.advancedModeDescription": "고급 모드는 별도의 텍스트 외곽선 요소를 사용하므로 크기를 자유롭게 지정할 수 있습니다.",
   "settings.advancedOutline": "고급(텍스트 외곽선)",

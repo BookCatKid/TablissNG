@@ -536,6 +536,7 @@
   "settings.actions.moveDown": "Bajar el widget",
   "settings.actions.moveUp": "Subir el widget",
   "settings.actions.remove": "Quitar el widget",
+  "settings.actions.removeConfirm": "Are you sure you want to remove \"{name}\" and delete all of its settings? This cannot be undone.",
   "settings.actions.storageWarning": "Sync storage warning",
   "settings.advancedModeDescription": "El modo avanzado utiliza un segundo elemento con un trazo de texto y permite cualquier tamaño.",
   "settings.advancedOutline": "Avanzado (Trazo)",

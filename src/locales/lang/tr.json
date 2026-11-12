@@ -536,6 +536,7 @@
   "settings.actions.moveDown": "Aracı aşağı taşı",
   "settings.actions.moveUp": "Aracı yukarı taşı",
   "settings.actions.remove": "Aracı kaldır",
+  "settings.actions.removeConfirm": "Are you sure you want to remove \"{name}\" and delete all of its settings? This cannot be undone.",
   "settings.actions.storageWarning": "Sync storage warning",
   "settings.advancedModeDescription": "Gelişmiş mod, metin dış hattına sahip ikinci bir öğe kullanır ve herhangi bir boyuta izin verir.",
   "settings.advancedOutline": "Gelişmiş (Dış Hat)",

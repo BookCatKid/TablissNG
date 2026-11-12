@@ -159,6 +159,38 @@ test.describe("Quick Links widget", () => {
     await expect(personalIcon).toHaveCSS("width", "128px");
   });
 
+  test("cancelling widget removal preserves saved Quick Links", async ({
+    page,
+  }) => {
+    const settings = await addQuickLinks(page);
+    const link = settings.locator(".LinkInput").first();
+    await link.locator('input[type="url"]').fill("https://example.com/saved");
+    await link.locator('input[type="text"]').first().fill("Saved link");
+
+    page.once("dialog", async (dialog) => {
+      expect(dialog.type()).toBe("confirm");
+      expect(dialog.message()).toContain('remove "Quick Links"');
+      expect(dialog.message()).toContain("delete all of its settings");
+      await dialog.dismiss();
+    });
+    await settings
+      .getByRole("button", { name: "Remove widget", exact: true })
+      .click();
+    await expect(settings).toHaveCount(1);
+    await expect(link.locator('input[type="text"]').first()).toHaveValue(
+      "Saved link",
+    );
+    await closeSettings(page);
+    await page.reload();
+
+    const savedLink = page.locator(".Links .Link", { hasText: "Saved link" });
+    await expect(savedLink).toBeVisible();
+    await expect(savedLink).toHaveAttribute(
+      "href",
+      "https://example.com/saved",
+    );
+  });
+
   test("adds, edits, normalizes, removes, and persists links", async ({
     page,
   }) => {
