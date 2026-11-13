@@ -2,6 +2,7 @@ import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
+import archivedMedia from "./fixtures/apod.json";
 import { closeSettings, openSettings, selectBackground } from "./helpers";
 
 const endpoint = "https://science.nasa.gov/wp-json/wp/v2/apod-basic";
@@ -153,6 +154,83 @@ test("renders direct videos and embedded-video thumbnails from NASA's HTML", asy
   );
 });
 
+test("resolves archived GIF, TIFF, and Vimeo media and keeps the last picture if a rendition fails", async ({
+  page,
+}) => {
+  const gifUrl =
+    "https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/january/UT-blink_3d_a.gif";
+  const tiffUrl =
+    "https://assets.science.nasa.gov/dynamicimage/assets/science/cds/apod/apod/2026/january/jupiter2026.tif?w=1920&fit=clip";
+  const vimeoThumbnail = "https://i.vimeocdn.com/video/apod-storm.jpg";
+  await page.route(`${endpoint}**`, (route) =>
+    route.fulfill({ json: [entry] }),
+  );
+  for (const [code, media] of Object.entries(archivedMedia)) {
+    await page.route(`${endpoint}/${code}`, (route) =>
+      route.fulfill({ json: media }),
+    );
+  }
+  await page.route("https://vimeo.com/api/oembed.json?**", (route) => {
+    expect(new URL(route.request().url()).searchParams.get("url")).toBe(
+      "https://vimeo.com/67995158",
+    );
+    return route.fulfill({ json: { thumbnail_url: vimeoThumbnail } });
+  });
+  await page.route(vimeoThumbnail, (route) =>
+    route.fulfill({
+      path: path.join(__dirname, "fixtures", "pixel.png"),
+      contentType: "image/png",
+    }),
+  );
+  await page.goto("/");
+  await selectBackground(page, "background/apod");
+  await page.locator(".ApodSettings select").selectOption("custom");
+
+  for (const [code, expectedUrl] of [
+    ["190104", gifUrl],
+    ["260110", tiffUrl],
+    ["210613", vimeoThumbnail],
+  ] as const) {
+    await page
+      .locator('.ApodSettings input[type="date"]')
+      .fill(archivedMedia[code].date);
+    await expect(page.locator(".Apod .image").last()).toHaveCSS(
+      "background-image",
+      `url("${expectedUrl}")`,
+    );
+  }
+
+  await page.route(`${endpoint}/260110`, (route) =>
+    route.fulfill({
+      json: {
+        ...archivedMedia["260110"],
+        basic_html: archivedMedia["260110"].basic_html.replace(
+          ".tif",
+          "-unavailable.tif",
+        ),
+      },
+    }),
+  );
+  await page.route(tiffUrl.replace(".tif", "-unavailable.tif"), (route) =>
+    route.fulfill({ status: 404 }),
+  );
+  await page
+    .locator('.ApodSettings input[type="date"]')
+    .fill(archivedMedia["260110"].date);
+  await expect(
+    page.locator('.Overlay button[title="Show errors"]'),
+  ).toHaveCount(1);
+  await closeSettings(page);
+  await page.locator('.Overlay button[title="Show errors"]').click();
+  await expect(page.locator(".Modal")).toContainText(
+    "NASA APOD image could not be loaded",
+  );
+  await expect(page.locator(".Apod .image").last()).toHaveCSS(
+    "background-image",
+    `url("${vimeoThumbnail}")`,
+  );
+});
+
 test("ignores an older date request that finishes after a newer selection", async ({
   page,
 }) => {
@@ -202,7 +280,7 @@ test("ignores an older date request that finishes after a newer selection", asyn
   await expect(image).toHaveCSS("background-image", /newer\.jpg/);
 });
 
-test("refreshes legacy cached images even when their date matches today", async ({
+test("refreshes cached media from before fallback validation even when its date matches today", async ({
   page,
 }) => {
   await page.clock.setFixedTime(new Date("2026-09-30T12:00:00"));
@@ -237,7 +315,7 @@ test("refreshes legacy cached images even when their date matches today", async 
                 if (!cursor.result) return;
                 const value = cursor.result.value;
                 if (value?.permalink) {
-                  delete value.permalink;
+                  delete value.mediaVersion;
                   Object.assign(value, {
                     url: "https://apod.nasa.gov/old.jpg",
                     hdurl: "https://apod.nasa.gov/old.jpg",

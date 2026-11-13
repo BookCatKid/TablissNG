@@ -9,6 +9,7 @@ export interface Data {
 }
 
 export interface Image {
+  mediaVersion?: number;
   url: string;
   hdurl: string;
 

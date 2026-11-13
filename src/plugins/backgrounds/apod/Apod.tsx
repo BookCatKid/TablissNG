@@ -5,18 +5,20 @@ import { usePushError } from "../../../api";
 import { db } from "../../../db/state";
 import { useValue } from "../../../lib/db/react";
 import BaseBackground from "../base/BaseBackground";
-import { getPicture } from "./api";
+import { getPicture, MEDIA_VERSION } from "./api";
 import { defaultData, Props } from "./types";
 import { useApodAccess } from "./useApodAccess";
 
 const isDirectVideo = (url: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(url);
 
 const isCacheFresh = (
-  cache: { date?: string; permalink?: string } | undefined,
+  cache:
+    { date?: string; permalink?: string; mediaVersion?: number } | undefined,
   data: { date: string; customDate?: string },
 ): boolean => {
-  // Legacy cache entries can contain URLs on the retired APOD host.
-  if (!cache?.date || !cache.permalink) return false;
+  // Earlier caches can contain retired URLs, placeholders, or undecodable images.
+  if (!cache?.date || !cache.permalink || cache.mediaVersion !== MEDIA_VERSION)
+    return false;
   const cachedDate = String(cache.date);
   if (data.date === "custom") {
     return cachedDate === data.customDate;

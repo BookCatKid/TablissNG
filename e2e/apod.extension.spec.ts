@@ -27,7 +27,7 @@ type PermissionTestWindow = Window & {
 
 test("loads APOD after granting access to the NASA host", async () => {
   const session = await launchExtension();
-  const { page } = session;
+  const { page, context } = session;
   const endpoint = "https://science.nasa.gov/wp-json/wp/v2/apod-basic";
   const imageUrl = "https://assets.science.nasa.gov/apod-test.jpg";
 
@@ -71,7 +71,7 @@ test("loads APOD after granting access to the NASA host", async () => {
         ],
       }),
     );
-    await page.route(imageUrl, (route) =>
+    await context.route(imageUrl, (route) =>
       route.fulfill({
         path: path.join(__dirname, "fixtures", "pixel.png"),
         contentType: "image/png",
