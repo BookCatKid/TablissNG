@@ -2,7 +2,9 @@ interface Engine {
   key: string;
   name: string;
   search_url: string;
+  // JSONP, web build only (blocked by the extension CSP)
   suggest_url?: string;
+  suggest_json_url?: string;
 }
 
 export const engines: Engine[] = [
@@ -12,6 +14,8 @@ export const engines: Engine[] = [
     search_url: "https://www.google.com/search?q={searchTerms}",
     suggest_url:
       "https://www.google.com/complete/search?client=chrome&q={searchTerms}&callback={callback}",
+    suggest_json_url:
+      "https://www.google.com/complete/search?client=chrome&q={searchTerms}",
   },
   {
     key: "searx",
@@ -24,6 +28,8 @@ export const engines: Engine[] = [
     search_url: "https://www.google.co.uk/search?q={searchTerms}",
     suggest_url:
       "https://www.google.co.uk/complete/search?client=chrome&q={searchTerms}&callback={callback}",
+    suggest_json_url:
+      "https://www.google.co.uk/complete/search?client=chrome&q={searchTerms}",
   },
   {
     key: "bing",
@@ -31,6 +37,7 @@ export const engines: Engine[] = [
     search_url: "https://www.bing.com/search?q={searchTerms}",
     suggest_url:
       "https://api.bing.com/osjson.aspx?query={searchTerms}&JsonType=callback&JsonCallback={callback}",
+    suggest_json_url: "https://api.bing.com/osjson.aspx?query={searchTerms}",
   },
   {
     key: "baidu",
@@ -41,6 +48,7 @@ export const engines: Engine[] = [
     key: "duckduckgo",
     name: "DuckDuckGo",
     search_url: "https://duckduckgo.com/?q={searchTerms}",
+    suggest_json_url: "https://duckduckgo.com/ac/?q={searchTerms}&type=list",
   },
   {
     key: "qwant",

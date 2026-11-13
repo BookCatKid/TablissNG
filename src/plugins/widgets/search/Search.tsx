@@ -5,20 +5,28 @@ import type {
   FormEvent,
   KeyboardEvent as ReactKeyboardEvent,
 } from "react";
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { defineMessages, useIntl } from "react-intl";
 
 import { useKeyPress } from "../../../hooks";
 import { Icon } from "../../../icons";
 import { isSpecialUrl } from "../../../utils";
 import {
+  getJsonSuggestions,
   getSuggestions,
   getWikipediaSuggestions,
   WikipediaSuggestionResult,
 } from "./getSuggestions";
 import Suggestions from "./Suggestions";
 import { defaultData, Props } from "./types";
-import { buildUrl, getSearchUrl, getSuggestUrl } from "./utils";
+import {
+  buildUrl,
+  getSearchUrl,
+  getSuggestJsonUrl,
+  getSuggestUrl,
+} from "./utils";
+
+const SUGGESTION_DEBOUNCE_MS = 200;
 
 export const messages = defineMessages({
   placeholder: {
@@ -37,7 +45,7 @@ export const messages = defineMessages({
 const Search: FC<Props> = ({ data = defaultData }) => {
   const searchInput = useRef<HTMLInputElement>(null);
   const previousValue = useRef("");
-
+  const [query, setQuery] = useState("");
   const [active, setActive] = useState<number>();
   const [suggestions, setSuggestions] =
     useState<(string | WikipediaSuggestionResult)[]>();
@@ -57,29 +65,54 @@ const Search: FC<Props> = ({ data = defaultData }) => {
     [keyBind.toUpperCase(), keyBind.toLowerCase()],
   );
 
+  useEffect(() => {
+    setSuggestions(undefined);
+    setActive(undefined);
+    if (!query || !data.suggestionsEngine) return;
+
+    let current = true;
+    const timeout = window.setTimeout(async () => {
+      try {
+        let results: (string | WikipediaSuggestionResult)[];
+
+        if (data.suggestionsEngine === "wikipedia") {
+          const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(query)}&limit=10`;
+          results = await getWikipediaSuggestions(query, url);
+        } else if (BUILD_TARGET === "web") {
+          const url = getSuggestUrl(data.suggestionsEngine);
+          if (!url) return;
+          results = await getSuggestions(query, url);
+        } else {
+          const url = getSuggestJsonUrl(data.suggestionsEngine);
+          if (!url) return;
+          results = await getJsonSuggestions(query, url);
+        }
+
+        if (current && searchInput.current?.value === query) {
+          const limited = results.slice(0, data.suggestionsQuantity);
+          setSuggestions(limited.length ? limited : undefined);
+          setActive(undefined);
+        }
+      } catch {
+        if (current) setSuggestions(undefined);
+      }
+    }, SUGGESTION_DEBOUNCE_MS);
+
+    return () => {
+      current = false;
+      window.clearTimeout(timeout);
+    };
+  }, [query, data.suggestionsEngine, data.suggestionsQuantity]);
+
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     previousValue.current = event.target.value;
-
-    if (data.suggestionsEngine === "wikipedia") {
-      // Use Wikipedia API for suggestions
-      const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(event.target.value)}&limit=10`;
-      getWikipediaSuggestions(event.target.value, url).then((suggestions) => {
-        setSuggestions(suggestions.slice(0, data.suggestionsQuantity));
-        setActive(undefined);
-      });
-    } else if (BUILD_TARGET === "web") {
-      const suggestUrl = getSuggestUrl(data.suggestionsEngine);
-      if (suggestUrl) {
-        getSuggestions(event.target.value, suggestUrl).then((suggestions) => {
-          setSuggestions(suggestions.slice(0, data.suggestionsQuantity));
-          setActive(undefined);
-        });
-      }
-    }
+    setQuery(event.target.value);
   };
 
   const handleKeyUp = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (!suggestions) {
+    if (event.key === "Escape") setQuery("");
+
+    if (!suggestions?.length) {
       return;
     }
 
