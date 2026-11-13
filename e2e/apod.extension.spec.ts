@@ -20,9 +20,16 @@ type PermissionTestWindow = Window & {
         addListener: (listener: () => void) => void;
         removeListener: (listener: () => void) => void;
       };
+      onRemoved: {
+        addListener: (listener: () => void) => void;
+        removeListener: (listener: () => void) => void;
+      };
     };
   };
   __apodRequestedOrigins: string[];
+  __startStaleAccessCheck: () => void;
+  __revokeApodAccess: () => void;
+  __finishStaleAccessCheck: () => void;
 };
 
 test("loads APOD after granting access to the NASA host", async () => {
@@ -37,9 +44,21 @@ test("loads APOD after granting access to the NASA host", async () => {
       const testWindow = window as PermissionTestWindow;
       let allowed = false;
       const added = new Set<() => void>();
+      const removed = new Set<() => void>();
+      let deferChecks = false;
+      const pendingChecks: Array<() => void> = [];
       testWindow.__apodRequestedOrigins = [];
       const permissions = testWindow.chrome.permissions;
       permissions.contains = (_permission, callback) => {
+        if (deferChecks) {
+          const result = allowed;
+          return new Promise<boolean>((resolve) =>
+            pendingChecks.push(() => {
+              callback?.(result);
+              resolve(result);
+            }),
+          );
+        }
         callback?.(allowed);
         return Promise.resolve(allowed);
       };
@@ -55,6 +74,24 @@ test("loads APOD after granting access to the NASA host", async () => {
       };
       permissions.onAdded.removeListener = (listener) => {
         added.delete(listener);
+      };
+      permissions.onRemoved.addListener = (listener) => {
+        removed.add(listener);
+      };
+      permissions.onRemoved.removeListener = (listener) => {
+        removed.delete(listener);
+      };
+      testWindow.__startStaleAccessCheck = () => {
+        deferChecks = true;
+        added.forEach((listener) => listener());
+        deferChecks = false;
+      };
+      testWindow.__revokeApodAccess = () => {
+        allowed = false;
+        removed.forEach((listener) => listener());
+      };
+      testWindow.__finishStaleAccessCheck = () => {
+        pendingChecks.splice(0).forEach((resolve) => resolve());
       };
     });
     await page.reload();
@@ -94,6 +131,19 @@ test("loads APOD after granting access to the NASA host", async () => {
       "background-image",
       `url("${imageUrl}")`,
     );
+    await page.evaluate(() => {
+      const state = window as PermissionTestWindow;
+      state.__startStaleAccessCheck();
+      state.__revokeApodAccess();
+    });
+    await expect(accessButton).toBeVisible();
+    await page.evaluate(() => {
+      (window as PermissionTestWindow).__finishStaleAccessCheck();
+      return new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      );
+    });
+    await expect(accessButton).toBeVisible();
   } finally {
     await closeExtension(session);
   }

@@ -20,6 +20,7 @@ export interface Image {
   explanation: string;
   thumbnail_url: string;
   copyright: string;
+  copyrightUrl?: string;
 }
 
 type Cache = Image;

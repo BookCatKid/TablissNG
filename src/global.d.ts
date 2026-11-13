@@ -5,7 +5,6 @@ declare global {
   const DEV: boolean;
   const GIPHY_API_KEY: string;
   const UNSPLASH_API_KEY: string;
-  const NASA_API_KEY: string;
   const TRELLO_API_KEY: string;
   const SENTRY_DSN: string | undefined;
   const VERSION: string;

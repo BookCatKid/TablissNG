@@ -51,6 +51,109 @@ test("loads the new APOD image and plain-text credits with the correct attributi
   await expect(page.locator(".Apod .right-info a")).toHaveText(
     "Robert Eder & Friends",
   );
+  await expect(page.locator(".Apod .right-info a")).toHaveAttribute(
+    "href",
+    "https://example.com/",
+  );
+});
+
+test("falls back to a poster for broken videos and retains it when no poster is available", async ({
+  page,
+}) => {
+  const brokenVideo = "https://assets.science.nasa.gov/broken.webm";
+  await page.route(brokenVideo, (route) => route.fulfill({ status: 404 }));
+  await page.route(`${endpoint}**`, (route) =>
+    route.fulfill({ json: [entry] }),
+  );
+  for (const [code, hdurl] of [
+    ["260929", imageUrl],
+    ["260928", ""],
+  ]) {
+    await page.route(`${endpoint}/${code}`, (route) =>
+      route.fulfill({
+        json: {
+          ...entry,
+          hdurl,
+          date: code === "260929" ? "2026-09-29" : "2026-09-28",
+          title: "Video poster fallback",
+          media_type: "video",
+          basic_html: `<video src="${brokenVideo}"></video>`,
+        },
+      }),
+    );
+  }
+  await page.goto("/");
+  await selectBackground(page, "background/apod");
+  await expect(page.locator(".Apod .image").last()).toHaveCSS(
+    "background-image",
+    `url("${imageUrl}")`,
+  );
+  await page.locator(".ApodSettings select").selectOption("custom");
+  await page.locator('.ApodSettings input[type="date"]').fill("2026-09-29");
+  await expect(page.locator(".Apod .left-info")).toHaveText(
+    "Video poster fallback",
+  );
+  await expect(page.locator(".Apod .image").last()).toHaveCSS(
+    "background-image",
+    `url("${imageUrl}")`,
+  );
+  await expect(page.locator(".Apod video")).toHaveCount(0);
+  await page.locator('.ApodSettings input[type="date"]').fill("2026-09-28");
+  await expect(
+    page.locator('.Overlay button[title="Show errors"]'),
+  ).toHaveCount(1);
+  await expect(page.locator(".Apod .image").last()).toHaveCSS(
+    "background-image",
+    `url("${imageUrl}")`,
+  );
+});
+
+test("times out stalled API, image, and Vimeo requests without losing the current picture", async ({
+  page,
+}) => {
+  const stalledImage = "https://assets.science.nasa.gov/stalled.jpg";
+  await page.clock.install();
+  await page.route("https://api.unsplash.com/**", (route) =>
+    route.fulfill({ json: [] }),
+  );
+  await page.route(`${endpoint}**`, (route) =>
+    route.fulfill({ json: [entry] }),
+  );
+  await page.route(`${endpoint}/260925`, () => {});
+  await page.route(stalledImage, () => {});
+  await page.route("https://vimeo.com/api/oembed.json?**", () => {});
+  await page.route(`${endpoint}/260924`, (route) =>
+    route.fulfill({
+      json: { ...entry, date: "2026-09-24", hdurl: stalledImage },
+    }),
+  );
+  await page.route(`${endpoint}/260923`, (route) =>
+    route.fulfill({ json: { ...archivedMedia["210613"], date: "2026-09-23" } }),
+  );
+  await page.goto("/");
+  await selectBackground(page, "background/apod");
+  await expect(page.locator(".Apod .image").last()).toHaveCSS(
+    "background-image",
+    `url("${imageUrl}")`,
+  );
+  await page.locator(".ApodSettings select").selectOption("custom");
+  for (const [date, url] of [
+    ["2026-09-25", `${endpoint}/260925`],
+    ["2026-09-24", stalledImage],
+    ["2026-09-23", "https://vimeo.com/api/oembed.json?**"],
+  ]) {
+    const requested = page.waitForRequest(url);
+    await page.locator('.ApodSettings input[type="date"]').fill(date);
+    await requested;
+    await page.clock.fastForward(60_000);
+    await expect(
+      page.locator('.Overlay [title="Loading new content"]'),
+    ).toHaveCount(0);
+    await expect(page.locator(".Apod .image").last()).toHaveCSS(
+      "background-image",
+      `url("${imageUrl}")`,
+    );
+  }
 });
 
 test("loads a custom date and keeps its image when a later request fails", async ({

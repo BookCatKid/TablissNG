@@ -89,7 +89,9 @@ const Apod: FC<Props> = ({ cache, data = defaultData, loader, setCache }) => {
     picture && picture.copyright
       ? {
           label: picture.copyright,
-          url: `https://www.google.com/search?q=${encodeURIComponent(picture.copyright)}`,
+          url:
+            picture.copyrightUrl ||
+            `https://www.google.com/search?q=${encodeURIComponent(picture.copyright)}`,
         }
       : null;
 

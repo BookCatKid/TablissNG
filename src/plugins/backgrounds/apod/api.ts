@@ -5,7 +5,57 @@ import { API } from "../../types";
 import { Data, Image } from "./types";
 
 const API_URL = "https://science.nasa.gov/wp-json/wp/v2/apod-basic";
-export const MEDIA_VERSION = 1;
+export const MEDIA_VERSION = 2;
+
+const withAbort = <T>(operation: Promise<T>, signal: AbortSignal): Promise<T> =>
+  new Promise((resolve, reject) => {
+    const onAbort = () => reject(signal.reason);
+    signal.addEventListener("abort", onAbort, { once: true });
+    operation.then(
+      (result) => {
+        signal.removeEventListener("abort", onAbort);
+        resolve(result);
+      },
+      (error) => {
+        signal.removeEventListener("abort", onAbort);
+        reject(error);
+      },
+    );
+    if (signal.aborted) onAbort();
+  });
+
+const loadImage = async (url: string, signal: AbortSignal) => {
+  const image = document.createElement("img");
+  image.src = url;
+  try {
+    await withAbort(image.decode(), signal);
+  } catch (error) {
+    throw new Error("NASA APOD image could not be loaded.", { cause: error });
+  } finally {
+    image.removeAttribute("src");
+  }
+};
+
+const loadVideo = async (url: string, signal: AbortSignal) => {
+  const video = document.createElement("video");
+  video.preload = "auto";
+  video.muted = true;
+  const loaded = new Promise<void>((resolve, reject) => {
+    const fail = () =>
+      reject(new Error("NASA APOD video could not be loaded."));
+    video.onloadeddata = () => (video.videoWidth > 0 ? resolve() : fail());
+    video.onerror = fail;
+  });
+  video.src = url;
+  try {
+    await withAbort(loaded, signal);
+  } finally {
+    video.onloadeddata = null;
+    video.onerror = null;
+    video.removeAttribute("src");
+    video.load();
+  }
+};
 
 const httpUrl = (value: unknown): string => {
   if (typeof value !== "string") return "";
@@ -53,7 +103,10 @@ const plainText = (value: unknown): string => {
   );
 };
 
-const parsePicture = async (value: unknown): Promise<Image> => {
+const parsePicture = async (
+  value: unknown,
+  signal: AbortSignal,
+): Promise<Image> => {
   if (!value || typeof value !== "object") {
     throw new Error("NASA APOD returned no picture.");
   }
@@ -87,7 +140,7 @@ const parsePicture = async (value: unknown): Promise<Image> => {
   const youtubeId = videoUrl.match(
     /^https?:\/\/(?:www\.)?(?:youtube(?:-nocookie)?\.com\/(?:embed\/|watch\?v=)|youtu\.be\/)([\w-]{11})/,
   )?.[1];
-  const isVideo =
+  let isVideo =
     entry.media_type !== "image" && (directVideo || Boolean(youtubeId));
   let thumbnail =
     pictureUrl ||
@@ -100,7 +153,10 @@ const parsePicture = async (value: unknown): Promise<Image> => {
       url: `https://vimeo.com/${vimeoId}`,
       width: "1920",
     });
-    const response = await fetch(`https://vimeo.com/api/oembed.json?${params}`);
+    const response = await fetch(
+      `https://vimeo.com/api/oembed.json?${params}`,
+      { signal },
+    );
     if (!response.ok)
       throw new Error(
         `NASA APOD video thumbnail request failed (${response.status}).`,
@@ -108,19 +164,30 @@ const parsePicture = async (value: unknown): Promise<Image> => {
     const metadata: { thumbnail_url?: unknown } = await response.json();
     thumbnail = imageUrl(metadata.thumbnail_url);
   }
+  if (isVideo && directVideo) {
+    try {
+      await loadVideo(videoUrl, signal);
+    } catch (error) {
+      if (signal.aborted || !thumbnail) throw error;
+      isVideo = false;
+    }
+  }
   const resolvedImage = isVideo ? thumbnail : pictureUrl || thumbnail;
   if (!isVideo && !resolvedImage) {
     throw new Error("NASA APOD returned no usable image or video.");
   }
   if (!(isVideo && directVideo)) {
-    const image = document.createElement("img");
-    image.src = resolvedImage;
-    try {
-      await image.decode();
-    } catch {
-      throw new Error("NASA APOD image could not be loaded.");
-    }
+    await loadImage(resolvedImage, signal);
   }
+
+  const credit = entry.copyright || entry.credit;
+  const creditLink =
+    typeof credit === "string"
+      ? new DOMParser()
+          .parseFromString(credit, "text/html")
+          .querySelector("a[href]")
+          ?.getAttribute("href")
+      : undefined;
 
   return {
     mediaVersion: MEDIA_VERSION,
@@ -131,7 +198,8 @@ const parsePicture = async (value: unknown): Promise<Image> => {
     hdurl: isVideo ? pictureUrl : resolvedImage,
     media_type: isVideo ? "video" : "image",
     thumbnail_url: thumbnail,
-    copyright: plainText(entry.copyright || entry.credit),
+    copyright: plainText(credit),
+    copyrightUrl: httpUrl(creditLink) || undefined,
     explanation: plainText(entry.explanation),
   };
 };
@@ -145,13 +213,23 @@ export async function getPicture(
       ? `${API_URL}/${format(parseLocalDate(data.customDate), "yyMMdd")}`
       : `${API_URL}?per_page=1`;
 
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 20_000);
   loader.push();
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, { signal: controller.signal });
     if (!res.ok) throw new Error(`NASA APOD request failed (${res.status}).`);
     const json: unknown = await res.json();
-    return await parsePicture(Array.isArray(json) ? json[0] : json);
+    return await parsePicture(
+      Array.isArray(json) ? json[0] : json,
+      controller.signal,
+    );
+  } catch (error) {
+    if (controller.signal.aborted)
+      throw new Error("NASA APOD request timed out.", { cause: error });
+    throw error;
   } finally {
+    window.clearTimeout(timeout);
     loader.pop();
   }
 }

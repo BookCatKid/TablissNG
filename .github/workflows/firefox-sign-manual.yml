@@ -30,5 +30,4 @@ jobs:
           WEB_EXT_API_SECRET: ${{ secrets.AMO_SECRET }}
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
           UNSPLASH_API_KEY: ${{ secrets.UNSPLASH_API_KEY }}
-          NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
           TRELLO_API_KEY: ${{ secrets.TRELLO_API_KEY }}
