@@ -13,7 +13,8 @@ export interface Image {
   hdurl: string;
 
   title: string;
-  date: Date;
+  date: string;
+  permalink?: string;
   media_type: string;
   explanation: string;
   thumbnail_url: string;
