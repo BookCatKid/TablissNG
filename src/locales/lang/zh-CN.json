@@ -6,6 +6,8 @@
   "app.error.saveSettings": "无法保存您的设置。您可能已达到最大存储容量。",
   "app.pageTitle": "新标签页",
   "background": "背景",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "NASA 天文图片",
   "backgrounds.apod.name": "每日天文图片",
   "backgrounds.base.paused": "(已暂停)",

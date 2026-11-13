@@ -6,6 +6,8 @@
   "app.error.saveSettings": "Cannot save your settings. You may have hit the maximum storage capacity.",
   "app.pageTitle": "Nový panel",
   "background": "Pozadí",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "Obrázky oblohy od NASA",
   "backgrounds.apod.name": "Astronomický obrázek dne",
   "backgrounds.base.paused": "(Paused)",

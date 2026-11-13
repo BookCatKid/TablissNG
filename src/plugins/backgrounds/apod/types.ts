@@ -9,15 +9,18 @@ export interface Data {
 }
 
 export interface Image {
+  mediaVersion?: number;
   url: string;
   hdurl: string;
 
   title: string;
-  date: Date;
+  date: string;
+  permalink?: string;
   media_type: string;
   explanation: string;
   thumbnail_url: string;
   copyright: string;
+  copyrightUrl?: string;
 }
 
 type Cache = Image;

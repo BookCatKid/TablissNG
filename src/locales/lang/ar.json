@@ -6,6 +6,8 @@
   "app.error.saveSettings": "Cannot save your settings. You may have hit the maximum storage capacity.",
   "app.pageTitle": "لسان جديد",
   "background": "الخلفية",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "NASA's sky pictures",
   "backgrounds.apod.name": "Astronomy Picture of the Day",
   "backgrounds.base.paused": "(Paused)",

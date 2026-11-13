@@ -6,6 +6,8 @@
   "app.error.saveSettings": "설정을 저장하지 못했습니다. 저장 공간이 부족할 수 있습니다.",
   "app.pageTitle": "새 탭",
   "background": "배경",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "NASA가 선정한 오늘의 우주 사진을 표시합니다.",
   "backgrounds.apod.name": "오늘의 천문 사진(APOD)",
   "backgrounds.base.paused": "(일시 정지됨)",

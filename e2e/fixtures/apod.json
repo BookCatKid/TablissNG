@@ -1,0 +1,26 @@
+{
+  "190104": {
+    "date": "2019-01-04",
+    "title": "Ultima Thule Rotation Gif",
+    "permalink": "https://science.nasa.gov/image-article/apod-2019-january-4-ultima-thule-rotation-gif/",
+    "media_type": "image",
+    "hdurl": "https://assets.science.nasa.gov/dynamicimage/assets/science/astro/programs/cosmic-origins/images/misc/news-thumbnail.png",
+    "basic_html": "<IMG SRC=\"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2019/january/UT-blink_3d_a.gif\" alt=\"See Explanation. Clicking on the picture will download the highest resolution version available.\">"
+  },
+  "210613": {
+    "date": "2021-06-13",
+    "title": "A Supercell Thunderstorm Over Texas",
+    "permalink": "https://science.nasa.gov/image-article/apod-2021-june-13-a-supercell-thunderstorm-over-texas/",
+    "media_type": "iframe",
+    "hdurl": "https://assets.science.nasa.gov/dynamicimage/assets/science/astro/programs/cosmic-origins/images/misc/news-thumbnail.png",
+    "basic_html": "<iframe src=\"https://player.vimeo.com/video/67995158?title=0&#038;portrait=0\" width=\"960\" height=\"720\" frameBorder=\"0\">"
+  },
+  "260110": {
+    "date": "2026-01-10",
+    "title": "Jupiter with the Great Red Spot",
+    "permalink": "https://science.nasa.gov/image-article/apod/apod-2026-january-10-jupiter-with-the-great-red-spot/",
+    "media_type": "image",
+    "hdurl": "",
+    "basic_html": "<IMG SRC=\"https://assets.science.nasa.gov/content/dam/science/cds/apod/apod/2026/january/jupiter2026.tif\" alt=\"See Explanation. Clicking on the picture will download the highest resolution version available.\">"
+  }
+}
