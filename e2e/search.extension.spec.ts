@@ -45,8 +45,14 @@ test("debounces typing and handles arrow keys after an empty response", async ()
       queries.push(query);
       await route.fulfill({ json: [query, query === "empty" ? [] : [query]] });
     });
+    await page.clock.pauseAt(new Date());
     await input.pressSequentially("tabliss", { delay: 20 });
+    await page.clock.runFor(199);
+    await page.waitForTimeout(30);
+    expect(queries).toEqual([]);
+    await page.clock.runFor(1);
     await expect(results).toHaveValue("tabliss");
+    await page.clock.resume();
     expect(queries).toEqual(["tabliss"]);
     const response = page.waitForResponse((response) =>
       response.url().includes("q=empty"),
@@ -173,6 +179,172 @@ test("keeps the retry notice when switching from an allowed provider is denied",
     await retry.click();
     await expect(provider).toHaveValue("bing");
     await expect(retry).toHaveCount(0);
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("a pending permission grant preserves newer settings", async () => {
+  const session = await launchSearch();
+  const { page, provider } = session;
+  try {
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await page.evaluate(() => {
+      chrome.permissions.contains = async () => true;
+      chrome.permissions.request = async () =>
+        new Promise<boolean>((resolve) => {
+          (
+            window as Window & { resolvePermission?: (value: boolean) => void }
+          ).resolvePermission = resolve;
+        });
+    });
+
+    await provider.selectOption("bing");
+    await page.waitForFunction(
+      () =>
+        typeof (
+          window as Window & {
+            resolvePermission?: (value: boolean) => void;
+          }
+        ).resolvePermission === "function",
+    );
+    const placeholder = widgetSettingsFieldset(page, "Search")
+      .locator("label", { hasText: "Placeholder Text" })
+      .locator("input");
+    await placeholder.fill("Updated while permission was pending");
+    await page.evaluate(() => {
+      (
+        window as Window & { resolvePermission?: (value: boolean) => void }
+      ).resolvePermission?.(true);
+    });
+    await page.waitForTimeout(100);
+    await expect(provider).toHaveValue("bing");
+    await closeSettings(page);
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await expect(placeholder).toHaveValue(
+      "Updated while permission was pending",
+    );
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("an obsolete permission grant cannot replace a newer provider", async () => {
+  const session = await launchSearch();
+  const { page, provider } = session;
+  try {
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await page.evaluate(() => {
+      chrome.permissions.contains = async () => true;
+      chrome.permissions.request = async (details) => {
+        if (details.origins?.[0] !== "https://api.bing.com/*") return true;
+        return new Promise<boolean>((resolve) => {
+          (
+            window as Window & { resolveBing?: (value: boolean) => void }
+          ).resolveBing = resolve;
+        });
+      };
+    });
+    await provider.selectOption("bing");
+    await page.waitForFunction(
+      () =>
+        typeof (window as Window & { resolveBing?: (value: boolean) => void })
+          .resolveBing === "function",
+    );
+    await provider.selectOption("duckduckgo");
+    await expect(provider).toHaveValue("duckduckgo");
+    await page.evaluate(() => {
+      (
+        window as Window & { resolveBing: (value: boolean) => void }
+      ).resolveBing(true);
+    });
+    await page.waitForTimeout(100);
+    await expect(provider).toHaveValue("duckduckgo");
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("out-of-order permission checks do not resurrect a retry notice", async () => {
+  const session = await launchSearch();
+  const { page } = session;
+  try {
+    await page.evaluate(() => {
+      chrome.permissions.contains = async () => true;
+    });
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await page.waitForTimeout(100);
+    await page.evaluate(() => {
+      const pending = window as Window & {
+        permissionChecks?: Array<(value: boolean) => void>;
+      };
+      pending.permissionChecks = [];
+      chrome.permissions.contains = (_details, callback) =>
+        new Promise<boolean>((resolve) => {
+          pending.permissionChecks!.push((granted) => {
+            callback?.(granted);
+            resolve(granted);
+          });
+        });
+    });
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await page.waitForFunction(
+      () =>
+        (window as Window & { permissionChecks?: unknown[] }).permissionChecks!
+          .length >= 1,
+    );
+    await page.evaluate(() => window.dispatchEvent(new Event("focus")));
+    await page.waitForFunction(
+      () =>
+        (window as Window & { permissionChecks?: unknown[] }).permissionChecks!
+          .length >= 2,
+    );
+    await page.evaluate(() => {
+      const checks = (
+        window as Window & {
+          permissionChecks: Array<(value: boolean) => void>;
+        }
+      ).permissionChecks;
+      checks[checks.length - 1](true);
+      checks.slice(0, -1).forEach((check) => check(false));
+    });
+    await page.waitForTimeout(100);
+    await expect(
+      widgetSettingsFieldset(page, "Search").getByRole("button", {
+        name: "Request access",
+      }),
+    ).toHaveCount(0);
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("changing suggestion quantity refreshes an existing query", async () => {
+  const session = await launchSearch();
+  const { page, input, results } = session;
+  try {
+    const queries: string[] = [];
+    await page.route(suggestionUrl, async (route) => {
+      const query = new URL(route.request().url()).searchParams.get("q")!;
+      queries.push(query);
+      await route.fulfill({ json: [query, ["First", "Second", "Third"]] });
+    });
+    await input.fill("refresh");
+    await expect(results).toHaveCount(3);
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    const quantity = widgetSettingsFieldset(page, "Search")
+      .locator("label", { hasText: "Suggestion Quantity" })
+      .locator('input[type="number"]');
+    await quantity.fill("1");
+    await closeSettings(page);
+    await expect(results).toHaveCount(1);
+    await expect(results.first()).toHaveValue("First");
+    expect(queries).toEqual(["refresh", "refresh"]);
   } finally {
     await closeExtension(session);
   }

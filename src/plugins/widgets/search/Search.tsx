@@ -45,9 +45,7 @@ export const messages = defineMessages({
 const Search: FC<Props> = ({ data = defaultData }) => {
   const searchInput = useRef<HTMLInputElement>(null);
   const previousValue = useRef("");
-  const suggestTimeoutRef = useRef<number>(undefined);
-  const suggestionRequestRef = useRef(0);
-
+  const [query, setQuery] = useState("");
   const [active, setActive] = useState<number>();
   const [suggestions, setSuggestions] =
     useState<(string | WikipediaSuggestionResult)[]>();
@@ -70,64 +68,49 @@ const Search: FC<Props> = ({ data = defaultData }) => {
   useEffect(() => {
     setSuggestions(undefined);
     setActive(undefined);
+    if (!query || !data.suggestionsEngine) return;
+
+    let current = true;
+    const timeout = window.setTimeout(async () => {
+      try {
+        let results: (string | WikipediaSuggestionResult)[];
+
+        if (data.suggestionsEngine === "wikipedia") {
+          const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(query)}&limit=10`;
+          results = await getWikipediaSuggestions(query, url);
+        } else if (BUILD_TARGET === "web") {
+          const url = getSuggestUrl(data.suggestionsEngine);
+          if (!url) return;
+          results = await getSuggestions(query, url);
+        } else {
+          const url = getSuggestJsonUrl(data.suggestionsEngine);
+          if (!url) return;
+          results = await getJsonSuggestions(query, url);
+        }
+
+        if (current && searchInput.current?.value === query) {
+          const limited = results.slice(0, data.suggestionsQuantity);
+          setSuggestions(limited.length ? limited : undefined);
+          setActive(undefined);
+        }
+      } catch {
+        if (current) setSuggestions(undefined);
+      }
+    }, SUGGESTION_DEBOUNCE_MS);
 
     return () => {
-      suggestionRequestRef.current += 1;
-      window.clearTimeout(suggestTimeoutRef.current);
+      current = false;
+      window.clearTimeout(timeout);
     };
-  }, [data.suggestionsEngine, data.suggestionsQuantity]);
-
-  const fetchSuggestions = async (query: string, request: number) => {
-    const isCurrent = () =>
-      suggestionRequestRef.current === request &&
-      searchInput.current?.value === query;
-
-    try {
-      let results: (string | WikipediaSuggestionResult)[];
-
-      if (data.suggestionsEngine === "wikipedia") {
-        const url = `https://en.wikipedia.org/w/rest.php/v1/search/title?q=${encodeURIComponent(query)}&limit=10`;
-        results = await getWikipediaSuggestions(query, url);
-      } else if (BUILD_TARGET === "web") {
-        const url = getSuggestUrl(data.suggestionsEngine);
-        if (!url) return;
-        results = await getSuggestions(query, url);
-      } else {
-        const url = getSuggestJsonUrl(data.suggestionsEngine);
-        if (!url) return;
-        results = await getJsonSuggestions(query, url);
-      }
-
-      if (isCurrent()) {
-        const limited = results.slice(0, data.suggestionsQuantity);
-        setSuggestions(limited.length ? limited : undefined);
-        setActive(undefined);
-      }
-    } catch {
-      if (isCurrent()) setSuggestions(undefined);
-    }
-  };
+  }, [query, data.suggestionsEngine, data.suggestionsQuantity]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const query = event.target.value;
-    previousValue.current = query;
-    const request = ++suggestionRequestRef.current;
-
-    window.clearTimeout(suggestTimeoutRef.current);
-    setSuggestions(undefined);
-    setActive(undefined);
-    if (!query) return;
-
-    suggestTimeoutRef.current = window.setTimeout(() => {
-      fetchSuggestions(query, request);
-    }, SUGGESTION_DEBOUNCE_MS);
+    previousValue.current = event.target.value;
+    setQuery(event.target.value);
   };
 
   const handleKeyUp = (event: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Escape") {
-      suggestionRequestRef.current += 1;
-      window.clearTimeout(suggestTimeoutRef.current);
-    }
+    if (event.key === "Escape") setQuery("");
 
     if (!suggestions?.length) {
       return;

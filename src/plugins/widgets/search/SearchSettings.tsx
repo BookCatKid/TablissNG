@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
 import { engines } from "./engines";
@@ -8,6 +8,12 @@ import { getSuggestOrigin } from "./utils";
 
 const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
   const intl = useIntl();
+  const latestDataRef = useRef(data);
+  const permissionRequestRef = useRef(0);
+
+  useEffect(() => {
+    latestDataRef.current = data;
+  }, [data]);
 
   const [deniedEngine, setDeniedEngine] = useState<string>();
   const permissionEngine = deniedEngine ?? data.suggestionsEngine;
@@ -18,12 +24,13 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
     const origin = getSuggestOrigin(permissionEngine);
     if (!origin) return;
 
-    let current = true;
+    let latestCheck = 0;
     const check = () => {
+      const checkId = ++latestCheck;
       browser.permissions
         .contains({ origins: [origin] })
         .then((granted) => {
-          if (current) {
+          if (checkId === latestCheck) {
             setDeniedEngine((denied) => {
               if (denied && denied !== permissionEngine) return denied;
               return granted ? undefined : permissionEngine;
@@ -40,7 +47,7 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
     document.addEventListener("visibilitychange", check);
 
     return () => {
-      current = false;
+      latestCheck += 1;
       browser.permissions.onAdded.removeListener(check);
       browser.permissions.onRemoved.removeListener(check);
       window.removeEventListener("focus", check);
@@ -49,19 +56,21 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
   }, [permissionEngine]);
 
   const requestSuggestionsAccess = async (engine: string) => {
+    const requestId = ++permissionRequestRef.current;
     const origin = getSuggestOrigin(engine);
     if (!origin) return;
 
     try {
       const granted = await browser.permissions.request({ origins: [origin] });
+      if (requestId !== permissionRequestRef.current) return;
       if (granted) {
         setDeniedEngine(undefined);
-        setData({ ...data, suggestionsEngine: engine });
+        setData({ ...latestDataRef.current, suggestionsEngine: engine });
       } else {
         setDeniedEngine(engine);
       }
     } catch {
-      setDeniedEngine(engine);
+      if (requestId === permissionRequestRef.current) setDeniedEngine(engine);
     }
   };
 
@@ -69,6 +78,7 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
     setDeniedEngine(undefined);
 
     if (BUILD_TARGET === "web" || !getSuggestOrigin(value)) {
+      permissionRequestRef.current += 1;
       setData({ ...data, suggestionsEngine: value });
       return;
     }
