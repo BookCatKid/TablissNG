@@ -6,6 +6,8 @@
   "app.error.saveSettings": "No se pueden guardar tus ajustes. Es posible que hayas alcanzado la capacidad máxima de almacenamiento.",
   "app.pageTitle": "Nueva pestaña",
   "background": "Fondo de pantalla",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "Imágenes astronómicas de la NASA",
   "backgrounds.apod.name": "Imagen astronómica del día",
   "backgrounds.base.paused": "(Pausado)",

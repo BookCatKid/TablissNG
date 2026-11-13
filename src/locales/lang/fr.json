@@ -6,6 +6,8 @@
   "app.error.saveSettings": "Impossible d’enregistrer vos paramètres. Vous avez peut-être atteint la capacité maximale de stockage.",
   "app.pageTitle": "Nouvel onglet",
   "background": "Image d’arrière-plan",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "Photos du ciel de la NASA",
   "backgrounds.apod.name": "Image d’astronomie du jour",
   "backgrounds.base.paused": "(en pause)",

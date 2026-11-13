@@ -107,14 +107,21 @@ test("loads a custom date and keeps its image when a later request fails", async
 test("renders direct videos and embedded-video thumbnails from NASA's HTML", async ({
   page,
 }) => {
-  const videoUrl = "https://assets.science.nasa.gov/occultation.mp4";
+  // VP8/WebM keeps playback checks independent of system H.264 codecs.
+  const videoUrl = "https://assets.science.nasa.gov/occultation.webm";
+  await page.route(videoUrl, (route) =>
+    route.fulfill({
+      path: path.join(__dirname, "fixtures", "apod.webm"),
+      contentType: "video/webm",
+    }),
+  );
   await page.route(`${endpoint}**`, (route) =>
     route.fulfill({
       json: [
         {
           ...entry,
           media_type: "video",
-          basic_html: `<html><body><video controls><source src="${videoUrl}" type="video/mp4"></video></body></html>`,
+          basic_html: `<html><body><video controls><source src="${videoUrl}" type="video/webm"></video></body></html>`,
         },
       ],
     }),
@@ -141,10 +148,24 @@ test("renders direct videos and embedded-video thumbnails from NASA's HTML", asy
   await selectBackground(page, "background/apod");
   await closeSettings(page);
 
-  await expect(page.locator(".Apod video").last()).toHaveAttribute(
-    "src",
-    videoUrl,
-  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".Apod video")
+        .last()
+        .evaluate((element) => {
+          const video = element as HTMLVideoElement;
+          return (
+            video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+            video.videoWidth > 0 &&
+            video.videoHeight > 0 &&
+            !video.paused &&
+            video.currentTime > 0 &&
+            video.getVideoPlaybackQuality().totalVideoFrames > 0
+          );
+        }),
+    )
+    .toBe(true);
   await openSettings(page);
   await page.locator(".ApodSettings select").selectOption("custom");
   await page.locator('.ApodSettings input[type="date"]').fill("2026-09-29");
