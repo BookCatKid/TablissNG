@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
   "plugins.search.keybind": "Phím tắt tìm kiếm",
   "plugins.search.name": "Tìm kiếm",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "Ghi đè chiều rộng thanh tìm kiếm",
   "plugins.search.placeholder": "Gõ để tìm kiếm",
   "plugins.search.placeholderLabel": "Placeholder Text",

@@ -349,3 +349,109 @@ test("changing suggestion quantity refreshes an existing query", async () => {
     await closeExtension(session);
   }
 });
+
+test("opens browser-default searches in the selected tab", async () => {
+  const session = await launchSearch();
+  const { page, context, input } = session;
+  try {
+    await context.route("https://www.google.com/search**", (route) =>
+      route.fulfill({ contentType: "text/html", body: "Search results" }),
+    );
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    const toggle = page.getByLabel("Open search results in a new tab");
+    await expect(toggle).not.toBeChecked();
+    await toggle.check();
+    await closeSettings(page);
+    const dashboardUrl = page.url();
+    await input.fill("new tab search");
+    const opened = context.waitForEvent("page");
+    await input.press("Enter");
+    const result = await opened;
+    await expect(result).toHaveURL(
+      /google\.com\/search\?.*q=new(?:\+|%20)tab(?:\+|%20)search/,
+    );
+    await expect(page).toHaveURL(dashboardUrl);
+    await result.close();
+
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await toggle.uncheck();
+    await closeSettings(page);
+    await input.fill("current tab search");
+    await input.press("Enter");
+    await expect(page).toHaveURL(
+      /google\.com\/search\?.*q=current(?:\+|%20)tab(?:\+|%20)search/,
+    );
+    expect(context.pages()).toHaveLength(1);
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("opens a clicked extension suggestion in a new tab", async () => {
+  const session = await launchSearch();
+  const { page, context, input, results } = session;
+  try {
+    await context.route("https://www.google.com/search**", (route) =>
+      route.fulfill({ contentType: "text/html", body: "Search results" }),
+    );
+    await page.route(suggestionUrl, (route) =>
+      route.fulfill({ json: ["suggestion", ["Selected suggestion"]] }),
+    );
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    const settings = widgetSettingsFieldset(page, "Search");
+    await settings
+      .locator("label", { hasText: "Search Provider" })
+      .locator("select")
+      .selectOption("google");
+    await settings.getByLabel("Open search results in a new tab").check();
+    await closeSettings(page);
+    const dashboardUrl = page.url();
+    await input.fill("suggestion");
+    await expect(results).toHaveValue("Selected suggestion");
+    const opened = context.waitForEvent("page");
+    await results.click();
+    const result = await opened;
+    await expect(result).toHaveURL(
+      "https://www.google.com/search?q=Selected%20suggestion",
+    );
+    await expect(page).toHaveURL(dashboardUrl);
+    expect(await result.evaluate(() => window.opener)).toBeNull();
+    expect(await result.evaluate(() => document.referrer)).toBe("");
+  } finally {
+    await closeExtension(session);
+  }
+});
+
+test("opens special URLs in the selected extension tab", async () => {
+  const session = await launchSearch();
+  const { page, context, input } = session;
+  try {
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    const toggle = page.getByLabel("Open search results in a new tab");
+    await toggle.check();
+    await closeSettings(page);
+    const dashboardUrl = page.url();
+    await input.fill("chrome://version");
+    const opened = context.waitForEvent("page");
+    await input.press("Enter");
+    const result = await opened;
+    await expect(result).toHaveURL("chrome://version/");
+    await expect(page).toHaveURL(dashboardUrl);
+    await result.close();
+
+    await openSettings(page);
+    await expandWidgetSettings(page, "Search");
+    await toggle.uncheck();
+    await closeSettings(page);
+    await input.fill("chrome://version");
+    await input.press("Enter");
+    await expect(page).toHaveURL("chrome://version/");
+    expect(context.pages()).toHaveLength(1);
+  } finally {
+    await closeExtension(session);
+  }
+});

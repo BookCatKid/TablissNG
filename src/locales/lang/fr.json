@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Désolé, Firefox restreint l’accès à ce type d’URL. Je n’y peux absolument rien.",
   "plugins.search.keybind": "Raccourci d’accès à la barre de recherche",
   "plugins.search.name": "Recherche",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "Élargir la barre de recherche",
   "plugins.search.placeholder": "Taper pour rechercher",
   "plugins.search.placeholderLabel": "Texte de remplacement",

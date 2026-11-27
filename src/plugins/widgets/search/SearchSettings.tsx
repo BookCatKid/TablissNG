@@ -124,6 +124,21 @@ const SearchSettings: FC<Props> = ({ data = defaultData, setData }) => {
         </select>
       </label>
 
+      <label className="checkbox">
+        <input
+          type="checkbox"
+          checked={data.openInNewTab ?? false}
+          onChange={(event) =>
+            setData({ ...data, openInNewTab: event.target.checked })
+          }
+        />
+        <FormattedMessage
+          id="plugins.search.openInNewTab"
+          defaultMessage="Open search results in a new tab"
+          description="Checkbox label to open search results in a new tab"
+        />
+      </label>
+
       {data.searchEngine === SEARCH_ENGINE_CUSTOM && (
         <>
           <label>

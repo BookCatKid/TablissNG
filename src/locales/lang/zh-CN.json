@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "抱歉，Firefox 限制访问此类 URL。这完全超出了我的控制范围。",
   "plugins.search.keybind": "搜索快捷键",
   "plugins.search.name": "搜索",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "覆盖搜索栏宽度",
   "plugins.search.placeholder": "输入以搜索",
   "plugins.search.placeholderLabel": "占位符文本",

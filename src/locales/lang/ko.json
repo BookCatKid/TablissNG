@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Firefox에서는 이 유형의 URL을 열 수 없습니다. 브라우저 제한으로 인한 동작입니다.",
   "plugins.search.keybind": "검색창 단축키",
   "plugins.search.name": "검색",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "검색창 너비 직접 설정",
   "plugins.search.placeholder": "검색어 입력",
   "plugins.search.placeholderLabel": "검색창 안내 문구",

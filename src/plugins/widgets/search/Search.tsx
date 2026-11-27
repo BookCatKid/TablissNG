@@ -175,32 +175,33 @@ const Search: FC<Props> = ({ data = defaultData }) => {
       getSearchUrl(data.searchEngine, data.searchEngineCustom),
     );
 
-    // If it's a special URL, handle it regardless of search engine
-    if (isSpecialUrl(url)) {
+    if (isSpecialUrl(url) && BUILD_TARGET !== "web") {
       if (BUILD_TARGET === "firefox") {
         alert(intl.formatMessage(messages.firefoxRestriction));
         return;
       }
 
-      if (BUILD_TARGET !== "web") {
-        browser.tabs.update({
-          url,
-        });
+      if (data.openInNewTab) {
+        browser.tabs.create({ url });
       } else {
-        // Web build can just redirect
-        window.location.assign(url);
+        browser.tabs.update({ url });
       }
       return;
     }
 
-    // If it's the default search engine and not a special URL, use browser search
     if (data.searchEngine === "default" && BUILD_TARGET !== "web") {
-      browser.search.query({ text: query });
+      browser.search.query({
+        text: query,
+        disposition: data.openInNewTab ? "NEW_TAB" : "CURRENT_TAB",
+      });
       return;
     }
 
-    // Regular search or URL for other cases
-    window.location.assign(url);
+    if (data.openInNewTab) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.assign(url);
+    }
   };
 
   return (

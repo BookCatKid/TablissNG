@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
   "plugins.search.keybind": "Tecla para buscar",
   "plugins.search.name": "Buscar",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "Sobrescribir el ancho de la barra de búsqueda",
   "plugins.search.placeholder": "Buscar en la Web",
   "plugins.search.placeholderLabel": "Texto del marcador",
