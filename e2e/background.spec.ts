@@ -1,8 +1,9 @@
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { expect, test } from "@playwright/test";
 
-import { closeSettings, selectBackground } from "./helpers";
+import { closeSettings, openSettings, selectBackground } from "./helpers";
 
 test.describe("Background", () => {
   test.beforeEach(async ({ page }) => {
@@ -186,6 +187,65 @@ test.describe("Background", () => {
           .__onlineBackgroundUrls,
     );
     expect(displayedUrls).toEqual([`wallpaper-${initialRequestCount}.jpg`]);
+  });
+
+  test("preserves uploaded media after exporting and importing settings", async ({
+    page,
+  }) => {
+    const buffer = await readFile(
+      path.join(__dirname, "fixtures", "pixel.png"),
+    );
+    await selectBackground(page, "background/image");
+    await page.locator(".MediaSettings input[type='file']").setInputFiles(
+      Array.from({ length: 15 }, (_, index) => ({
+        name: `wallpaper-${index}.png`,
+        mimeType: "image/png",
+        buffer,
+      })),
+    );
+    await expect(page.locator(".media-count")).toContainText(
+      "15 media uploaded",
+    );
+
+    const downloadPromise = page.waitForEvent("download");
+    await page.getByText("export", { exact: true }).click();
+    const exportedPath = await (await downloadPromise).path();
+    const accent = page.locator(
+      'label:has-text("Accent Color") input[type="color"]',
+    );
+    await accent.fill("#ff0000");
+
+    const chooserPromise = page.waitForEvent("filechooser");
+    await page.getByText("Import", { exact: true }).click();
+    await (await chooserPromise).setFiles(exportedPath!);
+    await expect(accent).toHaveValue("#3498db");
+    await expect(page.locator(".media-count")).toContainText(
+      "15 media uploaded",
+    );
+    await expect(page.locator(".Background .Image")).toBeVisible();
+
+    await page.reload();
+    await expect(page.locator(".Background .Image")).toBeVisible();
+    await openSettings(page);
+    await expect(page.locator(".media-count")).toContainText(
+      "15 media uploaded",
+    );
+    await page.getByText("Expand", { exact: true }).click();
+    const previews = page.locator(".MediaSettings .preview img");
+    await expect(previews).toHaveCount(15);
+    await expect
+      .poll(() =>
+        previews.evaluateAll((images) =>
+          images.every((image) => (image as HTMLImageElement).naturalWidth > 0),
+        ),
+      )
+      .toBe(true);
+
+    await selectBackground(page, "background/colour");
+    await selectBackground(page, "background/image");
+    await expect(page.locator(".media-count")).toContainText(
+      "15 media uploaded",
+    );
   });
 
   test("uploads media from a file", async ({ page }) => {

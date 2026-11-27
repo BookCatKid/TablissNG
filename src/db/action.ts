@@ -142,12 +142,13 @@ export const importStore = (dump: any): void => {
   if (typeof dump !== "object" || dump === null)
     throw new TypeError("Unexpected format");
 
-  resetStore();
   if ("backgrounds" in dump) {
     // Version 2 config
-    DB.put(db, `widget/default-time`, null);
-    DB.put(db, `widget/default-greeting`, null);
-    dump = migrateFrom2(dump);
+    dump = {
+      "widget/default-time": null,
+      "widget/default-greeting": null,
+      ...migrateFrom2(dump),
+    };
   } else if (dump.version === 3) {
     // Version 3 config
     delete dump.version;
@@ -158,6 +159,7 @@ export const importStore = (dump: any): void => {
     // Unknown version
     throw new TypeError("Unknown settings version");
   }
+  clear(db);
   // @ts-ignore
   Object.entries(dump).forEach(([key, val]) => DB.put(db, key, val));
 };
