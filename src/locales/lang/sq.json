@@ -6,6 +6,8 @@
   "app.error.saveSettings": "Cannot save your settings. You may have hit the maximum storage capacity.",
   "app.pageTitle": "Tab i ri",
   "background": "Sfondi",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "Fotografitë e qiellit nga NASA",
   "backgrounds.apod.name": "Fotografia Astronomike e Ditës",
   "backgrounds.base.paused": "(Paused)",

@@ -140,9 +140,10 @@ Then, fill in your API keys:
 ```ini
 GIPHY_API_KEY=your_key_here
 UNSPLASH_API_KEY=your_key_here
-NASA_API_KEY=your_key_here
 TRELLO_API_KEY=your_key_here # this requires the correct redirect URI to be set up in your Trello app settings: https://53dad6be72180770ccc08f0a6e2fc8a64dcf7b42.extensions.allizom.org and https://dlaogejjiafeobgofajdlkkhjlignalk.chromiumapp.org should work for firefox and chromium respectively.
 ```
+
+APOD uses NASA's public API and does not require an API key. Extension builds ask for NASA access in the APOD settings.
 
 ## Credits
 

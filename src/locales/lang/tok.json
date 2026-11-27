@@ -6,6 +6,8 @@
   "app.error.saveSettings": "Cannot save your settings. You may have hit the maximum storage capacity.",
   "app.pageTitle": "lipu sin",
   "background": "sitelen lon weka",
+  "backgrounds.apod.accessDescription": "Allow access to NASA to load the Astronomy Picture of the Day.",
+  "backgrounds.apod.allowAccess": "Allow NASA access",
   "backgrounds.apod.description": "sitelen sewi tan kulupu NASA",
   "backgrounds.apod.name": "sitelen pi ma ala pi suno ni",
   "backgrounds.base.paused": "(ni li awen)",
