@@ -29,11 +29,25 @@ test.beforeEach(async ({ page }) => {
   );
 });
 
-test("loads the new APOD image and plain-text credits with the correct attribution link", async ({
+test("loads APOD images with creator credits and a search fallback for unlinked creators", async ({
   page,
 }) => {
+  const creditPrefix =
+    '<b>Image Credit &amp; <a href="https://apod.nasa.gov/apod/lib/about_apod.html#srapply">Copyright</a>:</b> ';
+  const creditLabel = "Image Credit & Copyright: Robert Eder & Friends";
   await page.route(`${endpoint}**`, (route) =>
-    route.fulfill({ json: [entry] }),
+    route.fulfill({
+      json: [{ ...entry, copyright: creditPrefix + entry.copyright }],
+    }),
+  );
+  await page.route(`${endpoint}/260929`, (route) =>
+    route.fulfill({
+      json: {
+        ...entry,
+        date: "2026-09-29",
+        copyright: creditPrefix + "Robert Eder &amp; Friends",
+      },
+    }),
   );
   await page.goto("/");
   await selectBackground(page, "background/apod");
@@ -48,13 +62,19 @@ test("loads the new APOD image and plain-text credits with the correct attributi
     "href",
     entry.permalink,
   );
-  await expect(page.locator(".Apod .right-info a")).toHaveText(
-    "Robert Eder & Friends",
-  );
-  await expect(page.locator(".Apod .right-info a")).toHaveAttribute(
+  const credit = page.locator(".Apod .right-info a");
+  await expect(credit).toHaveText(creditLabel);
+  await expect(credit).toHaveAttribute("href", "https://example.com/");
+
+  await openSettings(page);
+  await page.locator(".ApodSettings select").selectOption("custom");
+  await page.locator('.ApodSettings input[type="date"]').fill("2026-09-29");
+  await expect(credit).toHaveAttribute(
     "href",
-    "https://example.com/",
+    `https://www.google.com/search?q=${encodeURIComponent(creditLabel)}`,
   );
+  await closeSettings(page);
+  await expect(credit).toHaveText(creditLabel);
 });
 
 test("falls back to a poster for broken videos and retains it when no poster is available", async ({

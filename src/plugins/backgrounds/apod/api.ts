@@ -183,9 +183,12 @@ const parsePicture = async (
   const credit = entry.copyright || entry.credit;
   const creditLink =
     typeof credit === "string"
-      ? new DOMParser()
-          .parseFromString(credit, "text/html")
-          .querySelector("a[href]")
+      ? Array.from(
+          new DOMParser()
+            .parseFromString(credit, "text/html")
+            .querySelectorAll("a[href]"),
+        )
+          .find((link) => link.textContent?.trim() !== "Copyright")
           ?.getAttribute("href")
       : undefined;
 
