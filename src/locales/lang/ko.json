@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "초 표시",
   "plugins.time.displayTime": "시간 표시",
   "plugins.time.name": "시간",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "구분 기호 표시",
   "plugins.timeTracker.compact": "간단히",
   "plugins.timeTracker.completionMessage": "완료 후 메시지",

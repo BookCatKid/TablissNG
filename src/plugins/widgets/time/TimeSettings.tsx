@@ -184,22 +184,39 @@ const TimeSettings: FC<Props> = ({ data = defaultData, setData }) => {
         />
       </label>
 
-      {data.showDate && (!data.hideTime || data.name) && (
+      {data.showDate && (
         <div style={{ marginLeft: "1em" }}>
           <label>
             <input
               type="checkbox"
-              checked={data.showSeparator}
+              checked={data.shortDate ?? false}
               onChange={(event) =>
-                setData({ ...data, showSeparator: event.target.checked })
+                setData({ ...data, shortDate: event.target.checked })
               }
             />
             <FormattedMessage
-              id="plugins.time.showSeparator"
-              defaultMessage="Show Separator"
-              description="Show separator toggle text"
+              id="plugins.time.shortDate"
+              defaultMessage="Short date format"
+              description="Use abbreviated weekday and month names"
             />
           </label>
+
+          {(!data.hideTime || data.name) && (
+            <label>
+              <input
+                type="checkbox"
+                checked={data.showSeparator}
+                onChange={(event) =>
+                  setData({ ...data, showSeparator: event.target.checked })
+                }
+              />
+              <FormattedMessage
+                id="plugins.time.showSeparator"
+                defaultMessage="Show Separator"
+                description="Show separator toggle text"
+              />
+            </label>
+          )}
         </div>
       )}
     </div>

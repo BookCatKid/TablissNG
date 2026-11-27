@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "Mostrar segundos",
   "plugins.time.displayTime": "Mostrar hora",
   "plugins.time.name": "Hora",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "Show Separator",
   "plugins.timeTracker.compact": "Compacto",
   "plugins.timeTracker.completionMessage": "Mensagem de conclusão",
