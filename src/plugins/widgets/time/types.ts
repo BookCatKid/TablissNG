@@ -4,6 +4,7 @@ type Data = {
   hour12: boolean;
   mode: "analogue" | "digital";
   showDate: boolean;
+  shortDate: boolean;
   hideTime: boolean;
   showHours: boolean;
   showMinutes: boolean;
@@ -21,6 +22,7 @@ export const defaultData: Data = {
   mode: "digital",
   hour12: false,
   showDate: false,
+  shortDate: false,
   hideTime: false,
   showHours: true,
   showMinutes: true,

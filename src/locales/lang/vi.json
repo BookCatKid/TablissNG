@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "Hiển thị giây",
   "plugins.time.displayTime": "Hiển thị thời gian",
   "plugins.time.name": "Thời gian",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "Show Separator",
   "plugins.timeTracker.compact": "Gọn nhẹ",
   "plugins.timeTracker.completionMessage": "Thông báo hoàn thành",

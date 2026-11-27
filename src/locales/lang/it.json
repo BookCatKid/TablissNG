@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "Mostra secondi",
   "plugins.time.displayTime": "Mostra ora",
   "plugins.time.name": "Ora",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "Show Separator",
   "plugins.timeTracker.compact": "Compact",
   "plugins.timeTracker.completionMessage": "Completion message",

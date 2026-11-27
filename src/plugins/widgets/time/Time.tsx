@@ -16,6 +16,7 @@ const Time: FC<Props> = ({ data = defaultData }) => {
     name,
     colorCircles,
     showDate,
+    shortDate,
     hideTime,
     showHours = true,
     showMinutes,
@@ -75,8 +76,8 @@ const Time: FC<Props> = ({ data = defaultData }) => {
             <FormattedDate
               value={time}
               day="numeric"
-              month="long"
-              weekday="long"
+              month={shortDate ? "short" : "long"}
+              weekday={shortDate ? "short" : "long"}
             />
           </h3>
         </>

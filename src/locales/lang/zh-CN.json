@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "显示秒数",
   "plugins.time.displayTime": "显示时间",
   "plugins.time.name": "时间",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "显示分隔符",
   "plugins.timeTracker.compact": "紧凑",
   "plugins.timeTracker.completionMessage": "完成消息",

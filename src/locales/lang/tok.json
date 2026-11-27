@@ -445,6 +445,7 @@
   "plugins.time.displaySeconds": "o lukin e tenpo lili lili",
   "plugins.time.displayTime": "o lukin e tenpo",
   "plugins.time.name": "tenpo",
+  "plugins.time.shortDate": "Short date format",
   "plugins.time.showSeparator": "Show Separator",
   "plugins.timeTracker.compact": "lili",
   "plugins.timeTracker.completionMessage": "toki pi pini pali",
