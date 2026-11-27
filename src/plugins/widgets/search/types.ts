@@ -6,6 +6,7 @@ export type SearchStyle =
 type Data = {
   searchEngine: string;
   searchEngineCustom?: string;
+  openInNewTab?: boolean;
   suggestionsEngine?: string;
   suggestionsQuantity: number;
   placeholderText?: string;

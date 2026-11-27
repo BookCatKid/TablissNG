@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
   "plugins.search.keybind": "nena alasa",
   "plugins.search.name": "o alasa",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "o ante wawa e suli poka pi poki alasa",
   "plugins.search.placeholder": "alasa la o sitelen",
   "plugins.search.placeholderLabel": "toki pi sitelen ala",

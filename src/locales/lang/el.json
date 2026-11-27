@@ -396,6 +396,7 @@
   "plugins.search.firefoxRestriction": "Sorry, Firefox restricts access to this type of URL. This is completely out of my control.",
   "plugins.search.keybind": "Search keybind",
   "plugins.search.name": "Search",
+  "plugins.search.openInNewTab": "Open search results in a new tab",
   "plugins.search.overrideWidth": "Override search bar width",
   "plugins.search.placeholder": "Πληκτρολογήστε για να αναζητήσετε",
   "plugins.search.placeholderLabel": "Placeholder Text",
